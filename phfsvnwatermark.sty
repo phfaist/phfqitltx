@@ -1,0 +1,155 @@
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{phfsvnwatermark}[2016/01/28 phfsvnwatermark package]
+
+
+\RequirePackage{kvoptions}
+
+
+% make sure the 'color' or 'xcolor' package is loaded
+\@ifpackageloaded{xcolor}{}{%
+  \@ifpackageloaded{color}{}{%
+    \RequirePackage{xcolor}%
+  }
+}
+
+
+% SVN Version ID watermark -- code recycled from my old docnote package
+%
+% Different possibilities:
+%
+% - with the {svn} package
+%
+% - by faking SVN tags with GIT tags 
+%
+% - with the {svn-multi} package
+%
+%
+
+\newcommand{\phfsvn@basicsvnversionidtag}{[\hspace*{0.5mm}\texttt{SVN Document Version Id:\hspace*{2mm}%
+\SVNId%
+}\hspace*{0.5mm}]}
+\newcommand{\phfsvn@GitInsteadOfSVN}{
+  \renewcommand{\phfsvn@basicsvnversionidtag} {[\hspace*{0.5mm}\texttt{git ID:\hspace*{2mm}%
+      \SVNId\hspace*{1.5em}\SVNDate~\SVNTime\hspace*{1.5em}\SVNAuthor%
+    }\hspace*{0.5mm}]}
+}
+\newcommand{\phfsvn@UseSvnMulti}{%
+  % 
+  % When we want to include the svn package, include the svn-multi package instead.
+  % 
+  \renewcommand{\phfsvn@doincludesvn}{\RequirePackage[filehooks]{svn-multi}}%
+  % 
+  % Redefine the watermark text.
+  % 
+  \renewcommand{\phfsvn@basicsvnversionidtag}{[\hspace*{0.5mm}\texttt{SVN Document Version:\hspace*{2mm}%
+    \svnmainfilename~r\svnrev~\svndate~\svnauthor%
+  }\hspace*{0.5mm}]}%
+}
+\newcommand{\phfsvn@SvnMultiWithCurrFile}{%
+  % 
+  % When we want to include the svn package, include the svn-multi package instead.
+  % 
+  \renewcommand{\phfsvn@doincludesvn}{%
+    \RequirePackage{currfile}%
+    \RequirePackage[filehooks]{svn-multi}%
+  }%
+  % 
+  % Redefine the watermark text.
+  % 
+  \renewcommand{\phfsvn@basicsvnversionidtag}{%
+    \begingroup%
+    \begin{minipage}{\textwidth}%
+      \parindent=0pt\relax\parskip=0pt\relax%
+      \raggedleft%
+      \ttfamily\scriptsize%
+      \par SVN Document Version:\hspace{1.5ex}r\svnrev~\svndate~\svnauthor%
+      \par%
+      \svnkw{Filename}:\hspace{1.5ex}r\svnfilerev~\svnfiledate~\svnfileauthor%
+    \end{minipage}%
+    \endgroup%
+    \hspace*{0.5mm}%
+  }%
+}
+\providecommand{\svnversionidtag}{%
+  \vfill\begin{flushright}{\footnotesize\phfsvn@basicsvnversionidtag }\end{flushright}%
+}
+\definecolor{phfsvnsvnversionidcolor}{rgb}{0.6,0.6,0.6}
+\providecommand{\phfsvn@svnidwatermarkxposright}{0.9\paperwidth}
+\providecommand{\phfsvn@svnidwatermarkypos}{0.04\paperheight}
+\providecommand{\phfsvn@domakesvnidwatermark}{
+  \phfsvn@doincludesvn
+  \RequirePackage{eso-pic}
+  \AddToShipoutPicture{%
+    \setlength{\@tempdimb}{\phfsvn@svnidwatermarkxposright}%
+    \setlength{\@tempdimc}{\phfsvn@svnidwatermarkypos}%
+    \setlength{\unitlength}{1pt}%
+    \put(2,\strip@pt\@tempdimc){%
+      \makebox(\strip@pt\@tempdimb,0)%
+      {\hfill \textcolor{phfsvnsvnversionidcolor}{\fontseries{m}\fontshape{n}\fontsize{8}{9}\selectfont%
+          \phfsvn@basicsvnversionidtag}}%
+    }%
+  }
+}
+\providecommand{\phfsvn@doincludesvn}{%
+  \RequirePackage{svn}%
+}
+
+\newcommand{\phfsvn@makesvnidwatermark}{\phfsvn@domakesvnidwatermark}
+
+
+\SetupKeyvalOptions{
+  family=phfsvn,
+  prefix=phfsvn@
+}
+
+\def\phfsvn@SetupForId#1{%
+  \ifcsname phfsvn@SetupForId@#1\endcsname%
+  \else%
+     \PackageError{phfsvn}{Unknown SvnId method: '#1'}%
+  \fi
+  \csname phfsvn@SetupForId@#1\endcsname%
+}
+
+\def\phfsvn@SetupForId@svn{
+  \message{phfsvn: Using SvnId method = svn}
+}
+\def\phfsvn@SetupForId@gitnotsvn{
+  \message{phfsvn: Using SvnId method = gitnotsvn}
+  \phfsvn@GitInsteadOfSVN  
+}
+\expandafter\def\csname phfsvn@SetupForId@svn-multi\endcsname{
+  \message{phfsvn: Using SvnId method = svn-multi}
+  \phfsvn@UseSvnMulti
+}
+\expandafter\def\csname phfsvn@SetupForId@svn-multi-currfile\endcsname{
+  \message{phfsvn: Using SvnId method = svn-multi-currfile}
+  \phfsvn@SvnMultiWithCurrFile
+}
+\def\phfsvn@SetupForId@{% no ID method
+  \PackageWarning{phfsvn}{*** No SvnId method provided, no watermark will be displayed.}
+  \renewcommand{\phfsvn@makesvnidwatermark}{}
+}
+
+
+\DeclareStringOption[]{id}[svn]
+\DeclareBoolOption[true]{watermark}
+
+\DeclareDefaultOption{%
+  % We provide the standard LaTeX error.
+  \@unknownoptionerror
+}
+
+\ProcessKeyvalOptions*
+
+\phfsvn@SetupForId{\phfsvn@id}
+
+\ifphfsvn@watermark
+\else
+  \renewcommand{\phfsvn@makesvnidwatermark}{}
+\fi
+
+
+
+
+\phfsvn@makesvnidwatermark

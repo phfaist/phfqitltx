@@ -1,0 +1,237 @@
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{phfqit}[2016/01/28 phfqit package]
+
+\RequirePackage{etoolbox}
+
+\RequirePackage{amsmath}
+\RequirePackage{dsfont}
+
+\RequirePackage{mathtools}
+
+% ------------------------------------------------
+% Simple Symbols & Shorthands
+% ------------------------------------------------
+
+% 
+% Some Symbols
+% 
+\newcommand{\Hs}{\mathscr{H}} % Hilbert space
+
+\newcommand\bit[1]{\texttt{#1}} % bit values, formatted possibly differently.
+
+\newcommand{\Ident}{\mathds{1}}
+
+% identity process
+\def\IdentProc[#1][#2]#3{\operatorname{id}_{#1\notblank{#2}{\to #2}{}}\notblank{#3}{\left(#3\right)}{}}
+
+% Lie Groups & Algebras
+\def\su(#1){\mathrm{su}(#1)}
+\def\SU(#1){\mathrm{SU}(#1)}
+\def\so(#1){\mathrm{so}(#1)}
+\def\SO(#1){\mathrm{SO}(#1)}
+
+
+% some shortcuts for partial derivatives
+\newcommand{\xdd}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\dd}[1]{\frac{\partial}{\partial #1}}
+
+\def\ee^#1{e^{#1}} % we could imagine that in inlines, we replace this by exp()...
+
+%
+% Gates
+%
+\newcommand{\gate}[1]{\ifmmode\textsc{\lowercase{#1}}\else{\rmfamily\textsc{\lowercase{#1}}}\fi}
+\newcommand{\AND}{\gate{And}}
+\newcommand{\XOR}{\gate{Xor}}
+\newcommand{\CNOT}{\gate{C-Not}}
+\newcommand{\NOT}{\gate{Not}}
+
+
+% ------------------------------------------------
+% Math Operators
+% ------------------------------------------------
+
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\Span}{span} % \span is already defined by latex
+\DeclareMathOperator{\spec}{spec}
+\DeclareMathOperator{\Prob}{Pr}
+\let\phfqit@Re\Re
+\DeclareMathOperator{\phfqit@Realpart}{Re}%
+\renewcommand{\Re}{\phfqit@Realpart}
+\let\phfqit@Im\Im
+\DeclareMathOperator{\phfqit@Imagpart}{Im}%
+\renewcommand{\Im}{\phfqit@Imagpart}
+
+
+
+
+% ------------------------------------------------
+% Bras, Kets, Norms, more delimiter stuff
+% ------------------------------------------------
+
+\DeclarePairedDelimiterX\ket[1]{\lvert}{\rangle}{{#1}}
+
+\DeclarePairedDelimiterX\bra[1]{\langle}{\rvert}{{#1}}
+
+\DeclarePairedDelimiterX\braket[2]{\langle}{\rangle}{%
+  {#1}\hspace{0.2ex}\delimsize\vert\hspace{0.2ex}{#2}%
+}
+
+\DeclarePairedDelimiterX\ketbra[2]{\lvert}{\rvert}{%
+  {#1}\delimsize\rangle\hspace{-0.25ex}\delimsize\langle{#2}%
+}
+
+\DeclarePairedDelimiterX\proj[1]{\lvert}{\rvert}{%
+  {#1}\delimsize\rangle\hspace{-0.25ex}\delimsize\langle{#1}%
+}
+
+\DeclarePairedDelimiterX\matrixel[3]{\langle}{\rangle}{%
+  {#1}\hspace{0.2ex}\delimsize\vert\hspace{0.2ex}{#2}\hspace{0.2ex}\delimsize\vert\hspace{0.2ex}{#3}%
+}
+
+\DeclarePairedDelimiterX\dmatrixel[2]{\langle}{\rangle}{%
+  {#1}\hspace{0.2ex}\delimsize\vert\hspace{0.2ex}{#2}\hspace{0.2ex}\delimsize\vert\hspace{0.2ex}{#1}%
+}
+
+\DeclarePairedDelimiterX\innerprod[2]{\langle}{\rangle}{%
+  {#1},\hspace{0.2ex}{#2}%
+}
+
+\DeclarePairedDelimiterX\abs[1]{\lvert}{\rvert}{{#1}}
+
+\DeclarePairedDelimiterX\avg[1]{\langle}{\rangle}{{#1}}
+
+\DeclarePairedDelimiterX\norm[1]{\lVert}{\rVert}{{#1}}
+
+
+
+
+% ------------------------------------------------
+% Entropies
+% ------------------------------------------------
+
+
+\newcommand\HHSym{H}
+% 
+% base formatting of entropy measure
+% 
+\newcommand\@@HHbase{%
+  \HH@v@sym_{\HH@v@sub}^{\HH@v@epsilon}% H_min^eps
+  %
+  % if system is blank, we just want the symbol itself with no argument.
+  %
+  \expandafter\notblank\expandafter{\HH@v@sys}{%
+    (%
+    {\HH@v@sys}% target system
+    \expandafter\notblank\expandafter{\HH@v@condsys}{\,|\,{\HH@v@condsys}}{}% conditioning system
+    )%
+    _{\HH@v@state}% the state as subscript, if any
+  }{}%
+  %
+}
+
+% usage: \@HHbase[symbol for "H"]{subscript for "H"}[state][epsilon]{"target" system name}[conditioning system name]
+\newcommand\@HHbase@endwcond[1][]{%
+  \def\HH@v@condsys{#1}%
+  \@@HHbase%
+  \endgroup% close group started by \@HHbase
+}
+\newcommand\@HHbase@contwepsilon[2][]{% #1=epsilon, #2="target system name"
+  \def\HH@v@epsilon{#1}%
+  \def\HH@v@sys{#2}%
+  \@HHbase@endwcond%
+}
+\newcommand\@HHbase@contwstate[1][]{% #1=state
+  \def\HH@v@state{#1}%
+  \@HHbase@contwepsilon%
+}
+\newcommand\@HHbase[2][\HHSym]{%
+  \begingroup% for our local def's
+  \def\HH@v@sym{#1}%
+  \def\HH@v@sub{#2}% subscript, e.g. \mathrm{min}  for H_min
+  \@HHbase@contwstate%
+}
+
+
+% 
+% Entropy commands usage: \HH[state][epsilon]{target system}[conditioning system]
+% 
+\newcommand\HH{\@HHbase{}}
+\newcommand\Hzero{\@HHbase{\mathrm{max},0}}
+\newcommand\Hmin{\@HHbase{\mathrm{min}}}
+\newcommand\Hmaxf{\@HHbase{\mathrm{max}}}
+%
+% Entropy function:
+%
+\def\Hfunc(#1){%
+  \HHSym({#1})%
+}
+
+
+
+% ------------------------------------------------
+% Relative Entropies
+% ------------------------------------------------
+
+ 
+\newcommand\DDSym{D}
+
+% \newcommand\@DDbase[4]{\DDSym_{#1}^{#2}\left(#3\vphantom{#4}\right.\mathclose{}\mathopen{}\left\Vert\vphantom{#3}#4\right)}
+
+\newcommand\@DDbase[5][\DDSym]{#1_{#2}^{#3}({#4}\,\Vert\,{#5})}
+\newcommand\DD[3][]{\@DDbase{}{#1}{#2}{#3}}
+\newcommand\DminF[3][]{\@DDbase{\mathrm{min,F}}{#1}{#2}{#3}}
+\newcommand\Dminz[3][]{\@DDbase{\mathrm{min,0}}{#1}{#2}{#3}}
+% \DDSym_\mathrm{min,0}^{#1}\left(#2\vphantom{#3}\right.\mathclose{}\mathopen{}\left\Vert\vphantom{#2}#3\right)}
+\newcommand\Dmax[3][]{\@DDbase{\mathrm{max}}{#1}{#2}{#3}}
+% \DDSym_\mathrm{max}^{#1}\left(#2\vphantom{#3}\right.\mathclose{}\mathopen{}\left\Vert\vphantom{#2}#3\right)}
+\newcommand\Dr[3][]{\@DDbase{\mathrm{r}}{#1}{#2}{#3}}
+% \DDSym_\mathrm{r}^{#1}\left(#2\vphantom{#3}\right.\mathclose{}\mathopen{}\left\Vert\vphantom{#2}#3\right)}
+\let\DH\relax
+% \DH[\eta]{\rho}{\Gamma}
+\newcommand\DH[3][\eta]{\@DDbase{H}{#1}{#2}{#3}}
+% \DDSym_H^{#1}\left(#2\vphantom{#3}\right.\mathclose{}\mathopen{}\left\Vert\vphantom{#2}#3\right)}
+
+% old versions...
+% \newcommand\DCond[6][]{\DCondSym^{#1}\left(#3\to #4\Vert #5, #6\right)_{#2}}
+% \newcommand\DCond[6][]{\DCondSym^{#1}\left(#3\to #4: #2\Vert #5, #6\right)}
+% \newcommand\DCond[6][]{\DCondSym^{#1}\left(#3\to #4\right)_{#2\Vert #5, #6}}
+
+% 
+% Usage: \DCond[\epsilon]{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
+% Usage: \DCond[\epsilon]{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
+% 
+% (If the `quantum state' argument starts with a star '*', then the system names are not
+% added as subscripts to the quantum state.
+% 
+\newcommand\DCond[6][]{%
+  \begingroup%
+  % Don't put ##1 inside braces (``{##1}'') because of for example \rho^{\otimes n}
+  \def\DCwsyst##1{\begingroup\let\emptysystem\relax ##1_{#4#3}\endgroup}%
+  \@DDbase[\DCondSym]{#3\to #4}{#1}{\@DCstate#2\@EndDCstate}{#5, #6}%
+  % \DCondSym^{#1}_{#3\to #4}\left(\@DCstate#2\@EndDCstate\Vert #5, #6\right)%
+  \endgroup%
+}
+\robustify\DCond % make command robust
+
+\newcommand\DCondSym{\bar\DDSym}
+
+% \def\emptysystem{\ensuremath{\{\}}}
+
+\def\emptysystem{\ensuremath{\emptyset}}
+
+\def\@DCstate{%
+  \@ifnextchar*\@DCreststatewosyst\@DCreststatewsyst%
+}
+\def\@DCreststatewsyst#1\@EndDCstate{%
+  \DCwsyst{#1}%
+}
+\def\@DCreststatewosyst*#1\@EndDCstate{%
+  #1%
+}
+
+
+
