@@ -1,0 +1,172 @@
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{phfparen}[2016/01/29 phfparen package]
+
+\RequirePackage{etoolbox}
+\RequirePackage{xparse}
+
+\RequirePackage{amsmath}
+
+\RequirePackage{mathtools}
+
+
+% ------------------------------------------------
+% Advanced Parenthetic Expressions.
+% ------------------------------------------------
+
+%
+% \paren({expression in parenthesis})
+% \paren[{expression in brackets}]
+% \paren\{{expression in curly braces}\}
+% \paren*[{expression in \left[...\right]}]
+% \paren\big[{expression in \lbig[..\rbig]}]
+%
+% Examples (` is interchangeable with \paren if [backtickon] package option is given):
+%
+%     \log\paren( a + \sin(x) - y)
+%     \log`( a + \sin(x) - y)
+%     \log`*( \sum_k`\big[ a_k^\dagger - a_k ] )
+%     F = `\big< f(x) >_x = `*< \sum g(`<p>) >
+%     `\Big[\sum_j `[x]^2 - \sum [y]^2 + \sum f`*(x_3^\dagger)^2]
+%     `(z + \backtick x)  % verbatim backtick
+%
+
+% syntax is: \paren<modifier-token><delimited-argument>  where modifier-token is optional and can be *
+\def\paren#1{%
+  %
+  % See if #1 is <delimited-argument>. Do that by seeing if #1 is a known and
+  % registered delimiter, see if \paren@registered@delims@<delimiter-token-as-string>
+  % is defined.
+  % 
+%\edef\paren@tmp@csdelimname{paren@registered@delims@\expandafter\string#1}%
+%\show\paren@tmp@csdelimname
+%\letcs\paren@tmp@delimname{\paren@tmp@csdelimname}%
+%\show\paren@tmp@delimname
+  \ifcsdef{paren@registered@delims@\string#1}{%
+    % this is a known delimiter
+    \paren@impl@nomod{#1}%
+  }{%
+    % this is not a known delimiter, assume it's a modifier-token
+    \paren@impl@mod{#1}%
+  }%
+}
+\def\paren@impl@nomod#1{% argument is the <delimiter-token>.
+  %
+  % \paren@registered@delims@<delimiter-token-as-string> should be defined to be the
+  % internal name of the registered delimiter.
+  %
+  \letcs\paren@tmp@delimname{paren@registered@delims@\string#1}%
+  % 
+  % call the implementation for that delimiter with the modifier-token as argument.
+  % 
+  \csname paren@impl@\paren@tmp@delimname\endcsname{}#1%
+  % 
+}
+\def\paren@impl@mod#1#2{% arguments are {modifier-token}{delimiter?}
+  %
+  % Check that the given delimiter is known and
+  % registered. \paren@registered@delims@<delimiter-token-as-string>
+  % should be defined to be the internal name of the registered delimiter.
+  %
+  \ifcsdef{paren@registered@delims@\string#2}{%
+    \letcs\paren@tmp@delimname{paren@registered@delims@\string#2}%
+    %
+    % call the implementation for that delimiter with the modifier-token as argument, and
+    % the delimiter to start parsing.
+    % 
+%\message{+++++\string#1++++++}
+%\message{+++++\string#2++++++}
+    \csname paren@impl@\paren@tmp@delimname\endcsname{#1}#2%
+    %
+  }{%
+    \PackageError{phfqit}{Unknown delimiter: (or can't parse args?)
+      {\string#1}{\string#2}}{You call to \string\paren couldn't be parsed, presumably
+      because I didn't recognize your delimiter, or because there's a bug in this package.}%
+    % 
+    #1#2% attempt to recover by keeping all args as text tokens ...
+  }%
+}
+
+%
+% Helper to register a delimiter set for use with \paren.
+%
+% This function defines \paren@registered@delims@<open-delimiter-token-as-string> to be
+% the internal registered <name> for this delimiter. Then, defines \paren@impl@<name>
+% which is a parser for this delimiter and calls the mathtools goodies
+% etc. \paren@impl@<name> takes one mandatory argument, which is all the stuff to insert
+% before the open delimiter and to pass on to mathtools (just a * or a delimiter size),
+% and then reads the delimited (balanced) content.
+%
+% This macro should only be called in the preamble.
+%
+\def\paren@register#1#2#3#4#5{% {name}{open-delim-macro}{close-delim-macro}{open-delim-output}{close-delim-output}
+  %
+  % Use mathtools util
+  %
+  \expandafter\DeclarePairedDelimiterX\csname paren@impl@#1@go\endcsname[1]{#4}{#5}{{##1}}
+
+%  \csdef{paren@impl@#1@goDEBUG}##1##2##3##4{%
+%\show\paren@impl@tmp@modifs
+%\toks0={##1}
+%\message{==========\the\toks0==========}
+%\message{========#2==\noexpand{\detokenize{##2}}==#3========}
+%    **##1**/**##2**/**##3**/**##4**%
+%  }
+
+  \expandafter\DeclareDocumentCommand\csname paren@impl@#1@parsedelim\endcsname{r#2#3}{%
+    \letcs\paren@impl@tmp@gocmd{paren@impl@#1@go}%
+%\message{********MESSAGE*********}
+%\message{**********\expandafter\detokenize\expandafter{\paren@impl@tmp@modifs}**********}%
+%\message{**********\noexpand{##1}***********}%
+    \expandafter\ifstrequal\expandafter{\paren@impl@tmp@modifs}{*}{%
+      \def\paren@impl@tmp@star{*}%
+      \def\paren@impl@tmp@sqmodifs{}%
+    }{%
+      \def\paren@impl@tmp@star{}%
+      \expandafter\ifblank\expandafter{\paren@impl@tmp@modifs}{%
+        \def\paren@impl@tmp@sqmodifs{}%
+      }{%
+        \edef\paren@impl@tmp@sqmodifs{[\expandonce{\paren@impl@tmp@modifs}]}%
+      }%
+    }%
+    \def\paren@impl@tmp@gocmdwstar{\expandafter\paren@impl@tmp@gocmd\paren@impl@tmp@star}%
+    \expandafter\paren@impl@tmp@gocmdwstar\paren@impl@tmp@sqmodifs{##1}%
+  }
+
+  \csdef{paren@impl@#1}##1{%  ##1=modifiers
+    \gdef\paren@impl@tmp@modifs{##1}%
+    \csname paren@impl@#1@parsedelim\endcsname%
+  }
+
+  % register this open delimiter to be detected by the parent \paren macro
+  \csdef{paren@registered@delims@\string#2}{#1}
+}
+
+\paren@register{parens}{(}{)}{(}{)}
+\paren@register{brackets}{[}{]}{[}{]}
+\paren@register{braces}{\{}{\}}{\{}{\}}
+\paren@register{angbrackets}{<}{>}{\langle}{\rangle}
+
+
+\def\parenMakeBacktickActiveParen{%
+  \let\backtick`%
+  \catcode`\`=\active%
+  % lccode-trick to do "\def`{...}" but for active "`" char
+  \begingroup%
+  \lccode`\~=`\`%
+  \lowercase{\endgroup\def~}{\paren}%
+}
+\def\parenMakeBacktickActiveParenInMathMode{%
+  \addto@hook\everymath\parenMakeBacktickActiveParen%
+  \addto@hook\everydisplay\parenMakeBacktickActiveParen%
+}
+
+
+\DeclareOption{backtickon}{
+  \parenMakeBacktickActiveParenInMathMode
+}
+\DeclareOption*{
+  \PackageError{ethuebung}{Unknown option `\CurrentOption'. 
+    Available options are sol, tips, english, deutsch, nobabel, noexenum, nogeom, and nohyperref}
+}
+\ProcessOptions\relax
