@@ -15,11 +15,12 @@
 % ------------------------------------------------
 
 %
-% \paren({expression in parenthesis})
-% \paren[{expression in brackets}]
-% \paren\{{expression in curly braces}\}
-% \paren*[{expression in \left[...\right]}]
-% \paren\big[{expression in \lbig[..\rbig]}]
+% \paren(expression in parenthesis)
+% \paren[expression in brackets]
+% \paren\{expression in curly braces\}
+% \paren*[expression in \left[...\right]]
+% \paren\big[expression in \lbig[..\rbig]]
+% \paren{ expression in curly braces }  % alternative syntax for curly braces
 %
 % Examples (` is interchangeable with \paren if [backtickon] package option is given):
 %
@@ -29,10 +30,24 @@
 %     F = `\big< f(x) >_x = `*< \sum g(`<p>) >
 %     `\Big[\sum_j `[x]^2 - \sum [y]^2 + \sum f`*(x_3^\dagger)^2]
 %     `(z + \backtick x)  % verbatim backtick
+%     `{\vec z}
+%     `*{ \vec z : \sum_i z_i = 1 }
+%     `\big{ \vec z : \sum_i z_i = 1 }
 %
 
 % syntax is: \paren<modifier-token><delimited-argument>  where modifier-token is optional and can be *
-\def\paren#1{%
+\def\paren{%
+  \@ifnextchar\bgroup\paren@impl@bgroup\paren@impl@nobgroup%
+}
+\def\paren@impl@bgroup{%
+  %
+  % Special treatment for curly braces (or whatever we have by default)
+  %
+  % Go directly. (We know the argument follows in the input token chain.)
+  % 
+  \csname paren@impl@\paren@registered@default @go\endcsname%
+}
+\def\paren@impl@nobgroup#1{%
   %
   % See if #1 is <delimited-argument>. Do that by seeing if #1 is a known and
   % registered delimiter, see if \paren@registered@delims@<delimiter-token-as-string>
@@ -50,7 +65,7 @@
     \paren@impl@mod{#1}%
   }%
 }
-\def\paren@impl@nomod#1{% argument is the <delimiter-token>.
+\def\paren@impl@nomod#1{% argument is the recognized <delimiter-token>.
   %
   % \paren@registered@delims@<delimiter-token-as-string> should be defined to be the
   % internal name of the registered delimiter.
@@ -62,30 +77,71 @@
   \csname paren@impl@\paren@tmp@delimname\endcsname{}#1%
   % 
 }
-\def\paren@impl@mod#1#2{% arguments are {modifier-token}{delimiter?}
+\def\paren@impl@mod#1{% argument is {modifier-token}
+  \def\paren@tmp@modtoken{#1}%
+  \@ifnextchar\bgroup\paren@impl@modBgroup\paren@impl@modNobgroup%
+}
+
+\def\paren@impl@modBgroup{%
+  %
+  % Special treatment for curly braces (or whatever we have by default)
+  %
+  % Parse the given modifiers:
+  \paren@util@parseModifs\paren@tmp@modifsForMathtools\paren@tmp@modtoken%
+  % 
+  \letcs\paren@tmp@gocmd{paren@impl@\paren@registered@default @go}%
+  %
+  % and Go! (we know the argument follows in the input token chain)
+  %
+  \expandafter\paren@tmp@gocmd\paren@tmp@modifsForMathtools%
+}
+
+\def\paren@impl@modNobgroup#1{% argument is {delimiter?}
   %
   % Check that the given delimiter is known and
   % registered. \paren@registered@delims@<delimiter-token-as-string>
   % should be defined to be the internal name of the registered delimiter.
   %
-  \ifcsdef{paren@registered@delims@\string#2}{%
-    \letcs\paren@tmp@delimname{paren@registered@delims@\string#2}%
+  \ifcsdef{paren@registered@delims@\string#1}{%
+    \letcs\paren@tmp@delimname{paren@registered@delims@\string#1}%
     %
     % call the implementation for that delimiter with the modifier-token as argument, and
     % the delimiter to start parsing.
     % 
-%\message{+++++\string#1++++++}
-%\message{+++++\string#2++++++}
-    \csname paren@impl@\paren@tmp@delimname\endcsname{#1}#2%
+    \letcs\paren@tmp@delimcmd{paren@impl@\paren@tmp@delimname}
+    \expandafter\paren@tmp@delimcmd\expandafter{\paren@tmp@modtoken}#1%
     %
   }{%
     \PackageError{phfqit}{Unknown delimiter: (or can't parse args?)
-      {\string#1}{\string#2}}{You call to \string\paren couldn't be parsed, presumably
-      because I didn't recognize your delimiter, or because there's a bug in this package.}%
+      {\expandafter\string\paren@tmp@modtoken}{\string#1}}{You call to \string\paren
+      couldn't be parsed, presumably because I didn't recognize your delimiter, or because
+      there's a bug in this package.}%
     % 
-    #1#2% attempt to recover by keeping all args as text tokens ...
+    \paren@tmp@modtoken#1% attempt to recover by keeping all args as text tokens ...
   }%
 }
+
+% 
+% defines macro-name to contain mathtools-compatible modifs args.  <modifs> is expanded
+% once, so it is expected to be a macro which contains the relevant modifiers.
+% 
+\def\paren@util@parseModifs#1#2{%  {macro-name}{modifs}
+  % 
+  \expandafter\ifstrequal\expandafter{#2}{*}{%
+    \def\paren@tmp@star{*}%
+    \def\paren@tmp@sqmodifs{}%
+  }{%
+    \def\paren@tmp@star{}%
+    \expandafter\ifblank\expandafter{#2}{%
+      \def\paren@tmp@sqmodifs{}%
+    }{%
+      \edef\paren@tmp@sqmodifs{[\expandonce{#2}]}%
+    }%
+  }%
+  \edef#1{\expandonce\paren@tmp@star\expandonce\paren@tmp@sqmodifs}%
+%\show#1%%%%%
+}
+
 
 %
 % Helper to register a delimiter set for use with \paren.
@@ -118,19 +174,9 @@
 %\message{********MESSAGE*********}
 %\message{**********\expandafter\detokenize\expandafter{\paren@impl@tmp@modifs}**********}%
 %\message{**********\noexpand{##1}***********}%
-    \expandafter\ifstrequal\expandafter{\paren@impl@tmp@modifs}{*}{%
-      \def\paren@impl@tmp@star{*}%
-      \def\paren@impl@tmp@sqmodifs{}%
-    }{%
-      \def\paren@impl@tmp@star{}%
-      \expandafter\ifblank\expandafter{\paren@impl@tmp@modifs}{%
-        \def\paren@impl@tmp@sqmodifs{}%
-      }{%
-        \edef\paren@impl@tmp@sqmodifs{[\expandonce{\paren@impl@tmp@modifs}]}%
-      }%
-    }%
-    \def\paren@impl@tmp@gocmdwstar{\expandafter\paren@impl@tmp@gocmd\paren@impl@tmp@star}%
-    \expandafter\paren@impl@tmp@gocmdwstar\paren@impl@tmp@sqmodifs{##1}%
+    \paren@util@parseModifs\paren@impl@tmp@modifsForMathtools\paren@impl@tmp@modifs%
+    % 
+    \expandafter\paren@impl@tmp@gocmd\paren@impl@tmp@modifsForMathtools{##1}%
   }
 
   \csdef{paren@impl@#1}##1{%  ##1=modifiers
@@ -142,11 +188,27 @@
   \csdef{paren@registered@delims@\string#2}{#1}
 }
 
-\paren@register{parens}{(}{)}{(}{)}
-\paren@register{brackets}{[}{]}{[}{]}
-\paren@register{braces}{\{}{\}}{\{}{\}}
-\paren@register{angbrackets}{<}{>}{\langle}{\rangle}
+%
+% Specify the internal name for the delimiter which should be used in the syntax `{...} or \paren{...}.
+%
+% This macro may be called multiple times, the last specified name is used.
+%
+\def\parenRegisterDefault#1{%
+  \def\paren@registered@default{#1}%
+}
 
+%
+% Register parens.
+%
+
+\def\paren@setup@registerDefaults{
+  \paren@register{parens}{(}{)}{(}{)}
+  \paren@register{brackets}{[}{]}{[}{]}
+  \paren@register{angbrackets}{<}{>}{\langle}{\rangle}
+  \paren@register{braces}{\{}{\}}{\{}{\}}
+  % the registered paren type to use when given the syntax \paren{...}: use curly braces.
+  \parenRegisterDefault{braces}
+}
 
 \def\parenMakeBacktickActiveParen{%
   \let\backtick`%
@@ -165,8 +227,14 @@
 \DeclareOption{backtickon}{
   \parenMakeBacktickActiveParenInMathMode
 }
+\DeclareOption{noregisterdefaults}{
+  \def\paren@setup@registerDefaults{}
+}
 \DeclareOption*{
   \PackageError{ethuebung}{Unknown option `\CurrentOption'. 
     Available options are sol, tips, english, deutsch, nobabel, noexenum, nogeom, and nohyperref}
 }
 \ProcessOptions\relax
+
+
+\paren@setup@registerDefaults
