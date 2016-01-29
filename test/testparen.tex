@@ -1,10 +1,19 @@
 \documentclass{article}
 
-\usepackage[backtickon]{/home/pfaist/ETH/PhD/docs/phfqitltx/phfparen}
+\usepackage[backtickon]{../phfparen}
 
-\everymath{\displaystyle}
+\makeatletter
+\paren@register{extra}{\start}{\stop}{(}{)}
+\makeatother
 
 \begin{document}
+
+%\begin{gather*}
+%%  \paren\big\start x \stop
+%  \paren\Big[ x \paren(y) ]
+%\end{gather*}
+%\end{document}
+%\endinput
 
 \begin{gather*}
   \paren\Big[\sum_j [x]^2 - \sum f\paren*(x_3^\dagger)^2]
@@ -15,7 +24,13 @@
   \\
   \paren(x)
   \\
+  `\big\{h^\dagger vhjvj\}
+  \\
   `\big{h^\dagger vhjvj}
+  \\
+  \paren\big\start x \stop
+  \\
+  \paren\Big[ x \paren(y) ]
 \end{gather*}
 
 \begin{gather*}
@@ -41,5 +56,6 @@
 %\texttt{\detokenize\expandafter{\the\everymath}}
 
 in text mode: $`{z} \sum_j$ and \( `{z} \sum_k \).
+
 
 \end{document}

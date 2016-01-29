@@ -4,6 +4,7 @@
 
 \RequirePackage{etoolbox}
 \RequirePackage{xparse}
+\RequirePackage{xstring}
 
 \RequirePackage{amsmath}
 
@@ -53,10 +54,6 @@
   % registered delimiter, see if \paren@registered@delims@<delimiter-token-as-string>
   % is defined.
   % 
-%\edef\paren@tmp@csdelimname{paren@registered@delims@\expandafter\string#1}%
-%\show\paren@tmp@csdelimname
-%\letcs\paren@tmp@delimname{\paren@tmp@csdelimname}%
-%\show\paren@tmp@delimname
   \ifcsdef{paren@registered@delims@\string#1}{%
     % this is a known delimiter
     \paren@impl@nomod{#1}%
@@ -74,6 +71,7 @@
   % 
   % call the implementation for that delimiter with the modifier-token as argument.
   % 
+  \def\paren@impl@tmp@delimtoken{#1}%
   \csname paren@impl@\paren@tmp@delimname\endcsname{}#1%
   % 
 }
@@ -98,6 +96,7 @@
 }
 
 \def\paren@impl@modNobgroup#1{% argument is {delimiter?}
+%\message{(((((((((([\noexpand#1]))))))))))}%
   %
   % Check that the given delimiter is known and
   % registered. \paren@registered@delims@<delimiter-token-as-string>
@@ -109,8 +108,10 @@
     % call the implementation for that delimiter with the modifier-token as argument, and
     % the delimiter to start parsing.
     % 
-    \letcs\paren@tmp@delimcmd{paren@impl@\paren@tmp@delimname}
-    \expandafter\paren@tmp@delimcmd\expandafter{\paren@tmp@modtoken}#1%
+    \def\paren@impl@tmp@delimtoken{#1}%
+    \letcs\paren@tmp@delimcmd{paren@impl@\paren@tmp@delimname}%
+    \edef\paren@tmp@modtokenarg{{\expandonce{\paren@tmp@modtoken}}}%
+    \expandafter\paren@tmp@delimcmd\paren@tmp@modtokenarg#1%
     %
   }{%
     \PackageError{phfqit}{Unknown delimiter: (or can't parse args?)
@@ -172,12 +173,25 @@
 
   \expandafter\DeclareDocumentCommand\csname paren@impl@#1@parsedelim\endcsname{r#2#3}{%
     \letcs\paren@impl@tmp@gocmd{paren@impl@#1@go}%
-%\message{********MESSAGE*********}
-%\message{**********\expandafter\detokenize\expandafter{\paren@impl@tmp@modifs}**********}%
-%\message{**********\noexpand{##1}***********}%
+%\message{********MESSAGE*********}%
+%\message{**********\detokenize\expandafter{\paren@impl@tmp@modifs}**********}%
+%\message{**********\detokenize{##1}***********}%
     \paren@util@parseModifs\paren@impl@tmp@modifsForMathtools\paren@impl@tmp@modifs%
+%\show\paren@impl@tmp@modifsForMathtools%
     % 
-    \expandafter\paren@impl@tmp@gocmd\paren@impl@tmp@modifsForMathtools{##1}%
+    % BUG in xparse: when using macros as delimiters: need to strip macro length from beginning
+    % 
+    \fullexpandarg\StrLen{\expandafter\string\paren@impl@tmp@delimtoken}[\paren@tmp@delimstrlen]%
+    \ifnum\paren@tmp@delimstrlen=1\relax%
+      \def\paren@tmp@contents{##1}%
+    \else%
+      \def\paren@tmp@delimstrlen@{\numexpr\paren@tmp@delimstrlen-1\relax}%
+      \noexpandarg\StrGobbleLeft{##1}{\the\paren@tmp@delimstrlen@}[\paren@tmp@contents]%
+    \fi
+%
+%\show\paren@impl@tmp@modifsForMathtools
+%\show\paren@tmp@contents
+    \expandafter\paren@impl@tmp@gocmd\paren@impl@tmp@modifsForMathtools{\paren@tmp@contents}%##1}%
   }
 
   \csdef{paren@impl@#1}##1{%  ##1=modifiers
