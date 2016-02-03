@@ -175,62 +175,247 @@
 % Relative Entropies
 % ------------------------------------------------
 
- 
+
 \newcommand\DDSym{D}
 
-% \newcommand\@DDbase[4]{\DDSym_{#1}^{#2}\left(#3\vphantom{#4}\right.\mathclose{}\mathopen{}\left\Vert\vphantom{#3}#4\right)}
 
-\newcommand\@DDbase[5][\DDSym]{#1_{#2}^{#3}({#4}\,\Vert\,{#5})}
-\newcommand\DD[3][]{\@DDbase{}{#1}{#2}{#3}}
-\newcommand\DminF[3][]{\@DDbase{\mathrm{min,F}}{#1}{#2}{#3}}
-\newcommand\Dminz[3][]{\@DDbase{\mathrm{min,0}}{#1}{#2}{#3}}
-% \DDSym_\mathrm{min,0}^{#1}\left(#2\vphantom{#3}\right.\mathclose{}\mathopen{}\left\Vert\vphantom{#2}#3\right)}
-\newcommand\Dmax[3][]{\@DDbase{\mathrm{max}}{#1}{#2}{#3}}
-% \DDSym_\mathrm{max}^{#1}\left(#2\vphantom{#3}\right.\mathclose{}\mathopen{}\left\Vert\vphantom{#2}#3\right)}
-\newcommand\Dr[3][]{\@DDbase{\mathrm{r}}{#1}{#2}{#3}}
-% \DDSym_\mathrm{r}^{#1}\left(#2\vphantom{#3}\right.\mathclose{}\mathopen{}\left\Vert\vphantom{#2}#3\right)}
-\let\DH\relax
-% \DH[\eta]{\rho}{\Gamma}
-\newcommand\DH[3][\eta]{\@DDbase{H}{#1}{#2}{#3}}
-% \DDSym_H^{#1}\left(#2\vphantom{#3}\right.\mathclose{}\mathopen{}\left\Vert\vphantom{#2}#3\right)}
-
-% old versions...
-% \newcommand\DCond[6][]{\DCondSym^{#1}\left(#3\to #4\Vert #5, #6\right)_{#2}}
-% \newcommand\DCond[6][]{\DCondSym^{#1}\left(#3\to #4: #2\Vert #5, #6\right)}
-% \newcommand\DCond[6][]{\DCondSym^{#1}\left(#3\to #4\right)_{#2\Vert #5, #6}}
-
-% 
-% Usage: \DCond[\epsilon]{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
-% Usage: \DCond[\epsilon]{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
-% 
-% (If the `quantum state' argument starts with a star '*', then the system names are not
-% added as subscripts to the quantum state.
-% 
-\newcommand\DCond[6][]{%
-  \begingroup%
-  % Don't put ##1 inside braces (``{##1}'') because of for example \rho^{\otimes n}
-  \def\DCwsyst##1{\begingroup\let\emptysystem\relax ##1_{#4#3}\endgroup}%
-  \@DDbase[\DCondSym]{#3\to #4}{#1}{\@DCstate#2\@EndDCstate}{#5, #6}%
-  % \DCondSym^{#1}_{#3\to #4}\left(\@DCstate#2\@EndDCstate\Vert #5, #6\right)%
-  \endgroup%
+%
+% \@DDbase@inner{rho}{Gamma}  -->  produces (\rho||\Gamma)
+% \@DDbase@inner*{rho}{Gamma}  -->  produces \left(\rho||\Gamma\right)
+% \@DDbase@inner[\big]{rho}{Gamma}  -->  produces \bigl(\rho||\Gamma\bigr)
+%
+\DeclarePairedDelimiterX\@DDbase@inner[2]{(}{)}{%
+  #1\mathclose{}\,\delimsize\Vert\,\mathopen{}#2%
 }
-\robustify\DCond % make command robust
 
-\newcommand\DCondSym{\bar\DDSym}
+%
+% \@DDbase  base macro for relative entropy macros.
+%
+% USAGE:
+%
+%   \@DDbase{D-symbol}{subscript}{superscript}<states-spec>
+%
+% with  <states-spec> =     {\rho}{\sigma}
+%                       or  +*+{\rho}{\sigma}
+%                       or  +\big+{\rho}{\sigma}
+%                       or  *{\rho}{\sigma}
+%                       or  [\big]{\rho}{\sigma}
+% 
+% Examples:
+%
+% \@DDbase{D-symbol}{subscript}{superscript}{\rho}{\Gamma}
+% \@DDbase{D-symbol}{subscript}{superscript}*{\rho}{\Gamma} -> with \left( \right)
+% \@DDbase{D-symbol}{subscript}{superscript}[\big]{\rho}{\Gamma} -> with \bigl( \bigr)
+%
+% and also alternative syntax, useful for higher-level macros which have already tons of [] options:
+%
+% \@DDbase{D-symbol}{subscript}{superscript}+*+{\rho}{\Gamma} -> with \left( \right)
+% \@DDbase{D-symbol}{subscript}{superscript}+\big+{\rho}{\Gamma} -> with \bigl( \bigr)
+%
+%
+\def\@DDbase#1#2#3{%
+  #1_{#2}^{#3}%
+  \@DDbase@parsesize%
+}
+\robustify\@DDbase
 
-% \def\emptysystem{\ensuremath{\{\}}}
+\def\@DDbase@parsesize{%
+  \@ifnextchar+\@DDbase@withsize\@DDbase@inner%
+}
 
+\def\@DDbase@withsize+#1+{%
+  \def\@tmp@arg{#1}%
+  \def\@tmp@star{*}%
+  \ifx\@tmp@arg\@tmp@star\relax%
+    \def\tmp@cmd{\@DDbase@inner*}%
+    \expandafter\tmp@cmd%
+  \else%
+    \def\tmp@cmd{\@DDbase@inner[#1]}%
+    \expandafter\tmp@cmd%
+  \fi%
+}
+
+%
+% \DD{\rho}{\sigma}
+% \DD*{\rho}{\sigma}
+% \DD+\big+{\rho}{\sigma}
+%
+% i.e. \DD<states-spec>
+%
+% \DD^{superscript}<states-spec>
+% \DD_{subscript}^{superscript}<states-spec>
+%
+% (see \@DDbase for <states-spec>)
+
+\newcommand\DD{%
+  \def\DD@tmp@sub{}%
+  \def\DD@tmp@sup{}%
+  \DD@%
+}
+\def\DD@{%
+  \@ifnextchar_\DD@parsesub\DD@@%
+}
+\def\DD@@{%
+  \@ifnextchar^\DD@parsesup\DD@@@%
+}
+\def\DD@@@{% sub/super-scripts have been parsed, move on to rest of command
+  \@DDbase{\DDSym}{\DD@tmp@sub}{\DD@tmp@sup}%
+}
+\def\DD@parsesub_#1{%
+  \def\DD@tmp@sub{#1}%
+  \DD@% continue parsing maybe another sub or superscript
+}
+\def\DD@parsesup^#1{%
+  \def\DD@tmp@sup{#1}%
+  \DD@% continue parsing maybe another sub or superscript
+}
+
+
+%
+% \DminF{\rho}{\sigma}
+% \DminF[\epsilon]{\rho}{\sigma}
+% \DminF<states-spec>
+% \DminF[\epsilon]<states-spec>
+%
+% See \@DDbase for <states-spec>
+% 
+\newcommand\DminF[1][]{%
+  \@DDbase{\DDSym}{\mathrm{min,F}}{#1}%
+}
+
+%
+% \Dminz{\rho}{\sigma}
+% \Dminz[\epsilon]{\rho}{\sigma}
+% \Dminz<states-spec>
+% \Dminz[\epsilon]<states-spec>
+%
+% See \@DDbase for <states-spec>
+% 
+\newcommand\Dminz[1][]{%
+  \@DDbase{\DDSym}{\mathrm{min,0}}{#1}%
+}
+
+%
+% \Dmax{\rho}{\sigma}
+% \Dmax[\epsilon]{\rho}{\sigma}
+% \Dmax<states-spec>
+% \Dmax[\epsilon]<states-spec>
+%
+% See \@DDbase for <states-spec>
+% 
+\newcommand\Dmax[1][]{%
+  \@DDbase{\DDSym}{\mathrm{max}}{#1}%
+}
+
+%
+% \Dr{\rho}{\sigma}
+% \Dr[\epsilon]{\rho}{\sigma}
+% \Dr<states-spec>
+% \Dr[\epsilon]<states-spec>
+%
+% See \@DDbase for <states-spec>
+% 
+\newcommand\Dr[1][]{%
+  \@DDbase{\DDSym}{\mathrm{r}}{#1}%
+}
+
+
+%
+% \DHyp{\rho}{\sigma}
+% \DHyp[\eta]{\rho}{\sigma}
+% \DHyp<states-spec>
+% \DHyp[\eta]<states-spec>
+%
+% See \@DDbase for <states-spec>
+% 
+\newcommand\DHyp[1][\eta]{%
+  \@DDbase{\DDSym}{\mathrm{H}}{#1}%
+}
+
+
+
+% -----------------------
+
+
+%
+% \DC@inner{rho}{Gamma1}{Gamma2}        -->  produces (rho||Gamma1,Gamma2)
+% \DC@inner*{rho}{Gamma1}{Gamma2}       -->  produces \left(rho||Gamma1,Gamma2\right)
+% \DC@inner[\big]{rho}{Gamma1}{Gamma2}  -->  produces \bigl(rho||Gamma1,Gamma2\bigr)
+%
+% If rho starts with the token *, then adds the subscript in \DC@tmp@rhosub to rho
+%
+\DeclarePairedDelimiterX\DC@inner[3]{(}{)}{%
+  #1\mathclose{}\,\delimsize\Vert\,\mathopen{}#2\mathclose{},\mathopen{}#3%
+}
+
+
+%
+% Symbol to use for the coherent relative entropy
+%
+\newcommand\DCSym{\bar\DDSym}
+
+%
+% Designates the trivial system (uses symbol for empty set)
+%
 \def\emptysystem{\ensuremath{\emptyset}}
 
-\def\@DCstate{%
-  \@ifnextchar*\@DCreststatewosyst\@DCreststatewsyst%
-}
-\def\@DCreststatewsyst#1\@EndDCstate{%
-  \DCwsyst{#1}%
-}
-\def\@DCreststatewosyst*#1\@EndDCstate{%
-  #1%
+
+%
+% Coherent Relative Entropy.
+%
+% USAGE:
+%
+%   \DCond[\epsilon]{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
+%   \DCond[\epsilon]{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
+%   \DCond[\epsilon]<size-spec>{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
+%   \DCond[\epsilon]<size-spec>{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
+%
+%   with an optional <size-spec> =  "+*+"  or  "+\Big+"
+%
+
+\newcommand\DCond[1][]{%
+  \def\DC@tmp@sup{#1}%
+%\message{*********|\detokenize{#1}|*********}%
+  \DC@parsesize%
 }
 
+\def\DC@parsesize#1{%
+  \def\DC@tmp@sizeargs{}%
+  \ifstrequal{#1}{+}\DC@withsize{\DC@rest{#1}}%
+%  \@ifnextchar+\DC@withsize\DC@rest%
+}
+
+\def\DC@withsize#1+{%
+%\message{*********\detokenize{#1}********}%
+  \def\@tmp@arg{#1}%
+  \def\@tmp@star{*}%
+  \ifx\@tmp@arg\@tmp@star\relax%
+    \def\DC@tmp@sizeargs{*}%
+    \expandafter\DC@rest%
+  \else%
+    \def\DC@tmp@sizeargs{[#1]}%
+    \expandafter\DC@rest%
+  \fi%
+}
+
+\def\DC@rest#1#2#3#4#5{% #1=rho, #2=system-in, #3=system-out, #4=Gamma_in, #5=Gamma_out
+%\message{*********\detokenize{#1}|\detokenize{#2}|\detokenize{#3}|\detokenize{#4}|\detokenize{#5}|********}%
+  \def\DC@tmp@rho{\DC@fmtrhosub#1\DC@ENDSTATE{#2}{#3}}%
+  \DCSym_{#2\to #3}^{\DC@tmp@sup}%
+  \expandafter\DC@inner\DC@tmp@sizeargs{\DC@tmp@rho}{#4}{#5}%
+}
+
+\def\DC@fmtrhosub{%
+  \@ifnextchar*\DC@fmtrhosub@nosub\DC@fmtrhosub@wsub%
+}
+\def\DC@fmtrhosub@nosub*#1\DC@ENDSTATE#2#3{%
+  #1%
+}
+\def\DC@fmtrhosub@wsub#1\DC@ENDSTATE#2#3{%
+  \begingroup%
+    \let\emptysystem\relax%
+    #1_{#3#2}%
+  \endgroup%
+}
 
 
