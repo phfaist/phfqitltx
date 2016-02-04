@@ -225,8 +225,10 @@
   \parenRegisterDefault{braces}
 }
 
+\def\normalbacktick{\mathcode`\`="0060\relax}
+
 \def\parenMakeBacktickActiveParen{%
-  \def\backtick{\begingroup\mathcode`\`="0060\relax`\endgroup}%
+  \def\backtick{\begingroup\normalbacktick`\endgroup}%
 %  \catcode`\`=\active%  don't change catcode, only mathcode so this works in inline formulae, too.
   % lccode-trick to do "\def`{...}" but for active "`" char
   \begingroup%

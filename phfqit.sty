@@ -112,61 +112,153 @@
 % Entropies
 % ------------------------------------------------
 
-
 \newcommand\HHSym{H}
+
+%
+% \@HHbase@inner{content}  -->  produces (content)
+% \@HHbase@inner*{content}  -->  produces \left(content\right)
+% \@HHbase@inner[\big]{content}  -->  produces \bigl(content\bigr)
+%
+\DeclarePairedDelimiterX\@HHbase@inner[1]{(}{)}{#1}
+
+%
+% \@HHbase  base macro for relative entropy macros.
+%
+% USAGE:
+%
+%   \@HHbase{H-symbol}{subscript}{superscript}<size-spec>[state][epsilon]{target system}[conditioning system]
+%
+% with optional <size-spec> =  "`*"  or  "`\Big"
 % 
-% base formatting of entropy measure
-% 
-\newcommand\@@HHbase{%
-  \HH@v@sym_{\HH@v@sub}^{\HH@v@epsilon}% H_min^eps
+% Examples:
+%
+% \@HHbase{H-symbol}{subscript}{superscript}[\rho][\epsilon]{E}[X']
+% \@HHbase{H-symbol}{subscript}{superscript}`*[\rho][\epsilon]{E}[X']     -> with \left( \right)
+% \@HHbase{H-symbol}{subscript}{superscript}`\big[\rho][\epsilon]{E}[X']  -> with \bigl( \bigr)
+%
+%
+\def\@HHbase#1#2{%
+  #1_{#2}%
+  \@HHbase@parsesize%
+}
+\robustify\@HHbase
+
+\def\@HHbase@parsesize{%
+  \begingroup\mathcode`\`="0060\relax%
+  \gdef\HH@tmp@sizearg{}%
+  \@ifnextchar`\@HHbase@withsize\@HHbase@endgroupandparseinner%
+}
+
+\def\@HHbase@withsize`#1{%
+  \def\@tmp@arg{#1}%
+  \def\@tmp@star{*}%
+  \ifx\@tmp@arg\@tmp@star\relax%
+    \gdef\HH@tmp@sizearg{*}%
+    \expandafter\@HHbase@endgroupandparseinner%
+  \else%
+    \gdef\HH@tmp@sizearg{[#1]}%
+    \expandafter\@HHbase@endgroupandparseinner%
+  \fi%
+}
+\def\@HHbase@endgroupandparseinner{\endgroup\@HHbase@parseinner}
+
+\newcommand\@HHbase@parseinner[1][]{%  arg: state
+  \def\HH@tmpstore@state{#1}%
+  \@HHbase@parseinner@%
+}
+\newcommand\@HHbase@parseinner@[2][]{% arg: epsilon and target system
+  \def\HH@tmpstore@epsilon{#1}%
+  \def\HH@tmpstore@system{#2}%
+  \@HHbase@parseinner@@%
+}
+\newcommand\@HHbase@parseinner@@[1][]{% arg: conditioning system
+  \def\HH@tmpstore@condsys{#1}%
+  \@HHbase@do@inner%
+}
+
+
+\newtoks\HH@tmp@toks
+\def\HH@addtoks#1\@HH@END@ADD@TOKS{\HH@tmp@toks=\expandafter{\the\HH@tmp@toks#1}}%
+
+\def\@HHbase@do@inner{%
   %
+  % Add the superscript
+  %
+  ^{\HH@tmpstore@epsilon}%
+  % 
   % if system is blank, we just want the symbol itself with no argument.
-  %
-  \expandafter\notblank\expandafter{\HH@v@sys}{%
-    (%
-    {\HH@v@sys}% target system
-    \expandafter\notblank\expandafter{\HH@v@condsys}{\,|\,{\HH@v@condsys}}{}% conditioning system
-    )%
-    _{\HH@v@state}% the state as subscript, if any
+  % 
+  \expandafter\notblank\expandafter{\HH@tmpstore@system}{%
+    % 
+    % Construct the parenthetic argument to the entropy
+    % 
+    \HH@tmp@toks={}%
+    %
+    % ... add system:
+    % 
+    \expandafter\HH@addtoks\HH@tmpstore@system\@HH@END@ADD@TOKS%
+    %
+    % ... add conditional system, if specified:
+    %
+    \expandafter\notblank\expandafter{\HH@tmpstore@condsys}{%
+      \HH@addtoks\mathclose{}\,\delimsize\vert\,\mathopen{}\@HH@END@ADD@TOKS%
+      \expandafter\HH@addtoks\HH@tmpstore@condsys\@HH@END@ADD@TOKS%
+    }{}%
+    % 
+    % tokens ready now. Prepare argument to command, and go.
+    %
+    \edef\tmp@args{\expandonce{\HH@tmp@sizearg}{\the\HH@tmp@toks}}%
+    \expandafter\@HHbase@inner\tmp@args%
   }{}%
   %
+  _{\HH@tmpstore@state}% the state as subscript, if any
+  %
 }
 
-% usage: \@HHbase[symbol for "H"]{subscript for "H"}[state][epsilon]{"target" system name}[conditioning system name]
-\newcommand\@HHbase@endwcond[1][]{%
-  \def\HH@v@condsys{#1}%
-  \@@HHbase%
-  \endgroup% close group started by \@HHbase
-}
-\newcommand\@HHbase@contwepsilon[2][]{% #1=epsilon, #2="target system name"
-  \def\HH@v@epsilon{#1}%
-  \def\HH@v@sys{#2}%
-  \@HHbase@endwcond%
-}
-\newcommand\@HHbase@contwstate[1][]{% #1=state
-  \def\HH@v@state{#1}%
-  \@HHbase@contwepsilon%
-}
-\newcommand\@HHbase[2][\HHSym]{%
-  \begingroup% for our local def's
-  \def\HH@v@sym{#1}%
-  \def\HH@v@sub{#2}% subscript, e.g. \mathrm{min}  for H_min
-  \@HHbase@contwstate%
-}
+
 
 
 % 
-% Entropy commands usage: \HH[state][epsilon]{target system}[conditioning system]
+% Entropy commands.
+%
+% Usage: \HH[state][epsilon]{target system}[conditioning system]
+%        \HH`*[state][epsilon]{target system}[conditioning system]     -> within \left(...\right)
+%        \HH`\big[state][epsilon]{target system}[conditioning system]  -> within \bigl(...\bigr)
 % 
-\newcommand\HH{\@HHbase{}}
-\newcommand\Hzero{\@HHbase{\mathrm{max},0}}
-\newcommand\Hmin{\@HHbase{\mathrm{min}}}
-\newcommand\Hmaxf{\@HHbase{\mathrm{max}}}
+\newcommand\HH{\@HHbase{\HHSym}{}}
+\newcommand\Hzero{\@HHbase{\HHSym}{\mathrm{max},0}}
+\newcommand\Hmin{\@HHbase{\HHSym}{\mathrm{min}}}
+\newcommand\Hmaxf{\@HHbase{\HHSym}{\mathrm{max}}}
+
 %
 % Entropy function:
 %
-\def\Hfunc(#1){%
-  \HHSym({#1})%
+%  \Hfunc(x)
+%  \Hfunc`*(x)
+%  \Hfunc`\big(x)
+%
+\def\Hfunc{%
+  \begingroup\mathcode`\`="0060\relax%
+  \gdef\Hfunc@tmp@sizearg{}%
+  \@ifnextchar`\Hfunc@withsize\Hfunc@next%
+}
+\def\Hfunc@withsize`#1{%
+  \def\@tmp@arg{#1}%
+  \def\@tmp@star{*}%
+  \ifx\@tmp@arg\@tmp@star\relax%
+    \gdef\Hfunc@tmp@sizearg{*}%
+    \endgroup%
+    \expandafter\Hfunc@inner%
+  \else%
+    \gdef\Hfunc@tmp@sizearg{[#1]}%
+    \endgroup%
+    \expandafter\Hfunc@inner%
+  \fi%
+}
+\def\Hfunc@next{\endgroup\Hfunc@inner}
+\def\Hfunc@inner(#1){%
+  \HHSym%  ({#1})%
+  \expandafter\@HHbase@inner\Hfunc@tmp@sizearg{#1}%
 }
 
 
@@ -196,8 +288,8 @@
 %   \@DDbase{D-symbol}{subscript}{superscript}<states-spec>
 %
 % with  <states-spec> =     {\rho}{\sigma}
-%                       or  +*+{\rho}{\sigma}
-%                       or  +\big+{\rho}{\sigma}
+%                       or  `*{\rho}{\sigma}
+%                       or  `\big{\rho}{\sigma}
 %                       or  *{\rho}{\sigma}
 %                       or  [\big]{\rho}{\sigma}
 % 
@@ -209,8 +301,8 @@
 %
 % and also alternative syntax, useful for higher-level macros which have already tons of [] options:
 %
-% \@DDbase{D-symbol}{subscript}{superscript}+*+{\rho}{\Gamma} -> with \left( \right)
-% \@DDbase{D-symbol}{subscript}{superscript}+\big+{\rho}{\Gamma} -> with \bigl( \bigr)
+% \@DDbase{D-symbol}{subscript}{superscript}`*{\rho}{\Gamma} -> with \left( \right)
+% \@DDbase{D-symbol}{subscript}{superscript}`\big{\rho}{\Gamma} -> with \bigl( \bigr)
 %
 %
 \def\@DDbase#1#2#3{%
@@ -220,10 +312,10 @@
 \robustify\@DDbase
 
 \def\@DDbase@parsesize{%
-  \@ifnextchar+\@DDbase@withsize\@DDbase@inner%
+  \@ifnextchar`\@DDbase@withsize\@DDbase@inner%
 }
 
-\def\@DDbase@withsize+#1+{%
+\def\@DDbase@withsize`#1{%
   \def\@tmp@arg{#1}%
   \def\@tmp@star{*}%
   \ifx\@tmp@arg\@tmp@star\relax%
@@ -238,14 +330,15 @@
 %
 % \DD{\rho}{\sigma}
 % \DD*{\rho}{\sigma}
-% \DD+\big+{\rho}{\sigma}
-%
-% i.e. \DD<states-spec>
+% \DD`\big{\rho}{\sigma}
+% (i.e. \DD<states-spec> )
 %
 % \DD^{superscript}<states-spec>
 % \DD_{subscript}^{superscript}<states-spec>
 %
-% (see \@DDbase for <states-spec>)
+% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
+%
+% Where optional  <size-spec>  =  "`*"  or  "`\Big"
 
 \newcommand\DD{%
   \def\DD@tmp@sub{}%
@@ -277,7 +370,9 @@
 % \DminF<states-spec>
 % \DminF[\epsilon]<states-spec>
 %
-% See \@DDbase for <states-spec>
+% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
+%
+% Where optional  <size-spec>  =  "`*"  or  "`\Big"
 % 
 \newcommand\DminF[1][]{%
   \@DDbase{\DDSym}{\mathrm{min,F}}{#1}%
@@ -289,7 +384,9 @@
 % \Dminz<states-spec>
 % \Dminz[\epsilon]<states-spec>
 %
-% See \@DDbase for <states-spec>
+% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
+%
+% Where optional  <size-spec>  =  "`*"  or  "`\Big"
 % 
 \newcommand\Dminz[1][]{%
   \@DDbase{\DDSym}{\mathrm{min,0}}{#1}%
@@ -301,7 +398,9 @@
 % \Dmax<states-spec>
 % \Dmax[\epsilon]<states-spec>
 %
-% See \@DDbase for <states-spec>
+% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
+%
+% Where optional  <size-spec>  =  "`*"  or  "`\Big"
 % 
 \newcommand\Dmax[1][]{%
   \@DDbase{\DDSym}{\mathrm{max}}{#1}%
@@ -313,7 +412,9 @@
 % \Dr<states-spec>
 % \Dr[\epsilon]<states-spec>
 %
-% See \@DDbase for <states-spec>
+% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
+%
+% Where optional  <size-spec>  =  "`*"  or  "`\Big"
 % 
 \newcommand\Dr[1][]{%
   \@DDbase{\DDSym}{\mathrm{r}}{#1}%
@@ -326,7 +427,9 @@
 % \DHyp<states-spec>
 % \DHyp[\eta]<states-spec>
 %
-% See \@DDbase for <states-spec>
+% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
+%
+% Where optional  <size-spec>  =  "`*"  or  "`\Big"
 % 
 \newcommand\DHyp[1][\eta]{%
   \@DDbase{\DDSym}{\mathrm{H}}{#1}%
@@ -370,30 +473,33 @@
 %   \DCond[\epsilon]<size-spec>{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
 %   \DCond[\epsilon]<size-spec>{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
 %
-%   with an optional <size-spec> =  "+*+"  or  "+\Big+"
+%   with an optional <size-spec> =  "`*"  or  "`\Big"
 %
 
 \newcommand\DCond[1][]{%
   \def\DC@tmp@sup{#1}%
 %\message{*********|\detokenize{#1}|*********}%
+  \begingroup\mathcode`\`="0060\relax
   \DC@parsesize%
 }
 
 \def\DC@parsesize#1{%
-  \def\DC@tmp@sizeargs{}%
-  \ifstrequal{#1}{+}\DC@withsize{\DC@rest{#1}}%
-%  \@ifnextchar+\DC@withsize\DC@rest%
+  \gdef\DC@tmp@sizeargs{}%
+  \ifstrequal{#1}{`}\DC@withsize{\endgroup\DC@rest{#1}}%
+%  \@ifnextchar`\DC@withsize\DC@rest%
 }
 
-\def\DC@withsize#1+{%
+\def\DC@withsize#1{%
 %\message{*********\detokenize{#1}********}%
   \def\@tmp@arg{#1}%
   \def\@tmp@star{*}%
   \ifx\@tmp@arg\@tmp@star\relax%
-    \def\DC@tmp@sizeargs{*}%
+    \gdef\DC@tmp@sizeargs{*}%
+    \endgroup%
     \expandafter\DC@rest%
   \else%
-    \def\DC@tmp@sizeargs{[#1]}%
+    \gdef\DC@tmp@sizeargs{[#1]}%
+    \endgroup%
     \expandafter\DC@rest%
   \fi%
 }
