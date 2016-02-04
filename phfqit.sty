@@ -209,9 +209,10 @@
     %
     \edef\tmp@args{\expandonce{\HH@tmp@sizearg}{\the\HH@tmp@toks}}%
     \expandafter\@HHbase@inner\tmp@args%
+    % 
+    _{\HH@tmpstore@state}% the state as subscript, if any
+    %
   }{}%
-  %
-  _{\HH@tmpstore@state}% the state as subscript, if any
   %
 }
 
