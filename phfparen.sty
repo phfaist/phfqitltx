@@ -115,7 +115,7 @@
     %
   }{%
     \PackageError{phfqit}{Unknown delimiter: (or can't parse args?)
-      {\expandafter\string\paren@tmp@modtoken}{\string#1}}{You call to \string\paren
+      {\expandafter\string\paren@tmp@modtoken}{\string#1}}{Your call to \string\paren
       couldn't be parsed, presumably because I didn't recognize your delimiter, or because
       there's a bug in this package.}%
     % 
@@ -248,8 +248,8 @@
   \def\paren@setup@registerDefaults{}
 }
 \DeclareOption*{
-  \PackageError{ethuebung}{Unknown option `\CurrentOption'. 
-    Available options are sol, tips, english, deutsch, nobabel, noexenum, nogeom, and nohyperref}
+  \PackageError{phfparen}{Unknown option `\CurrentOption'. 
+    Available options are backtickon and noregisterdefaults.}
 }
 \ProcessOptions\relax
 
