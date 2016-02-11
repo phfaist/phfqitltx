@@ -26,10 +26,17 @@
 \def\IdentProc[#1][#2]#3{\operatorname{id}_{#1\notblank{#2}{\to #2}{}}\notblank{#3}{\left(#3\right)}{}}
 
 % Lie Groups & Algebras
-\def\su(#1){\mathrm{su}(#1)}
-\def\SU(#1){\mathrm{SU}(#1)}
-\def\so(#1){\mathrm{so}(#1)}
-\def\SO(#1){\mathrm{SO}(#1)}
+\def\uu(#1){\phfqit@fmtLieAlgebra{u}(#1)}
+\def\UU(#1){\phfqit@fmtGroup{U}(#1)}
+\def\su(#1){\phfqit@fmtLieAlgebra{su}(#1)}
+\def\SU(#1){\phfqit@fmtGroup{SU}(#1)}
+\def\so(#1){\phfqit@fmtLieAlgebra{so}(#1)}
+\def\SO(#1){\phfqit@fmtGroup{SO}(#1)}
+
+\def\SN(#1){\mathrm{S}_{#1}}
+
+\def\phfqit@fmtLieAlgebra#1{\mathrm{#1}}
+\def\phfqit@fmtGroup#1{\mathrm{#1}}
 
 
 % some shortcuts for partial derivatives
