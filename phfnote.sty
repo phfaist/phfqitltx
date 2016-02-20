@@ -268,6 +268,7 @@
     \vspace*{2mm}%
     \hrule%
     \vspace*{-2mm}%
+    \parskip=2pt\relax%
     \tableofcontents{}%
     \vspace*{4mm}%
     \hrule%
@@ -335,33 +336,6 @@
 }
 
 
-
-% ------------------------------------------------------------------------------
-%     COSMETIC DEFINITIONS - PARAGRAPHS, FIGURES, ETC.
-% ------------------------------------------------------------------------------
-
-
-\newcommand{\phfnote@do@cosmeticdefs}{
-
-  %
-  % Text/Floats settings
-  %
-  \@ifpackageloaded{babel}{%
-    % package babel is loaded, specal treatment...
-    \addto\captionsenglish{%
-      \renewcommand{\figurename}{Fig.}
-      \renewcommand{\tablename}{Table}
-    }
-  }{% package babel is not loaded, simple treatment...
-    \renewcommand{\figurename}{Fig.}
-    \renewcommand{\tablename}{Table}
-  }
-
-  %
-  % Theorems Settings
-  % 
-  \renewcommand{\qedsymbol}{\ensuremath{\blacksquare}}
-}
 
 
 % ------------------------------------------------------------------------------
@@ -467,6 +441,11 @@
     \thmhdgtitleitinternal %
   } { \endthmhdgtitleitinternal }%
   
+
+  %
+  % QED symbol
+  % 
+  \renewcommand{\qedsymbol}{\ensuremath{\blacksquare}}
 }
 
 
@@ -664,6 +643,16 @@
 %
 \DeclareComplementaryOption{nohyperrefdefs}{hyperrefdefs}
 
+%
+% e.g. [theoremsdefs=false]
+%
+% Load default theorems definitions with lemmas, etc.
+%
+% [notheoremsdefs] is equivalent to [theoremsdefs=false]
+%
+\DeclareBoolOption[true]{theoremsdefs}
+\DeclareComplementaryOption{notheoremsdefs}{theoremsdefs}
+
 
 %
 % e.g. [secfmt={section,compact}]
@@ -770,8 +759,9 @@
   \phfnote@do@pdfhyperrefdefs
 \fi
 
-\phfnote@do@cosmeticdefs
-\phfnote@do@theorems
+\ifphfnote@opt@theoremsdefs
+  \phfnote@do@theorems
+\fi
 
 \ifphfnote@opt@bibliographydefs
   \phfnote@do@bibliographydefs
