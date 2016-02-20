@@ -1,0 +1,660 @@
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{phfnote}[2016/02/20 phfnote package]
+
+
+\RequirePackage{kvoptions}
+
+
+% ------------------------------------------------------------------------------
+%     TITLE
+% ------------------------------------------------------------------------------
+
+%
+% -- common note title defs --
+%
+\newcommand{\notetitlefont}{\sffamily\bfseries}%\fontfamily{cmss}\fontseries{bx}\selectfont}
+\newcommand{\notetitleauthorfont}{}
+\newcommand{\notetitledatefont}{}
+
+
+%
+% common to several styles -- adjust top spacing for the title
+%
+\def\phfnote@title@vskiptop{-1.2cm}
+
+
+% -- STYLE: default --
+\newcommand{\notetitle@style@default}{% `default' style title
+  \begin{flushleft}
+    \vspace*{\phfnote@title@vskiptop}
+    \begin{singlespace}
+      {\Large  {\notetitlefont \@title}}\\[4mm]
+      \hspace*{0.04\textwidth}\begin{minipage}{0.96\textwidth}{\notetitleauthorfont \@author}\end{minipage}\\[2mm]
+      \hspace*{0.04\textwidth}\begin{minipage}{0.96\textwidth}{\footnotesize%
+          \notetitledatefont \@date}\end{minipage}\\[4mm]
+      \hrule
+    \end{singlespace}
+    \vspace*{3mm}
+  \end{flushleft}
+}
+% -- STYLE: small --
+\newcommand{\notetitle@style@small}{% `small' style title
+  \begin{flushleft}
+    \vspace*{\phfnote@title@vskiptop}
+    {\notetitlefont \@title}
+    \hfill\makebox{\fontsize{9pt}{10pt}\selectfont {\notetitleauthorfont \@author}%
+      \hspace*{2mm}--\hspace*{2mm}{\emph{\notetitledatefont \@date}}}
+    \vspace*{1mm}\hrule\vspace*{1mm}
+  \end{flushleft}
+}
+% -- STYLE: article --
+\newcommand{\notetitle@style@article}{% `article' style title
+  % \begingroup%
+  % \newpage%
+  % \global\@topnum\z@   % Prevents figures from going at top of page.
+  % \null%
+  \vspace*{-5em}%
+  \begin{center}%
+    \let \footnote \thanks%
+    {\LARGE \@title \par}%
+    \vskip 1.5em%
+    {\large%
+      \lineskip .5em%
+      \begin{tabular}[t]{c}%
+        \@author%
+      \end{tabular}\par}%
+    \vskip 0.5em%
+    \@thanks%
+    \vskip 1em%
+    {\large \@date}%
+  \end{center}%
+  \par%
+  \vskip 1.5em%
+  % \endgroup%
+}
+
+
+
+%
+% Actually perform the definitions to make \maketitle produce the title with the
+% given style.
+%
+% #1 = style name, e.g. 'default'
+%
+\def\phfnote@do@notetitle#1{
+  \ifcsname notetitle@style@#1\endcsname
+    \def\phfnote@tmp@titsty{#1}%
+  \else
+    \PackageError{phfnote}{Unknown title style: '#1'. Using default style instead}
+    \def\phfnote@tmp@titsty{default}%
+  \fi
+  \def\@maketitle{\csname notetitle@style@\phfnote@tmp@titsty\endcsname}
+}
+
+
+
+% ------------------------------------------------------------------------------
+%     ABSTRACT
+% ------------------------------------------------------------------------------
+
+\let\notedefaultabstract\abstract
+\let\endnotedefaultabstract\endabstract
+
+\newcommand{\noteabstracttextfont}{}
+\newcommand{\noteabstractnamefont}{\bfseries\small}
+\newcommand{\noteabstracttextwidth}{0.9\textwidth}
+
+\def\noteabstract@nameline{
+  \begin{center}{\noteabstractnamefont\abstractname}\end{center}\vspace*{-2mm}%
+}
+
+\newlength\noteabstractafterspacing
+\setlength{\noteabstractafterspacing}{4mm}
+\newenvironment{noteabstract}{%
+  \begin{center}%
+    \begin{minipage}{\noteabstracttextwidth}%
+      \noteabstract@nameline%
+      \noteabstracttextfont%
+    }% begin commands
+    {% end commands
+    \end{minipage}\end{center}\vspace*{\noteabstractafterspacing}%
+} % end commands
+
+
+\def\noteabstract@attr@wide{%
+  \def\noteabstracttextwidth{\textwidth}%
+}
+\def\noteabstract@attr@narrow{%
+  \def\noteabstracttextwidth{0.8\textwidth}%
+}
+
+\def\noteabstract@attr@noname{%
+  \def\noteabstract@nameline{\vspace*{1ex}}%
+}
+
+\def\noteabstract@attr@original{%
+  \let\abstract\notedefaultabstract
+  \let\endabstract\endnotedefaultabstract
+}
+
+
+%
+%  #1 = a comma-separated list of attributes
+%
+\def\phfnote@do@noteabstract#1{
+
+  \let\abstract\noteabstract
+  \let\endabstract\endnoteabstract
+
+  \@for\next:=#1\do{%
+    \ifcsname noteabstract@attr@\next\endcsname%
+      \csname noteabstract@attr@\next\endcsname%
+    \else%
+      \PackageWarning{phfnote}{Unknown abstract attribute: '\next'. Ignoring.}
+    \fi
+  }
+
+}
+
+
+% ------------------------------------------------------------------------------
+%     PAGE GEOMETRY
+% ------------------------------------------------------------------------------
+
+
+\newcommand{\phfnote@do@pagegeomdefs}{
+  %
+  % Page geometry settings
+  %
+  \if@twocolumn
+
+    \PassOptionsToPackage{hmargin=0.75in,vmargin=0.75in,includeheadfoot}{geometry}%
+
+  \else
+
+    % fix the margins a bit to make text wider
+
+    \ifcase\@ptsize% mods for 10 pt
+      \PassOptionsToPackage{hmargin=1.25in,vmargin=1.25in}{geometry}%
+    \or% mods for 11 pt
+      \PassOptionsToPackage{hmargin=1.25in,vmargin=1.25in}{geometry}%
+    \or% mods for 12 pt
+      \PassOptionsToPackage{hmargin=1in,vmargin=1.25in}{geometry}%
+    \fi%
+
+  \fi
+
+  \RequirePackage{geometry}%
+}
+
+
+
+% ------------------------------------------------------------------------------
+%     TEXT, PARAGRAPH, AND LINE SPACING
+% ------------------------------------------------------------------------------
+
+
+\def\phfnote@do@spacing{%
+
+  \if@twocolumn
+    %\renewcommand\baselinestretch{1.0} % leave default
+    \emergencystretch=3em
+  \else
+    \ifcase\@ptsize% 10pt
+      \renewcommand\baselinestretch{1.1}
+    \or% 11pt
+      \renewcommand\baselinestretch{1.05}
+    \or% 12pt
+      \renewcommand\baselinestretch{1.03}
+    \fi
+    \emergencystretch=5em
+  \fi
+
+}
+
+
+% ------------------------------------------------------------------------------
+%     INLINE TABLE OF CONTENTS
+% ------------------------------------------------------------------------------
+
+
+\newcommand{\inlinetoc}{%
+  {%
+    \vspace*{2mm}%
+    \hrule%
+    \vspace*{-2mm}%
+    \phfnote@makepdfbookmarktoc%
+    \tableofcontents{}%
+    \vspace*{4mm}%
+    \hrule%
+    \vspace*{6mm}%
+  }%
+}
+
+
+
+% ------------------------------------------------------------------------------
+%     FONTS
+% ------------------------------------------------------------------------------
+
+%
+% Section fonts are customized using the {sectsty} package.  If this conflicts
+% in your document, use the [nosectionfonts] package option, then sectsty won't
+% be loaded.
+%
+
+
+% Font Settings
+%
+% 	pbk = bookman ; bch = charter ; ppl = palatino ; ptm = Adobe Times ;
+% 	phv = Adobe Helvetica ; pcr = Adobe Courier ; put = Utopia ;
+% 	cmr = Comupter Modern Roman ; cmss = CM Sans Serif
+%
+\newcommand{\phfnote@do@sectionfonts}{
+  \RequirePackage{sectsty}
+  \sectionfont{\notesectionfont\notesectionfontsize}
+  \subsectionfont{\notesectionfont\notesubsectionfontsize}
+  \subsubsectionfont{\notesectionfont\notesubsubsectionfontsize}
+}
+\newcommand{\phfnote@declarealsoparagraphfonts}{
+  \paragraphfont{\notesectionfont\noteparagraphfontsize}
+  \subparagraphfont{\notesectionfont\notesubparagraphfontsize}
+}
+%
+\newcommand{\notesectionfontsize}{\large}
+\newcommand{\notesubsectionfontsize}{\normalsize}
+\newcommand{\notesubsubsectionfontsize}{\small}
+\newcommand{\noteparagraphfontsize}{\normalsize}
+\newcommand{\notesubparagraphfontsize}{\normalsize}
+%
+\newcommand{\notesectionfont}{\fontfamily{\notesectionfontfamily}\fontseries{b}\selectfont}
+\newcommand{\notesectionfontfamily}{ppl}
+% 
+\newcommand{\notesectionfontsetsizes}[3]{%
+  \renewcommand{\notesectionfontsize}{#1}%
+  \renewcommand{\notesubsectionfontsize}{#2}%
+  \renewcommand{\notesubsubsectionfontsize}{#3}%
+}
+% 
+\newcommand{\noteparagraphfontsetsizes}[2]{%
+  \renewcommand{\noteparagraphfontsize}{#1}%
+  \renewcommand{\notesubparagraphfontsize}{#2}%
+}
+
+
+\def\phfnote@do@paragraphfonts{
+  \paragraphfont{\notesectionfont\noteparagraphfontsize}
+  \subparagraphfont{\notesectionfont\notesubparagraphfontsize}
+}
+
+
+
+
+% ------------------------------------------------------------------------------
+%     COSMETIC DEFINITIONS - PARAGRAPHS, FIGURES, ETC.
+% ------------------------------------------------------------------------------
+
+
+\newcommand{\phfnote@do@cosmeticdefs}{
+
+  %
+  % Text/Floats settings
+  %
+  \@ifpackageloaded{babel}{%
+    % package babel is loaded, specal treatment...
+    \addto\captionsenglish{%
+      \renewcommand{\figurename}{Fig.}
+      \renewcommand{\tablename}{Table}
+    }
+  }{% package babel is not loaded, simple treatment...
+    \renewcommand{\figurename}{Fig.}
+    \renewcommand{\tablename}{Table}
+  }
+
+  %
+  % Theorems Settings
+  % 
+  \renewcommand{\qedsymbol}{\ensuremath{\blacksquare}}
+
+  % 
+  % Paragraph Settings
+  % 
+  \setlength{\parindent}{0.2cm}
+  \setlength{\parskip}{0.1cm}
+}
+
+
+% ------------------------------------------------------------------------------
+%     INCLUDE DEFAULT SET OF USEFUL PACKAGES
+% ------------------------------------------------------------------------------
+
+\def\phfnote@do@pkgset@none{
+}
+
+\def\phfnote@do@pkgset@minimal{
+
+  \RequirePackage{amsmath}
+  \RequirePackage{amsfonts}
+  \RequirePackage{amssymb}
+  \RequirePackage{amsthm}
+  
+  \RequirePackage{xcolor}
+
+}
+
+\def\phfnote@do@pkgset@rich{
+
+  \phfnote@do@pkgset@minimal
+
+  \RequirePackage{setspace}
+  \RequirePackage{microtype}
+
+  \PassOptionsToPackage{shortlabels}{enumitem}
+  \RequirePackage{enumitem}
+
+  \RequirePackage{graphicx}
+
+}
+
+\def\phfnote@do@pkgset@extended{
+
+  \phfnote@do@pkgset@rich
+
+  \RequirePackage{float}
+
+  \RequirePackage{verbdef}
+
+  \RequirePackage{csquotes}
+
+  \RequirePackage{dsfonts}
+  \RequirePackage{bbm}
+  \RequirePackage{mathtools}
+
+}
+
+
+\def\phfnote@do@pkgset#1{
+
+  \@for\next:=#1\do{%
+    \ifcsname phfnote@do@pkgset@\next\endcsname%
+      \csname phfnote@do@pkgset@\next\endcsname%
+    \else%
+      \PackageWarning{phfnote}{Unknown package set to load: '\next'. Ignoring.}
+    \fi
+  }
+
+}
+
+
+% ------------------------------------------------------------------------------
+%     THEOREMS
+% ------------------------------------------------------------------------------
+
+\newcommand{\phfnote@do@theorems}{
+
+  \RequirePackage{amsmath}
+  \RequirePackage{amsthm}
+
+  \theoremstyle{plain}
+  \newtheorem{thm}{Theorem}
+  \newtheorem{prop}[thm]{Proposition}
+  \newtheorem{lemma}[thm]{Lemma}
+  \newtheorem{cor}[thm]{Corollary}
+  \newtheorem{conj}[thm]{Conjecture}
+  \newtheorem{remark}[thm]{Remark}
+  \newtheorem*{thm*}{Theorem}
+  \newtheorem*{prop*}{Proposition}
+  \newtheorem*{lemma*}{Lemma}
+  \newtheorem*{cor*}{Corollary}
+  \newtheorem*{conj*}{Conjecture}
+  \newtheorem*{idea*}{Idea}
+  \newtheorem*{remark*}{Remark}
+
+  % A special \begin{thmheading}{Title} .... \end{thmheading} for customizing the heading
+  % on-the-fly. Useful for my formatting of definitions. Using \begin{thmheeadingit} instead
+  %   makes body text italic.
+  \def\thmhdg@title{No Title Given}
+  \theoremstyle{definition}
+  \newtheorem*{thmhdgtitleinternal}{\thmhdg@title}
+  \theoremstyle{plain}
+  \newtheorem*{thmhdgtitleitinternal}{\thmhdg@title}
+  % define the relevant environments
+  \newenvironment{thmheading}[1]{%
+    \def\thmhdg@title{##1} %
+    \thmhdgtitleinternal %
+  } { \endthmhdgtitleinternal }%
+  \newenvironment{thmheadingit}[1]{%
+    \def\thmhdg@title{##1} %
+    \thmhdgtitleitinternal %
+  } { \endthmhdgtitleitinternal }%
+  
+}
+
+
+
+% ------------------------------------------------------------------------------
+%     PDF & HYPERLINKS - HYPERREF
+% ------------------------------------------------------------------------------
+
+
+%
+% NOTE: the name `docnotelinkcolor' is hard-coded in many other files I've used,
+% so I'm NOT changing it.
+%
+
+
+%
+% Set links color.  Use as \phfnotePdfLinkColor{<color specification or name>}.
+%
+% The pacakge {xcolor} must be loaded.
+%
+\newcommand{\phfnotePdfLinkColor}[1]{%
+  \@ifpackageloaded{xcolor}{%
+    \colorlet{docnotelinkcolor}{#1}%
+  }{% else:
+    \PackageWarning{phfnote}{\protect\phfnotePdfLinkColor may only be used if the package
+      xcolor is loaded.}%
+  }%
+}
+
+\newcommand{\phfnote@do@pdfhyperrefdefs}{%
+  %
+  % Make sure a color-managing package is loaded, {color} or {xcolor}
+  %
+  \phfnote@requirecolorpackage%
+  % 
+  % Define our default color
+  % 
+  \definecolor{docnotelinkcolor}{rgb}{0,0,0.4}% actually define our PDF hyperref link color
+  %
+  % Set up hyperref
+  %
+  \PassOptionsToPackage{bookmarks=true,backref=false}{hyperref}%
+  \RequirePackage{hyperref}%
+  %
+  \hypersetup{unicode=true, %
+    bookmarksnumbered=false,bookmarksopen=false,bookmarksopenlevel=1,%
+    breaklinks=true,pdfborder={0 0 0},colorlinks=true}%
+  \hypersetup{%
+    anchorcolor=docnotelinkcolor,citecolor=docnotelinkcolor, %
+    filecolor=docnotelinkcolor,linkcolor=docnotelinkcolor, %
+    menucolor=docnotelinkcolor,runcolor=docnotelinkcolor, %
+    urlcolor=docnotelinkcolor}%
+}
+
+
+
+
+\def\phfnote@requirecolorpackage{%
+  % require the 'color' or 'xcolor' package
+  \@ifpackageloaded{color}{%
+    % all fine
+  }{% else
+    \@ifpackageloaded{xcolor}{%
+      % all fine again
+    }{% else - no color package loaded
+      \RequirePackage{xcolor}%
+    }%
+  }%
+}
+
+
+
+
+
+% ------------------------------------------------------------------------------
+%     BIBLIOGRAPHY
+% ------------------------------------------------------------------------------
+
+%
+% our default bibliography style -- hacked version of naturemag
+%
+\newcommand{\phfnote@bibstyle}{naturemagdoi}
+
+%
+%
+%
+\newcommand{\phfnote@bibliographystyle}[1]{\renewcommand{\phfnote@bibstyle}{#1}}
+\newcommand{\phfnotebibfont}{\fontsize{9}{11}\selectfont}
+
+\let\phfnote@old@bibliography\bibliography
+\let\phfnote@old@bibliographystyle\bibliographystyle
+
+\newcommand{\phfnote@bibliography}[1]{%
+  \begingroup%
+    \phfnotebibfont%
+    % \bibliographystyle{unsrturl}
+    \phfnote@old@bibliographystyle{\phfnote@bibstyle}%
+    %
+    % \clearpage%
+    \addcontentsline{toc}{section}{\refname}
+    % 
+    % Some fixes for some special chars which may appear in ill-advised
+    % bibliography managers -- such as the '&' symbol
+    % 
+    \catcode`\&=12\relax% normal char
+    %
+    \phfnote@old@bibliography{#1}%
+    %
+  \endgroup%
+}
+
+\def\phfnote@do@bibliographydefs{%
+  \let\bibliographystyle\phfnote@bibliographystyle%
+  \let\bibliography\phfnote@bibliography%
+}
+
+
+
+\SetupKeyvalOptions{
+  family=phfnote,
+  prefix=phfnote@opt@
+}
+
+%
+% Package set to load, for convenience.  'none', 'minimal', 'rich', or 'extended'
+%
+\DeclareStringOption[rich]{pkgset}
+
+%
+% enable the styled note title, or leave the document default?
+%
+\DeclareBoolOption[true]{title}
+
+%
+% The title style to use. By default, the 'default' style.  May be 'default',
+% 'small', or 'article'.
+%
+\DeclareStringOption[default]{titlestyle}
+
+%
+% Abstract flags.  May be a comma-separated list of the following: 'wide',
+% 'narrow', 'noname', 'original'
+%
+\DeclareStringOption[]{abstract}
+
+%
+% Load hyperref and corresponding definitions.
+%
+\DeclareBoolOptions[true]{hyperrefdefs}
+
+
+\DeclareDefaultOption{%
+  % We provide the standard LaTeX error.
+  \@unknownoptionerror
+}
+
+\ProcessKeyvalOptions*
+
+
+
+
+
+% % Handle Package Options
+% \DeclareOption{titlesmall}{\renewcommand{\notetitle}{\notetitlesmall}}
+% \DeclareOption{titlearticle}{\renewcommand{\notetitle}{\notetitlearticle}}
+% \DeclareOption{wideabstract}{\notewideabstract}
+% \DeclareOption{narrowabstract}{\notenarrowabstract}
+% \DeclareOption{nosectionfonts}{\renewcommand{\phfnote@declaresectionfonts}{}}
+% \DeclareOption{sectionfontscompact}{\phfnote@sectionfontscompact}
+% \DeclareOption{sectionparagraphfonts}{%
+%   \renewcommand{\phfnote@maybedeclarealsoparagraphfonts}{\phfnote@declarealsoparagraphfonts}%
+% }
+% \DeclareOption{nonotetitle}{\renewcommand{\phfnote@makenotetitle}{}}
+% \DeclareOption{nocosmeticdefs}{\renewcommand{\phfnote@cosmeticdefs}{}}
+% \DeclareOption{nopagegeomdefs}{\renewcommand{\phfnote@pagegeomdefs}{}}
+% \DeclareOption{nopdfhyperref}{\renewcommand{\phfnote@pdfhyperrefdefs}{}}
+% \DeclareOption{pdflinkblack}{%
+%   \renewcommand{\phfnote@pdfhyperrefcolordef}{%
+%     \definecolor{docnotelinkcolor}{rgb}{0,0,0}
+%   }%
+% }
+% \DeclareOption{notheorems}{%
+%   \renewcommand{\phfnote@theorems}{}%
+% }
+% \DeclareOption{onlystandalonedefs}{%
+%   \renewcommand{\phfnote@declaresectionfonts}{}%
+%   \renewcommand{\phfnote@makenotetitle}{}%
+%   \renewcommand{\phfnote@cosmeticdefs}{}%
+%   \renewcommand{\phfnote@do@pagegeomdefs}{}%
+%   \renewcommand{\phfnote@pdfhyperrefdefs}{}%
+% }
+% \DeclareOption*{%
+%   \PackageError{phfnote}{Unknown option `\CurrentOption'. Available options are titlesmall,titlearticle,nosectionfonts,sectionfontscompact,sectionparagraphfonts,nonotetitle,nocosmeticdefs,nopagegeomdefs,nopdfhyperref,pdflinkblack,notheorems,onlystandalonedefs}%
+% }
+% \ProcessOptions\relax
+
+
+
+
+%
+% execute definitions controlled by options
+%
+
+
+\phfnote@do@pkgset{\phfnote@opt@pkgset}
+
+\ifphfnote@opt@title
+  \phfnote@do@notetitle{\phfnote@opt@titlestyle}
+\fi
+
+\phfnote@do@noteabstract{\phfnote@opt@abstract}
+
+\phfnote@do@sectionfonts
+\phfnote@do@paragraphfonts
+
+\phfnote@do@pagegeomdefs
+\phfnote@do@spacing
+
+\ifphfnote@opt@hyperrefdefs
+  \phfnote@do@pdfhyperrefdefs
+\fi
+
+\phfnote@do@cosmeticdefs
+\phfnote@do@theorems
+
+\phfnote@do@bibliographydefs
+
+
+

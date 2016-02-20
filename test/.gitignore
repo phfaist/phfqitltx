@@ -1,4 +1,12 @@
 testquotetext.pdf
 testparen.pdf
 testqitentropies.pdf
-
+testnote.pdf
+*.bbl
+*.blg
+*.log
+*.aux
+*.out
+*.toc
+*.synctex.gz
+*.bibolamazicache

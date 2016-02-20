@@ -1,0 +1,1 @@
+../naturemagdoi.bst
