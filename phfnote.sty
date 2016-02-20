@@ -216,7 +216,7 @@
 \def\phfnote@do@spacing{%
 
   \if@twocolumn
-    %\renewcommand\baselinestretch{1.0} % leave default
+    \renewcommand\baselinestretch{1.0} % leave default
     \emergencystretch=3em
   \else
     \ifcase\@ptsize% 10pt
@@ -229,6 +229,32 @@
     \emergencystretch=5em
   \fi
 
+}
+
+\def\phfnote@par@original{%
+}
+
+\def\phfnote@par@indent{%
+  % 
+  % Paragraph Settings
+  % 
+  \setlength{\parindent}{1.5em}
+  \setlength{\parskip}{0.3em}
+}
+\def\phfnote@par@skip{%
+  % 
+  % Paragraph Settings
+  % 
+  \setlength{\parindent}{0em}
+  \setlength{\parskip}{0.8em}
+}
+
+\def\phfnote@do@par#1{%
+  \ifcsname phfnote@par@#1\endcsname
+    \csname phfnote@par@#1\endcsname
+  \else
+    \PackageWarning{phfnote}{Bad paragraph setting: #1. Leaving original}
+  \fi
 }
 
 
@@ -335,12 +361,6 @@
   % Theorems Settings
   % 
   \renewcommand{\qedsymbol}{\ensuremath{\blacksquare}}
-
-  % 
-  % Paragraph Settings
-  % 
-  \setlength{\parindent}{0.2cm}
-  \setlength{\parskip}{0.1cm}
 }
 
 
@@ -386,7 +406,7 @@
 
   \RequirePackage{csquotes}
 
-  \RequirePackage{dsfonts}
+  \RequirePackage{dsfont}
   \RequirePackage{bbm}
   \RequirePackage{mathtools}
 
@@ -395,7 +415,12 @@
 
 \def\phfnote@do@pkgset#1{
 
-  \phfnote@internal@execattribs{phfnote@do@pkgset@}{package set to load}{#1}
+  \ifcsname phfnote@do@pkgset@#1\endcsname
+    \csname phfnote@do@pkgset@#1\endcsname
+  \else
+    \PackageWarning{phfnote}{Unknown package set to load: #1. Loading minimal set}
+    \phfnote@do@pkgset@minimal
+  \fi
 
 }
 
@@ -599,6 +624,26 @@
 \DeclareBoolOption[true]{pagegeomdefs}
 \DeclareComplementaryOption{nopagegeomdefs}{pagegeomdefs}
 
+%
+% e.g. [spacingdefs=false]
+%
+% Add definitions to adjust spacing of lines and words.  Includes definitions to
+% avoid overflowing words in the margin in case of long words.
+%
+% [nospacingdefs] is equivalent to [spacingdefs=false]
+%
+\DeclareBoolOption[true]{spacingdefs}
+\DeclareComplementaryOption{nospacingdefs}{spacingdefs}
+
+
+%
+% e.g. [par=skip] or [par=indent]
+%
+% How to treat paragraphs.  Can be indented ('indent'), with an empty line
+% ('skip'), or no change from LaTeX default ('original').
+%
+\DeclareStringOption[skip]{par}
+
 
 %
 % e.g. [abstract={noname,narrow}]
@@ -711,11 +756,15 @@
 
 \phfnote@do@secfmt{\phfnote@opt@secfmt}
 
-
 \ifphfnote@opt@pagegeomdefs
   \phfnote@do@pagegeomdefs
 \fi
-\phfnote@do@spacing
+
+\ifphfnote@opt@spacingdefs
+  \phfnote@do@spacing
+\fi
+
+\phfnote@do@par{\phfnote@opt@par}
 
 \ifphfnote@opt@hyperrefdefs
   \phfnote@do@pdfhyperrefdefs
