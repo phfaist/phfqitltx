@@ -6,6 +6,31 @@
 \RequirePackage{kvoptions}
 
 
+
+
+%
+% internal -- execute all definitions given in list of attributes
+%
+\def\phfnote@internal@execattribs#1#2#3{%
+  %
+  % #1 = prefix to look for attributes
+  % 
+  % #2 = name of what #1 represents, to use in message in case attribute is not found
+  %
+  % #3 = list of attributes
+  %
+  \@for\next:=#3\do{%
+    \ifcsname #1\next\endcsname%
+      \csname #1\next\endcsname%
+    \else%
+      \PackageWarning{phfnote}{Unknown #2: '\next'. Ignoring.}
+    \fi
+  }
+}
+
+
+
+
 % ------------------------------------------------------------------------------
 %     TITLE
 % ------------------------------------------------------------------------------
@@ -147,14 +172,7 @@
   \let\abstract\noteabstract
   \let\endabstract\endnoteabstract
 
-  \@for\next:=#1\do{%
-    \ifcsname noteabstract@attr@\next\endcsname%
-      \csname noteabstract@attr@\next\endcsname%
-    \else%
-      \PackageWarning{phfnote}{Unknown abstract attribute: '\next'. Ignoring.}
-    \fi
-  }
-
+  \phfnote@internal@execattribs{noteabstract@attr@}{abstract attribute}{#1}
 }
 
 
@@ -224,7 +242,6 @@
     \vspace*{2mm}%
     \hrule%
     \vspace*{-2mm}%
-    \phfnote@makepdfbookmarktoc%
     \tableofcontents{}%
     \vspace*{4mm}%
     \hrule%
@@ -251,16 +268,7 @@
 % 	phv = Adobe Helvetica ; pcr = Adobe Courier ; put = Utopia ;
 % 	cmr = Comupter Modern Roman ; cmss = CM Sans Serif
 %
-\newcommand{\phfnote@do@sectionfonts}{
-  \RequirePackage{sectsty}
-  \sectionfont{\notesectionfont\notesectionfontsize}
-  \subsectionfont{\notesectionfont\notesubsectionfontsize}
-  \subsubsectionfont{\notesectionfont\notesubsubsectionfontsize}
-}
-\newcommand{\phfnote@declarealsoparagraphfonts}{
-  \paragraphfont{\notesectionfont\noteparagraphfontsize}
-  \subparagraphfont{\notesectionfont\notesubparagraphfontsize}
-}
+
 %
 \newcommand{\notesectionfontsize}{\large}
 \newcommand{\notesubsectionfontsize}{\normalsize}
@@ -283,11 +291,22 @@
 }
 
 
-\def\phfnote@do@paragraphfonts{
+\def\phfnote@do@secfmt@section{
+  \sectionfont{\notesectionfont\notesectionfontsize}
+  \subsectionfont{\notesectionfont\notesubsectionfontsize}
+  \subsubsectionfont{\notesectionfont\notesubsubsectionfontsize}
+}
+\def\phfnote@do@secfmt@paragraph{
   \paragraphfont{\notesectionfont\noteparagraphfontsize}
   \subparagraphfont{\notesectionfont\notesubparagraphfontsize}
 }
-
+\def\phfnote@do@secfmt@compact{
+  \notesectionfontsetsizes{\normalsize}{\small}{\small}
+}
+\def\phfnote@do@secfmt#1{%
+  \RequirePackage{sectsty}
+  \phfnote@internal@execattribs{phfnote@do@secfmt@}{section formatting preset}{#1}
+}
 
 
 
@@ -376,13 +395,7 @@
 
 \def\phfnote@do@pkgset#1{
 
-  \@for\next:=#1\do{%
-    \ifcsname phfnote@do@pkgset@\next\endcsname%
-      \csname phfnote@do@pkgset@\next\endcsname%
-    \else%
-      \PackageWarning{phfnote}{Unknown package set to load: '\next'. Ignoring.}
-    \fi
-  }
+  \phfnote@internal@execattribs{phfnote@do@pkgset@}{package set to load}{#1}
 
 }
 
@@ -553,15 +566,21 @@
 }
 
 %
+% e.g. [pkgset=minimal]
+%
 % Package set to load, for convenience.  'none', 'minimal', 'rich', or 'extended'
 %
 \DeclareStringOption[rich]{pkgset}
 
 %
+% e.g. [title=false]
+%
 % enable the styled note title, or leave the document default?
 %
 \DeclareBoolOption[true]{title}
 
+%
+% e.g. [titlestyle=small]
 %
 % The title style to use. By default, the 'default' style.  May be 'default',
 % 'small', or 'article'.
@@ -569,15 +588,64 @@
 \DeclareStringOption[default]{titlestyle}
 
 %
+% e.g. [pagegeomdefs=false]
+%
+% Define the page geometry.  This tries to come up with nice margin widths
+% depending on note font size (10pt,11pt,12pt) and whether it is [twocolumn] or
+% not.
+%
+% [nopagegeomdefs] is equivalent to [pagegeomdefs=false]
+%
+\DeclareBoolOption[true]{pagegeomdefs}
+\DeclareComplementaryOption{nopagegeomdefs}{pagegeomdefs}
+
+
+%
+% e.g. [abstract={noname,narrow}]
+%
 % Abstract flags.  May be a comma-separated list of the following: 'wide',
 % 'narrow', 'noname', 'original'
 %
 \DeclareStringOption[]{abstract}
 
 %
+% e.g. [hyperref=false]
+%
 % Load hyperref and corresponding definitions.
 %
-\DeclareBoolOptions[true]{hyperrefdefs}
+\DeclareBoolOption[true]{hyperrefdefs}
+%
+% [nohyperrefdefs] is equivalent to [hyperrefdefs=false]
+%
+\DeclareComplementaryOption{nohyperrefdefs}{hyperrefdefs}
+
+
+%
+% e.g. [secfmt={section,compact}]
+%
+% Styling of section headings.  Value is comma-separated list of actions to
+% take, chosen among:
+%
+%  - "section"  style section/subsection/subsubsection headings
+%
+%  - "compact"  make section/subsection/subsubsection headings more compact
+%
+%  - "paragraph"  style paragraph/subparagraph headings
+%
+\DeclareStringOption[section]{secfmt}
+
+%
+% e.g. [bibliographydefs=false]
+%
+% Adjustments for bibliography, including default style
+%
+\DeclareBoolOption[true]{bibliographydefs}
+%
+% [nobibliographydefs] is equivalent to [bibliographydefs=false]
+%
+\DeclareComplementaryOption{nobibliographydefs}{bibliographydefs}
+
+
 
 
 \DeclareDefaultOption{%
@@ -641,10 +709,12 @@
 
 \phfnote@do@noteabstract{\phfnote@opt@abstract}
 
-\phfnote@do@sectionfonts
-\phfnote@do@paragraphfonts
+\phfnote@do@secfmt{\phfnote@opt@secfmt}
 
-\phfnote@do@pagegeomdefs
+
+\ifphfnote@opt@pagegeomdefs
+  \phfnote@do@pagegeomdefs
+\fi
 \phfnote@do@spacing
 
 \ifphfnote@opt@hyperrefdefs
@@ -654,7 +724,9 @@
 \phfnote@do@cosmeticdefs
 \phfnote@do@theorems
 
-\phfnote@do@bibliographydefs
+\ifphfnote@opt@bibliographydefs
+  \phfnote@do@bibliographydefs
+\fi
 
 
 
