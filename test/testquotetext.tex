@@ -1,0 +1,70 @@
+\documentclass{article}
+
+\usepackage{../phfquotetext}
+
+\usepackage{xcolor}
+\usepackage[T1]{fontenc}  % needed for display of "\" char in quoted text in sans serif font
+\usepackage[normalem]{ulem} % for \sout{}
+
+\begin{document}
+
+Here is some text.
+
+\begin{quotetext}
+  here is some \quoted text. use \mathcal{E}_{X\to X'} to do math, and % this is not a comment.
+  
+  It can span several paragraphs, and the dollar sign $ does not $ start math mode.
+\end{quotetext}
+
+
+\vspace*{5em}
+
+
+\renewcommand\quotetextfont{\sffamily\color{red!50!black}}
+\renewcommand\quotetextstart{%
+  % 
+  % definitions here are local, because \begin{quotetext}...\end{quotetext} enclose
+  % everything within \begingroup...\endgroup.
+  % 
+  \vspace{1em}%
+  \hrule height .5ex\relax%
+  \vspace{0.5ex}%
+  % 
+  \let\oldpar\par%
+  \def\par{\vspace{0.5ex}\oldpar\hrule\oldpar\vspace{0.5ex}}%
+}
+\renewcommand\quotetextend{%
+  \vspace{0.5ex}%
+  \hrule height .5ex\relax%
+  \vspace{1em}%
+}
+
+Right after a paragraph, with custom font, and custom new paragraph style:
+\begin{quotetext}
+  here is some \quoted text formatted with \sffamily. use \mathcal{E}_{X\to X'} to do
+  math, and % this is not a comment.
+  
+  It can span several paragraphs, and the dollar sign $ does not $ start math mode.
+\end{quotetext}
+
+
+Back to normal text. See, everything has been reset to normal.
+
+Hopefully.
+
+
+\renewcommand\quotetextfont[1]{%
+  \sffamily\sout{#1}%
+}
+\renewcommand\quotetextstart{}
+\renewcommand\quotetextend{}
+
+\begin{quotetext}
+  here is some \quoted text. use \mathcal{E}_{X\to X'} to do math, and % this is not a comment.
+%
+  Because I've used \sout{} in the font, this may not span several paragraphs.  ...., the
+  dollar sign $ does not $ start math mode.
+\end{quotetext}
+
+
+\end{document}
