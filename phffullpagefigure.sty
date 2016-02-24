@@ -201,28 +201,44 @@
 \newdimen\phffpf@tmp@compareto
 
 \def\phffpf@placecode@onsameparity{%
-  %
-  % See if there is enough place left on this page to place the figure caption; otherwise
-  % use two \afterpage's
-  %
-[PLACING FIG CODE ON SAME PARITY]% -- debugging
   % 
-  \phffpf@tmp@spaceleft=\textheight\relax%
-  \phffpf@tmp@compareto=\phffpf@val@capmaxheight\relax%
-  \advance\phffpf@tmp@spaceleft by -\pagetotal%
-%  [DIM LEFT: \the\phffpf@tmp@spaceleft]%
-  \ifdim\phffpf@tmp@spaceleft>\phffpf@tmp@compareto%
+  % First, see if the caption requires to be full-page [and thus no height calculations
+  % are necessary, and an additional clearpage is required]
+  % 
+  \def\@tmpa{p}%
+  \ifx\phffpf@val@placement\@tmpa%
     %
-    % Enough space left on page, don't use two `afterpage`'s.
+    % place caption on page of its own -- use an additional \clearpage for that.
     %
-%    [ENOUGH DIM LEFT.] % -- debugging
-    \phffpf@tmp@figcode%
+    \afterpage{\vspace*{0pt}\afterpage{\phffpf@tmp@figcode\clearpage}}%
+    %
   \else%
-    % Not enough space, use two \afterpage's
-%    [*NOT ENOUGH* DIM LEFT.] % -- debugging
-    \afterpage{\vspace*{0pt}\afterpage{\phffpf@tmp@figcode}}%
+    %
+    % Figure caption is there along with some text on the page.
+    %
+    % 
+    % See if there is enough place left on this page to place the figure caption; otherwise
+    % use two \afterpage's
+    % 
+[PLACING FIG CODE ON SAME PARITY]% -- debugging
+    % 
+    \phffpf@tmp@spaceleft=\textheight\relax%
+    \phffpf@tmp@compareto=\phffpf@val@capmaxheight\relax%
+    \advance\phffpf@tmp@spaceleft by -\pagetotal%
+%    [DIM LEFT: \the\phffpf@tmp@spaceleft]%
+    \ifdim\phffpf@tmp@spaceleft>\phffpf@tmp@compareto%
+      % 
+      % Enough space left on page, don't use two `afterpage`'s.
+      %
+%      [ENOUGH DIM LEFT.] % -- debugging
+      \phffpf@tmp@figcode%
+    \else%
+      % Not enough space, use two \afterpage's
+%      [*NOT ENOUGH* DIM LEFT.] % -- debugging
+      \afterpage{\vspace*{0pt}\afterpage{\phffpf@tmp@figcode}}%
+    \fi%
+    %
   \fi%
-  %
 }
 
 \def\phffpf@placecode@onotherparity{%
@@ -231,7 +247,24 @@
   %
 [PLACING FIG CODE ON OTHER PARITY]% -- debugging
   % 
-  \afterpage{\phffpf@tmp@figcode}%
+  % 
+  % First, see if the caption requires to be full-page [and thus no height calculations
+  % are necessary, and an additional clearpage is required]
+  % 
+  \def\@tmpa{p}%
+  \ifx\phffpf@val@placement\@tmpa%
+    %
+    % place caption on page of its own -- use an additional \clearpage for that.
+    %
+    \afterpage{\phffpf@tmp@figcode\clearpage}%
+    %
+  \else%
+    %
+    % Figure caption is there along with some text on the page.
+    %
+    \afterpage{\phffpf@tmp@figcode}%
+    % 
+  \fi%
 }
 
 
