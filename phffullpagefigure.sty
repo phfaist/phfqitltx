@@ -1,0 +1,285 @@
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{phffullpagefigure}[2016/02/24 phffullpagefigure package]
+
+
+\RequirePackage{etoolbox}
+\RequirePackage{ifoddpage}
+\RequirePackage{afterpage}
+
+\RequirePackage{placeins} % \FloatBarrier
+
+
+
+\newcounter{phffpf@internal@pending}
+\setcounter{phffpf@internal@pending}{0}
+
+
+\newenvironment{fullpagefigure}[1][b]{% 
+  %
+  % Remember that we have a float pending to be placed
+  %
+  \addtocounter{phffpf@internal@pending}{1}%
+  %
+  % Don't allow any other floats to meddle with our calculations.
+  % 
+  \FloatBarrier%
+  %
+  % These variables will store the relevant values of options collected in the definition
+  % of the figure with e.g. \figplacement, \figcontents, etc.
+  % 
+  \xdef\phffpf@val@pageside{\phffpf@side@}%
+  \gdef\phffpf@val@captionopt{}%
+  \gdef\phffpf@val@caption{}%
+  \gdef\phffpf@val@label{}%
+  \gdef\phffpf@val@placement{#1}%  figure caption at 'bottom' of previous page, by default.
+  \gdef\phffpf@val@capmaxheight{\paperheight}%  TODO: this should be automatically calculated from caption
+  \gdef\phffpf@val@figcontents{}%
+  % 
+  % If this document has facing pages (odd/even pages), then by default place the float on
+  % an odd page.
+  %
+  \if@twoside%
+    \xdef\phffpf@val@pageside{\phffpf@side@odd}%
+  \else\fi%
+  %
+  % Provide option-value-setting commands within this figure block
+  %
+  \begingroup%
+  \let\figcontents\phffpf@impl@figcontents%
+  \let\figpageside\phffpf@impl@figpageside%
+  \let\caption\phffpf@impl@caption%
+  \let\label\phffpf@impl@label%
+  \let\figplacement\phffpf@impl@placement%
+  \let\figcapmaxheight\phffpf@impl@capmaxheight%
+  \phffpf@provide@figpdf% provide \figpdf as a shorthand, if appropriate
+}{%
+  % 
+  % End environment.
+  %
+  \endgroup%  restore \caption & \label
+  %
+  % Finally we should actually place the figure.
+  % 
+  \phffpf@doplacefigure%
+  %
+}
+
+\newtoks\phffpf@tmp@toks
+\def\phffpf@impl@figcontents#1{%
+  \phffpf@tmp@toks={#1}%
+  \xdef\phffpf@val@figcontents{\the\phffpf@tmp@toks}%
+}
+
+
+\def\phffpf@side@odd{O}
+\def\phffpf@side@even{E}
+\def\phffpf@side@{x}
+
+\def\phffpf@impl@figpageside#1{%
+  \ifcsname phffpf@side@#1\endcsname%
+    \xdef\phffpf@val@pageside{\csname phffpf@side@#1\endcsname}%
+  \else%
+    \PacakgeError{phffullpagefigure}{Unknown page side designation: '#1'. Please use 'odd',
+      'even', or '' for no preference.}%
+  \fi%
+}
+
+\def\phffpf@NOARG{}
+\def\phffpf@test@NOARG{\phffpf@NOARG}
+
+\newcommand\phffpf@impl@caption[2][\phffpf@NOARG]{%
+  \gdef\phffpf@val@captionopt{#1}%
+  \gdef\phffpf@val@caption{#2}%
+}
+
+\def\phffpf@impl@label#1{%
+  \gdef\phffpf@val@label{#1}%
+}
+
+\def\phffpf@impl@placement#1{%
+  \gdef\phffpf@val@placement{#1}%
+}
+
+\def\phffpf@impl@capmaxheight#1{%
+  \gdef\phffpf@val@capmaxheight{#1}%
+}
+
+
+
+\def\fullpagefigurecaptionfmt#1{%
+  \figurename\nobreakspace\thefigure\nobreakspace(\csname fullpagefigurecaptionfmt@paren@#1\endcsname)%
+}
+\def\fullpagefigurecaptionfmt@paren@O{on facing page} % for odd page figures
+\def\fullpagefigurecaptionfmt@paren@E{on next page}   % for even page figures
+\def\fullpagefigurecaptionfmt@paren@x{on next page}   % for next-page figures
+
+
+\def\phffpf@doplacefigure{%
+  %
+  % Now, all options have been set etc., the fullpagefigure environment has finished, so
+  % calculate the commands to place the figure appropriately.
+  %
+  %
+  % Prepare some code which should be placed on the page immediately preceeding the full
+  % page figure.
+  % 
+[PLACING FIGURE ON PAGE SIDE \phffpf@val@pageside] % -- for debugging
+  \gdef\phffpf@tmp@figcode{%
+    \edef\phffpf@tmp@figplacementarg{[\phffpf@val@placement]}%
+    \expandafter\figure\phffpf@tmp@figplacementarg%
+    \centering%
+    \begingroup%
+    %[FIGURE GHOST CONTENT: \phffpf@val@caption]
+    \def\fnum@figure{\fullpagefigurecaptionfmt{\phffpf@val@pageside}}%
+    \afterpage{\phffpf@val@figcontents}%
+    \ifx\phffpf@val@captionopt\phffpf@test@NOARG%
+      \caption{\phffpf@val@caption}%
+    \else%
+      \caption[\phffpf@val@captionopt]{\phffpf@val@caption}%
+    \fi%
+    \notblank{\phffpf@val@label}{%
+      \label{\phffpf@val@label}%
+    }{%
+    }
+    \endgroup%
+    \endfigure%
+    % 
+    % We have placed the figure, so decrease our "pending" counter
+    % 
+    \addtocounter{phffpf@internal@pending}{-1}%
+  }%
+  %
+  % 
+  % Now, determine where exactly to place the figure code.
+  %
+  \ifx\phffpf@val@pageside\phffpf@side@%
+    %
+    % No side preference.
+    %
+    % Just place the figure.  Like right now.
+    %
+    \phffpf@tmp@figcode%
+    %
+  \else%
+    %
+    % We have a side preference.  So check everything carefully.
+    %
+    \ifx\phffpf@val@pageside\phffpf@side@odd%
+%      [CHECK DONE HERE/WANT ODD] % -- for debugging
+      \checkoddpage\ifoddpageoroneside%
+%        [IS ODD] % -- for debugging
+        \let\phffpf@tmp@doplace\phffpf@placecode@onotherparity%
+      \else%
+%        [IS NOT ODD] % -- for debugging
+        \let\phffpf@tmp@doplace\phffpf@placecode@onsameparity%
+      \fi%
+    \else%
+%      [CHECK DONE HERE/WANT EVEN] % -- for debugging
+      \checkoddpage\ifoddpage%
+%        [IS ODD] % -- for debugging
+        \let\phffpf@tmp@doplace\phffpf@placecode@onsameparity%
+      \else%
+%        [IS NOT ODD] % -- for debugging
+        \let\phffpf@tmp@doplace\phffpf@placecode@onotherparity%
+      \fi%
+    \fi%
+  \fi%
+  %
+  % Now, do place the figure somewhere.
+  % 
+  \phffpf@tmp@doplace%
+  % 
+  % I think an \hbox{} might help to place the anchor which determines which page this is
+  % on. --- No, it inserts a blank paragraph (WHY??)
+  % 
+  %\hbox{}%
+}
+
+
+\newdimen\phffpf@tmp@spaceleft
+\newdimen\phffpf@tmp@compareto
+
+\def\phffpf@placecode@onsameparity{%
+  %
+  % See if there is enough place left on this page to place the figure caption; otherwise
+  % use two \afterpage's
+  %
+[PLACING FIG CODE ON SAME PARITY]% -- debugging
+  % 
+  \phffpf@tmp@spaceleft=\textheight\relax%
+  \phffpf@tmp@compareto=\phffpf@val@capmaxheight\relax%
+  \advance\phffpf@tmp@spaceleft by -\pagetotal%
+%  [DIM LEFT: \the\phffpf@tmp@spaceleft]%
+  \ifdim\phffpf@tmp@spaceleft>\phffpf@tmp@compareto%
+    %
+    % Enough space left on page, don't use two `afterpage`'s.
+    %
+%    [ENOUGH DIM LEFT.] % -- debugging
+    \phffpf@tmp@figcode%
+  \else%
+    % Not enough space, use two \afterpage's
+%    [*NOT ENOUGH* DIM LEFT.] % -- debugging
+    \afterpage{\vspace*{0pt}\afterpage{\phffpf@tmp@figcode}}%
+  \fi%
+  %
+}
+
+\def\phffpf@placecode@onotherparity{%
+  %
+  % Place the figure code after the current page.
+  %
+[PLACING FIG CODE ON OTHER PARITY]% -- debugging
+  % 
+  \afterpage{\phffpf@tmp@figcode}%
+}
+
+
+
+
+
+
+
+
+
+%
+% Command which can be used to ensure that all full-page figure floats have been placed.
+%
+
+\newcommand\FlushAllFullPageFigures[1][\phffpf@clearpage]{%  optional arg: clear page command
+  \ifnumcomp{\value{phffpf@internal@pending}}{>}{0}{%
+    \clearpage% clear page, possibly placing the figure.
+%    [page cleared.]% DEBUG
+    \FlushAllFullPageFigures[#1]% recurse again.
+  }{% all figures placed, all fine.  Still need to flush one last time because at this
+    % point the figure code (ie. caption) has been placed only, and we want the text that
+    % follows to come after the figure itself.
+    #1%
+  }%
+}
+
+\def\phffpf@clearpage{\if@twoside\cleardoublepage\else\clearpage\fi}
+
+
+
+\def\phffpf@provide@figpdf{}
+
+\newcommand\phffpf@impl@figpdf[2][]{%
+  \figcontents{\includepdf[#1]{#2}}%
+}
+
+\def\phffpf@do@pdfpages{%
+  \RequirePackage{pdfpages}%
+  \def\phffpf@provide@figpdf{\let\figpdf\phffpf@impl@figpdf}%
+}
+
+
+
+\DeclareOption{nopdfpages}{\def\phffpf@do@pdfpages{}}
+\DeclareOption*{%
+  \@unknownoptionerror%
+}
+\ProcessOptions\relax
+
+
+\phffpf@do@pdfpages
