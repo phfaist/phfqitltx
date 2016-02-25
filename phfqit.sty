@@ -117,6 +117,16 @@
 \DeclarePairedDelimiterX\norm[1]{\lVert}{\rVert}{{#1}}
 
 
+% ------------------------------------------------
+% Open/Closed/Semi-Open Intervals
+% ------------------------------------------------
+
+%[
+\DeclarePairedDelimiterX\intervalc[2]{[}{]}{{#1\mathclose{}\,,\,\mathopen{}#2}}
+\DeclarePairedDelimiterX\intervalo[2]{]}{[}{{#1\mathclose{}\,,\,\mathopen{}#2}}
+\DeclarePairedDelimiterX\intervalco[2]{[}{[}{{#1\mathclose{}\,,\,\mathopen{}#2}}
+\DeclarePairedDelimiterX\intervaloc[2]{]}{]}{{#1\mathclose{}\,,\,\mathopen{}#2}}
+%]
 
 % ------------------------------------------------
 % Entropies
