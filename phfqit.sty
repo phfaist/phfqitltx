@@ -122,10 +122,11 @@
 % ------------------------------------------------
 
 %[
-\DeclarePairedDelimiterX\intervalc[2]{[}{]}{{#1\mathclose{}\,,\,\mathopen{}#2}}
-\DeclarePairedDelimiterX\intervalo[2]{]}{[}{{#1\mathclose{}\,,\,\mathopen{}#2}}
-\DeclarePairedDelimiterX\intervalco[2]{[}{[}{{#1\mathclose{}\,,\,\mathopen{}#2}}
-\DeclarePairedDelimiterX\intervaloc[2]{]}{]}{{#1\mathclose{}\,,\,\mathopen{}#2}}
+\def\phfqit@insideinterval#1#2{{#1\mathclose{},\mathopen{}#2}}
+\DeclarePairedDelimiterX\intervalc[2]{[}{]}{\phfqit@insideinterval{#1}{#2}}
+\DeclarePairedDelimiterX\intervalo[2]{]}{[}{\phfqit@insideinterval{#1}{#2}}
+\DeclarePairedDelimiterX\intervalco[2]{[}{[}{\phfqit@insideinterval{#1}{#2}}
+\DeclarePairedDelimiterX\intervaloc[2]{]}{]}{\phfqit@insideinterval{#1}{#2}}
 %]
 
 % ------------------------------------------------
