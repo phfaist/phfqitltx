@@ -11,6 +11,64 @@
 
 
 
+%
+% \begin{fullpagefigure}
+%   % figure contents:
+%   \figcontents{ ... commands to create the full-page figure, e.g. \includepdf{} command(s). ... }
+%   % OR: shorthand for \figcontents{\includepdf[options]{pdf-file}}
+%   \figpdf[options]{pdf-file}
+%
+%   % more full-page figure options
+%   \fig*** ...
+%
+%   % Caption and label
+%   \caption{The figure caption goes here}
+%   \label{fig:some-label}
+% \end{fullpagefigure}
+%
+% Possible \fig*** option commands:
+%
+% \figpageside{odd}, \figpageside{}, \figpageside{even}  if the document is two-side, then
+%   specify the side the figure should appear on.  Use an empty argument to use either
+%   side.
+%
+% \figplacement{b|t|p}  figure caption placement, as for usual LaTeX floats. b=bottom,
+%   t=top, p=full page.  Use only ONE placement option, don't combine them.
+%
+%   The figure placement can also be specified as an optional argument to the environment.
+%
+% \figcapmaxheight{length}  the estimated height of the caption.  This is used to see
+%   whether the figure caption fits on the current page.
+%
+% \caption, \label  use as usual for figures.
+%
+% \figcontents{LaTeX commands}  specify a set of LaTeX commands to execute within an
+%   \afterpage{} command, in order to generate a full-page figure.  For example you might
+%   want to execute one or several \includepdf{} command(s) here.
+%
+% \figpdf[options]{pdf-file}  shorthand for \figcontents{\includepdf[options]{pdf-file}}
+%
+%
+%
+% The figure label in the caption may be changed (e.g. "Figure X (on facing page): ") by
+% redefining the command \fullpagefigurecaptionfmt.  See the default implementation for
+% more info.
+%
+%
+% \FlushAllFullPageFigures - issue this command whenever you need to make sure that all
+% full-page figures have been placed up to this point.  An optional argument
+% \FlushAllFullPageFigures[\clearpage] or \FlushAllFullPageFigures[\cleardoublepage]
+% specifies whether to continue on any page or on an odd-side page only.
+% 
+%
+%
+% PACKAGE OPTIONS
+%
+% [nopdfpages]  -- don't load the package {pdfpages}, and don't provide the \figpdf{}
+%                  command.
+%
+
+
 \newcounter{phffpf@internal@pending}
 \setcounter{phffpf@internal@pending}{0}
 
@@ -124,9 +182,13 @@
   % Prepare some code which should be placed on the page immediately preceeding the full
   % page figure.
   % 
-[PLACING FIGURE ON PAGE SIDE \phffpf@val@pageside] % -- for debugging
+%[PLACING FIGURE ON PAGE SIDE \phffpf@val@pageside] % -- for debugging
   \gdef\phffpf@tmp@figcode{%
-    \edef\phffpf@tmp@figplacementarg{[\phffpf@val@placement]}%
+    \expandafter\ifblank\expandafter{\phffpf@val@placement}{% don't have placement arg
+      \edef\phffpf@tmp@figplacementarg{}%
+    }{% have placement arg
+      \edef\phffpf@tmp@figplacementarg{[\phffpf@val@placement]}%
+    }
     \expandafter\figure\phffpf@tmp@figplacementarg%
     \centering%
     \begingroup%
@@ -166,21 +228,21 @@
     % We have a side preference.  So check everything carefully.
     %
     \ifx\phffpf@val@pageside\phffpf@side@odd%
-%      [CHECK DONE HERE/WANT ODD] % -- for debugging
-      \checkoddpage\ifoddpageoroneside%
-%        [IS ODD] % -- for debugging
+%[CHECK DONE HERE/WANT ODD] % -- for debugging
+      \checkoddpage\ifoddpage%
+%[IS ODD] % -- for debugging
         \let\phffpf@tmp@doplace\phffpf@placecode@onotherparity%
       \else%
-%        [IS NOT ODD] % -- for debugging
+%[IS NOT ODD] % -- for debugging
         \let\phffpf@tmp@doplace\phffpf@placecode@onsameparity%
       \fi%
     \else%
-%      [CHECK DONE HERE/WANT EVEN] % -- for debugging
+%[CHECK DONE HERE/WANT EVEN] % -- for debugging
       \checkoddpage\ifoddpage%
-%        [IS ODD] % -- for debugging
+%[IS ODD] % -- for debugging
         \let\phffpf@tmp@doplace\phffpf@placecode@onsameparity%
       \else%
-%        [IS NOT ODD] % -- for debugging
+%[IS NOT ODD] % -- for debugging
         \let\phffpf@tmp@doplace\phffpf@placecode@onotherparity%
       \fi%
     \fi%
@@ -220,7 +282,7 @@
     % See if there is enough place left on this page to place the figure caption; otherwise
     % use two \afterpage's
     % 
-[PLACING FIG CODE ON SAME PARITY]% -- debugging
+%[PLACING FIG CODE ON SAME PARITY]% -- debugging
     % 
     \phffpf@tmp@spaceleft=\textheight\relax%
     \phffpf@tmp@compareto=\phffpf@val@capmaxheight\relax%
@@ -245,7 +307,7 @@
   %
   % Place the figure code after the current page.
   %
-[PLACING FIG CODE ON OTHER PARITY]% -- debugging
+%[PLACING FIG CODE ON OTHER PARITY]% -- debugging
   % 
   % 
   % First, see if the caption requires to be full-page [and thus no height calculations
