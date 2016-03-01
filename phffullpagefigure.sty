@@ -26,6 +26,9 @@
 %   \label{fig:some-label}
 % \end{fullpagefigure}
 %
+% NOTE: The environment should be placed at the beginning of a paragraph, or on its own
+% paragraph.
+%
 % Possible \fig*** option commands:
 %
 % \figpageside{odd}, \figpageside{}, \figpageside{even}  if the document is two-side, then
@@ -83,6 +86,7 @@
   % Don't allow any other floats to meddle with our calculations.
   % 
   \FloatBarrier%
+%[YYY]% -- debugging [where is a space being inserted?]
   %
   % These variables will store the relevant values of options collected in the definition
   % of the figure with e.g. \figplacement, \figcontents, etc.
@@ -112,6 +116,10 @@
   \let\figplacement\phffpf@impl@placement%
   \let\figcapmaxheight\phffpf@impl@capmaxheight%
   \phffpf@provide@figpdf% provide \figpdf as a shorthand, if appropriate
+  %
+  % Finally, ignore any spaces following this command
+  %
+  \ignorespaces%
 }{%
   % 
   % End environment.
@@ -122,12 +130,17 @@
   % 
   \phffpf@doplacefigure%
   %
+  %
+  % Finally, ignore any spaces following this command
+  %
+  \ignorespaces%
 }
 
 \newtoks\phffpf@tmp@toks
 \def\phffpf@impl@figcontents#1{%
   \phffpf@tmp@toks={#1}%
   \xdef\phffpf@val@figcontents{\the\phffpf@tmp@toks}%
+  \ignorespaces%
 }
 
 
@@ -142,6 +155,7 @@
     \PacakgeError{phffullpagefigure}{Unknown page side designation: '#1'. Please use 'odd',
       'even', or '' for no preference.}%
   \fi%
+  \ignorespaces%
 }
 
 \def\phffpf@NOARG{}
@@ -150,18 +164,22 @@
 \newcommand\phffpf@impl@caption[2][\phffpf@NOARG]{%
   \gdef\phffpf@val@captionopt{#1}%
   \gdef\phffpf@val@caption{#2}%
+  \ignorespaces%
 }
 
 \def\phffpf@impl@label#1{%
   \gdef\phffpf@val@label{#1}%
+  \ignorespaces%
 }
 
 \def\phffpf@impl@placement#1{%
   \gdef\phffpf@val@placement{#1}%
+  \ignorespaces%
 }
 
 \def\phffpf@impl@capmaxheight#1{%
   \gdef\phffpf@val@capmaxheight{#1}%
+  \ignorespaces%
 }
 
 

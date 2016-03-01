@@ -6,6 +6,8 @@
 
 \usepackage{lipsum}
 
+\sloppy
+
 
 \begin{document}
 
@@ -140,6 +142,44 @@ height flag. [FIGPDF,FIGCAPMAXHEIGHT]
 \end{fullpagefigure}
 
 \lipsum[5-11]
+
+
+\cleardoublepage
+\lipsum[1-3]
+
+{\def\FloatBarrier{}
+And see Fig.~\ref{fig:test-8}. Placed on an odd side page [ODD,FIGPDF], but within two%
+%
+\begin{fullpagefigure}
+  \figpageside{even}
+  \figpdf{exampleA5fig}
+  \caption{Caption here. This is some text. This is some text. This is some text. This is
+    some text. This is some text. This is some text. This is some text. This is some
+    text. This is some text. This is some text. This is some text. This is some text. This
+    is some text. This is some text. }
+  \label{fig:test-8}
+\end{fullpagefigure}%
+%
+words of this paragraph.}
+
+\lipsum[5-7]
+
+\cleardoublepage
+\lipsum[1-3]
+
+\begin{fullpagefigure}
+  \figpageside{even}
+  \figpdf{exampleA5fig}
+  \caption{Caption here. This is some text. This is some text. This is some text. This is
+    some text. This is some text. This is some text. This is some text. This is some
+    text. This is some text. This is some text. This is some text. This is some text. This
+    is some text. This is some text. }
+  \label{fig:test-9}
+\end{fullpagefigure}
+And see Fig.~\ref{fig:test-9}. Placed on an odd side page [ODD,FIGPDF], but at the
+beginning of this paragraph.
+
+\lipsum[5-7]
 
 
 
