@@ -405,42 +405,7 @@
 
 \newcommand{\phfnote@do@theorems}{
 
-  \RequirePackage{amsmath}
-  \RequirePackage{amsthm}
-
-  \theoremstyle{plain}
-  \newtheorem{thm}{Theorem}
-  \newtheorem{prop}[thm]{Proposition}
-  \newtheorem{lemma}[thm]{Lemma}
-  \newtheorem{cor}[thm]{Corollary}
-  \newtheorem{conj}[thm]{Conjecture}
-  \newtheorem{remark}[thm]{Remark}
-  \newtheorem*{thm*}{Theorem}
-  \newtheorem*{prop*}{Proposition}
-  \newtheorem*{lemma*}{Lemma}
-  \newtheorem*{cor*}{Corollary}
-  \newtheorem*{conj*}{Conjecture}
-  \newtheorem*{idea*}{Idea}
-  \newtheorem*{remark*}{Remark}
-
-  % A special \begin{thmheading}{Title} .... \end{thmheading} for customizing the heading
-  % on-the-fly. Useful for my formatting of definitions. Using \begin{thmheeadingit} instead
-  %   makes body text italic.
-  \def\thmhdg@title{No Title Given}
-  \theoremstyle{definition}
-  \newtheorem*{thmhdgtitleinternal}{\thmhdg@title}
-  \theoremstyle{plain}
-  \newtheorem*{thmhdgtitleitinternal}{\thmhdg@title}
-  % define the relevant environments
-  \newenvironment{thmheading}[1]{%
-    \def\thmhdg@title{##1} %
-    \thmhdgtitleinternal %
-  } { \endthmhdgtitleinternal }%
-  \newenvironment{thmheadingit}[1]{%
-    \def\thmhdg@title{##1} %
-    \thmhdgtitleitinternal %
-  } { \endthmhdgtitleitinternal }%
-  
+  \RequirePacakge{phfthm}
 
   %
   % QED symbol

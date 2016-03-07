@@ -50,7 +50,7 @@
 %
 % Gates
 %
-\newcommand{\gate}[1]{\ifmmode\textsc{\lowercase{#1}}\else{\rmfamily\textsc{\lowercase{#1}}}\fi}
+\DeclareRobustCommand\gate[1]{\ifmmode\textsc{\lowercase{#1}}\else{\rmfamily\textsc{\lowercase{#1}}}\fi}
 \newcommand{\AND}{\gate{And}}
 \newcommand{\XOR}{\gate{Xor}}
 \newcommand{\CNOT}{\gate{C-Not}}

@@ -1,0 +1,340 @@
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{phfthm}[2016/03/07 phfthm package]
+
+\RequirePackage{xkeyval}
+\RequirePackage{etoolbox}
+
+\RequirePackage{aliascnt}
+
+\RequirePackage{amsmath}
+\RequirePackage{amsthm}
+
+
+% %
+% % internal -- execute all definitions given in list of attributes
+% %
+% \def\phfthm@internal@execattribs#1#2#3{%
+%   %
+%   % #1 = prefix to look for attributes
+%   % 
+%   % #2 = name of what #1 represents, to use in message in case attribute is not found
+%   %
+%   % #3 = list of attributes
+%   %
+%   \@for\next:=#3\do{%
+%     \ifcsname #1\next\endcsname%
+%       \csname #1\next\endcsname%
+%     \else%
+%       \PackageWarning{phfthm}{Unknown #2: '\next'. Ignoring.}
+%     \fi
+%   }
+% }
+
+
+\define@cmdkey{phfmkthm}{counter}{}
+\define@boolkey{phfmkthm}{alias}[true]{}
+\define@cmdkey{phfmkthm}{style}{}
+\define@boolkey{phfmkthm}{alsostarred}[true]{}
+
+
+\newcommand\phfMakeTheorem[3][]{%
+  % 
+  %  #1 = [options]
+  %  #2 = {theorem-codename}
+  %  #3 = {Theorem Name}
+  %
+  %  e.g. \phfMakeTheorem[counter=thmcounter]{prop}{Proposition}
+  %  
+  %
+  % Handle [options]
+  % ----------------
+  %
+  % ensure defaults are set
+  % 
+  \KV@phfmkthm@aliastrue%
+  \def\cmdKV@phfmkthm@counter{}%
+  \def\cmdKV@phfmkthm@style{}%
+  \KV@phfmkthm@alsostarredtrue%
+  %
+  \setkeys{phfmkthm}{#1}% options
+  %
+  %
+  % Now, implementation
+  % -------------------
+  % 
+  % set style if requested
+  %
+  \if\relax\detokenize\expandafter{\cmdKV@phfmkthm@style}\relax% test if empty:
+  %                                                              [http://tex.stackexchange.com/a/53091/32188]
+  \else%
+    \theoremstyle{\cmdKV@phfmkthm@style}%
+  \fi%
+  %
+  % separate counter?
+  % 
+  \if\relax\detokenize\expandafter{\cmdKV@phfmkthm@counter}\relax% tests if empty:
+    %                                                              [http://tex.stackexchange.com/a/53091/32188]
+    %
+    % Use our own separate counter.
+    %
+    \newtheorem{phfthm@#2}{#3}%
+    % 
+    \csdef{phfthm@#2autorefname}{#3}%  for \autoref{}
+    %
+  \else%
+    %
+    % Use another counter.
+    %
+    \ifKV@phfmkthm@alias%
+      %
+      % Make a distinct alias counter, e.g. for use with autoref.
+      %
+      \newaliascnt{#2}{\cmdKV@phfmkthm@counter}%
+      \newtheorem{phfthm@#2}[#2]{#3}%
+      \aliascntresetthe{#2}%
+      % 
+      \csdef{#2autorefname}{#3}%  for \autoref{}
+      %
+    \else%
+      %
+      % Directly instruct \newtheorem to use the other counter.  Does not work with \autoref.
+      %
+      \newtheorem{phfthm@#2}[\cmdKV@phfmkthm@counter]{#3}%
+    \fi%
+  \fi%
+  %
+  %
+  \newenvironment{#2}[1][]{%
+    \begin{phfthm@#2}[##1]%
+      \begingroup%
+        \csname phfthm@hook@start@#2\endcsname{##1}%
+    }{%
+        \csname phfthm@hook@end@#2\endcsname%
+      \endgroup%
+    \end{phfthm@#2}%
+  }%
+  %
+  \csdef{phfthm@hook@start@#1}##1{\phfthm@hook@startcommon{#1}}%
+  \csdef{phfthm@hook@end@#1}{\phfthm@hook@endcommon{#1}}%
+  %
+  %
+  %
+  % Maybe also make starred version
+  %
+  \ifKV@phfmkthm@alsostarred%
+    \newtheorem*{phfthm@#2*}{#3}%
+    \newenvironment{#2*}[1][]{%
+      \begin{phfthm@#2*}[##1]%
+        \begingroup%
+          \csname phfthm@hook@start@#2*\endcsname{##1}%
+      }{%
+          \csname phfthm@hook@end@#2*\endcsname%
+        \endgroup%
+      \end{phfthm@#2*}%
+    }%
+    % 
+  \fi%
+  %
+  \csdef{phfthm@hook@start@#1*}##1{\csname phfthm@hook@start@#1\endcsname{#1}}%
+  \csdef{phfthm@hook@end@#1*}{\phfthm@hook@end@#1\endcsname{#1}}%
+  %
+  % 
+}
+
+
+
+\def\phfthm@hook@startcommon#1{%
+  \postdisplaypenalty=10000\relax% avoid orphan line on new page after display equation
+  \phfthm@def@label@thmlabel{#1}%
+}
+\def\phfthm@hook@endcommon#1{%
+}
+
+
+
+
+
+
+% ------------------------------------------------
+
+%
+% Improved, smart {proof} environment
+%
+
+
+\newcounter{phfthmproofcnt}
+
+\newenvironment{phfthm@proof@inner}[1]{%
+  \refstepcounter{phfthmproofcnt}%
+  \phfthm@hook@start@proof{#1}%
+  \phfthm@do@proofofwhat{#1}%
+  \phfthm@hook@startpost@proof{#1}%
+}{%
+}
+
+
+\def\phfthm@hook@start@proof#1{}%\def\baselinestretch{1.2}\footnotesize}
+\def\phfthm@hook@startpost@proof#1{\hspace{1.5ex plus 0.5ex minus 0.2ex}}
+
+
+\def\phfthm@do@proofofwhat#1{%
+  \def\phfthm@val@proofoflabel{}%
+  \def\phfthm@val@prooftitle{}%
+  \if\relax\detokenize\expandafter{#1}\relax% #1 = empty ? 
+    \phfthm@fmt@prooftitle{\proofname}%
+  \else%
+    \phfthm@do@proofofwhat@maybelabel#1\phfthm@do@proofofwhat@END%
+    \phfthm@fmt@prooftitle{\proofofname{\phfthm@val@prooftitle}}%
+  \fi%
+  \if\relax\detokenize\expandafter{\phfthm@val@proofoflabel}\relax% proof of label = empty ?
+  \else%
+    \label{proof:\phfthm@val@proofoflabel}%  pin label of our own for this proof.
+  \fi%
+}
+
+\def\phfthm@do@proofofwhat@maybelabel{%
+  \@ifnextchar*\phfthm@do@proofofwhat@label\phfthm@do@proofofwhat@title%
+}
+\def\phfthm@do@proofofwhat@label*#1\phfthm@do@proofofwhat@END{%
+  \edef\phfthm@val@proofoflabel{#1}%
+  \def\phfthm@val@prooftitle{\autoref{#1}}%
+}
+\def\phfthm@do@proofofwhat@title#1\phfthm@do@proofofwhat@END{%
+  \def\phfthm@val@proofoflabel{}%
+  \def\phfthm@val@prooftitle{#1}%
+}
+
+\def\phfthm@fmt@prooftitle#1{{\bfseries\itshape#1.}}%
+\def\proofofname#1{\proofname{} of #1}
+
+
+\newenvironment{phfthm@proof}[1][]{%
+  \par%
+  \pushQED{\qed}%
+  \normalfont\topsep6\p@\@plus6\p@\relax%
+  \trivlist\item\relax%
+  \begin{phfthm@proof@inner}{#1}%
+  \ignorespaces%
+}{%
+  \popQED\endtrivlist\@endpefalse%
+  \end{phfthm@proof@inner}%
+}
+
+
+%
+% Reasonable defaults need to be controlled by package options.....
+%
+
+
+\newcounter{phfthm@counter}
+\setcounter{phfthm@counter}{0}
+
+\phfMakeTheorem[counter=phfthm@counter]{theorem}{Theorem}
+\phfMakeTheorem[counter=phfthm@counter]{proposition}{Proposition}
+\phfMakeTheorem[counter=phfthm@counter]{lemma}{Lemma}
+\phfMakeTheorem[counter=phfthm@counter]{corollary}{Corollary}
+\phfMakeTheorem[counter=phfthm@counter]{conjecture}{Conjecture}
+\phfMakeTheorem[counter=phfthm@counter]{remark}{Remark}
+
+
+\let\proof\phfthm@proof
+\let\endproof\endphfthm@proof
+
+
+
+
+% ==============================================================================
+
+
+
+
+
+% % the actual counter; the others will just be aliases. See http://tex.stackexchange.com/a/113540/32188
+% \newcounter{thmcounter}
+% %\numberwithin{thmcounter}{chapter}
+
+
+
+
+
+% \def\phfthm@def@label@thmlabel#1{% theorem type
+%   \let\phfthm@old@label\label%
+%   \def\label{\phfthm@thmlabel{#1}}%
+% }
+% \def\phfthm@thmlabel#1#2{% theorem type, label name
+%   \global\def\phfthm@last@thmlabel{#2}%
+%   \phfthm@old@label{#2}%
+%   \phfthm@make@proofref@at@label@point{#1}{#2}%
+%   % and restore old \label definition for other items in the environment:
+%   \let\label\phfthm@old@label%
+% }
+
+% %
+% % Redefine this macro to customize where the proofref should appear: at label point or at
+% % the end of the theorem? Use \appto\phfthm@thm@atend to place it at the end.
+% %
+% \def\phfthm@make@proofref@at@label@point#1#2{% theorem type, label name
+%   % by default, insert proof reference at the end of the theorem.
+%   \appto\phfthm@thm@atend{\proofref{#2}}%
+% }
+
+% %
+% % Don't issue a "Proof of this on page that" at a particular theorem. Might be because it
+% % doesn't have a corresponding proof block.
+% %
+% % Call this BEFORE \label{}ing the theorem! For example:
+% %
+% %     \begin{theorem}[Pythagoras]
+% %       \noproofref
+% %       \label{thm:pythagoras}
+% %       ...
+% %     \end{theorem}
+% %
+% \def\noproofref{
+%   \let\phfthm@make@proofref@at@label@point\phfthm@NO@proofref@at@label@point%
+% }
+% \def\phfthm@NO@proofref@at@label@point#1#2{}% do nothing
+
+
+
+
+
+
+
+
+
+% % ------------------------- old -----------------------------------
+% \theoremstyle{plain}
+%   \newtheorem{thm}{Theorem}
+%   \newtheorem{prop}[thm]{Proposition}
+%   \newtheorem{lemma}[thm]{Lemma}
+%   \newtheorem{cor}[thm]{Corollary}
+%   \newtheorem{conj}[thm]{Conjecture}
+%   \newtheorem{remark}[thm]{Remark}
+%   \newtheorem*{thm*}{Theorem}
+%   \newtheorem*{prop*}{Proposition}
+%   \newtheorem*{lemma*}{Lemma}
+%   \newtheorem*{cor*}{Corollary}
+%   \newtheorem*{conj*}{Conjecture}
+%   \newtheorem*{idea*}{Idea}
+%   \newtheorem*{remark*}{Remark}
+%
+%   % A special \begin{thmheading}{Title} .... \end{thmheading} for customizing the heading
+%   % on-the-fly. Useful for my formatting of definitions. Using \begin{thmheeadingit} instead
+%   %   makes body text italic.
+%   \def\thmhdg@title{No Title Given}
+%   \theoremstyle{definition}
+%   \newtheorem*{thmhdgtitleinternal}{\thmhdg@title}
+%   \theoremstyle{plain}
+%   \newtheorem*{thmhdgtitleitinternal}{\thmhdg@title}
+%   % define the relevant environments
+%   \newenvironment{thmheading}[1]{%
+%     \def\thmhdg@title{##1} %
+%     \thmhdgtitleinternal %
+%   } { \endthmhdgtitleinternal }%
+%   \newenvironment{thmheadingit}[1]{%
+%     \def\thmhdg@title{##1} %
+%     \thmhdgtitleitinternal %
+%   } { \endthmhdgtitleitinternal }%
+  
