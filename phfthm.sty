@@ -1,10 +1,9 @@
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{phfthm}[2016/03/07 phfthm package]
+\ProvidesPackage{phfthm}[2016/03/08 phfthm package]
 
 \RequirePackage{xkeyval}
 \RequirePackage{etoolbox}
-\RequirePackage{xstring}
 
 \RequirePackage{aliascnt}
 
@@ -286,37 +285,47 @@
 
 % proof ref machinery
 
-\providecommand\proofonname[1]{Proof on #1.}
-%\providecommand\proofonname[1]{The proof of this \phfthm@autorefnameof{#1} can be found on #1.}
+\providecommand\proofonname[2]{Proof on #2.}
 
 \def\noproofref{%
   \def\phfthm@val@noproofref{1}% if this is defined, then no proof ref should be generated for the current thmlabel
 }
 
-\def\phfthm@fmt@proofref#1{%
+%
+% This one may also be defined to take one argument, the proof ref text.
+%
+\def\proofrefsize{\footnotesize}
+
+\def\phfthm@fmt@proofref#1#2{%
   %
-  % #1 = full reference (e.g. "page XYZ")
+  % #1 = theorem's label (e.g. "prop:1")
+  % #2 = full reference (e.g. "page XYZ")
   % 
   {\parfillskip=0pt\relax% Thanks http://tex.stackexchange.com/a/43239/32188 !
-    \hfil\hbox{\footnotesize (\proofonname{#1})}\par}%
+    \hfil\hbox{\proofrefsize{(\proofonname{#1}{#2})}}\par}%
 }
 
-\def\phfthm@proofref@implsimple#1{%
-  %
-  % #1 = referenced label
-  %
-  % Simplest version of this macro:
-  %
-  %The proof of this \phfthm@autorefnameof{#1} is given on \autopageref{proof:#1}.
-  %
-  \phfthm@fmt@proofref{\autopageref{proof:#1}}%
-}
+\def\phfthm@fmt@proofref@farback#1#2{\phfthm@fmt@proofref{#1}{#2}}
+\def\phfthm@fmt@proofref@farahead#1#2{\phfthm@fmt@proofref{#1}{#2}}
+\def\phfthm@fmt@proofref@closeby#1#2{}
+
+
+% \def\phfthm@proofref@impl#1{%  SIMPLE VERSION
+%   %
+%   % #1 = referenced label
+%   %
+%   % Simplest version of this macro:
+%   %
+%   %The proof of this \phfthm@autorefnameof{#1} is given on \autopageref{proof:#1}.
+%   %
+%   \phfthm@fmt@proofref{\autopageref{proof:#1}}%
+% }
 
 \def\phfthm@proofref@warnnolabel{%
   \PackageWarning{phfthm}{No label provided for proof reference!}%
 }
 
-\def\phfthm@proofref@implcomplicated@thmlabel{%
+\def\phfthm@proofref@impl@thmlabel{%
   \ifdefined\phfthm@val@noproofref\relax%
     % "no proof ref" was explicitly specified
   \else%
@@ -325,16 +334,22 @@
     % generate the proof reference for current thmlabel
     \edef\phfthm@tmpa{{\phfthm@val@thmlabel}}%
     \expandafter\notblank\phfthm@tmpa{%
-      \expandafter\phfthm@proofref@implcomplicated\phfthm@tmpa%
+      \expandafter\phfthm@proofref@impl\phfthm@tmpa%
     }{%
       \phfthm@proofref@warnnolabel% no label provided
     }%
   \fi%
 }
 
+%
+% allow the proof to be this many pages away. Use -1 to force display of reference.
+%
+\newcommand\phfthmProofrefPageBackTolerance{1}
+\newcommand\phfthmProofrefPageAheadTolerance{1}
+
 \newcounter{phfthmInternalProofrefCounter}
 
-\def\phfthm@proofref@implcomplicated#1{%
+\def\phfthm@proofref@impl#1{%
   %
   % #1 = referenced label
   %
@@ -348,25 +363,22 @@
   \refstepcounter{phfthmInternalProofrefCounter}\label{internalproofref\thephfthmInternalProofrefCounter}%
   \edef\phfthm@proofref@tmp@proofpage{\phfthm@min@pageref{proof:#1}}%
   \edef\phfthm@proofref@tmp@thispage{\phfthm@min@pageref{internalproofref\thephfthmInternalProofrefCounter}}%
-%  \IfStrEq{\phfthm@proofref@tmp@proofpage}{\phfthm@proofref@tmp@thispage}%
-  \ifnum\numexpr\phfthm@proofref@tmp@proofpage\relax=\numexpr\phfthm@proofref@tmp@thispage\relax%
-    % if on same page: nothing
+  \edef\phfthm@proofref@tmp@pagediff{\the\numexpr\phfthm@proofref@tmp@proofpage-\phfthm@proofref@tmp@thispage\relax}%
+  \ifnum\numexpr\phfthm@proofref@tmp@pagediff\relax<\numexpr-\phfthmProofrefPageBackTolerance\relax%
+    % far back
+    \phfthm@fmt@proofref@farback{#1}{\autopageref{proof:#1}}%
   \else%
-    % else: check if on following page:
-    \ifnum\numexpr\phfthm@proofref@tmp@proofpage\relax=\numexpr1+\phfthm@proofref@tmp@thispage\relax%
-      % if on following page: nothing
+    \ifnum\numexpr\phfthm@proofref@tmp@pagediff\relax>\numexpr\phfthmProofrefPageAheadTolerance\relax%
+      % far ahead
+      \phfthm@fmt@proofref@farahead{#1}{\autopageref{proof:#1}}%
     \else%
-      % else: page reference
-      \phfthm@fmt@proofref{\autopageref{proof:#1}}%
+      % close
+      \phfthm@fmt@proofref@closeby{#1}{\autopageref{proof:#1}}%
     \fi%
   \fi%
 %  [\number\numexpr\phfthm@proofref@tmp@proofpage\relax{} vs % DEBUG
 %  \number\numexpr\phfthm@proofref@tmp@thispage\relax or % DEBUG
 %  \number\numexpr1+\phfthm@proofref@tmp@thispage\relax] % DEBUG
-}
-\def\phfthm@pageref@or@zero#1{%
-  \edef\phfthm@thepagerefnum{\pageref{#1}}%
-  \IfInteger{\phfthm@thepagerefnum}{\phfthm@thepagerefnum}{}% xstring package
 }
 
 \def\phfthm@autorefnameof#1{%
@@ -557,7 +569,8 @@
 
 
 \ifKV@phfthmpkg@smallproofs
-  \apptocmd\phfthm@hook@start@proof{\footnotesize}{}{Failed to change command \string\phfthm@hook@start@proof}
+  \apptocmd\phfthm@hook@start@proof{\def\baselinestretch{1.2}\footnotesize}{}{%
+    Failed to change command \string\phfthm@hook@start@proof}
 \fi
 
 \ifKV@phfthmpkg@qedsymbolblacksquare
@@ -577,15 +590,35 @@
 
   \def\phfthm@proofref@style@margin{%
     % 
-    \def\phfthm@fmt@proofref##1{%
+    \def\phfthm@fmt@proofref##1##2{%
       % 
       % ##1 = full reference (e.g. "page XYZ")
       % 
-      \marginpar{\footnotesize\proofonname{##1}}%
+      \marginpar{\proofrefsize{\proofonname{##1}{##2}}}%
     }%
   }
   \def\phfthm@proofref@style@default{}
   \def\phfthm@proofref@style@{}
+  % 
+  \def\phfthm@proofref@style@always{
+    \def\phfthmProofrefPageBackTolerance{-1}
+    \def\phfthmProofrefPageAheadTolerance{-1}
+  }
+  \def\phfthm@proofref@style@onlyifveryfar{
+    \def\phfthmProofrefPageBackTolerance{2}
+    \def\phfthmProofrefPageAheadTolerance{4}
+  }
+  % 
+  \def\phfthm@proofref@style@longref{
+    \def\proofonname##1##2{The proof of this \phfthm@autorefnameof{##1} can be found on ##2.}
+    \def\phfthm@fmt@proofref##1##2{%
+      % 
+      % #1 = theorem's label (e.g. "prop:1")
+      % #2 = full reference (e.g. "page XYZ")
+      % 
+      \par{\raggedleft\proofrefsize{(\proofonname{##1}{##2})}\par}%
+    }
+  }
 
   \def\phfthm@exec@proofrefstyles#1\phfthm@END{\phfthm@internal@execattribs{phfthm@proofref@style@}{ProofRef Style}{#1}}
   \expandafter\phfthm@exec@proofrefstyles\cmdKV@phfthmpkg@proofref@style\phfthm@END
@@ -595,7 +628,7 @@
   \def\phfthm@def@thmset@mktheorem#1#2{% #1 = prop env name ("proposition"), #2 = prop title name ("Proposition")
     \phfthm@def@thmset@mktheorem@OLD{#1}{#2}%
     \expandafter\apptocmd\csname phfthm@hook@end@#1\endcsname{%
-      \phfthm@proofref@implcomplicated@thmlabel%
+      \phfthm@proofref@impl@thmlabel%
     }{}{Failed to append to command `\expandafter\string\csname phfthm@hook@end@#1\endcsname!!}%
   }
 
