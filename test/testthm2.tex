@@ -1,0 +1,71 @@
+\documentclass[12pt,a5paper]{article}
+
+\usepackage[thmset=shortnames]{../phfthm}
+
+% no hyperref package loading.
+
+
+\begin{document}
+
+\begin{prop}
+  \label{prop:1}
+  Proposition here.
+\end{prop}
+\begin{proof}[*prop:1]
+  this is a proof.
+\end{proof}
+
+\bigskip
+
+\begin{lem}
+\label{lem:1}
+Another lemma here.
+\end{lem}
+\begin{proof}[the Lemma]
+  this is another proof.
+\end{proof}
+
+\bigskip
+
+\begin{prop}
+Another proposition here.
+\end{prop}
+\begin{proof}
+  this is yet another proof.
+\end{proof}
+
+\bigskip
+
+\begin{prop*}
+Another proposition here, with no numbering.
+\end{prop*}
+\begin{proof}
+  this is yet another proof.
+\end{proof}
+
+\bigskip
+
+\begin{thm}
+\label{thm:1}
+And a theorem
+\end{thm}
+\begin{proof}[*thm:1]
+  ....... and  this is yet yet another proof.
+\end{proof}
+
+\bigskip
+
+See also Prop.~\ref{prop:1}, Thm.~\ref{thm:1} and Lem.~\ref{lem:1}.
+
+
+
+
+
+
+\end{document}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
