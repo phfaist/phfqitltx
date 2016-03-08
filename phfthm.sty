@@ -481,6 +481,20 @@
   \phfthm@def@thmset@mktheorem{problem}{Problem}
 }
 
+\newcommand\phfthmLoadThmSet[3]{%
+  % 
+  % #1 = options for theorem definitions
+  % #2 = options for definition definitions
+  % #3 = name of the thm set to load
+  %
+  \ifcsname phfthm@thmset@#3\endcsname%
+    \edef\phfthm@val@mkthmoptarg@theorem{#1}%
+    \edef\phfthm@val@mkthmoptarg@defn{#2}%
+    \csname phfthm@thmset@#3\endcsname%
+  \else%
+    \PackageWarning{phfthm}{Unknown theorem set: `#3'!}%
+  \fi%
+}
 
 
 % ==============================================================================
@@ -501,6 +515,10 @@
 \define@boolkey{phfthmpkg}{sepcounters}[true]{}
 \KV@phfthmpkg@sepcountersfalse% false by default
 
+\define@boolkey{phfthmpkg}{thmheading}[true]{}
+\KV@phfthmpkg@thmheadingtrue% set to true by default because these are only stand-alone definitions
+\define@cmdkey{phfthmpkg}{thmheadingstyle}{}
+\def\cmdKV@phfthmpkg@thmheadingstyle{plain}
 
 %
 % proof ref options
@@ -548,7 +566,18 @@
 \expandafter\@tmpa\@tmpb{%
   \xdef\cmdKV@phfthmpkg@thmset{\val}%
 }
+\def\cmdKV@phfthmpkg@thmset{default}% by default, load the default set
 
+
+%
+% These set which theorem style to use for theorems and definitions, when loading the
+% given thmset.
+%
+\define@cmdkey{phfthmpkg}{theoremstyle}{}
+\def\cmdKV@phfthmpkg@theoremstyle{plain}
+%
+\define@cmdkey{phfthmpkg}{definitionstyle}{}
+\def\cmdKV@phfthmpkg@definitionstyle{definition}
 
 
 \DeclareOptionX*{%
@@ -658,16 +687,10 @@
 % load the theorem set defined by the options
 %
 
-%\def\phfthm@exec@thmsets{\phfthm@internal@execattribs{phfthm@thmset@}{Theorem Set}}
-%\expandafter\phfthm@exec@thmsets\cmdKV@phfthmpkg@thmset
-\ifcsname phfthm@thmset@\cmdKV@phfthmpkg@thmset\endcsname
-  \edef\phfthm@val@mkthmoptarg@theorem{[\phfthm@val@mkthmopt@counteropts]}
-  \edef\phfthm@val@mkthmoptarg@defn{[\phfthm@val@mkthmopt@counteropts,thmstyle=definition]}
-  \csname phfthm@thmset@\cmdKV@phfthmpkg@thmset\endcsname
-\else
-  \PackageWarning{phfthm}{Unknown theorem set: `\cmdKV@phfthmpkg@thmset'!}
-\fi
-
+\phfthmLoadThmSet%
+{[\phfthm@val@mkthmopt@counteropts,thmstyle=\cmdKV@phfthmpkg@theoremstyle]}% opts for theorems
+{[\phfthm@val@mkthmopt@counteropts,thmstyle=\cmdKV@phfthmpkg@definitionstyle]}% opts for definitions
+{\cmdKV@phfthmpkg@thmset} % the theorem set
 
 
 %
@@ -685,6 +708,50 @@
 %
 \let\proof\phfthm@proof
 \let\endproof\endphfthm@proof
+
+
+
+\ifKV@phfthmpkg@thmheading % also set \cmdKV@phfthmpkg@thmheadingstyle
+
+  % 
+  % A special \begin{thmheading}{Title} .... \end{thmheading} for customizing the heading
+  % on-the-fly. Useful for my formatting of definitions.
+  % 
+  % You can also use \label{...} and \ref{} which yields the title.
+  % 
+
+  \newcounter{phfthmheadingcounter}
+
+  \def\phfthm@thmheading@val@title{$\langle$No Title Given$\rangle$}
+  \theoremstyle{\cmdKV@phfthmpkg@thmheadingstyle}
+
+  \newtheorem*{phfthm@internal@thmheading}{\phfthm@thmheading@val@title}
+  % define the relevant environments
+  \newenvironment{thmheading}[1]{%
+    \def\phfthm@thmheading@val@title{#1}%
+    \let\thephfthmheadingcounter\phfthm@thmheading@val@title%
+    \phfthm@internal@thmheading%
+    % \hspace: see http://tex.stackexchange.com/a/88493/32188, especially the first comment
+    \hspace*{0pt}\refstepcounter{phfthmheadingcounter}%
+    \phfthm@hook@thmheading@start{#1}%
+    % add some flexibility in the hspace
+    \hskip 0em plus 0.5em minus 0em%
+    \ignorespaces%
+  }{%
+    \phfthm@hook@thmheading@end%
+    \endphfthm@internal@thmheading%
+  }%
+
+  \def\phfthm@hook@thmheading@start#1{}
+  \def\phfthm@hook@thmheading@end{}
+
+\fi
+
+
+
+
+
+
 
 
 

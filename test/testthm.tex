@@ -1,7 +1,8 @@
 \documentclass[12pt,a5paper]{article}
 
 %\usepackage[thmset=default,sepcounters,proofref={margin,always}]{../phfthm}
-\usepackage[thmset=default,sepcounters,proofref={longref,margin}]{../phfthm}
+%\usepackage[theoremstyle=definition,definitionstyle=remark,thmset=rich,proofref={longref,margin}]{../phfthm}
+\usepackage[sepcounters,proofref]{../phfthm}
 
 \def\proofrefsize{\tiny}
 
@@ -30,6 +31,8 @@ Another lemma here.
   And more stuff.
 \end{proof}
 
+
+You might also like the defintion of the \ref{thmheading:trace-dist} on \autopageref{thmheading:trace-dist}.
 
 \begin{proposition}
 \noproofref
@@ -79,6 +82,14 @@ x
   ....... and this is yet yet another proof.  This proof is only on the next page of the
   theorem, so it should not necessary display the reference there.
 \end{proof}
+
+\begin{thmheading}{Trace Distance}
+  \label{thmheading:trace-dist}
+  The \emph{trace distance} is given by the following expression:
+  \begin{align}
+    \delta(\rho,\sigma) = \frac12 \left\lVert \rho - \sigma \right\rVert_1
+  \end{align}
+\end{thmheading}
 
 \cleardoublepage
 
