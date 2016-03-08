@@ -1,6 +1,6 @@
 \documentclass[12pt,a5paper]{article}
 
-\usepackage[thmset=default,sepcounters]{../phfthm}
+\usepackage[thmset=default,sepcounters,proofref={default,margin}]{../phfthm}
 
 \usepackage{hyperref}  % for \autoref{}
 
@@ -8,15 +8,15 @@
 
 \begin{document}
 
+
 \begin{lemma}
 \label{lem:1}
 Another lemma here.
 \end{lemma}
-\begin{proof}[the Lemma]
+\begin{proof}[of a different Lemma]
   this is another proof.
 \end{proof}
 
-\bigskip
 
 \begin{proposition}
   \label{prop:1}
@@ -28,16 +28,33 @@ Another lemma here.
   And more stuff.
 \end{proof}
 
-\bigskip
 
 \begin{proposition}
+\noproofref
 Another proposition here.
 \end{proposition}
 \begin{proof}
   this is yet another proof.
 \end{proof}
 
-\bigskip
+
+\begin{theorem}
+\label{thm:1}
+And a theorem
+\end{theorem}
+
+
+\begin{theorem}
+\noproofref
+\label{thm:2}
+I heard you like theorems?
+\end{theorem}
+
+\begin{definition*}
+\label{def:1}
+This is a definition.
+\end{definition*}
+
 
 \begin{proposition*}
 Another proposition here, with no numbering.
@@ -46,29 +63,32 @@ Another proposition here, with no numbering.
   this is yet another proof.
 \end{proof}
 
-\bigskip
-
 \begin{theorem}
-\label{thm:1}
-And a theorem
+  \label{thm:another}
+  Yet another theorem here.
 \end{theorem}
-\begin{proof}[*thm:1]
-  ....... and  this is yet yet another proof.
-\end{proof}
 
-\bigskip
-
-\begin{definition*}
-\label{def:1}
-This is a definition.
-\end{definition*}
-
-\bigskip
 
 See also \autoref{prop:1}, \autoref{thm:1} and \autoref{lem:1}
 
+\cleardoublepage
+x
+\begin{proof}[*thm:1]
+  ....... and this is yet yet another proof.  This proof is only on the next page of the
+  theorem, so it should not necessary display the reference there.
+\end{proof}
 
+\cleardoublepage
 
+\begin{proof}[*lem:1]
+  this is another proof.
+\end{proof}
+
+\cleardoublepage
+
+\begin{proof}[*thm:another]
+  Proof proof proof proof. You're convinced?
+\end{proof}
 
 
 

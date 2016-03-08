@@ -4,6 +4,7 @@
 
 \RequirePackage{xkeyval}
 \RequirePackage{etoolbox}
+\RequirePackage{xstring}
 
 \RequirePackage{aliascnt}
 
@@ -122,8 +123,9 @@
       \end{phfthm@#2}%
     }%
     %
-    \csdef{phfthm@hook@start@#1}##1{\phfthm@hook@startcommon{#1}}%
-    \csdef{phfthm@hook@end@#1}{\phfthm@hook@endcommon{#1}}%
+    \csdef{phfthm@hook@start@#2}##1{\phfthm@hook@startcommonnostar{#2}{##1}}%
+    \csdef{phfthm@hook@afterlabel@#2}{\phfthm@hook@afterlabelcommon{#2}}%
+    \csdef{phfthm@hook@end@#2}{\phfthm@hook@endcommonnostar{#2}}%
     %
     %
   \fi%
@@ -145,19 +147,60 @@
     % 
   \fi%
   %
-  \csdef{phfthm@hook@start@#1*}##1{\csname phfthm@hook@start@#1\endcsname{#1}}%
-  \csdef{phfthm@hook@end@#1*}{\phfthm@hook@end@#1\endcsname{#1}}%
+  \csdef{phfthm@hook@start@#2*}##1{\phfthm@hook@startcommonstar{#2}{##1}}%
+  \csdef{phfthm@hook@end@#2*}{\phfthm@hook@endcommonstar{#2}}%
   %
   % 
 }
 
 
 
-\def\phfthm@hook@startcommon#1{%
-  \postdisplaypenalty=10000\relax% avoid orphan line on new page after display equation
+% --------
+
+\def\phfthm@hook@startcommonnostar#1#2{% #1 = "proposition", #2 = "Full Title of Proposition, if Given."
+  %
+  \phfthm@hook@startcommon{#1}{#2}%
+  %
   \phfthm@def@label@thmlabel{#1}%
 }
-\def\phfthm@hook@endcommon#1{%
+\def\phfthm@hook@endcommonnostar#1{\phfthm@hook@endcommon{#1}}
+
+
+% --
+
+\def\phfthm@hook@startcommonstar#1#2{% #1 = "proposition", #2 = "Full Title of Proposition, if Given."
+  %
+  \phfthm@hook@startcommon{#1}{#2}%
+  %
+  %  don't touch \label{}, in case it's used in inner environments such as {itemize}
+}
+\def\phfthm@hook@endcommonstar#1{%
+}
+
+% --
+
+\def\phfthm@hook@startcommon#1#2{% #1 = "proposition", #2 = "Full Title of Proposition, if Given."
+  %
+  \postdisplaypenalty=10000\relax% avoid orphan line on new page after display equation
+  %
+}
+\def\phfthm@hook@afterlabelcommon#1{}
+\def\phfthm@hook@endcommon#1{}
+
+% --------
+
+
+\def\phfthm@def@label@thmlabel#1{% #1 = theorem type e.g. "proposition"
+  \let\phfthm@old@label\label%
+  \def\label{\phfthm@thmlabel{#1}}%
+}
+\def\phfthm@thmlabel#1#2{% theorem type, label name
+  \def\phfthm@val@thmlabel{#2}% save the label name
+  \phfthm@old@label{#2}% actually do the LaTeX \label{}
+  \csname phfthm@hook@afterlabel@#1\endcsname%
+  % and restore old \label definition for other items in the environment:
+  \let\label\phfthm@old@label%
+  \ignorespaces%
 }
 
 
@@ -165,10 +208,11 @@
 
 
 
-% ------------------------------------------------
 
+
+% ------------------------------------------------------------------------------
 %
-% Improved, smart {proof} environment
+% Improved, smarter {proof} environment
 %
 
 
@@ -237,6 +281,145 @@
 }
 
 
+
+% ------------------------------------------------
+
+% proof ref machinery
+
+\providecommand\proofonname[1]{Proof on #1.}
+%\providecommand\proofonname[1]{The proof of this \phfthm@autorefnameof{#1} can be found on #1.}
+
+\def\noproofref{%
+  \def\phfthm@val@noproofref{1}% if this is defined, then no proof ref should be generated for the current thmlabel
+}
+
+\def\phfthm@fmt@proofref#1{%
+  %
+  % #1 = full reference (e.g. "page XYZ")
+  % 
+  {\parfillskip=0pt\relax% Thanks http://tex.stackexchange.com/a/43239/32188 !
+    \hfil\hbox{\footnotesize (\proofonname{#1})}\par}%
+}
+
+\def\phfthm@proofref@implsimple#1{%
+  %
+  % #1 = referenced label
+  %
+  % Simplest version of this macro:
+  %
+  %The proof of this \phfthm@autorefnameof{#1} is given on \autopageref{proof:#1}.
+  %
+  \phfthm@fmt@proofref{\autopageref{proof:#1}}%
+}
+
+\def\phfthm@proofref@warnnolabel{%
+  \PackageWarning{phfthm}{No label provided for proof reference!}%
+}
+
+\def\phfthm@proofref@implcomplicated@thmlabel{%
+  \ifdefined\phfthm@val@noproofref\relax%
+    % "no proof ref" was explicitly specified
+  \else%
+    % make sure \phfthm@val@thmlabel is defined, maybe empty
+    \providecommand\phfthm@val@thmlabel{}%
+    % generate the proof reference for current thmlabel
+    \edef\phfthm@tmpa{{\phfthm@val@thmlabel}}%
+    \expandafter\notblank\phfthm@tmpa{%
+      \expandafter\phfthm@proofref@implcomplicated\phfthm@tmpa%
+    }{%
+      \phfthm@proofref@warnnolabel% no label provided
+    }%
+  \fi%
+}
+
+\newcounter{phfthmInternalProofrefCounter}
+
+\def\phfthm@proofref@implcomplicated#1{%
+  %
+  % #1 = referenced label
+  %
+  % Check to see if the proof is far away (further than on the next page).  Only if that's
+  % the case, display the reference.
+  %
+  % See http://tex.stackexchange.com/a/2526 to test whether ref is on same page. Note that
+  % was problematic, probably due to hyperref. I needed to use my own \phfthm@min@pageref
+  % without any hyper linking mechanism in place.
+  %
+  \refstepcounter{phfthmInternalProofrefCounter}\label{internalproofref\thephfthmInternalProofrefCounter}%
+  \edef\phfthm@proofref@tmp@proofpage{\phfthm@min@pageref{proof:#1}}%
+  \edef\phfthm@proofref@tmp@thispage{\phfthm@min@pageref{internalproofref\thephfthmInternalProofrefCounter}}%
+%  \IfStrEq{\phfthm@proofref@tmp@proofpage}{\phfthm@proofref@tmp@thispage}%
+  \ifnum\numexpr\phfthm@proofref@tmp@proofpage\relax=\numexpr\phfthm@proofref@tmp@thispage\relax%
+    % if on same page: nothing
+  \else%
+    % else: check if on following page:
+    \ifnum\numexpr\phfthm@proofref@tmp@proofpage\relax=\numexpr1+\phfthm@proofref@tmp@thispage\relax%
+      % if on following page: nothing
+    \else%
+      % else: page reference
+      \phfthm@fmt@proofref{\autopageref{proof:#1}}%
+    \fi%
+  \fi%
+%  [\number\numexpr\phfthm@proofref@tmp@proofpage\relax{} vs % DEBUG
+%  \number\numexpr\phfthm@proofref@tmp@thispage\relax or % DEBUG
+%  \number\numexpr1+\phfthm@proofref@tmp@thispage\relax] % DEBUG
+}
+\def\phfthm@pageref@or@zero#1{%
+  \edef\phfthm@thepagerefnum{\pageref{#1}}%
+  \IfInteger{\phfthm@thepagerefnum}{\phfthm@thepagerefnum}{}% xstring package
+}
+
+\def\phfthm@autorefnameof#1{%
+  % 
+  % Extract the counter part of the reference `section.NN', which is 4th element in the
+  % \r@label macro
+  %
+  % Code extracted from hyperref.sty
+  % 
+  \expandafter\ifx\csname r@#1\endcsname\relax%
+    \textbf{??}%
+  \else%
+    \expandafter\expandafter\expandafter\phfthm@HyPsd@autorefname%
+        \csname r@#1\endcsname{}{}{}{}\@nil%
+  \fi%
+}
+\def\phfthm@HyPsd@autorefname#1#2#3#4#5\@nil{%
+  \ifx\\#4\\%
+  \else%
+    \phfthm@HyPsd@@autorefname#4.\@nil%
+  \fi%
+}
+\def\phfthm@HyPsd@@autorefname#1.#2\@nil{%
+  \ltx@IfUndefined{#1autorefname}{%
+    \ltx@IfUndefined{#1name}{%
+    }{%
+      \csname#1name\endcsname%
+    }%
+  }{%
+    \csname#1autorefname\endcsname%
+  }%
+}
+
+\def\phfthm@min@pageref#1{%
+  \ifcsname r@#1\endcsname%
+    %
+    % Dark magic going on here. Copied from hyperref.sty, in "\def\HyPsd@@@pageref..."
+    % 
+    \expandafter\expandafter\expandafter\expandafter
+    \expandafter\expandafter\expandafter\@car
+    \expandafter\expandafter\expandafter\@gobble
+    \csname r@#1\endcsname{}\@nil
+  \else%
+    0%
+  \fi%
+}
+
+
+
+
+
+
+
 % ==============================================================================
 %                    STYLES AND THEOREM SETS
 % ==============================================================================
@@ -294,15 +477,6 @@
 % The machinery is in place, now define and parse the package options.
 %
 
-%\define@choicekey{phfthmpkg}{thmset}[\val]{\phfthm@def@thmset@optlist}{ ... but with expanded option list arg
-\def\@tmpa{\define@choicekey{phfthmpkg}{thmset}[\val]}
-\edef\@tmpb{{\phfthm@def@thmset@optlist}}
-\expandafter\@tmpa\@tmpb{%
-  \xdef\cmdKV@phfthmpkg@thmset{\val}%
-}
-
-
-
 \define@boolkey{phfthmpkg}{smallproofs}[true]{}
 \KV@phfthmpkg@smallproofstrue% true by default
 
@@ -316,17 +490,53 @@
 \KV@phfthmpkg@sepcountersfalse% false by default
 
 
+%
+% proof ref options
+%
+\newif\ifKV@phfthmpkg@proofref
+\KV@phfthmpkg@proofreffalse% false by default
+\def\cmdKV@phfthmpkg@proofref@style{}
+\define@key{phfthmpkg}{proofref}[]{%
+  \ifblank{#1}{%
+    % blank argument provided, set some sensible defaults with proofref on:
+    \KV@phfthmpkg@proofreftrue%
+    \def\cmdKV@phfthmpkg@proofref@style{default}%
+    %
+  }{%
+    \ifstrequal{#1}{false}{%
+      \KV@phfthmpkg@proofreffalse%
+    }{%
+      \KV@phfthmpkg@proofreftrue%
+      %
+      % and set value:
+      \def\cmdKV@phfthmpkg@proofref@style{#1}%
+    }%
+  }%
+}
+
+
 \define@key{phfthmpkg}{resetstyle}[]{%
   \KV@phfthmpkg@smallproofsfalse%
   \KV@phfthmpkg@qedsymbolblacksquarefalse%
   \KV@phfthmpkg@prooftitleitbffalse%
   \KV@phfthmpkg@sepcountersfalse%
+  \KV@phfthmpkg@proofreffalse%
   % 
   \if\relax\detokenize{#1}\relax% expect empty arg.
   \else%
     \PackageWarning{phfthm}{'resetstyle' does not take any argument.}%
   \fi%
 }
+
+
+
+% \define@choicekey{phfthmpkg}{thmset}[\val]{\phfthm@def@thmset@optlist}{ ... but with expanded option list arg
+\def\@tmpa{\define@choicekey{phfthmpkg}{thmset}[\val]}
+\edef\@tmpb{{\phfthm@def@thmset@optlist}}
+\expandafter\@tmpa\@tmpb{%
+  \xdef\cmdKV@phfthmpkg@thmset{\val}%
+}
+
 
 
 \DeclareOptionX*{%
@@ -361,6 +571,34 @@
 
 \ifKV@phfthmpkg@sepcounters
   \def\phfthm@val@mkthmopt@counteropts{}
+\fi
+
+\ifKV@phfthmpkg@proofref
+
+  \def\phfthm@proofref@style@margin{%
+    % 
+    \def\phfthm@fmt@proofref##1{%
+      % 
+      % ##1 = full reference (e.g. "page XYZ")
+      % 
+      \marginpar{\footnotesize\proofonname{##1}}%
+    }%
+  }
+  \def\phfthm@proofref@style@default{}
+  \def\phfthm@proofref@style@{}
+
+  \def\phfthm@exec@proofrefstyles#1\phfthm@END{\phfthm@internal@execattribs{phfthm@proofref@style@}{ProofRef Style}{#1}}
+  \expandafter\phfthm@exec@proofrefstyles\cmdKV@phfthmpkg@proofref@style\phfthm@END
+
+
+  \let\phfthm@def@thmset@mktheorem@OLD\phfthm@def@thmset@mktheorem%
+  \def\phfthm@def@thmset@mktheorem#1#2{% #1 = prop env name ("proposition"), #2 = prop title name ("Proposition")
+    \phfthm@def@thmset@mktheorem@OLD{#1}{#2}%
+    \expandafter\apptocmd\csname phfthm@hook@end@#1\endcsname{%
+      \phfthm@proofref@implcomplicated@thmlabel%
+    }{}{Failed to append to command `\expandafter\string\csname phfthm@hook@end@#1\endcsname!!}%
+  }
+
 \fi
 
 
