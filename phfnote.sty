@@ -38,7 +38,8 @@
 %
 % -- common note title defs --
 %
-\newcommand{\notetitlefont}{\sffamily\bfseries}%\fontfamily{cmss}\fontseries{bx}\selectfont}
+\newcommand{\notetitlefontfamily}{\sffamily}
+\newcommand{\notetitlefont}{\sffamily\bfseries}
 \newcommand{\notetitleauthorfont}{}
 \newcommand{\notetitledatefont}{}
 
@@ -180,19 +181,39 @@
 %     PAGE GEOMETRY
 % ------------------------------------------------------------------------------
 
-
-\newcommand{\phfnote@do@pagegeomdefs}{
-  %
-  % Page geometry settings
-  %
+\def\phfnote@pagegeomstyle@default{
   \if@twocolumn
-
-    \PassOptionsToPackage{hmargin=0.75in,vmargin=0.75in,includeheadfoot}{geometry}%
-
+    \PassOptionsToPackage{hmargin=1in,vmargin=0.75in,includeheadfoot}{geometry}%
   \else
-
     % fix the margins a bit to make text wider
-
+    \ifcase\@ptsize% mods for 10 pt
+      \PassOptionsToPackage{hmargin=1.5in,vmargin=1.25in}{geometry}%
+    \or% mods for 11 pt
+      \PassOptionsToPackage{hmargin=1.5in,vmargin=1.25in}{geometry}%
+    \or% mods for 12 pt
+      \PassOptionsToPackage{hmargin=1.25in,vmargin=1.25in}{geometry}%
+    \fi%
+  \fi
+}
+\def\phfnote@pagegeomstyle@narrow{
+  \if@twocolumn
+    \PassOptionsToPackage{hmargin=1.25in,vmargin=0.75in,includeheadfoot}{geometry}%
+  \else
+    % fix the margins a bit to make text wider
+    \ifcase\@ptsize% mods for 10 pt
+      \PassOptionsToPackage{hmargin=1.75in,vmargin=1.5in}{geometry}%
+    \or% mods for 11 pt
+      \PassOptionsToPackage{hmargin=1.75in,vmargin=1.5in}{geometry}%
+    \or% mods for 12 pt
+      \PassOptionsToPackage{hmargin=1.5in,vmargin=1.5in}{geometry}%
+    \fi%
+  \fi
+}
+\def\phfnote@pagegeomstyle@wide{
+  \if@twocolumn
+    \PassOptionsToPackage{hmargin=0.75in,vmargin=0.75in,includeheadfoot}{geometry}%
+  \else
+    % fix the margins a bit to make text wider
     \ifcase\@ptsize% mods for 10 pt
       \PassOptionsToPackage{hmargin=1.25in,vmargin=1.25in}{geometry}%
     \or% mods for 11 pt
@@ -200,7 +221,29 @@
     \or% mods for 12 pt
       \PassOptionsToPackage{hmargin=1in,vmargin=1.25in}{geometry}%
     \fi%
+  \fi
+}
+\def\phfnote@pagegeomstyle@xwide{
+  \if@twocolumn
+    \PassOptionsToPackage{hmargin=0.5in,vmargin=0.75in,includeheadfoot}{geometry}%
+  \else
+    % fix the margins a bit to make text wider
+    \ifcase\@ptsize% mods for 10 pt
+      \PassOptionsToPackage{hmargin=1in,vmargin=1.25in}{geometry}%
+    \or% mods for 11 pt
+      \PassOptionsToPackage{hmargin=1in,vmargin=1.25in}{geometry}%
+    \or% mods for 12 pt
+      \PassOptionsToPackage{hmargin=0.75in,vmargin=1.25in}{geometry}%
+    \fi%
+  \fi
+}
 
+\newcommand{\phfnote@do@pagegeomdefs}[1]{
+
+  \ifcsname phfnote@pagegeomstyle@#1\endcsname
+    \csname phfnote@pagegeomstyle@#1\endcsname
+  \else
+    \PackageWarning{phfnote}{Unknown page geometry style: `#1'!}
   \fi
 
   \RequirePackage{geometry}%
@@ -222,29 +265,29 @@
     \ifcase\@ptsize% 10pt
       \renewcommand\baselinestretch{1.1}
     \or% 11pt
-      \renewcommand\baselinestretch{1.05}
+      \renewcommand\baselinestretch{1.0} %1.05
     \or% 12pt
-      \renewcommand\baselinestretch{1.03}
+      \renewcommand\baselinestretch{1.0} %1.03
     \fi
     \emergencystretch=5em
   \fi
 
 }
 
+% 
+% Paragraph Settings
+% 
 \def\phfnote@par@original{%
 }
-
 \def\phfnote@par@indent{%
-  % 
-  % Paragraph Settings
-  % 
+  \setlength{\parindent}{1.5em}
+  \setlength{\parskip}{0em} %0.3em
+}
+\def\phfnote@par@indentminiskip{%
   \setlength{\parindent}{1.5em}
   \setlength{\parskip}{0.3em}
 }
 \def\phfnote@par@skip{%
-  % 
-  % Paragraph Settings
-  % 
   \setlength{\parindent}{0em}
   \setlength{\parskip}{0.8em}
 }
@@ -399,21 +442,6 @@
 }
 
 
-% ------------------------------------------------------------------------------
-%     THEOREMS
-% ------------------------------------------------------------------------------
-
-\newcommand{\phfnote@do@theorems}{
-
-  \RequirePacakge{phfthm}
-
-  %
-  % QED symbol
-  % 
-  \renewcommand{\qedsymbol}{\ensuremath{\blacksquare}}
-}
-
-
 
 % ------------------------------------------------------------------------------
 %     PDF & HYPERLINKS - HYPERREF
@@ -481,9 +509,18 @@
   }%
 }
 
+% ------------------------------------------------------------------------------
+%     NICE FONT DEFS
+% ------------------------------------------------------------------------------
 
+\def\phfnote@do@fontdefs{
+  
+  \PassOptionsToPackage{T1}{fontenc}
+  \RequirePackage{fontenc}
 
-
+  \renewcommand\sfdefault{cmbr}
+  
+}
 
 % ------------------------------------------------------------------------------
 %     BIBLIOGRAPHY
@@ -528,6 +565,31 @@
 }
 
 
+% ==============================================================================
+
+%
+% OTHER, STAND-ALONE USEFUL DEFINITIONS
+% 
+
+%
+% URL styles: 'notesf' and 'noteitsf'
+%
+\def\url@notesfstyle{%
+  \def\UrlFont{\sffamily}%
+  \phfnote@urlstyle@common%
+}
+\def\url@noteitsfstyle{%
+  \def\UrlFont{\sffamily\itshape}%
+  \phfnote@urlstyle@common%
+}
+
+\def\phfnote@urlstyle@common{%
+  \def\UrlTildeSpecial{\do\~{\raise-0.8ex\hbox{\kern-0.2ex\textasciitilde}}}%
+  \let\Url@force@Tilde\UrlTildeSpecial%
+}
+
+% ==============================================================================
+
 
 \SetupKeyvalOptions{
   family=phfnote,
@@ -569,6 +631,14 @@
 \DeclareComplementaryOption{nopagegeomdefs}{pagegeomdefs}
 
 %
+% e.g. [pagegeom=narrow]
+%
+% The style of page geometry to use.  Available are 'narrow', 'default', 'wide' and
+% 'xwide'
+%
+\DeclareStringOption[default]{pagegeom}
+
+%
 % e.g. [spacingdefs=false]
 %
 % Add definitions to adjust spacing of lines and words.  Includes definitions to
@@ -583,8 +653,9 @@
 %
 % e.g. [par=skip] or [par=indent]
 %
-% How to treat paragraphs.  Can be indented ('indent'), with an empty line
-% ('skip'), or no change from LaTeX default ('original').
+% How to treat paragraphs.  Can be indented ('indent'), with an empty line ('skip'),
+% indented with small skip ('indentminiskip') or no change from LaTeX default
+% ('original').
 %
 \DeclareStringOption[skip]{par}
 
@@ -609,15 +680,16 @@
 \DeclareComplementaryOption{nohyperrefdefs}{hyperrefdefs}
 
 %
-% e.g. [theoremsdefs=false]
+% e.g. [fontdefs=true]
 %
-% Load default theorems definitions with lemmas, etc.
+% Do some adjustments to the fonts. In particular, use the Computer Modern Bright sans
+% serif font instead of the default sans serif font, e.g. for the title.
 %
-% [notheoremsdefs] is equivalent to [theoremsdefs=false]
+\DeclareBoolOption[true]{fontdefs}
 %
-\DeclareBoolOption[true]{theoremsdefs}
-\DeclareComplementaryOption{notheoremsdefs}{theoremsdefs}
-
+% [nofontdefs] is equivalent to [fontdefs=false]
+%
+\DeclareComplementaryOption{nofontdefs}{fontdefs}
 
 %
 % e.g. [secfmt={section,compact}]
@@ -630,6 +702,8 @@
 %  - "compact"  make section/subsection/subsubsection headings more compact
 %
 %  - "paragraph"  style paragraph/subparagraph headings
+%
+% Leave empty to keep the original styling.
 %
 \DeclareStringOption[section]{secfmt}
 
@@ -645,7 +719,37 @@
 \DeclareComplementaryOption{nobibliographydefs}{bibliographydefs}
 
 
+%
+% DEFINE PRESETS
+%
+\def\phfnote@preset@article{
+  \def\phfnote@opt@titlestyle{article}
+  \def\phfnote@opt@par{indent}
+  \def\phfnote@opt@pagegeom{default}
+}
+\def\phfnote@preset@sfnote{
+  \renewcommand\familydefault{\sfdefault}
+  \def\phfnote@opt@titlestyle{default}
+  \def\phfnote@opt@par{skip}
+  \def\phfnote@opt@pagegeom{wide}
+}
 
+%
+% Allow to set a preset, which may set other options, for example.
+%
+\define@key{phfnote}{preset}{%
+  \ifcsname phfnote@preset@#1\endcsname%
+    \csname phfnote@preset@#1\endcsname%
+  \else%
+    \PackageWarning{phfnote}{Unknown preset: `#1'!}
+  \fi%
+}
+
+
+
+%
+% NOW PROCESS THE OPTIONS
+%
 
 \DeclareDefaultOption{%
   % We provide the standard LaTeX error.
@@ -655,43 +759,7 @@
 \ProcessKeyvalOptions*
 
 
-
-
-
-% % Handle Package Options
-% \DeclareOption{titlesmall}{\renewcommand{\notetitle}{\notetitlesmall}}
-% \DeclareOption{titlearticle}{\renewcommand{\notetitle}{\notetitlearticle}}
-% \DeclareOption{wideabstract}{\notewideabstract}
-% \DeclareOption{narrowabstract}{\notenarrowabstract}
-% \DeclareOption{nosectionfonts}{\renewcommand{\phfnote@declaresectionfonts}{}}
-% \DeclareOption{sectionfontscompact}{\phfnote@sectionfontscompact}
-% \DeclareOption{sectionparagraphfonts}{%
-%   \renewcommand{\phfnote@maybedeclarealsoparagraphfonts}{\phfnote@declarealsoparagraphfonts}%
-% }
-% \DeclareOption{nonotetitle}{\renewcommand{\phfnote@makenotetitle}{}}
-% \DeclareOption{nocosmeticdefs}{\renewcommand{\phfnote@cosmeticdefs}{}}
-% \DeclareOption{nopagegeomdefs}{\renewcommand{\phfnote@pagegeomdefs}{}}
-% \DeclareOption{nopdfhyperref}{\renewcommand{\phfnote@pdfhyperrefdefs}{}}
-% \DeclareOption{pdflinkblack}{%
-%   \renewcommand{\phfnote@pdfhyperrefcolordef}{%
-%     \definecolor{docnotelinkcolor}{rgb}{0,0,0}
-%   }%
-% }
-% \DeclareOption{notheorems}{%
-%   \renewcommand{\phfnote@theorems}{}%
-% }
-% \DeclareOption{onlystandalonedefs}{%
-%   \renewcommand{\phfnote@declaresectionfonts}{}%
-%   \renewcommand{\phfnote@makenotetitle}{}%
-%   \renewcommand{\phfnote@cosmeticdefs}{}%
-%   \renewcommand{\phfnote@do@pagegeomdefs}{}%
-%   \renewcommand{\phfnote@pdfhyperrefdefs}{}%
-% }
-% \DeclareOption*{%
-%   \PackageError{phfnote}{Unknown option `\CurrentOption'. Available options are titlesmall,titlearticle,nosectionfonts,sectionfontscompact,sectionparagraphfonts,nonotetitle,nocosmeticdefs,nopagegeomdefs,nopdfhyperref,pdflinkblack,notheorems,onlystandalonedefs}%
-% }
-% \ProcessOptions\relax
-
+% ==============================================================================
 
 
 
@@ -711,7 +779,7 @@
 \phfnote@do@secfmt{\phfnote@opt@secfmt}
 
 \ifphfnote@opt@pagegeomdefs
-  \phfnote@do@pagegeomdefs
+  \phfnote@do@pagegeomdefs{\phfnote@opt@pagegeom}
 \fi
 
 \ifphfnote@opt@spacingdefs
@@ -724,8 +792,8 @@
   \phfnote@do@pdfhyperrefdefs
 \fi
 
-\ifphfnote@opt@theoremsdefs
-  \phfnote@do@theorems
+\ifphfnote@opt@fontdefs
+  \phfnote@do@fontdefs
 \fi
 
 \ifphfnote@opt@bibliographydefs
