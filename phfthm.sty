@@ -429,6 +429,76 @@
 
 
 
+% ==============================================================================
+%                    THEOREM HEADING MACHINERY
+% ==============================================================================
+
+
+\define@cmdkey{phfthmmkthmheading}{thmstyle}{}
+\define@cmdkey{phfthmmkthmheading}{internalcounter}{}
+
+
+\newcounter{phfthmheadingcounter}%
+
+% 
+% Creates a new environment \begin{thmheading}{Title} .... \end{thmheading} for
+% customizing the heading on-the-fly. Useful for my formatting of definitions.
+% 
+% You can also use \label{...} and \ref{} which yields the title.
+% 
+\newcommand\phfthmMakeThmheadingEnvironment[2][]{%
+  % 
+  % #1 = options (thmstyle=xyz)
+  % 
+  % #2 = environment name
+  %
+  %
+  % First, parse options:
+  % 
+  %   set defaults:
+  %
+  \def\cmdKV@phfthmmkthmheading@thmstyle{plain}%
+  \def\cmdKV@phfthmmkthmheading@internalcounter{phfthmheadingcounter}%
+  %
+  %   manually given options:
+  % 
+  \setkeys{phfthmmkthmheading}{#1}%
+  % 
+  %
+  % And the definitions, per se:
+  %
+  \csdef{phfthm@thmheading@#2@val@title}{$\langle$No Title Given$\rangle$}%
+  \theoremstyle{\cmdKV@phfthmmkthmheading@thmstyle}%
+  % 
+  \newtheorem*{phfthm@internal@thmheading@#2}{\csname phfthm@thmheading@#2@val@title\endcsname}%
+  %
+  % define the relevant environment
+  % 
+  \newenvironment{#2}[1]{%
+    \csdef{phfthm@thmheading@#2@val@title}{##1}%
+    \letcs\thephfthmheadingcounter{phfthm@thmheading@#2@val@title}%
+    \csname phfthm@internal@thmheading@#2\endcsname%
+    % \hspace: see http://tex.stackexchange.com/a/88493/32188, especially the first comment
+    \hspace*{0pt}\refstepcounter{\cmdKV@phfthmmkthmheading@internalcounter}%
+    \csname phfthm@hook@thmheading@#2@start\endcsname{##1}%
+    % add some flexibility in the hspace
+    \hskip 0em plus 0.5em minus 0em%
+    \ignorespaces%
+  }{%
+    \csname phfthm@hook@thmheading@#2@end\endcsname%
+    \csname endphfthm@internal@thmheading@#2\endcsname%
+  }%
+  % 
+  \csdef{phfthm@hook@thmheading@#2@start}##1{\phfthm@hook@thmheading@start{##1}}%
+  \csdef{phfthm@hook@thmheading@#2@end}{\phfthm@hook@thmheading@end}%
+  %
+}
+
+\def\phfthm@hook@thmheading@start#1{}
+\def\phfthm@hook@thmheading@end{}
+
+
+
 
 
 
@@ -453,6 +523,12 @@
 
 \phfthm@def@thmset{empty}{
   % empty set, name 'empty'
+}
+\phfthm@def@thmset{simple}{
+  \phfthm@def@thmset@mktheorem{theorem}{Theorem}
+  \phfthm@def@thmset@mktheorem{proposition}{Proposition}
+  \phfthm@def@thmset@mktheorem{lemma}{Lemma}
+  \phfthm@def@thmset@mktheorem{corollary}{Corollary}
 }
 \phfthm@def@thmset{default}{
   \phfthm@def@thmset@mktheorem{theorem}{Theorem}
@@ -604,7 +680,8 @@
 
 \ifKV@phfthmpkg@qedsymbolblacksquare
   \RequirePackage{amssymb}
-  \renewcommand\qedsymbol{\text{\tiny$\blacksquare$}}
+  \providecommand\filledsquare{\ensuremath{\blacksquare}}
+  \renewcommand\qedsymbol{\text{\tiny\filledsquare}}
 \fi
 
 \ifKV@phfthmpkg@prooftitleitbf
@@ -669,15 +746,15 @@
 % Common counter, in case we use a common counter for all thm types
 %
 
+\newcounter{phfthmcounter}
+\setcounter{phfthmcounter}{0}
+
 \ifdefined\phfthm@val@mkthmopt@counteropts% already defined by some above option, e.g. separate counters
 \else
 
   % 
   % provide common counter
   %
-  \newcounter{phfthmcounter}
-  \setcounter{phfthmcounter}{0}
-
   \def\phfthm@val@mkthmopt@counteropts{counter=phfthmcounter}
 
 \fi
@@ -713,135 +790,9 @@
 
 \ifKV@phfthmpkg@thmheading % also set \cmdKV@phfthmpkg@thmheadingstyle
 
-  % 
-  % A special \begin{thmheading}{Title} .... \end{thmheading} for customizing the heading
-  % on-the-fly. Useful for my formatting of definitions.
-  % 
-  % You can also use \label{...} and \ref{} which yields the title.
-  % 
-
-  \newcounter{phfthmheadingcounter}
-
-  \def\phfthm@thmheading@val@title{$\langle$No Title Given$\rangle$}
-  \theoremstyle{\cmdKV@phfthmpkg@thmheadingstyle}
-
-  \newtheorem*{phfthm@internal@thmheading}{\phfthm@thmheading@val@title}
-  % define the relevant environments
-  \newenvironment{thmheading}[1]{%
-    \def\phfthm@thmheading@val@title{#1}%
-    \let\thephfthmheadingcounter\phfthm@thmheading@val@title%
-    \phfthm@internal@thmheading%
-    % \hspace: see http://tex.stackexchange.com/a/88493/32188, especially the first comment
-    \hspace*{0pt}\refstepcounter{phfthmheadingcounter}%
-    \phfthm@hook@thmheading@start{#1}%
-    % add some flexibility in the hspace
-    \hskip 0em plus 0.5em minus 0em%
-    \ignorespaces%
-  }{%
-    \phfthm@hook@thmheading@end%
-    \endphfthm@internal@thmheading%
-  }%
-
-  \def\phfthm@hook@thmheading@start#1{}
-  \def\phfthm@hook@thmheading@end{}
+  \phfthmMakeThmheadingEnvironment[thmstyle=\cmdKV@phfthmpkg@thmheadingstyle]{thmheading}
 
 \fi
 
 
 
-
-
-
-
-
-
-
-
-%
-%
-% TODO:
-%
-%
-%   -- proof references "(Proof on page XYZ)"
-%
-%   -- {thmheading} environments, referencable with \ref{} and \pageref{}
-%
-%
-
-
-
-
-
-% ==============================================================================
-
-
-
-
-
-% % the actual counter; the others will just be aliases. See http://tex.stackexchange.com/a/113540/32188
-% \newcounter{thmcounter}
-% %\numberwithin{thmcounter}{chapter}
-
-
-
-
-
-% \def\phfthm@def@label@thmlabel#1{% theorem type
-%   \let\phfthm@old@label\label%
-%   \def\label{\phfthm@thmlabel{#1}}%
-% }
-% \def\phfthm@thmlabel#1#2{% theorem type, label name
-%   \global\def\phfthm@last@thmlabel{#2}%
-%   \phfthm@old@label{#2}%
-%   \phfthm@make@proofref@at@label@point{#1}{#2}%
-%   % and restore old \label definition for other items in the environment:
-%   \let\label\phfthm@old@label%
-% }
-
-% %
-% % Redefine this macro to customize where the proofref should appear: at label point or at
-% % the end of the theorem? Use \appto\phfthm@thm@atend to place it at the end.
-% %
-% \def\phfthm@make@proofref@at@label@point#1#2{% theorem type, label name
-%   % by default, insert proof reference at the end of the theorem.
-%   \appto\phfthm@thm@atend{\proofref{#2}}%
-% }
-
-% %
-% % Don't issue a "Proof of this on page that" at a particular theorem. Might be because it
-% % doesn't have a corresponding proof block.
-% %
-% % Call this BEFORE \label{}ing the theorem! For example:
-% %
-% %     \begin{theorem}[Pythagoras]
-% %       \noproofref
-% %       \label{thm:pythagoras}
-% %       ...
-% %     \end{theorem}
-% %
-% \def\noproofref{
-%   \let\phfthm@make@proofref@at@label@point\phfthm@NO@proofref@at@label@point%
-% }
-% \def\phfthm@NO@proofref@at@label@point#1#2{}% do nothing
-
-
-
-%
-%   % A special \begin{thmheading}{Title} .... \end{thmheading} for customizing the heading
-%   % on-the-fly. Useful for my formatting of definitions. Using \begin{thmheeadingit} instead
-%   %   makes body text italic.
-%   \def\thmhdg@title{No Title Given}
-%   \theoremstyle{definition}
-%   \newtheorem*{thmhdgtitleinternal}{\thmhdg@title}
-%   \theoremstyle{plain}
-%   \newtheorem*{thmhdgtitleitinternal}{\thmhdg@title}
-%   % define the relevant environments
-%   \newenvironment{thmheading}[1]{%
-%     \def\thmhdg@title{##1} %
-%     \thmhdgtitleinternal %
-%   } { \endthmhdgtitleinternal }%
-%   \newenvironment{thmheadingit}[1]{%
-%     \def\thmhdg@title{##1} %
-%     \thmhdgtitleitinternal %
-%   } { \endthmhdgtitleitinternal }%
-  
