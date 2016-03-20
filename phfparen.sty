@@ -4,7 +4,6 @@
 
 \RequirePackage{etoolbox}
 \RequirePackage{xparse}
-\RequirePackage{xstring}
 
 \RequirePackage{amsmath}
 
@@ -145,6 +144,34 @@
 }
 
 
+\def\paren@xparsefix@storeparenarg#1{% #1 = paren argument;
+  % use \paren@impl@tmp@delimtoken is the delimiter token;
+  % store final value in \paren@tmp@contents
+  \def\paren@tmp@contents{#1}%
+}
+
+\@ifpackagelater{xparse}{2015/11/04}{% "too recent" version of package: has bug when using
+                                     % macros as delimiter tokens
+  % 
+  % BUG in recent xparse version: when using macros as delimiters: need to strip macro
+  % length from beginning of argument
+  % 
+  \RequirePackage{xstring}%
+  %
+  \def\paren@xparsefix@storeparenarg#1{%
+    \fullexpandarg\StrLen{\expandafter\string\paren@impl@tmp@delimtoken}[\paren@tmp@delimstrlen]%
+    \ifnum\paren@tmp@delimstrlen=1\relax%
+      \def\paren@tmp@contents{#1}%
+    \else%
+      \def\paren@tmp@delimstrlen@{\numexpr\paren@tmp@delimstrlen-1\relax}%
+      \noexpandarg\StrGobbleLeft{#1}{\the\paren@tmp@delimstrlen@}[\paren@tmp@contents]%
+    \fi%
+  }%
+}{%
+  % old xparse: macro delimiters won't work.
+}
+
+
 %
 % Helper to register a delimiter set for use with \paren.
 %
@@ -178,16 +205,7 @@
 %\message{**********\detokenize{##1}***********}%
     \paren@util@parseModifs\paren@impl@tmp@modifsForMathtools\paren@impl@tmp@modifs%
 %\show\paren@impl@tmp@modifsForMathtools%
-    % 
-    % BUG in xparse: when using macros as delimiters: need to strip macro length from beginning
-    % 
-    \fullexpandarg\StrLen{\expandafter\string\paren@impl@tmp@delimtoken}[\paren@tmp@delimstrlen]%
-    \ifnum\paren@tmp@delimstrlen=1\relax%
-      \def\paren@tmp@contents{##1}%
-    \else%
-      \def\paren@tmp@delimstrlen@{\numexpr\paren@tmp@delimstrlen-1\relax}%
-      \noexpandarg\StrGobbleLeft{##1}{\the\paren@tmp@delimstrlen@}[\paren@tmp@contents]%
-    \fi
+    \paren@xparsefix@storeparenarg{##1}%
 %
 %\show\paren@impl@tmp@modifsForMathtools
 %\show\paren@tmp@contents
