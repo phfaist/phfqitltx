@@ -129,7 +129,11 @@
 
 \newcommand{\noteabstracttextfont}{}
 \newcommand{\noteabstractnamefont}{\bfseries\small}
-\newcommand{\noteabstracttextwidth}{0.9\textwidth}
+\if@twocolumn
+  \newcommand\noteabstracttextwidth{\hsize}
+\else
+  \newcommand{\noteabstracttextwidth}{0.9\hsize}
+\fi
 
 \def\noteabstract@nameline{
   \begin{center}{\noteabstractnamefont\abstractname}\end{center}\vspace*{-2mm}%
@@ -152,7 +156,10 @@
   \def\noteabstracttextwidth{\textwidth}%
 }
 \def\noteabstract@attr@narrow{%
-  \def\noteabstracttextwidth{0.8\textwidth}%
+  \if@twocolumn
+  \else
+    \def\noteabstracttextwidth{0.8\textwidth}%
+  \fi
 }
 
 \def\noteabstract@attr@noname{%
@@ -411,6 +418,11 @@
 
   \RequirePackage{graphicx}
 
+  \PassOptionsToPackage{T1}{fontenc}
+  \RequirePackage{fontenc}
+
+  \PassOptionsToPackage{utf8}{inputenc}
+  \RequirePackage{inputenc}
 }
 
 \def\phfnote@do@pkgset@extended{
@@ -477,21 +489,51 @@
   % Define our default color
   % 
   \definecolor{docnotelinkcolor}{rgb}{0,0,0.4}% actually define our PDF hyperref link color
+  % 
+  %
+  % Load URL package.
+  %
+  \RequirePackage{url}%
+  %
+  \DeclareUrlCommand\phfnote@format@url{}% a version of \url which is not patched by hyperref
+  % 
   %
   % Set up hyperref
   %
   \PassOptionsToPackage{bookmarks=true,backref=false}{hyperref}%
   \RequirePackage{hyperref}%
   %
-  \hypersetup{unicode=true, %
+  \hypersetup{unicode=true,%
     bookmarksnumbered=false,bookmarksopen=false,bookmarksopenlevel=1,%
     breaklinks=true,pdfborder={0 0 0},colorlinks=true}%
   \hypersetup{%
-    anchorcolor=docnotelinkcolor,citecolor=docnotelinkcolor, %
-    filecolor=docnotelinkcolor,linkcolor=docnotelinkcolor, %
-    menucolor=docnotelinkcolor,runcolor=docnotelinkcolor, %
+    anchorcolor=docnotelinkcolor,citecolor=docnotelinkcolor,%
+    filecolor=docnotelinkcolor,linkcolor=docnotelinkcolor,%
+    menucolor=docnotelinkcolor,runcolor=docnotelinkcolor,%
     urlcolor=docnotelinkcolor}%
+  %
+  %
+  % and also provide an \email{} command for emails.
+  %
+  \def\phfnote@sanitize@url{%
+    \catcode`\$12%
+    \catcode`\&12%
+    \catcode`\#12%
+    \catcode`\^12%
+    \catcode`\_12%
+    \catcode`\%12%
+    %\catcode`\^^J10%  newline = space
+    %\catcode`\^^M10%  newline = space
+    \relax%
+  }%
+  \def\email{\begingroup\phfnote@sanitize@url\phfnote@impl@email@}%
+  \def\phfnote@impl@email@##1{\endgroup\href{mailto:##1}{\phfnote@format@url{##1}}}%
+  % 
 }
+
+
+
+
 
 
 
@@ -514,7 +556,7 @@
 % ------------------------------------------------------------------------------
 
 \def\phfnote@do@fontdefs{
-  
+ 
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
 
@@ -554,6 +596,10 @@
     % 
     \catcode`\&=12\relax% normal char
     %
+    % Defs for appearance
+    %
+    \providecommand\eprint[2][]{\href{http://arxiv.org/abs/##2}{arXiv:##2}}
+    %
     \phfnote@old@bibliography{#1}%
     %
   \endgroup%
@@ -571,21 +617,53 @@
 % OTHER, STAND-ALONE USEFUL DEFINITIONS
 % 
 
+\def\notesmallerfrac{0.9}
+\newcommand\notesmaller[1][\notesmallerfrac]{%
+  \fontsize{#1\dimexpr\f@size pt\relax}{#1\dimexpr\f@baselineskip pt\relax}%
+  \selectfont\ignorespaces%
+}
+
 %
-% URL styles: 'notesf' and 'noteitsf'
+% URL styles: 'notett', 'notesf', 'noteitsf', 'noterm', 'noteit' and 'notesml'
 %
+\def\url@notettstyle{%
+  \def\UrlFont{\ttfamily\notesmaller}%
+  \phfnote@urlstyle@common%
+}
 \def\url@notesfstyle{%
-  \def\UrlFont{\sffamily}%
+  \def\UrlFont{\sffamily\notesmaller}%
   \phfnote@urlstyle@common%
 }
 \def\url@noteitsfstyle{%
-  \def\UrlFont{\sffamily\itshape}%
+  \def\UrlFont{\sffamily\itshape\notesmaller}%
+  \phfnote@urlstyle@common%
+}
+\def\url@notermstyle{%
+  \def\UrlFont{\rmfamily\notesmaller}%
+  \phfnote@urlstyle@common%
+}
+\def\url@noteitstyle{%
+  \def\UrlFont{\itshape\notesmaller}%
+  \phfnote@urlstyle@common%
+}
+\def\url@notesmlstyle{%
+  \def\UrlFont{\notesmaller}%
   \phfnote@urlstyle@common%
 }
 
 \def\phfnote@urlstyle@common{%
-  \def\UrlTildeSpecial{\do\~{\raise-0.8ex\hbox{\kern-0.2ex\textasciitilde}}}%
+%  \def\UrlTildeSpecial{\do\~{\raise-0.8ex\hbox{\kern-0.2ex\fontfamily{cmbr}\selectfont\textasciitilde}}}
+  % \raise-0.8ex\hbox{\kern-0.2ex\textasciitilde}}}%
+  \def\UrlTildeSpecial{\do\~{\hbox{\fontfamily{ptm}\selectfont\textasciitilde}}}%
   \let\Url@force@Tilde\UrlTildeSpecial%
+}
+
+%
+% Fix \path and \email commands to follow \urlstyle
+%
+\def\noteUrlFixCommands{%
+%  \DeclareUrlCommand\path{}
+%  \DeclareUrlCommand\email{}
 }
 
 % ==============================================================================
@@ -669,7 +747,7 @@
 \DeclareStringOption[]{abstract}
 
 %
-% e.g. [hyperref=false]
+% e.g. [hyperrefdefs=false]
 %
 % Load hyperref and corresponding definitions.
 %
@@ -678,6 +756,7 @@
 % [nohyperrefdefs] is equivalent to [hyperrefdefs=false]
 %
 \DeclareComplementaryOption{nohyperrefdefs}{hyperrefdefs}
+
 
 %
 % e.g. [fontdefs=true]
@@ -719,6 +798,9 @@
 \DeclareComplementaryOption{nobibliographydefs}{bibliographydefs}
 
 
+
+\def\phfnote@hook@atendload{}
+
 %
 % DEFINE PRESETS
 %
@@ -732,6 +814,11 @@
   \def\phfnote@opt@titlestyle{default}
   \def\phfnote@opt@par{skip}
   \def\phfnote@opt@pagegeom{wide}
+  \g@addto@macro\phfnote@hook@atendload{
+    \ifdefined\urlstyle
+      \urlstyle{noteitsf}
+    \fi
+    }
 }
 
 %
@@ -800,5 +887,8 @@
   \phfnote@do@bibliographydefs
 \fi
 
+
+
+\phfnote@hook@atendload
 
 

@@ -259,7 +259,7 @@
 %  \Hfunc`*(x)
 %  \Hfunc`\big(x)
 %
-\def\Hfunc{%
+\DeclareRobustCommand\Hfunc{%
   \begingroup\mathcode`\`="0060\relax%
   \gdef\Hfunc@tmp@sizearg{}%
   \@ifnextchar`\Hfunc@withsize\Hfunc@next%
@@ -362,11 +362,12 @@
 %
 % Where optional  <size-spec>  =  "`*"  or  "`\Big"
 
-\newcommand\DD{%
+\DeclareRobustCommand\DD{%
   \def\DD@tmp@sub{}%
   \def\DD@tmp@sup{}%
   \DD@%
 }
+
 \def\DD@{%
   \@ifnextchar_\DD@parsesub\DD@@%
 }
@@ -396,7 +397,7 @@
 %
 % Where optional  <size-spec>  =  "`*"  or  "`\Big"
 % 
-\newcommand\DminF[1][]{%
+\DeclareRobustCommand\DminF[1][]{%
   \@DDbase{\DDSym}{\mathrm{min,F}}{#1}%
 }
 
@@ -410,7 +411,7 @@
 %
 % Where optional  <size-spec>  =  "`*"  or  "`\Big"
 % 
-\newcommand\Dminz[1][]{%
+\DeclareRobustCommand\Dminz[1][]{%
   \@DDbase{\DDSym}{\mathrm{min,0}}{#1}%
 }
 
@@ -424,7 +425,7 @@
 %
 % Where optional  <size-spec>  =  "`*"  or  "`\Big"
 % 
-\newcommand\Dmax[1][]{%
+\DeclareRobustCommand\Dmax[1][]{%
   \@DDbase{\DDSym}{\mathrm{max}}{#1}%
 }
 
@@ -438,7 +439,7 @@
 %
 % Where optional  <size-spec>  =  "`*"  or  "`\Big"
 % 
-\newcommand\Dr[1][]{%
+\DeclareRobustCommand\Dr[1][]{%
   \@DDbase{\DDSym}{\mathrm{r}}{#1}%
 }
 
@@ -453,10 +454,9 @@
 %
 % Where optional  <size-spec>  =  "`*"  or  "`\Big"
 % 
-\newcommand\DHyp[1][\eta]{%
+\DeclareRobustCommand\DHyp[1][\eta]{%
   \@DDbase{\DDSym}{\mathrm{H}}{#1}%
 }
-
 
 
 % -----------------------

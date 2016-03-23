@@ -1,6 +1,7 @@
 \documentclass[11pt,a4paper]{article}
 
-\usepackage[title=true,titlestyle=small,pkgset=extended]{../phfnote}
+%\usepackage[title=true,titlestyle=small,pkgset=extended]{../phfnote}
+\usepackage[preset=sfnote,pkgset=extended]{../phfnote}
 %\usepackage{../phfnote}
 \def\mypkgs{
   \usepackage{amsmath}
@@ -28,8 +29,12 @@
   \newtheorem*{remark*}{Remark}
 
 
-\providecommand\url\texttt
+%\providecommand\url\texttt
 
+%\urlstyle{noteitsf}
+%\urlstyle{notett}
+%\urlstyle{notesml}
+%\urlstyle{noteitsf}
 
 \def\noteabstracttextfont{\small\itshape}
 
@@ -103,16 +108,16 @@
 
 \section{Introduction and Framework}
 
-This example document contains early material which was ultimately further developed and
-published open-access in \emph{Nature Communications},
-\url{http://dx.doi.org/10.1038/ncomms8669}.
-
 \begin{figure}[t]
   \centering
   \includegraphics[width=3cm]{testfigure}
-  \caption{Test figure. This should not appear at the top where the title is.}
+  \caption{Test figure. This should not appear above the title.}
   \label{fig:test}
 \end{figure}
+
+This example document contains early material which was ultimately further developed and
+published open-access in \emph{Nature Communications},
+\url{http://dx.doi.org/10.1038/ncomms8669}.
 
 Landauer's Principle~\cite{Landauer1961_5392446Erasure}, and more generally the relation between the second law
 of thermodynamics and information theory, has driven much attention in the past decades. Studies have notably
@@ -121,6 +126,10 @@ via information theory (see eg.~\cite{Bennett2003_NotesLP}), and generalizations
 characterization of entanglement through thermodynamical
 considerations~\cite{Oppenheim2002PRL_thermodynamical}, or the determination of the single shot work cost of
 the erasure of a quantum system with quantum side information~\cite{delRio2011Nature}.
+
+This is some text, {\notesmaller[1.2] this text is bigger, {\notesmaller[0.8] and this is
+    some smaller text {\notesmaller and this is even smaller {\notesmaller and smaller
+        {\notesmaller and smaller {\notesmaller and smaller \ldots}}}}}}
 
 Some previous work has attempted to justify Landauer's Principle and generalizations
 through explicit models such as Szilard
@@ -801,13 +810,33 @@ it can also be characterized in terms of a differently normalized subunital chan
 \end{myproof}
 
 
+\section*{Test URL Styles}
+
+{% all definitions are local
+
+\def\testurlstyle#1{\par This is an URL typeset in the `#1' style:
+  \urlstyle{#1}\url{https://www.phys.ethz.ch/~pfaist/}. Email:
+  \email{pfaist+xyz@fkdln_safk.com}.
+}
+
+\testurlstyle{noteitsf}
+\testurlstyle{notesf}
+\testurlstyle{noteit}
+\testurlstyle{noterm}
+\testurlstyle{notesml}
+\testurlstyle{notett}
+
+}
+
+
+
 %{\footnotesize
 %\bibliographystyle{unsrturl}
 %\bibliographystyle{naturemag}
 %\clearpage%
 %\addcontentsline{toc}{section}{\refname}\bibliography{ref,ref_internal}
 %}
-\bibliographystyle{unsrt}
+%\bibliographystyle{unsrt}
 \bibliography{testnote.bibolamazi}
 
 
