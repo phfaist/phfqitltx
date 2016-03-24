@@ -171,6 +171,14 @@
   \let\endabstract\endnotedefaultabstract
 }
 
+\def\noteabstract@attr@small{%
+  \g@addto@macro\noteabstracttextfont{\small}%
+}
+
+\def\noteabstract@attr@it{%
+  \g@addto@macro\noteabstracttextfont{\itshape}%
+}
+
 
 %
 %  #1 = a comma-separated list of attributes
@@ -513,24 +521,30 @@
     urlcolor=docnotelinkcolor}%
   %
   %
-  % and also provide an \email{} command for emails.
+  % Provide an \email command.
   %
-  \def\phfnote@sanitize@url{%
-    \catcode`\$12%
-    \catcode`\&12%
-    \catcode`\#12%
-    \catcode`\^12%
-    \catcode`\_12%
-    \catcode`\%12%
-    %\catcode`\^^J10%  newline = space
-    %\catcode`\^^M10%  newline = space
-    \relax%
-  }%
-  \def\email{\begingroup\phfnote@sanitize@url\phfnote@impl@email@}%
-  \def\phfnote@impl@email@##1{\endgroup\href{mailto:##1}{\phfnote@format@url{##1}}}%
-  % 
+  \let\email\phfnote@email%
 }
 
+
+% 
+% and also provide an \email{} command for emails.
+% 
+\def\phfnote@sanitize@url{%
+  \catcode`\$12%
+  \catcode`\&12%
+  \catcode`\#12%
+  \catcode`\^12%
+  \catcode`\_12%
+  \catcode`\%12%
+  % \catcode`\^^J10%  newline = space
+  % \catcode`\^^M10%  newline = space
+  \relax%
+}%
+\providecommand\phfnote@format@url{\texttt}
+\def\phfnote@email{\begingroup\phfnote@sanitize@url\phfnote@impl@email@}%
+\def\phfnote@impl@email@#1{\endgroup\href{mailto:#1}{\phfnote@format@url{#1}}}%
+% 
 
 
 
@@ -634,6 +648,10 @@
   \def\UrlFont{\sffamily\notesmaller}%
   \phfnote@urlstyle@common%
 }
+\def\url@notesfssstyle{%
+  \def\UrlFont{\fontfamily{cmss}\selectfont\notesmaller}%
+  \phfnote@urlstyle@common%
+}
 \def\url@noteitsfstyle{%
   \def\UrlFont{\sffamily\itshape\notesmaller}%
   \phfnote@urlstyle@common%
@@ -666,6 +684,10 @@
 %  \DeclareUrlCommand\email{}
 }
 
+
+
+% ==============================================================================
+% DEFINE PACKAGE OPTIONS
 % ==============================================================================
 
 
@@ -694,6 +716,8 @@
 % The title style to use. By default, the 'default' style.  May be 'default',
 % 'small', or 'article'.
 %
+% This has no effect if [title=false] was given.
+%
 \DeclareStringOption[default]{titlestyle}
 
 %
@@ -713,6 +737,8 @@
 %
 % The style of page geometry to use.  Available are 'narrow', 'default', 'wide' and
 % 'xwide'
+%
+% This has no effect if [pagegeomdefs=false] was given.
 %
 \DeclareStringOption[default]{pagegeom}
 
@@ -742,7 +768,7 @@
 % e.g. [abstract={noname,narrow}]
 %
 % Abstract flags.  May be a comma-separated list of the following: 'wide',
-% 'narrow', 'noname', 'original'
+% 'narrow', 'noname', 'small', 'it', 'original'
 %
 \DeclareStringOption[]{abstract}
 
@@ -799,6 +825,14 @@
 
 
 
+% ----------------------------
+%          PRESETS
+% ----------------------------
+
+%
+% A hook for presets to do stuff at the end of package load.
+%
+
 \def\phfnote@hook@atendload{}
 
 %
@@ -820,6 +854,20 @@
     \fi
     }
 }
+\def\phfnote@preset@reset{
+  \def\phfnote@opt@pkgset{none}
+  \phfnote@opt@titlefalse
+  \phfnote@opt@pagegeomdefsfalse
+  \phfnote@opt@spacingdefsfalse
+  \def\phfnote@opt@par{original}
+  \def\phfnote@opt@abstract{original}
+  \phfnote@opt@hyperrefdefsfalse
+  \phfnote@opt@fontdefsfalse
+  \def\phfnote@opt@secfmt{}
+  \phfnote@opt@bibliographydefsfalse
+% ADD RESET DEF HERE for new options.
+}
+
 
 %
 % Allow to set a preset, which may set other options, for example.
@@ -846,6 +894,8 @@
 \ProcessKeyvalOptions*
 
 
+% ==============================================================================
+% EXECUTE PACKAGE OPTIONS
 % ==============================================================================
 
 

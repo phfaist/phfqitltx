@@ -2,6 +2,9 @@
 
 %\usepackage[title=true,titlestyle=small,pkgset=extended]{../phfnote}
 \usepackage[preset=sfnote,pkgset=extended]{../phfnote}
+%\usepackage[preset=article,pkgset=extended]{../phfnote}
+%\usepackage[preset=reset,pkgset=extended,spacingdefs,fontdefs,pagegeomdefs,pagegeom=xwide,bibliographydefs,title,titlestyle=small,abstract={wide,small,it}]{../phfnote} \usepackage{hyperref}\makeatletter\let\email\phfnote@email\makeatother\phfnotePdfLinkColor{red}
+%\usepackage[preset=reset,pkgset=extended]{../phfnote} \usepackage{hyperref}\makeatletter\let\email\phfnote@email\makeatother\phfnotePdfLinkColor{red}\let\oldbibliography\bibliography\def\bibliography{\catcode`\&=12\relax\oldbibliography}\bibliographystyle{unsrturl}
 %\usepackage{../phfnote}
 \def\mypkgs{
   \usepackage{amsmath}
@@ -36,7 +39,7 @@
 %\urlstyle{notesml}
 %\urlstyle{noteitsf}
 
-\def\noteabstracttextfont{\small\itshape}
+%\def\noteabstracttextfont{\small\itshape}
 
 
 \usepackage{../phfqit}
@@ -175,6 +178,12 @@ This \rule{5em}{1ex} \rule{5em}{1ex} paragraph \rule{5em}{1ex} might \rule{5em}{
 And this \rule{15em}{1ex} \rule{15em}{1ex} paragraph \rule{15em}{1ex} might
 \rule{15em}{1ex} have \rule{15em}{1ex} long \rule{15em}{1ex} words \rule{15em}{1ex} which
 \rule{15em}{1ex} can't \rule{15em}{1ex} be \rule{15em}{1ex} broken.
+%
+And this \rule{15em}{1ex} \rule{5em}{1ex} paragraph \rule{10em}{1ex} might
+\rule{15em}{1ex} have \rule{15em}{1ex} alternating \rule{6em}{1ex} long \rule{8em}{1ex}
+words \rule{12em}{1ex} which \rule{15em}{1ex} can't \rule{12em}{1ex} be \rule{4em}{1ex}
+broken.
+
 
 \subsection{Test Another Subsection}
 
@@ -814,17 +823,33 @@ it can also be characterized in terms of a differently normalized subunital chan
 
 {% all definitions are local
 
-\def\testurlstyle#1{\par This is an URL typeset in the `#1' style:
-  \urlstyle{#1}\url{https://www.phys.ethz.ch/~pfaist/}. Email:
+  \urlstyle{noteitsf}  URL typeset in the `noteitsf' style:
+  \url{https://www.phys.ethz.ch/~pfaist/}. Email:
   \email{pfaist+xyz@fkdln_safk.com}.
-}
 
-\testurlstyle{noteitsf}
-\testurlstyle{notesf}
-\testurlstyle{noteit}
-\testurlstyle{noterm}
-\testurlstyle{notesml}
-\testurlstyle{notett}
+  \urlstyle{notesf}  URL typeset in the `notesf' style:
+  \url{https://www.phys.ethz.ch/~pfaist/}. Email:
+  \email{pfaist+xyz@fkdln_safk.com}.
+
+  \urlstyle{notesfss}  URL typeset in the `notesfss' style:
+  \url{https://www.phys.ethz.ch/~pfaist/}. Email:
+  \email{pfaist+xyz@fkdln_safk.com}.
+
+  \urlstyle{noteit}  URL typeset in the `noteit' style:
+  \url{https://www.phys.ethz.ch/~pfaist/}. Email:
+  \email{pfaist+xyz@fkdln_safk.com}.
+
+  \urlstyle{noterm}  URL typeset in the `noterm' style:
+  \url{https://www.phys.ethz.ch/~pfaist/}. Email:
+  \email{pfaist+xyz@fkdln_safk.com}.
+
+  \urlstyle{notesml} URL typeset in the `notesml' style:
+  \url{https://www.phys.ethz.ch/~pfaist/}. Email:
+  \email{pfaist+xyz@fkdln_safk.com}.
+
+  \urlstyle{notett}  URL typeset in the `notett' style:
+  \url{https://www.phys.ethz.ch/~pfaist/}. Email:
+  \email{pfaist+xyz@fkdln_safk.com}.
 
 }
 
