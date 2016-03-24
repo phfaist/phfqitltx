@@ -76,7 +76,23 @@
 \newcounter{phffpf@internal@pending}
 \setcounter{phffpf@internal@pending}{0}
 
+%
+% Redefine this if you don't want to use a \FloatBarrier.  Be warned that:
+%
+% - \FloatBarrier introduces automatically a new paragraph.  Nothing you can do about
+%   that a priori.
+%
+% - If you remove \FloatBarrier, you need to either be sure that there are no floats
+%   which can mess up placement of the fullpagefigure, or you need to provide your own
+%   mechanism that ensures that.
+%
+\def\phffpfFloatBarrier{\FloatBarrier}
 
+
+
+%
+% The main {fullpagefigure} environment.
+%
 \newenvironment{fullpagefigure}[1][b]{% 
   %
   % Remember that we have a float pending to be placed
@@ -85,7 +101,7 @@
   %
   % Don't allow any other floats to meddle with our calculations.
   % 
-  \FloatBarrier%
+  \phffpfFloatBarrier%
 %[YYY]% -- debugging [where is a space being inserted?]
   %
   % These variables will store the relevant values of options collected in the definition
@@ -119,21 +135,46 @@
   %
   % Finally, ignore any spaces following this command
   %
+  \ignorespacesafterend%
   \ignorespaces%
 }{%
   % 
   % End environment.
   %
-  \endgroup%  restore \caption & \label
   %
+  % Remove any spaces which might have been inserted.
+  %
+  \ifhmode\unskip\fi%
+  % 
+  % Restore \caption & \label and etc.
+  %
+  \endgroup%
+  %
+  % 
   % Finally we should actually place the figure.
   % 
   \phffpf@doplacefigure%
   %
   %
-  % Finally, ignore any spaces following this command
+  % Finally, ignore any spaces following this command.  Note that because the expansion
+  % of \endfullpagefigure is inside the definition of LaTeX' "\end" and has internal
+  % commands after that, we can't just have here \ignorespaces.
   %
-  \ignorespaces%
+  \phfpf@useignorespacesandallpars%  \phffpf@ignorespacesnewlines%
+}
+
+
+% see http://tex.stackexchange.com/a/179034/32188  and  http://tex.stackexchange.com/a/23101/32188
+\def\phfpf@useignorespacesandallpars#1\ignorespaces\fi{%
+  #1\fi\phffpf@ignorespacesandallpars}
+%
+\def\phffpf@ignorespacesandallpars{%
+  \begingroup%
+  \catcode`\^^M=10\relax%
+  \catcode`\^^J=10\relax%
+  \@ifnextchar\par%
+    {\endgroup\expandafter\phffpf@ignorespacesandallpars\@gobble}%
+    {\endgroup}%
 }
 
 \newtoks\phffpf@tmp@toks
@@ -266,15 +307,16 @@
       \fi%
     \fi%
   \fi%
+  % 
+  % 
+  % I think an \hbox{} might help to place the anchor which determines which page this is
+  % on. --- No, it inserts a blank paragraph (WHY??) -- SHOULD BE FIXED NOW
+  % 
+  \leavevmode\hbox{}%
   %
   % Now, do place the figure somewhere.
   % 
   \phffpf@tmp@doplace%
-  % 
-  % I think an \hbox{} might help to place the anchor which determines which page this is
-  % on. --- No, it inserts a blank paragraph (WHY??)
-  % 
-  %\hbox{}%
 }
 
 
