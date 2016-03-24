@@ -1,12 +1,15 @@
 \documentclass[11pt,a4paper]{article}
 
-%\usepackage[title=true,titlestyle=small,pkgset=extended]{../phfnote}
-\usepackage[preset=sfnote,pkgset=extended]{../phfnote}
+%\usepackage[title=small,pkgset=extended]{../phfnote}
+%\usepackage[preset=sfnote,pkgset=extended]{../phfnote}
+%\usepackage[preset=sfssnote,pkgset=extended]{../phfnote}
 %\usepackage[preset=article,pkgset=extended]{../phfnote}
-%\usepackage[preset=reset,pkgset=extended,spacingdefs,fontdefs,pagegeomdefs,pagegeom=xwide,bibliographydefs,title,titlestyle=small,abstract={wide,small,it}]{../phfnote} \usepackage{hyperref}\makeatletter\let\email\phfnote@email\makeatother\phfnotePdfLinkColor{red}
+\usepackage[preset=reset,pkgset=extended,title=small,secfmt={section},spacingdefs,fontdefs,pagegeomdefs,pagegeom=xwide,bibliographydefs,abstract={wide,small,it}]{../phfnote} \usepackage{hyperref}\makeatletter\let\email\phfnote@email\makeatother\phfnotePdfLinkColor{red}
 %\usepackage[preset=reset,pkgset=extended]{../phfnote} \usepackage{hyperref}\makeatletter\let\email\phfnote@email\makeatother\phfnotePdfLinkColor{red}\let\oldbibliography\bibliography\def\bibliography{\catcode`\&=12\relax\oldbibliography}\bibliographystyle{unsrturl}
 %\usepackage{../phfnote}
-\def\mypkgs{
+
+
+\def\mypkgs{% for testing less complete package sets, here are the necessary ones:
   \usepackage{amsmath}
   \usepackage{amsfonts}
   \usepackage{amsthm}
@@ -15,35 +18,31 @@
 }
 %\mypkgs
 
+% we need some theorem definitions.
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{lemma}[thm]{Lemma}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{conj}[thm]{Conjecture}
+\newtheorem{remark}[thm]{Remark}
+\newtheorem*{thm*}{Theorem}
+\newtheorem*{prop*}{Proposition}
+\newtheorem*{lemma*}{Lemma}
+\newtheorem*{cor*}{Corollary}
+\newtheorem*{conj*}{Conjecture}
+\newtheorem*{idea*}{Idea}
+\newtheorem*{remark*}{Remark}
 
-  \theoremstyle{plain}
-  \newtheorem{thm}{Theorem}
-  \newtheorem{prop}[thm]{Proposition}
-  \newtheorem{lemma}[thm]{Lemma}
-  \newtheorem{cor}[thm]{Corollary}
-  \newtheorem{conj}[thm]{Conjecture}
-  \newtheorem{remark}[thm]{Remark}
-  \newtheorem*{thm*}{Theorem}
-  \newtheorem*{prop*}{Proposition}
-  \newtheorem*{lemma*}{Lemma}
-  \newtheorem*{cor*}{Corollary}
-  \newtheorem*{conj*}{Conjecture}
-  \newtheorem*{idea*}{Idea}
-  \newtheorem*{remark*}{Remark}
 
 
-%\providecommand\url\texttt
-
-%\urlstyle{noteitsf}
-%\urlstyle{notett}
-%\urlstyle{notesml}
-%\urlstyle{noteitsf}
-
+% To test custom fonts in abstract
+%
 %\def\noteabstracttextfont{\small\itshape}
 
 
+% for notation & definitions
 \usepackage{../phfqit}
-
 
 % fully mixed state, \Ident_X/|X|
 \newcommand{\Mixed}[1]{{\frac{\Ident_{#1}}{\abs{#1}}}}
@@ -54,8 +53,7 @@
 % fully mixed state, \Ident_n/n, text-style fraction
 \newcommand{\Mixedin}[1]{{\textstyle\frac{\Ident_{#1}}{#1}}}
 
-
-% hilbert spaces & entropies & spaces...
+% hilbert spaces & entropies & spaces... override those in {phfqit}.
 \def\Hs{\mathscr{H}}% Hilbert space
 \def\Hamilt{\mathcal{H}}% Hamiltonian
 \def\HH{{H}}% Entropy-denoting 'H' letter
@@ -73,6 +71,7 @@
 
 
 %\usepackage{txfonts}
+%\usepackage{mathptmx}
 %\usepackage{multicol}
 
 
@@ -213,7 +212,7 @@ $S_i^{~j}\geqslant 0$, $\sum_i S_i^{~j} \leqslant 1$, $\sum_j S_i^{~j} \leqslant
   \label{prop:majorizationDoublyStochMatrix}
   Two (normalized) density matrices $\sigma$ and $\rho$ satisfy $\sigma\succ\rho$ if and only if
   there exists a doubly substochastic matrix $S_i^{~j}$ such that
-  $\lambda_i(\rho) = \sum_j S_i^{~j}\lambda_j(\sigma)$ .
+  $\lambda_i(\rho) = \sum_j S_i^{~j}\lambda_j(\sigma)$.
 \end{prop}
 
 Majorization defines a {\em partial order} on states and has a ``smallest'' element, the fully mixed state. Also,

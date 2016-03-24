@@ -109,13 +109,22 @@
 % #1 = style name, e.g. 'default'
 %
 \def\phfnote@do@notetitle#1{
-  \ifcsname notetitle@style@#1\endcsname
-    \def\phfnote@tmp@titsty{#1}%
+  \if\relax\detokenize\expandafter{#1}\relax
+    %
+    % Empty definition -- leave default title
+    %
   \else
-    \PackageError{phfnote}{Unknown title style: '#1'. Using default style instead}
-    \def\phfnote@tmp@titsty{default}%
+    %
+    % Custom note title to set.
+    %
+    \ifcsname notetitle@style@#1\endcsname
+      \def\phfnote@tmp@titsty{#1}%
+    \else
+      \PackageError{phfnote}{Unknown title style: '#1'. Using default style instead}
+      \def\phfnote@tmp@titsty{default}%
+    \fi
+    \def\@maketitle{\csname notetitle@style@\phfnote@tmp@titsty\endcsname}
   \fi
-  \def\@maketitle{\csname notetitle@style@\phfnote@tmp@titsty\endcsname}
 }
 
 
@@ -361,7 +370,7 @@
 \newcommand{\noteparagraphfontsize}{\normalsize}
 \newcommand{\notesubparagraphfontsize}{\normalsize}
 %
-\newcommand{\notesectionfont}{\fontfamily{\notesectionfontfamily}\fontseries{b}\selectfont}
+\newcommand{\notesectionfont}{\fontfamily{\notesectionfontfamily}\fontseries{bx}\selectfont}
 \newcommand{\notesectionfontfamily}{ppl}
 % 
 \newcommand{\notesectionfontsetsizes}[3]{%
@@ -524,6 +533,12 @@
   % Provide an \email command.
   %
   \let\email\phfnote@email%
+  %
+  %
+  % And set the default \url/\email style
+  %
+  \urlstyle{notesf}%
+  %
 }
 
 
@@ -703,22 +718,15 @@
 %
 \DeclareStringOption[rich]{pkgset}
 
-%
-% e.g. [title=false]
-%
-% enable the styled note title, or leave the document default?
-%
-\DeclareBoolOption[true]{title}
 
 %
-% e.g. [titlestyle=small]
+% e.g. [title=small]
 %
-% The title style to use. By default, the 'default' style.  May be 'default',
-% 'small', or 'article'.
+% The title style to use. By default, the 'default' style.  May be 'default', 'small', or
+% 'article'.  You may leave empty to avoid overriding the title style, and leaving the
+% class default.
 %
-% This has no effect if [title=false] was given.
-%
-\DeclareStringOption[default]{titlestyle}
+\DeclareStringOption[default]{title}
 
 %
 % e.g. [pagegeomdefs=false]
@@ -804,7 +812,8 @@
 %
 %  - "section"  style section/subsection/subsubsection headings
 %
-%  - "compact"  make section/subsection/subsubsection headings more compact
+%  - "compact"  make section/subsection/subsubsection headings more compact. Needs to be
+%    used in conjunction with 'section'
 %
 %  - "paragraph"  style paragraph/subparagraph headings
 %
@@ -839,24 +848,34 @@
 % DEFINE PRESETS
 %
 \def\phfnote@preset@article{
-  \def\phfnote@opt@titlestyle{article}
+  \def\phfnote@opt@title{article}
   \def\phfnote@opt@par{indent}
   \def\phfnote@opt@pagegeom{default}
 }
 \def\phfnote@preset@sfnote{
   \renewcommand\familydefault{\sfdefault}
-  \def\phfnote@opt@titlestyle{default}
+  \def\phfnote@opt@title{default}
   \def\phfnote@opt@par{skip}
   \def\phfnote@opt@pagegeom{wide}
   \g@addto@macro\phfnote@hook@atendload{
     \ifdefined\urlstyle
       \urlstyle{noteitsf}
     \fi
-    }
+  }
+  \renewcommand{\notesectionfontfamily}{\sfdefault}
+}
+\def\phfnote@preset@sfssnote{
+  % as sfnote, ...
+  \phfnote@preset@sfnote
+  % ... but:
+  \phfnote@opt@fontdefsfalse
+  \PassOptionsToPackage{T1}{fontenc}
+  \RequirePackage{fontenc}
+  \renewcommand\sfdefault{cmss}
 }
 \def\phfnote@preset@reset{
   \def\phfnote@opt@pkgset{none}
-  \phfnote@opt@titlefalse
+  \def\phfnote@opt@title{}
   \phfnote@opt@pagegeomdefsfalse
   \phfnote@opt@spacingdefsfalse
   \def\phfnote@opt@par{original}
@@ -907,9 +926,7 @@
 
 \phfnote@do@pkgset{\phfnote@opt@pkgset}
 
-\ifphfnote@opt@title
-  \phfnote@do@notetitle{\phfnote@opt@titlestyle}
-\fi
+\phfnote@do@notetitle{\phfnote@opt@title}
 
 \phfnote@do@noteabstract{\phfnote@opt@abstract}
 
