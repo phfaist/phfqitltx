@@ -38,7 +38,6 @@
 %
 % -- common note title defs --
 %
-\newcommand{\notetitlefontfamily}{\sffamily}
 \newcommand{\notetitlefont}{\sffamily\bfseries}
 \newcommand{\notetitleauthorfont}{}
 \newcommand{\notetitledatefont}{}
@@ -249,7 +248,7 @@
 }
 \def\phfnote@pagegeomstyle@xwide{
   \if@twocolumn
-    \PassOptionsToPackage{hmargin=0.5in,vmargin=0.75in,includeheadfoot}{geometry}%
+    \PassOptionsToPackage{hmargin=0.5in,vmargin=0.5in,includeheadfoot}{geometry}%
   \else
     % fix the margins a bit to make text wider
     \ifcase\@ptsize% mods for 10 pt
@@ -293,7 +292,7 @@
     \or% 12pt
       \renewcommand\baselinestretch{1.0} %1.03
     \fi
-    \emergencystretch=5em
+    \emergencystretch=6em
   \fi
 
 }
@@ -640,6 +639,17 @@
 }
 
 
+% ------------------------------------------------------------------------------
+%     FOOTNOTES
+% ------------------------------------------------------------------------------
+
+\def\phfnote@do@footnotedefs{
+  \let\phfnote@orig@makefnmark\@makefnmark
+%  \def\@makefnmark{\hbox{\@textsuperscript{\normalfont\tiny\fontseries{sb}\selectfont\@thefnmark}}}
+  \def\@makefnmark{\hbox{\@textsuperscript{\normalfont\tiny\bfseries\@thefnmark}}}
+}
+
+
 % ==============================================================================
 
 %
@@ -684,10 +694,11 @@
   \phfnote@urlstyle@common%
 }
 
+\def\phfnote@url@tilde{\hbox{\fontfamily{ptm}\selectfont\textasciitilde}}
 \def\phfnote@urlstyle@common{%
 %  \def\UrlTildeSpecial{\do\~{\raise-0.8ex\hbox{\kern-0.2ex\fontfamily{cmbr}\selectfont\textasciitilde}}}
   % \raise-0.8ex\hbox{\kern-0.2ex\textasciitilde}}}%
-  \def\UrlTildeSpecial{\do\~{\hbox{\fontfamily{ptm}\selectfont\textasciitilde}}}%
+  \def\UrlTildeSpecial{\do\~{\phfnote@url@tilde}}%
   \let\Url@force@Tilde\UrlTildeSpecial%
 }
 
@@ -822,6 +833,17 @@
 \DeclareStringOption[section]{secfmt}
 
 %
+% e.g. [footnotedefs=false]
+%
+% Adjustments for footnotes. Changes the symbol appearance a little bit.
+%
+\DeclareBoolOption[true]{footnotedefs}
+%
+% [nofootnotedefs] is equivalent to [footnotedefs=false]
+%
+\DeclareComplementaryOption{nofootnotedefs}{footnotedefs}
+
+%
 % e.g. [bibliographydefs=false]
 %
 % Adjustments for bibliography, including default style
@@ -846,22 +868,29 @@
 
 %
 % DEFINE PRESETS
+% --------------------
 %
 \def\phfnote@preset@article{
   \def\phfnote@opt@title{article}
   \def\phfnote@opt@par{indent}
   \def\phfnote@opt@pagegeom{default}
 }
-\def\phfnote@preset@sfnote{
-  \renewcommand\familydefault{\sfdefault}
+% -------------
+\newcommand\phfnote@presetcommon@xnote[1][noteitsf]{% common settings to all "{sf|sfss|utopia}note" presets
   \def\phfnote@opt@title{default}
   \def\phfnote@opt@par{skip}
   \def\phfnote@opt@pagegeom{wide}
   \g@addto@macro\phfnote@hook@atendload{
     \ifdefined\urlstyle
-      \urlstyle{noteitsf}
+      \urlstyle{#1}
     \fi
   }
+}
+\def\phfnote@preset@sfnote{
+  \phfnote@presetcommon@xnote
+  \phfnote@opt@footnotedefstrue
+  \phfnote@opt@fontdefstrue
+  \renewcommand\familydefault{\sfdefault}
   \renewcommand{\notesectionfontfamily}{\sfdefault}
 }
 \def\phfnote@preset@sfssnote{
@@ -872,6 +901,16 @@
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
   \renewcommand\sfdefault{cmss}
+}
+\def\phfnote@preset@utopianote{
+  \phfnote@presetcommon@xnote[noteit]
+  \phfnote@opt@fontdefsfalse
+  \PassOptionsToPackage{T1}{fontenc}
+  \RequirePackage{fontenc}
+  \RequirePackage{fourier}
+  \renewcommand{\notesectionfontfamily}{put}
+  \renewcommand{\notetitlefont}{\bfseries}
+  \renewcommand{\sfdefault}{phv}
 }
 \def\phfnote@preset@reset{
   \def\phfnote@opt@pkgset{none}
@@ -884,6 +923,7 @@
   \phfnote@opt@fontdefsfalse
   \def\phfnote@opt@secfmt{}
   \phfnote@opt@bibliographydefsfalse
+  \phfnote@opt@footnotedefsfalse
 % ADD RESET DEF HERE for new options.
 }
 
@@ -952,6 +992,10 @@
 
 \ifphfnote@opt@bibliographydefs
   \phfnote@do@bibliographydefs
+\fi
+
+\ifphfnote@opt@footnotedefs
+  \phfnote@do@footnotedefs
 \fi
 
 

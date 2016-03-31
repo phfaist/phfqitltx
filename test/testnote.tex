@@ -1,10 +1,11 @@
-\documentclass[11pt,a4paper]{article}
+\documentclass[10pt,letterpaper]{article}
 
-%\usepackage[title=small,pkgset=extended]{../phfnote}
+\usepackage[title=small,pkgset=extended]{../phfnote}
 %\usepackage[preset=sfnote,pkgset=extended]{../phfnote}
-%\usepackage[preset=sfssnote,pkgset=extended]{../phfnote}
+%\usepackage[preset=sfssnote,pkgset=extended,pagegeom=narrow]{../phfnote}
+%\usepackage[preset=utopianote,pkgset=extended,pagegeom=narrow]{../phfnote}
 %\usepackage[preset=article,pkgset=extended]{../phfnote}
-\usepackage[preset=reset,pkgset=extended,title=small,secfmt={section},spacingdefs,fontdefs,pagegeomdefs,pagegeom=xwide,bibliographydefs,abstract={wide,small,it}]{../phfnote} \usepackage{hyperref}\makeatletter\let\email\phfnote@email\makeatother\phfnotePdfLinkColor{red}
+%\usepackage[preset=reset,pkgset=extended,title=small,secfmt={section},spacingdefs,fontdefs,pagegeomdefs,pagegeom=xwide,bibliographydefs,abstract={wide,small,it}]{../phfnote} \usepackage{hyperref}\makeatletter\let\email\phfnote@email\makeatother\phfnotePdfLinkColor{red}
 %\usepackage[preset=reset,pkgset=extended]{../phfnote} \usepackage{hyperref}\makeatletter\let\email\phfnote@email\makeatother\phfnotePdfLinkColor{red}\let\oldbibliography\bibliography\def\bibliography{\catcode`\&=12\relax\oldbibliography}\bibliographystyle{unsrturl}
 %\usepackage{../phfnote}
 
@@ -72,6 +73,9 @@
 
 %\usepackage{txfonts}
 %\usepackage{mathptmx}
+%\usepackage{fourier}
+%\usepackage{pxfonts}
+%\usepackage{helvet}
 %\usepackage{multicol}
 
 
@@ -141,7 +145,7 @@ Hamiltonian models~\cite{Alicki2004_hamiltonian}, all of which are NOT depicted 
 Principle as being valid, much like one generally accepts the second law of thermodynamics
 as being valid. This allows us to {\em define} a notion of work in our quantum setting by
 characterizing how much randomness can be absorbed or is generated during a noisy
-operation.
+operation.\footnote{This is how a footnote looks like.} Yes.\footnote{Another footnote.}
 
 This notion is closely related to the notion of {\em themomajorization} introduced by
 Horodecki et al.~\cite{Horodecki2013_ThermoMaj}. However, while their approach is to model
@@ -176,7 +180,7 @@ This \rule{5em}{1ex} \rule{5em}{1ex} paragraph \rule{5em}{1ex} might \rule{5em}{
 %
 And this \rule{15em}{1ex} \rule{15em}{1ex} paragraph \rule{15em}{1ex} might
 \rule{15em}{1ex} have \rule{15em}{1ex} long \rule{15em}{1ex} words \rule{15em}{1ex} which
-\rule{15em}{1ex} can't \rule{15em}{1ex} be \rule{15em}{1ex} broken.
+\rule{15em}{1ex} can't \rule{15em}{1ex} be \rule{15em}{1ex} \rule{15em}{1ex} \rule{15em}{1ex} broken.
 %
 And this \rule{15em}{1ex} \rule{5em}{1ex} paragraph \rule{10em}{1ex} might
 \rule{15em}{1ex} have \rule{15em}{1ex} alternating \rule{6em}{1ex} long \rule{8em}{1ex}
@@ -821,6 +825,12 @@ it can also be characterized in terms of a differently normalized subunital chan
 \section*{Test URL Styles}
 
 {% all definitions are local
+
+  URL typeset in the default style of the document:
+  \url{https://www.phys.ethz.ch/~pfaist/}. Email:
+  \email{pfaist+xyz@fkdln_safk.com}.
+  \textit{In italic context, this is \url{https://www.phys.ethz.ch/~pfaist}.}
+  \textbf{In bold context, this is \url{https://www.phys.ethz.ch/~pfaist}.}
 
   \urlstyle{noteitsf}  URL typeset in the `noteitsf' style:
   \url{https://www.phys.ethz.ch/~pfaist/}. Email:
