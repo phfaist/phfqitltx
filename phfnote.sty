@@ -73,6 +73,23 @@
     \vspace*{1mm}\hrule\vspace*{1mm}
   \end{flushleft}
 }
+% -- STYLE: titleonly -- [ big title only. Use paragraphs for several lines ]
+\newcommand{\notetitle@style@titleonly}{% `titleonly' style title
+  \begin{flushleft}
+    \vspace*{\phfnote@title@vskiptop}
+    \begin{singlespace}
+      \begingroup
+        \Large\notetitlefont{
+          \parindent=0pt
+          \parskip=1.5ex
+          \par  \@title\par\vspace{4mm}%
+          }%
+      \endgroup
+      \hrule
+    \end{singlespace}
+    \vspace*{3mm}
+  \end{flushleft}
+}
 % -- STYLE: article --
 \newcommand{\notetitle@style@article}{% `article' style title
   % \begingroup%
@@ -126,7 +143,11 @@
   \fi
 }
 
-
+%
+% Provide long definition for \title{}, so that several "paragraphs" can be put into the
+% title as different lines.
+%
+\long\def\title#1{\gdef\@title{#1}}
 
 % ------------------------------------------------------------------------------
 %     ABSTRACT
@@ -395,6 +416,9 @@
 }
 \def\phfnote@do@secfmt@compact{
   \notesectionfontsetsizes{\normalsize}{\small}{\small}
+}
+\def\phfnote@do@secfmt@sffamily{
+  \renewcommand\notesectionfontfamily{\sfdefault}
 }
 \def\phfnote@do@secfmt#1{%
   \RequirePackage{sectsty}
