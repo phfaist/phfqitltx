@@ -457,15 +457,15 @@
 
 }
 
-
 \def\phfnote@do@pkgset#1{
 
-  \ifcsname phfnote@do@pkgset@#1\endcsname
-    \csname phfnote@do@pkgset@#1\endcsname
-  \else
-    \PackageWarning{phfnote}{Unknown package set to load: #1. Loading minimal set}
-    \phfnote@do@pkgset@minimal
-  \fi
+  \phfnote@internal@execattribs{phfnote@do@pkgset@}{package set}{#1}
+%  \ifcsname phfnote@do@pkgset@#1\endcsname
+%    \csname phfnote@do@pkgset@#1\endcsname
+%  \else
+%    \PackageWarning{phfnote}{Unknown package set to load: #1. Loading minimal set}
+%    \phfnote@do@pkgset@minimal
+%  \fi
 
 }
 
@@ -647,6 +647,7 @@
   \let\phfnote@orig@makefnmark\@makefnmark
 %  \def\@makefnmark{\hbox{\@textsuperscript{\normalfont\tiny\fontseries{sb}\selectfont\@thefnmark}}}
   \def\@makefnmark{\hbox{\@textsuperscript{\normalfont\tiny\bfseries\@thefnmark}}}
+%  \def\@makefnmark{\hbox{\@textsuperscript{\normalfont\scriptsize\bfseries\@thefnmark}}} % too large
 }
 
 
@@ -911,6 +912,22 @@
   \renewcommand{\notesectionfontfamily}{put}
   \renewcommand{\notetitlefont}{\bfseries}
   \renewcommand{\sfdefault}{phv}
+}
+\def\phfnote@preset@mnmynote{
+  \phfnote@presetcommon@xnote[noteit]
+  \phfnote@opt@footnotedefsfalse
+  \phfnote@opt@fontdefsfalse
+  \PassOptionsToPackage{T1}{fontenc}
+  \RequirePackage{fontenc}
+  \renewcommand{\notesectionfontfamily}{\sfdefault}
+  % require these AFTER the default package set, because some symbols may be defined in package sets etc...
+  \g@addto@macro\phfnote@hook@atendload{
+    \RequirePackage{MnSymbol}
+    \PassOptionsToPackage{medfamily,textosf,mathlf,minionint,footnotefigures}{MinionPro}
+    \RequirePackage{MinionPro}
+    \PassOptionsToPackage{medfamily}{MyriadPro}
+    \RequirePackage{MyriadPro}
+  }
 }
 \def\phfnote@preset@reset{
   \def\phfnote@opt@pkgset{none}
