@@ -90,6 +90,7 @@
 
 
 
+
 %
 % The main {fullpagefigure} environment.
 %
@@ -106,6 +107,8 @@
   %
   % These variables will store the relevant values of options collected in the definition
   % of the figure with e.g. \figplacement, \figcontents, etc.
+  % 
+  % If you add a @val@ storage variable, don't forget to fix that value in "doplacefigure"
   % 
   \xdef\phffpf@val@pageside{\phffpf@side@}%
   \gdef\phffpf@val@captionopt{}%
@@ -153,7 +156,7 @@
   % 
   % Finally we should actually place the figure.
   % 
-  \phffpf@doplacefigure%
+  \phffpf@takecareofplacingfigure%
   %
   %
   % Finally, ignore any spaces following this command.  Note that because the expansion
@@ -233,7 +236,59 @@
 \def\fullpagefigurecaptionfmt@paren@x{on next page}   % for next-page figures
 
 
-\def\phffpf@doplacefigure{%
+%
+% this macro will store code to be executed after the next figure has been placed.  This
+% can be used to queue other figures to place later.
+%
+\def\phffpf@place@pending@figs@code{\phffpf@place@pending@figs@code@start}
+
+\def\phffpf@place@pending@figs@code@start{\gdef\phffpf@place@pending@figs@code{\phffpf@place@pending@figs@code@start}}
+
+%
+% The code to be inserted to generate the figure.
+%
+\gdef\phffpf@impl@figcode#1{%  #1 = prefix macro for fields as \csname #1@FIELD\endcsname
+  \expandafter\ifblank\expandafter{\csname #1@placement\endcsname}{% don't have placement arg
+    \edef\phffpf@tmp@figplacementarg{}%
+  }{% have placement arg
+    \edef\phffpf@tmp@figplacementarg{[\csname #1@placement\endcsname]}%
+  }
+  \expandafter\figure\phffpf@tmp@figplacementarg%
+  \centering%
+  \begingroup%
+  % [FIGURE GHOST CONTENT: \csname #1@caption\endcsname]
+  \def\fnum@figure{\fullpagefigurecaptionfmt{\csname #1@pageside\endcsname}}%
+  \expandafter\afterpage\expandafter{\csname #1@figcontents\endcsname}%
+  \expandafter\ifx\csname #1@captionopt\endcsname\phffpf@test@NOARG%
+    \expandafter\caption\expandafter{\csname #1@caption\endcsname}%
+  \else%
+    \def\phffpf@tmp@captioncmdopt{\expandafter\caption\expandafter[\csname #1@captionopt\endcsname]}%
+    \expandafter\phffpf@tmp@captioncmdopt\expandafter{\csname #1@caption\endcsname}%
+  \fi%
+  \expandafter\notblank\expandafter{\csname #1@label\endcsname}{%
+    \expandafter\label\expandafter{\csname #1@label\endcsname}%
+  }{%
+  }
+  \endgroup%
+  \endfigure%
+  % 
+  % We have placed the figure, so decrease our "pending" counter
+  % 
+  \addtocounter{phffpf@internal@pending}{-1}%
+  %
+  % and add code to place any other pending figures.
+  %
+  \afterpage{%
+%    [PLACING PENDING FIGURES: \arabic{phffpf@internal@pending}]  % -- DEBUGGING
+%    \texttt{\detokenize\expandafter{\phffpf@place@pending@figs@code}}%  -- DEBUGGING
+    \phffpf@flag@forcenextmaybequeuetoplacefiguretrue%
+    \phffpf@place@pending@figs@code%
+  }%
+}%
+
+
+
+\def\phffpf@takecareofplacingfigure{%
   %
   % Now, all options have been set etc., the fullpagefigure environment has finished, so
   % calculate the commands to place the figure appropriately.
@@ -242,46 +297,102 @@
   % Prepare some code which should be placed on the page immediately preceeding the full
   % page figure.
   % 
-%[PLACING FIGURE ON PAGE SIDE \phffpf@val@pageside] % -- for debugging
-  \gdef\phffpf@tmp@figcode{%
-    \expandafter\ifblank\expandafter{\phffpf@val@placement}{% don't have placement arg
-      \edef\phffpf@tmp@figplacementarg{}%
-    }{% have placement arg
-      \edef\phffpf@tmp@figplacementarg{[\phffpf@val@placement]}%
-    }
-    \expandafter\figure\phffpf@tmp@figplacementarg%
-    \centering%
-    \begingroup%
-    %[FIGURE GHOST CONTENT: \phffpf@val@caption]
-    \def\fnum@figure{\fullpagefigurecaptionfmt{\phffpf@val@pageside}}%
-    \afterpage{\phffpf@val@figcontents}%
-    \ifx\phffpf@val@captionopt\phffpf@test@NOARG%
-      \caption{\phffpf@val@caption}%
-    \else%
-      \caption[\phffpf@val@captionopt]{\phffpf@val@caption}%
-    \fi%
-    \notblank{\phffpf@val@label}{%
-      \label{\phffpf@val@label}%
-    }{%
-    }
-    \endgroup%
-    \endfigure%
-    % 
-    % We have placed the figure, so decrease our "pending" counter
-    % 
-    \addtocounter{phffpf@internal@pending}{-1}%
+%[PLACING FIGURE ON PAGE SIDE \phffpf@valname{pageside}] % -- for debugging
+  %
+  %
+  % Here's the tricky part: make sure we save the values of phffpf@val@<FIELD> in a fixed
+  % way so that several figures won't overwrite each other's values.
+  %
+  \edef\phffpf@tmp@fixallfieldvalues{%  \phffpf@tmp@fixallfieldvalues expands once to a
+    % list of commands "\gdef\phffpf@val@FIELD{value-of-the-field}"
+    \noexpand\gdef\noexpand\phffpf@val@pageside{\expandonce\phffpf@val@pageside}%
+    \noexpand\gdef\noexpand\phffpf@val@captionopt{\expandonce\phffpf@val@captionopt}%
+    \noexpand\gdef\noexpand\phffpf@val@caption{\expandonce\phffpf@val@caption}%
+    \noexpand\gdef\noexpand\phffpf@val@label{\expandonce\phffpf@val@label}%
+    \noexpand\gdef\noexpand\phffpf@val@placement{\expandonce\phffpf@val@placement}%
+    \noexpand\gdef\noexpand\phffpf@val@capmaxheight{\expandonce\phffpf@val@capmaxheight}%
+    \noexpand\gdef\noexpand\phffpf@val@figcontents{\expandonce\phffpf@val@figcontents}%
+%    \phffpf@impl@fixfieldvaluecode{pageside}%
+%    \phffpf@impl@fixfieldvaluecode{captionopt}%
+%    \phffpf@impl@fixfieldvaluecode{caption}%
+%    \phffpf@impl@fixfieldvaluecode{label}%
+%    \phffpf@impl@fixfieldvaluecode{placement}%
+%    \phffpf@impl@fixfieldvaluecode{capmaxheight}%
+%    \phffpf@impl@fixfieldvaluecode{figcontents}%
+  }%
+  \edef\phffpf@tmp@figcodetwoargs{%
+    {\expandonce\phffpf@tmp@fixallfieldvalues}%
+    {\noexpand\phffpf@impl@figcode{phffpf@val}}%
   }%
   %
+%\show\phffpf@tmp@figcode %% DEBUG
+  %
+  \expandafter\phffpf@maybequeuefigurecode\phffpf@tmp@figcodetwoargs%
+}
+
+\newif\ifphffpf@flag@forcenextmaybequeuetoplacefigure
+\phffpf@flag@forcenextmaybequeuetoplacefigurefalse
+
+\long\def\phffpf@maybequeuefigurecode#1#2{%
+  % #1 = code to restore correct phffpf@val@XYZ values
+  % #2 = figure code. Make sure it's expanded
+  %
+  % See if there are other figures waiting to be placed first.  If so, queue ours.
   % 
-  % Now, determine where exactly to place the figure code.
+  \ifphffpf@flag@forcenextmaybequeuetoplacefigure%
+    %
+    % reset flag ...
+    % 
+    \phffpf@flag@forcenextmaybequeuetoplacefigurefalse
+    % 
+    % and deal with placing the figure now.
+    %
+    \phffpf@doplacefigure{#1}{#2}%
+    %
+%    [FORCED figure placed: \texttt{\detokenize{#1}}] % DEBUGGING
+  \else
+    \ifnum\value{phffpf@internal@pending}>1\relax% other figure waiting to be placed.
+      % 
+      % add to queue
+      %
+      \xdef\phffpf@place@pending@figs@code{%
+          \expandonce\phffpf@place@pending@figs@code%
+          \unexpanded{\phffpf@maybequeuefigurecode{#1}{#2}}%
+        }%
+%      \show\phffpf@place@pending@figs@code
+%        [figure queued:  \texttt{\detokenize{#1}}]%  -- DEBUGGING
+        %
+    \else
+      %
+      % deal with placing the figure now.
+      %
+      \phffpf@doplacefigure{#1}{#2}%
+      %
+%      [figure placed: \texttt{\detokenize{#1}}]  -- DEBUGGING
+    \fi
+  \fi%
+}
+
+\long\def\phffpf@doplacefigure#1#2{%
+  % #1 = code to restore correct phffpf@val@XYZ values
+  % #2 = figure code. Make sure it's expanded
+  %
+  % Make sure the correct values of phffpf@val@XYZ are restored, because we need
+  % e.g. \phffpf@val@pageside.  They may be wrong because this might be called after a
+  % figure has been queued.
+  % 
+  #1%
+  % 
+  % Now, determine where exactly to place the figure code.  There are no other pending
+  % figures.
   %
   \ifx\phffpf@val@pageside\phffpf@side@%
     %
     % No side preference.
     %
-    % Just place the figure.  Like right now.
+    % Just place the figure pretty much now.
     %
-    \phffpf@tmp@figcode%
+    \let\phffpf@tmp@doplace\@firstofone%
     %
   \else%
     %
@@ -316,14 +427,14 @@
   %
   % Now, do place the figure somewhere.
   % 
-  \phffpf@tmp@doplace%
+  \phffpf@tmp@doplace{#1#2}%
 }
 
 
 \newdimen\phffpf@tmp@spaceleft
 \newdimen\phffpf@tmp@compareto
 
-\def\phffpf@placecode@onsameparity{%
+\long\def\phffpf@placecode@onsameparity#1{%
   % 
   % First, see if the caption requires to be full-page [and thus no height calculations
   % are necessary, and an additional clearpage is required]
@@ -333,7 +444,7 @@
     %
     % place caption on page of its own -- use an additional \clearpage for that.
     %
-    \afterpage{\vspace*{0pt}\afterpage{\phffpf@tmp@figcode\clearpage}}%
+    \afterpage{\vspace*{0pt}\afterpage{#1\clearpage}}%
     %
   \else%
     %
@@ -354,17 +465,17 @@
       % Enough space left on page, don't use two `afterpage`'s.
       %
 %      [ENOUGH DIM LEFT.] % -- debugging
-      \phffpf@tmp@figcode%
+      #1%\phffpf@tmp@figcode%
     \else%
       % Not enough space, use two \afterpage's
 %      [*NOT ENOUGH* DIM LEFT.] % -- debugging
-      \afterpage{\vspace*{0pt}\afterpage{\phffpf@tmp@figcode}}%
+      \afterpage{\vspace*{0pt}\afterpage{#1}}%
     \fi%
     %
   \fi%
 }
 
-\def\phffpf@placecode@onotherparity{%
+\def\phffpf@placecode@onotherparity#1{%
   %
   % Place the figure code after the current page.
   %
@@ -379,13 +490,13 @@
     %
     % place caption on page of its own -- use an additional \clearpage for that.
     %
-    \afterpage{\phffpf@tmp@figcode\clearpage}%
+    \afterpage{#1\clearpage}%
     %
   \else%
     %
     % Figure caption is there along with some text on the page.
     %
-    \afterpage{\phffpf@tmp@figcode}%
+    \afterpage{#1}%
     % 
   \fi%
 }

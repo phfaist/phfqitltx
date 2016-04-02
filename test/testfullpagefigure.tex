@@ -176,10 +176,40 @@ words of this paragraph.}
     is some text. This is some text. }
   \label{fig:test-9}
 \end{fullpagefigure}
-And see Fig.~\ref{fig:test-9}. Placed on an odd side page [ODD,FIGPDF], but at the
+And see Fig.~\ref{fig:test-9}. Placed on an even side page [EVEN,FIGPDF], but at the
 beginning of this paragraph.
 
 \lipsum[5-7]
+
+
+\cleardoublepage
+\lipsum[1-3]
+
+\begin{fullpagefigure}
+  \figpageside{odd}
+  \figpdf[scale=0.25]{exampleA5fig}
+  \caption{First caption.}
+  \label{fig:test-10}
+\end{fullpagefigure}
+And see Fig.~\ref{fig:test-10}. Placed on an odd side page [ODD,FIGPDF].
+And also see Fig.~\ref{fig:test-11}.  These are several full-page figures requested at
+once, with different flags/settings!
+\begin{fullpagefigure}
+  \figpageside{even}
+  \figpdf{exampleA5fig}
+  \caption{SECOND CAPTION.}
+  \label{fig:test-11}
+\end{fullpagefigure}
+And also another Fig.~\ref{fig:test-12}!!  These are several full-page figures requested at
+once, with different flags/settings!
+\begin{fullpagefigure}
+  \figpageside{even}
+  \figpdf[scale=0.5]{exampleA5fig}
+  \caption{3rd 3rd 3rd 3rd 3rd 3rd 3rd 3rd CAPTION.}
+  \label{fig:test-12}
+\end{fullpagefigure}
+
+\lipsum[5-20]
 
 
 
