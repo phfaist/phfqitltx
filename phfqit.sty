@@ -24,8 +24,39 @@
 
 \newcommand{\Ident}{\mathds{1}}
 
-% identity process
-\def\IdentProc[#1][#2]#3{\operatorname{id}_{#1\notblank{#2}{\to #2}{}}\notblank{#3}{\left(#3\right)}{}}
+% identity process.
+%
+% \IdentProc[A][B]{\rho}  % typesets "Id_{A\to B}(\rho)"
+% \IdentProc[A][B]{}  % typesets "Id_{A\to B}"
+% \IdentProc[A]{\rho}  % typesets "Id_{A}(\rho)"
+%
+% \IdentProc`<size-arg>...  % specifies size argument for parens around argument.
+%                                           % see entropy commands for size-arg.
+%
+\def\IdentProc{%
+  \phfqit@parsesizearg\phfqit@IdentProc@maybeA%
+}
+\newcommand\phfqit@IdentProc@maybeA[1][]{%
+  \def\phfqit@IdentProc@val@A{#1}%
+  \phfqit@IdentProc@maybeB%
+}
+\newcommand\phfqit@IdentProc@maybeB[1][]{%
+  \def\phfqit@IdentProc@val@B{#1}%
+  \phfqit@IdentProc@arg%
+}
+\def\phfqit@IdentProc@arg#1{%
+  \def\phfqit@IdentProc@val@arg{#1}%
+  \edef\@tmp@args{% prepare the three arguments, each expanded exactly as they were when given to these macros
+    {\expandonce{\phfqit@IdentProc@val@A}}%
+    {\expandonce{\phfqit@IdentProc@val@B}}%
+    {\expandonce{\phfqit@IdentProc@val@arg}}%
+  }%
+  \expandafter\phfqit@IdentProc@do\@tmp@args%
+}
+\def\phfqit@IdentProc@do#1#2#3{%
+  \operatorname{id}_{#1\notblank{#2}{\to #2}{}}\notblank{#3}{\expandafter\phfqit@inner@parens\phfqit@val@sizearg{#3}}{}%
+}
+
 
 % Lie Groups & Algebras
 \def\uu(#1){\phfqit@fmtLieAlgebra{u}(#1)}
@@ -129,18 +160,55 @@
 \DeclarePairedDelimiterX\intervaloc[2]{]}{]}{\phfqit@insideinterval{#1}{#2}}
 %]
 
+
+% ------------------------------------------------
+% Internal utility to parse size argument with backtick
+% ------------------------------------------------
+
+%
+% Parses a size argument, if any, and stores it into \phfqit@val@sizearg.  The value
+% stored can directly be expanded as an optional argument to a
+% \DeclarePairedDelimiter-compatible command.
+%
+%  #1 = (command): next action to take, after argument has been parsed.
+%
+\def\phfqit@parsesizearg#1{%
+  \begingroup%
+  \mathcode`\`="0060\relax%
+  \gdef\phfqit@val@sizearg{}%
+  \@ifnextchar`{\phfqit@parsesizearg@withsize{#1}}{\endgroup#1}%
+}
+\def\phfqit@parsesizearg@withsize#1`#2{%
+  \def\@tmp@arg{#2}%
+  \def\@tmp@star{*}%
+  \def\@tmp@endgroupandcontinue{\endgroup#1}%
+  \ifx\@tmp@arg\@tmp@star\relax%
+    \gdef\phfqit@val@sizearg{*}%
+    \expandafter\@tmp@endgroupandcontinue%
+  \else%
+    \gdef\phfqit@val@sizearg{[#2]}%
+    \expandafter\@tmp@endgroupandcontinue%
+  \fi%
+}
+
+
+%
+% \phfqit@inner@parens{content}  -->  produces (content)
+% \phfqit@inner@parens*{content}  -->  produces \left(content\right)
+% \phfqit@inner@parens[\big]{content}  -->  produces \bigl(content\bigr)
+%
+\DeclarePairedDelimiterX\phfqit@inner@parens[1]{(}{)}{#1}
+
+
+
+
+
 % ------------------------------------------------
 % Entropies
 % ------------------------------------------------
 
 \newcommand\HHSym{H}
 
-%
-% \@HHbase@inner{content}  -->  produces (content)
-% \@HHbase@inner*{content}  -->  produces \left(content\right)
-% \@HHbase@inner[\big]{content}  -->  produces \bigl(content\bigr)
-%
-\DeclarePairedDelimiterX\@HHbase@inner[1]{(}{)}{#1}
 
 %
 % \@HHbase  base macro for relative entropy macros.
@@ -229,7 +297,7 @@
     % tokens ready now. Prepare argument to command, and go.
     %
     \edef\tmp@args{\expandonce{\HH@tmp@sizearg}{\the\HH@tmp@toks}}%
-    \expandafter\@HHbase@inner\tmp@args%
+    \expandafter\phfqit@inner@parens\tmp@args%
     % 
     _{\HH@tmpstore@state}% the state as subscript, if any
     %
@@ -280,7 +348,7 @@
 \def\Hfunc@next{\endgroup\Hfunc@inner}
 \def\Hfunc@inner(#1){%
   \HHSym%  ({#1})%
-  \expandafter\@HHbase@inner\Hfunc@tmp@sizearg{#1}%
+  \expandafter\phfqit@inner@parens\Hfunc@tmp@sizearg{#1}%
 }
 
 

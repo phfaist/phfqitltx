@@ -18,10 +18,10 @@
     \DD_{\mathrm{sub}}`*{\rho}{\sigma} \quad
     \DD_{\mathrm{sub}}^{\epsilon}`\Big{\rho}{\sigma} \quad
     \\
-    \DminF{\rho}{\sigma} \quad
-    \DminF[\epsilon]{\rho}{\sigma} \quad
-    \DminF`\Big{\rho}{\sigma} \quad
-    \DminF[\epsilon]`\Big{\rho}{\sigma} \quad
+    \Dminf{\rho}{\sigma} \quad
+    \Dminf[\epsilon]{\rho}{\sigma} \quad
+    \Dminf`\Big{\rho}{\sigma} \quad
+    \Dminf[\epsilon]`\Big{\rho}{\sigma} \quad
     \\
     \DCond{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
     \DCond{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
@@ -67,5 +67,32 @@
     \\
     \Hmin{} \quad % just the symbol w/o args
   \end{gather*}
+
+  \begin{align*}
+    \IdentProc[A][B]{\rho}
+    & &
+      \IdentProc[A]{\rho}
+    \\
+      \IdentProc[A][B]{}
+    &&
+       \IdentProc[A]{}
+    \\
+    \IdentProc`\big[A][B]{\rho}
+    &&
+       \IdentProc`\Big[A]{\rho}
+    \\
+    \IdentProc`*[A][B]{\sum\rho}
+    &&
+    \IdentProc`*[A]{\sum\rho}
+    \\
+    \IdentProc[A][B]{\sum\rho}
+    &&
+    \IdentProc[A]{\sum\rho}
+    \\
+    \IdentProc`\bigg[A][B]{}
+    &&
+    \IdentProc`\bigg[A]{}
+  \end{align*}
+
 
 \end{document}
