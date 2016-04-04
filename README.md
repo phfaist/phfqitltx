@@ -21,6 +21,10 @@ LaTeX packages for QIT stuff which I use often
 - `phfsvnwatermark` - add a watermark to your documents with the SVN ID, so that
   you know which document is which version
 
+- `phffullpagefigure` - as the package name suggests, place figures on full pages.
+  The caption e.g. reads "Figure 1 (on next page): blah blah" and the figure
+  may occupy the full next page.
+
 
 
 # Package Documentation
