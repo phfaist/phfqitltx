@@ -2,6 +2,8 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{phfqit}[2016/01/28 phfqit package]
 
+\RequirePackage{calc}
+
 \RequirePackage{etoolbox}
 
 \RequirePackage{amsmath}
@@ -21,6 +23,26 @@
 \newcommand{\Hs}{\mathscr{H}} % Hilbert space
 
 \newcommand\bit[1]{\texttt{#1}} % bit values, formatted possibly differently.
+\newcommand\bitstring[1]{\phfqit@bitstring{#1}}%  a string of bits, fixes spacing
+
+\def\phfqit@bitstring#1{%
+  \begingroup%
+  \setlength{\phfqit@len@bit}{\maxof{\widthof{\bit{0}}}{\widthof{\bit{1}}}}%
+  \phfqitBitstringFormat{\phfqit@bitstring@#1\phfqit@END}%
+  \endgroup%
+} % 
+\def\phfqit@bitstring@#1#2\phfqit@END{%
+  \makebox[\phfqit@len@bit][c]{\phfqitBitstringFormatBit{#1}}%
+  \if\relax\detokenize\expandafter{#2}\relax%
+  \else%
+    \phfqitBitstringSep\phfqit@bitstring@#2\phfqit@END% recurse for the rest of the bitstring
+  \fi%
+}
+\newlength\phfqit@len@bit
+
+\newcommand\phfqitBitstringSep{\hspace{0.3ex}}
+\newcommand\phfqitBitstringFormat[1]{\ensuremath{\underline{\overline{#1}}}}
+\def\phfqitBitstringFormatBit{\bit}
 
 \newcommand{\Ident}{\mathds{1}}
 
