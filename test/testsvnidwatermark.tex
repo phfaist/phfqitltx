@@ -1,0 +1,59 @@
+\documentclass[12pt]{article}
+
+\newif\ifTestManualPlacement
+
+%\usepackage[id=svn-multi-currfile,placement=manual]{../phfsvnwatermark}\TestManualPlacementtrue
+%\usepackage[id=svn-multi-currfile]{../phfsvnwatermark}\TestManualPlacementfalse
+\usepackage[id=svn-multi]{../phfsvnwatermark}\TestManualPlacementfalse
+%\usepackage[id=svn-multi,placement=manual]{../phfsvnwatermark}\TestManualPlacementtrue
+
+% Fake ID, because this file is not in SVN... [could use GIT, but it's slightly more complicated....]
+\svnid{$Id: testsvnidwatermark.tex 1332 2016-04-08 17:47:06Z pfaist $}
+
+\usepackage{lipsum}
+
+\usepackage{fancyhdr}
+
+\fancypagestyle{myfancy}{%
+  \fancyhead{}
+  \fancyhead[L]{Header Left}
+  \fancyhead[R]{Header Right}
+  % \fancyhead[LE,RO]{\thepage}
+  \renewcommand{\headrulewidth}{0.4pt}
+  \fancyfoot{}%
+  \ifTestManualPlacement
+    \fancyfoot[C]{X\phfsvnVersionIdTag* X} % for placement=manual
+  \fi
+  \fancyfoot[R]{\thepage}
+  % \fancyfoot[CE,CO]{\thepage}
+}
+
+
+\begin{document}
+
+\pagestyle{myfancy}
+
+\large
+\lipsum[1-4]
+
+\input{testsvnidwatermark-subfile}
+
+\clearpage
+\pagestyle{empty}
+\lipsum[9-11]
+
+\clearpage
+\pagestyle{fancy}
+\lipsum[1-4]
+
+\clearpage
+\thispagestyle{empty}
+\lipsum[1-4]
+
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

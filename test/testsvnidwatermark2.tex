@@ -1,0 +1,59 @@
+\documentclass[12pt]{article}
+
+\newif\ifTestManualPlacement
+
+%\usepackage[id=svn]{../phfsvnwatermark}\TestManualPlacementfalse
+\usepackage[id=svn,placement=manual]{../phfsvnwatermark}\TestManualPlacementtrue
+
+% Fake ID, because this file is not in SVN... [could use GIT, but it's slightly more complicated....]
+\SVN $Id: testsvnidwatermark.tex 1332 2016-04-08 17:47:06Z pfaist $
+
+% color can be adjusted, too
+\usepackage{xcolor}
+\colorlet{phfsvnversionidcolor}{blue!60!white}
+
+\usepackage{lipsum}
+
+\usepackage{fancyhdr}
+
+\fancypagestyle{myfancy}{%
+  \fancyhead{}
+  \fancyhead[L]{Header Left}
+  \fancyhead[R]{Header Right}
+  % \fancyhead[LE,RO]{\thepage}
+  \renewcommand{\headrulewidth}{0.4pt}
+  \fancyfoot{}%
+  \ifTestManualPlacement
+    \fancyfoot[C]{X\phfsvnVersionIdTag* X} % for placement=manual
+  \fi
+  \fancyfoot[R]{\thepage}
+  % \fancyfoot[CE,CO]{\thepage}
+}
+
+
+\begin{document}
+
+\pagestyle{myfancy}
+
+\large
+\lipsum[1-4]
+
+\clearpage
+\pagestyle{empty}
+\lipsum[9-11]
+
+\clearpage
+\pagestyle{fancy}
+\lipsum[1-4]
+
+\clearpage
+\thispagestyle{empty}
+\lipsum[1-4]
+
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
