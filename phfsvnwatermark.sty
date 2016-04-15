@@ -34,10 +34,12 @@
 % common exterior formatting for Version ID tag
 %
 \definecolor{phfsvnversionidcolor}{rgb}{0.6,0.6,0.6}
+\def\phfsvnVersionIdTagOuterFont{\normalfont\scriptsize}
+\def\phfsvnVersionIdTagInnerFont{\ttfamily}
 \def\phfsvn@versionidtag{%
   \begingroup%
-    \color{phfsvnversionidcolor}\fontseries{m}\fontshape{n}\fontsize{8}{9}\selectfont%
-    [\hspace*{0.25ex}\texttt{\phfsvn@versionidtag@contents}\hspace*{0.25ex}]%
+    \color{phfsvnversionidcolor}\phfsvnVersionIdTagOuterFont%
+    [\,\begingroup\phfsvnVersionIdTagInnerFont {\phfsvn@versionidtag@contents}\endgroup\,]%
   \endgroup%
 }
 
@@ -48,7 +50,7 @@
   \@ifstar\phfsvn@smashedsvnversionidtag\phfsvn@versionidtag
 }
 \def\phfsvn@smashedsvnversionidtag{%
-  \smash{\phfsvn@clap{\phfsvn@versionidtag}}
+  \hspace*{0pt}\smash{\phfsvn@clap{\phfsvn@versionidtag}}
 }
 
 % see https://www.tug.org/TUGboat/tb22-4/tb72perlS.pdf
@@ -97,18 +99,22 @@
 %
 % definitions for method id=svn-multi-currfile
 %
+\def\phfsvn@svnmulticurrfile@maxwidth{0.8\paperwidth}
 \newsavebox\phfsvn@box@upperline
 \newsavebox\phfsvn@box@lowerline
+\def\phfsvn@svnmulticurrfile@upperline{SVN Document Version:\hspace{1.5ex}r\svnrev~\svndate~\svnauthor}%
+\def\phfsvn@svnmulticurrfile@lowerline{\svnkw{Filename}:\hspace{1.5ex}r\svnfilerev~\svnfiledate~\svnfileauthor}%
 \def\phfsvn@versionidtag@for@svnmulticurrfile{%
   \begingroup%
-  \color{phfsvnversionidcolor}\footnotesize%
-  \sbox\phfsvn@box@upperline{\ttfamily\scriptsize SVN Document Version:\hspace{1.5ex}r\svnrev~\svndate~\svnauthor}%
-  \sbox\phfsvn@box@lowerline{\ttfamily\scriptsize \svnkw{Filename}:\hspace{1.5ex}r\svnfilerev~\svnfiledate~\svnfileauthor}%
-  \begin{minipage}[t]{\maxof{\wd\phfsvn@box@upperline}{\wd\phfsvn@box@lowerline}}%
+  \color{phfsvnversionidcolor}\phfsvnVersionIdTagOuterFont\phfsvnVersionIdTagInnerFont%
+  \sbox\phfsvn@box@upperline{\phfsvn@svnmulticurrfile@upperline}%
+  \sbox\phfsvn@box@lowerline{\phfsvn@svnmulticurrfile@lowerline}%
+  \begin{minipage}[t]{\minof{\phfsvn@svnmulticurrfile@maxwidth}{\maxof{\wd\phfsvn@box@upperline}{\wd\phfsvn@box@lowerline}}}%
     \parindent=0pt\relax\parskip=0pt\relax%
     \raggedleft%
-    \par\usebox\phfsvn@box@upperline
-    \par\usebox\phfsvn@box@lowerline
+    % don't just \usebox the saved boxes, because if the filenames are long we want to re-layout and allow line breaks
+    \par\phfsvn@svnmulticurrfile@upperline%
+    \par\phfsvn@svnmulticurrfile@lowerline%
   \end{minipage}%
   \endgroup%
 }%
