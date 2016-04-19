@@ -1,7 +1,10 @@
 \documentclass[11pt,letterpaper]{article}
 
-\usepackage{../phfnote}
-%\usepackage[title=small,pkgset=extended]{../phfnote}
+\newif\iftestnoteNeedsMinPkgs\testnoteNeedsMinPkgsfalse
+
+%\usepackage{../phfnote}
+%\usepackage[pkgset=minimal,title=default]{../phfnote}\testnoteNeedsMinPkgstrue \usepackage{setspace}
+\usepackage[title=small,pkgset=extended]{../phfnote}
 %\usepackage[preset=sfnote,pkgset=extended]{../phfnote}
 %\usepackage[preset=sfssnote,pkgset=extended,pagegeom=narrow]{../phfnote}
 %\usepackage[preset=utopianote,pkgset=extended,pagegeom=narrow]{../phfnote}
@@ -11,14 +14,14 @@
 %\usepackage[preset=reset,pkgset=extended]{../phfnote} \usepackage{hyperref}\makeatletter\let\email\phfnote@email\makeatother\phfnotePdfLinkColor{red}\let\oldbibliography\bibliography\def\bibliography{\catcode`\&=12\relax\oldbibliography}\bibliographystyle{unsrturl}
 
 
-\def\mypkgs{% for testing less complete package sets, here are the necessary ones:
+
+\iftestnoteNeedsMinPkgs
   \usepackage{amsmath}
-  \usepackage{amsfonts}
   \usepackage{amsthm}
-  \usepackage{xcolor}
+  \usepackage{color}
   \usepackage[shortlabels]{enumitem}
-}
-%\mypkgs
+\fi
+
 
 % we need some theorem definitions.
 \theoremstyle{plain}
@@ -108,6 +111,7 @@
   suitable tool to find a lower bound to the work cost of the erasure of a system possessing quantum
   correlations with a memory, expressed as the min-entropy of the system conditioned on the memory. This
   bound is complementary to the upper bound presented in~[del Rio et al., Nature, 2011].
+  \iftestnoteNeedsMinPkgs ([NeedsMinPkgs=TRUE])\fi
 \end{abstract}
 
 
@@ -208,6 +212,15 @@ only if $\sigma\succ\rho$.
 \subsection{Overview}
 We will characterize our randomness absorption process in terms of a gerenalized notion of doubly
 substochastic matrices.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=4cm]{testfigure}
+  \caption{This test figure is a test figure, for example to verify that the line spacing
+    of captions is correct. Lorem ipsum test.  Uput non amet si dolor no voler a ponopodar
+    esto gargantua.  Latinum no es ma specialitatum.}
+  \label{fig:test-2}
+\end{figure}
 
 Recall that majorization between two normalized states is exactly characterized by the existance of
 a doubly substochastic matrix relating both spectra~\cite{BookBhatiaMatrixAnalysis1997}. A doubly

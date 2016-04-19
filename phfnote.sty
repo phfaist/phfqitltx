@@ -49,46 +49,55 @@
 \def\phfnote@title@vskiptop{-1.2cm}
 
 
+\def\phfnote@title@checksetspace#1{%  #1 = title style, for the error message
+  \ifdefined\singlespace\else%
+    \PackageError{phfnote}{Note title style `#1' requires the `setspace' package to be
+      loaded!  Please load it, or use a pkgset which loads it automatically}%
+  \fi%
+}
+
 % -- STYLE: default --
 \newcommand{\notetitle@style@default}{% `default' style title
-  \begin{flushleft}
-    \vspace*{\phfnote@title@vskiptop}
-    \begin{singlespace}
-      {\Large  {\notetitlefont \@title}}\\[4mm]
-      \hspace*{0.04\textwidth}\begin{minipage}{0.96\textwidth}{\notetitleauthorfont \@author}\end{minipage}\\[2mm]
+  \begin{flushleft}%
+    \vspace*{\phfnote@title@vskiptop}%
+    \phfnote@title@checksetspace{default}%
+    \begin{singlespace}%
+      {\Large  {\notetitlefont \@title}}\\[4mm]%
+      \hspace*{0.04\textwidth}\begin{minipage}{0.96\textwidth}{\notetitleauthorfont \@author}\end{minipage}\\[2mm]%
       \hspace*{0.04\textwidth}\begin{minipage}{0.96\textwidth}{\footnotesize%
-          \notetitledatefont \@date}\end{minipage}\\[4mm]
-      \hrule
-    \end{singlespace}
-    \vspace*{3mm}
-  \end{flushleft}
+          \notetitledatefont \@date}\end{minipage}\\[4mm]%
+      \hrule%
+    \end{singlespace}%
+    \vspace*{3mm}%
+  \end{flushleft}%
 }
 % -- STYLE: small --
 \newcommand{\notetitle@style@small}{% `small' style title
-  \begin{flushleft}
-    \vspace*{\phfnote@title@vskiptop}
-    {\notetitlefont \@title}
+  \begin{flushleft}%
+    \vspace*{\phfnote@title@vskiptop}%
+    {\notetitlefont \@title}%
     \hfill\makebox{\fontsize{9pt}{10pt}\selectfont {\notetitleauthorfont \@author}%
-      \hspace*{2mm}--\hspace*{2mm}{\emph{\notetitledatefont \@date}}}
-    \vspace*{1mm}\hrule\vspace*{1mm}
-  \end{flushleft}
+      \hspace*{2mm}--\hspace*{2mm}{\emph{\notetitledatefont \@date}}}%
+    \vspace*{1mm}\hrule\vspace*{1mm}%
+  \end{flushleft}%
 }
 % -- STYLE: titleonly -- [ big title only. Use paragraphs for several lines ]
 \newcommand{\notetitle@style@titleonly}{% `titleonly' style title
-  \begin{flushleft}
-    \vspace*{\phfnote@title@vskiptop}
-    \begin{singlespace}
-      \begingroup
-        \Large\notetitlefont{
-          \parindent=0pt
-          \parskip=1.5ex
+  \begin{flushleft}%
+    \vspace*{\phfnote@title@vskiptop}%
+    \phfnote@title@checksetspace{titleonly}%
+    \begin{singlespace}%
+      \begingroup%
+        \Large\notetitlefont{%
+          \parindent=0pt%
+          \parskip=1.5ex%
           \par  \@title\par\vspace{4mm}%
           }%
-      \endgroup
-      \hrule
-    \end{singlespace}
-    \vspace*{3mm}
-  \end{flushleft}
+      \endgroup%
+      \hrule%
+    \end{singlespace}%
+    \vspace*{3mm}%
+  \end{flushleft}%
 }
 % -- STYLE: article --
 \newcommand{\notetitle@style@article}{% `article' style title
@@ -139,6 +148,9 @@
       \PackageError{phfnote}{Unknown title style: '#1'. Using default style instead}
       \def\phfnote@tmp@titsty{default}%
     \fi
+    %
+    % Actually overload title style
+    %
     \def\@maketitle{\csname notetitle@style@\phfnote@tmp@titsty\endcsname}
   \fi
 }
@@ -300,20 +312,34 @@
 % ------------------------------------------------------------------------------
 
 
-\def\phfnote@do@spacing{%
+\def\phfnote@do@spacing{
+
+  \@ifpackageloaded{setspace}{
+    \def\phfnote@dostretch##1{\setstretch{##1}\phfnote@docaptionstretch{##1}}
+  }{
+    \def\phfnote@dostretch##1{\renewcommand\baselinestretch{##1}\phfnote@docaptionstretch{##1}}
+  }
+  \@ifpackageloaded{caption}{
+    \def\phfnote@docaptionstretch##1{\captionsetup{font={stretch=##1}}}
+  }{
+    \def\phfnote@docaptionstretch##1{\PackageWarning{phfnote}{Can't set line spacing for
+        captions, because the package `caption' is not loaded.  Please load it before
+        `phfnote', or use an appropriate (e.g. `rich') pkgset which loads this package
+        automatically .}}
+  }
 
   \if@twocolumn
-    \renewcommand\baselinestretch{1.0} % leave default
-    \emergencystretch=3em
+    \phfnote@dostretch{1.0} % leave default
+    \emergencystretch=3em\relax
   \else
     \ifcase\@ptsize% 10pt
-      \renewcommand\baselinestretch{1.1}
+      \phfnote@dostretch{1.1}
     \or% 11pt
-      \renewcommand\baselinestretch{1.0} %1.05
+      \phfnote@dostretch{1.0} %1.05
     \or% 12pt
-      \renewcommand\baselinestretch{1.0} %1.03
+      \phfnote@dostretch{1.0} %1.03
     \fi
-    \emergencystretch=6em
+    \emergencystretch=6em\relax
   \fi
 
 }
@@ -451,6 +477,8 @@
   \phfnote@do@pkgset@minimal
 
   \RequirePackage{setspace}
+  \RequirePackage{caption}
+
   \RequirePackage{microtype}
 
   \PassOptionsToPackage{shortlabels}{enumitem}
