@@ -40,8 +40,9 @@
 %
 \newcommand{\notetitlefont}{\sffamily\bfseries}
 \newcommand{\notetitleauthorfont}{}
-\newcommand{\notetitledatefont}{}
+\newcommand{\notetitledatefont}{\footnotesize}
 
+\newcommand{\notetitlebelowspace}{4mm}
 
 %
 % common to several styles -- adjust top spacing for the title
@@ -56,58 +57,165 @@
   \fi%
 }
 
+% \newcounter{phfnotethanks}
+% \setcounter{phfnotethanks}{0}
+% \renewcommand\thephfnotethanks{\arabic{phfnotethanks}}
+% \newcommand\phfnotethanksfont{\itshape\small}
+% \newcommand\phfnote@inlinethanks@thanks[2][]{%
+%   \if\relax\detokenize{#1}\relax% no identifier
+%     \stepcounter{phfnotethanks}%
+%     \phfnote@inlinethanks@thanks@store{\thephfnotethanks}{#2}% store directly
+%   \else%
+%     \ifcsname phfnote@thanks@internal@ident@#1\endcsname% ident already seen -- just display mark
+%       \phfnote@inlinethanks@showthanksmark{\csname phfnote@thanks@internal@ident@#1\endcsname}%
+%     \else% ident new -- create and remember.
+%       \begingroup%
+%         \stepcounter{phfnotethanks}%
+%         \expandafter\xdef\csname phfnote@thanks@internal@ident@#1\endcsname{\thephfnotethanks}%
+%         \phfnote@inlinethanks@thanks@store{\thephfnotethanks}{#2}%
+%       \endgroup%
+%     \fi%
+%   \fi%
+% }
+% \def\phfnote@inlinethanks@showthanksmark#1{%
+%   \edef\@thefnmark{#1}\@footnotemark\hspace*{1ex}%
+% }
+% \long\def\phfnote@inlinethanks@thanks@store#1#2{%
+%   \phfnote@inlinethanks@showthanksmark{#1}%
+%   \edef\phfnote@tmpA{{\noexpand\phfnote@inlinethanks[#1]{\unexpanded{#2}}}}%
+%   \expandafter\g@addto@macro\expandafter\@thanks\phfnote@tmpA%
+% }
+% \def\phfnote@inlinethanks[#1]#2{%
+%   \leavevmode\edef\@thefnmark{#1}\@footnotemark\hspace*{1ex}#2\hskip 1em\relax%
+% }
+
+\def\phfnote@setupthanksmpfootnote{%
+  \def\thempfootnote{\arabic{mpfootnote}}%
+  \let\footnoterule\relax%
+%  \long\def\@makefntext##1{\parindent=0pt\parskip=0pt\noindent%
+%    \hb@xt@1.8em{\hss\@textsuperscript{\normalfont\@thefnmark}}##1\hskip 1em plus.5em minus.2em\relax%
+%  }%
+  \def\phfnote@mpfootmaterial{}%
+  \long\def\@mpfootnotetext##1{%
+    \protected@edef\@currentlabel
+         {\csname p@mpfootnote\endcsname\@thefnmark}%
+    \protected@edef\@tmpa{\protect\phfnote@mympfootnotemark{\@thefnmark}{##1}\protect\phfnote@mpfootnoteglue}%
+    \expandafter\g@addto@macro\expandafter\phfnote@mpfootmaterial\expandafter{\@tmpa}%
+  }%
+  \def\thanksmark[##1]{\phfnote@mympfootnotemark{##1}}%
+  \let\thanks\footnote%
+}
+\def\thanksmark{\footnotemark}
+\def\phfnote@mympfootnotemark#1{\@textsuperscript{\normalfont#1}}
+\def\phfnote@mpfootnoteglue{\hskip 1.2em plus 2em minus 0.5em\relax}
+\def\phfnote@finalizempfootnotes{%
+  \global\setbox\@mpfootins=\vbox{%
+    \parskip=0pt\parindent=0pt\parshape 1 0.04\textwidth 0.96\textwidth\relax\noindent\leavevmode%
+    \reset@font\footnotesize%
+    \phfnote@fmt@titlefootnotes%
+    \phfnote@mpfootmaterial}%
+}
+
+\def\phfnote@fmt@titlefootnotes{}
+
+\def\phfnote@fmt@institute{\emph}
+
+%\def\institute#1{\thanks{\protect\phfnote@fmt@institute{#1}}}  -- no, then better use RevTeX directly...
+
+
+%
+% Extend LaTeX's \thanks{} to allow an optional argument as for footnotes.
+%
+\let\phfnote@old@thanks\thanks
+%
+\def\thanks{\@ifnextchar[\phfnote@thanks{\phfnote@thanks[]}} %]
+\long\def\phfnote@thanks[#1]#2{%
+  \if\relax\detokenize{#1}\relax% no argument, use default implementation.
+    %  copied from default LaTeX implementation:
+    \footnotemark%
+    \protected@xdef\@thanks{\@thanks\protect\footnotetext[\the\c@footnote]{#2}}%
+  \else% argument, pass on to sub-commands:
+    \footnotemark[#1]%
+    \protected@xdef\@thanks{\@thanks\protect\footnotetext[#1]{#2}}%
+  \fi%
+}
+
+
+
+
+
 % -- STYLE: default --
 \newcommand{\notetitle@style@default}{% `default' style title
-  \begin{flushleft}%
+  \begingroup\par\raggedright% \begin{flushleft}%
+    \phfnote@setupthanksmpfootnote%
+%    \let\footnote\thanks%
     \vspace*{\phfnote@title@vskiptop}%
     \phfnote@title@checksetspace{default}%
-    \begin{singlespace}%
-      {\Large  {\notetitlefont \@title}}\\[4mm]%
-      \hspace*{0.04\textwidth}\begin{minipage}{0.96\textwidth}{\notetitleauthorfont \@author}\end{minipage}\\[2mm]%
-      \hspace*{0.04\textwidth}\begin{minipage}{0.96\textwidth}{\footnotesize%
-          \notetitledatefont \@date}\end{minipage}\\[4mm]%
-      \hrule%
-    \end{singlespace}%
-    \vspace*{3mm}%
-  \end{flushleft}%
+    \begin{minipage}{\textwidth}%
+      \begin{singlespace}%
+        \parskip=0pt\parindent=0pt\relax%
+        {\let\phfnote@old@par\par%
+          \def\par{\phfnote@old@par\parskip=1.5ex\relax\parshape 1 0pt \textwidth\noindent\relax}%
+          \par%
+          \Large  {\notetitlefont \@title}\par}%
+        \vskip 2mm\relax
+        \if\relax\detokenize\expandafter{\@author}\relax\else%
+          \par\parshape 1 0.04\textwidth 0.96\textwidth\relax%
+          {\notetitleauthorfont \@author}%
+          \vskip 2mm\relax%
+        \fi
+        \if\relax\detokenize\expandafter{\@date}\relax\else%
+          \par\parshape 1 0.04\textwidth 0.96\textwidth\relax%
+          {\notetitledatefont \@date}
+          \vskip 2mm\relax%
+        \fi
+        \global\let\@thanks\@empty%
+        \phfnote@finalizempfootnotes%
+      \end{singlespace}%
+    \end{minipage}%
+    \vspace*{2mm}%
+    \hrule%
+    \par%
+  \endgroup%
+  \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
 }
 % -- STYLE: small --
 \newcommand{\notetitle@style@small}{% `small' style title
-  \begin{flushleft}%
+  \begingroup\par\raggedright% \begin{flushleft}%
+    \let\footnote\thanks%
     \vspace*{\phfnote@title@vskiptop}%
     {\notetitlefont \@title}%
     \hfill\makebox{\fontsize{9pt}{10pt}\selectfont {\notetitleauthorfont \@author}%
       \hspace*{2mm}--\hspace*{2mm}{\emph{\notetitledatefont \@date}}}%
     \vspace*{1mm}\hrule\vspace*{1mm}%
-  \end{flushleft}%
+    \par%
+  \endgroup%
+  \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
 }
-% -- STYLE: titleonly -- [ big title only. Use paragraphs for several lines ]
-\newcommand{\notetitle@style@titleonly}{% `titleonly' style title
-  \begin{flushleft}%
-    \vspace*{\phfnote@title@vskiptop}%
-    \phfnote@title@checksetspace{titleonly}%
-    \begin{singlespace}%
-      \begingroup%
-        \Large\notetitlefont{%
-          \parindent=0pt%
-          \parskip=1.5ex%
-          \par  \@title\par\vspace{4mm}%
-          }%
-      \endgroup%
-      \hrule%
-    \end{singlespace}%
-    \vspace*{3mm}%
-  \end{flushleft}%
-}
+% % -- STYLE: titleonly -- [ big title only. Use paragraphs for several lines ]  ### USE 'default' INSTEAD. WORKS WELL NOW.
+% \newcommand{\notetitle@style@titleonly}{% `titleonly' style title
+%   \begingroup\par\raggedright% \begin{flushleft}%
+%     \vspace*{\phfnote@title@vskiptop}%
+%     \phfnote@title@checksetspace{titleonly}%
+%     \begin{singlespace}%
+%       \begingroup%
+%         \Large\notetitlefont{%
+%           \parindent=0pt%
+%           \parskip=1.5ex%
+%           \par  \@title\par\vspace{4mm}%
+%           }%
+%       \endgroup%
+%       \hrule%
+%     \par%
+%   \endgroup%
+%   \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
+% }
 % -- STYLE: article --
 \newcommand{\notetitle@style@article}{% `article' style title
-  % \begingroup%
-  % \newpage%
-  % \global\@topnum\z@   % Prevents figures from going at top of page.
-  % \null%
-  \vspace*{-5em}%
-  \begin{center}%
-    \let \footnote \thanks%
+  \vspace*{-3em}%
+  \begingroup
+    \centering
+    \let\footnote\thanks%
     {\LARGE \@title \par}%
     \vskip 1.5em%
     {\large%
@@ -115,14 +223,12 @@
       \begin{tabular}[t]{c}%
         \@author%
       \end{tabular}\par}%
-    \vskip 0.5em%
-    \@thanks%
-    \vskip 1em%
+    \vskip 1.5em%
     {\large \@date}%
-  \end{center}%
+    \par%
+  \endgroup%
   \par%
-  \vskip 1.5em%
-  % \endgroup%
+  \vskip 2.5em\relax%
 }
 
 
@@ -177,19 +283,25 @@
 \fi
 
 \def\noteabstract@nameline{
-  \begin{center}{\noteabstractnamefont\abstractname}\end{center}\vspace*{-2mm}%
+  {\parskip=0pt\relax\par\centering\noteabstractnamefont\abstractname\par}\vskip 1ex\relax%
 }
 
-\newlength\noteabstractafterspacing
-\setlength{\noteabstractafterspacing}{4mm}
+\newcommand\noteabstractafterspacing{1.5em}
+\newcommand\noteabstractbeforespacing{1.5em}
 \newenvironment{noteabstract}{%
-  \begin{center}%
+  \removelastskip%
+  \vspace{\noteabstractbeforespacing}%
+  \begingroup%
+    \par\noindent\centering%
     \begin{minipage}{\noteabstracttextwidth}%
       \noteabstract@nameline%
       \noteabstracttextfont%
     }% begin commands
     {% end commands
-    \end{minipage}\end{center}\vspace*{\noteabstractafterspacing}%
+    \end{minipage}%
+    \par%
+  \endgroup%
+  \vspace{\noteabstractafterspacing}%
 } % end commands
 
 
@@ -204,7 +316,7 @@
 }
 
 \def\noteabstract@attr@noname{%
-  \def\noteabstract@nameline{\vspace*{1ex}}%
+  \def\noteabstract@nameline{}%\vspace*{1ex}}%
 }
 
 \def\noteabstract@attr@original{%
@@ -214,6 +326,11 @@
 
 \def\noteabstract@attr@small{%
   \g@addto@macro\noteabstracttextfont{\small}%
+}
+
+\def\noteabstract@attr@compact{%
+  \renewcommand\noteabstractafterspacing{1ex}%
+  \renewcommand\noteabstractbeforespacing{1ex}%
 }
 
 \def\noteabstract@attr@it{%
@@ -854,7 +971,7 @@
 % e.g. [abstract={noname,narrow}]
 %
 % Abstract flags.  May be a comma-separated list of the following: 'wide',
-% 'narrow', 'noname', 'small', 'it', 'original'
+% 'narrow', 'noname', 'small', 'it', 'original', 'compact'
 %
 \DeclareStringOption[]{abstract}
 
@@ -999,7 +1116,7 @@
 \def\phfnote@preset@pkgdoc{% (preset for package documentations :-)
   \phfnote@preset@utopianote% inherits utopianote
   \def\phfnote@opt@pagegeom{bigmargin}
-  \def\phfnote@opt@abstract{noname}
+  \def\phfnote@opt@abstract{noname,compact}
 }
 \def\phfnote@preset@reset{
   \def\phfnote@opt@pkgset{none}

@@ -30,6 +30,7 @@
 \usepackage{phfquotetext}
 \usepackage[preset=pkgdoc]{phfnote}
 \usepackage[normalem]{ulem}
+\usepackage{verbdef}
 \EnableCrossrefs         
 \RecordChanges
 \let\oldPrintChanges\PrintChanges
@@ -70,7 +71,7 @@
 %
 % \DoNotIndex{\newcommand,\newenvironment}
 % 
-% \title{The \textsf{phfquotetext} package\thanks{
+% \title{The \textsf{phfquotetext} package\thanks{\itshape
 % This document corresponds to
 % \textsf{phfquotetext}~\fileversion, dated \filedate. It is part of
 % the Part of the
@@ -92,7 +93,7 @@
 %
 % This package provides a quoting environment useful to quote, e.g., email text.  It is
 % somewhat like a verbatim environment (for instance, there is no macro expansion), but
-% with also no whitespace preformatting.
+% with also no white space formatting.
 %
 % For instance, you might find this useful for formatting replies to a
 % referee, because any pseudo-\LaTeX{} commands are reproduced
@@ -107,14 +108,19 @@
 % \end{quotetext}
 % \end{verbatim}
 %
-% The above code gives the following output:
+% \verbdef\tmpA|\quotetextfont|
+% \verbdef\tmpB|\sffamily\color{blue}|
+% The above code gives the following output:\footnote{
+%   Here, we've assumed the \tmpA{} was redefined as
+%   \tmpB{}.  Because it does look nicer.  See
+%   \autoref{sec:customize-appearance}.}
 %
 % \renewcommand\quotetextfont{\sffamily\color{blue}}
 % \begin{quotetext}   This is some text which was provided in plain text, for example, by a   referee.  The object \calE should probably be defined with a factor 1/2 to   help the \sum_k \ket{k} states not overwhelm rho by this and that by more than 50%.... \end{quotetext}
 %
-%   (Here, we've assumed the |\quotetextfont| was redefined as
-%   |\sffamily\color{blue}|.  Because it does look nicer.  See
-%   \autoref{sec:customize-appearance})
+%
+% 
+%
 %
 % \section{Usage}
 %
@@ -134,6 +140,10 @@
 % \end{quotetext}
 % \end{verbatim}
 %
+% The |{quotetext}| environment does not start a paragraph on its own, nor does it end it.
+% You can thus in principle use this environment to quote text inline within a paragraph
+% if you want to, unless you're enforcing new paragraphs in |\quotetextstart| and
+% |\quotetextend|.
 %
 %
 % \subsection{Customize appearance}
@@ -196,6 +206,11 @@
 %   not forget to precede it with |\ignorespaces| as appropriate (as
 %   in the example above in \autoref{sec:customize-appearance}).
 %   I'm not sure how to remove trailing whitespace.
+% \item By default, the |{quotetext}| environment does not start a new paragraph nor end
+%   the paragraph, unless you enforce this explicitly in |\quotetextstart| and
+%   |\quotetextend|.  This is purposely left as a feature to be aware of.
+% \item The contents of |\quotetextstart| is protected within a \TeX{} group, but NOT that
+%   of |\quotetextend|.
 % \end{itemize}
 %
 % \section{Implementation}
@@ -311,16 +326,27 @@
 %
 %
 % \begin{macro}{\phfquotetext@warg}
-%   Prepares to read the contents of the environment.  Opens a \TeX{} group, sets the
-%   catcodes and relays the call to |\phfquotetext@warg@|.
+%   Prepares to read the contents of the environment.  A new \TeX{} group has already been
+%   opened by |\begin{quotetext}|.
 %    \begin{macrocode}
 \def\phfquotetext@warg{%
   %
+%    \end{macrocode}
+% Set the catcode of all special chars to ``other'' (12).  We use |\dospecials| provided
+% by \LaTeX{} itself.\footnote{see \url{http://tex.stackexchange.com/a/12890/32188}} We
+% leave the space token to the ``space'' catcode, so that white space is properly managed
+% by LaTeX.  Finally, include any user catcode overrides in |\quotetextcatcodedefs|.
+%    \begin{macrocode}
   \let\do\@makeother%
-  \dospecials% verbatim catcodes -- \dospecials comes from LaTeX itself
-  \catcode`\ =10\relax% exception for space token
-  %
+  \dospecials%
+  \catcode`\ =10\relax% keep space
   \quotetextcatcodedefs%
+%    \end{macrocode}
+%
+% Finally, relay the call to |\phfquotetext@warg@| to read the contents of the group and
+% close the \TeX{} group.
+%
+%    \begin{macrocode}
   \phfquotetext@warg@%
 }
 %    \end{macrocode}
