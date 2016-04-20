@@ -94,12 +94,11 @@
 % somewhat like a verbatim environment (for instance, there is no macro expansion), but
 % with also no whitespace preformatting.
 %
-% For instance, you might find this useful for formatting replies to a referee:
-%
-% \changes{v1.0b}{2016/04/21}{test change.}
+% For instance, you might find this useful for formatting replies to a
+% referee, because any pseudo-\LaTeX{} commands are reproduced
+% verbatim, but the bulk is still nicely formatted:
 %
 % \begin{verbatim}
-% \renewcommand\quotetextfont{\sffamily\color{blue}}
 % \begin{quotetext}
 %   This is some text which was provided in plain text, for example,
 %   by the referee.  The object \calE should probably be defined with
@@ -107,12 +106,15 @@
 %   by this and that by more than 50%....
 % \end{quotetext}
 % \end{verbatim}
-% gives:
+%
+% The above code gives the following output:
 %
 % \renewcommand\quotetextfont{\sffamily\color{blue}}
 % \begin{quotetext}   This is some text which was provided in plain text, for example, by a   referee.  The object \calE should probably be defined with a factor 1/2 to   help the \sum_k \ket{k} states not overwhelm rho by this and that by more than 50%.... \end{quotetext}
 %
-%
+%   (Here, we've assumed the |\quotetextfont| was redefined as
+%   |\sffamily\color{blue}|.  Because it does look nicer.  See
+%   \autoref{sec:customize-appearance})
 %
 % \section{Usage}
 %
@@ -126,14 +128,16 @@
 % \begin{verbatim}
 % \begin{quotetext}
 %   Stuff which you want to display verbatim, but with automatic white
-%   space formatting and re-flow.  \commands will not be expanded, and
-%   will be displayed verbatim.  Percent signs also work 100%.
+%   space formatting and text re-flow.  \commands will not be
+%   expanded, and will be displayed verbatim.  Percent signs also work
+%   100%.
 % \end{quotetext}
 % \end{verbatim}
 %
 %
 %
 % \subsection{Customize appearance}
+% \label{sec:customize-appearance}
 %
 % \DescribeMacro{\quotetextfont}
 % This macro contains the formatting commands to set up the quote font.  Redefine at will.
@@ -159,15 +163,16 @@
 %   \par\noindent\color{blue}\hrule height 0.8pt\vspace{2pt}\vspace{-\parskip}}
 % \renewcommand\quotetextend{%
 %   \begingroup\color{blue}\vspace{2pt}\hrule height 0.8pt\vspace{2pt}\endgroup}
-% \renewcommand\quotetextfont[1]{\sout{#1}} % \usepackage[normalem]{ulem}
+% % \sout{} requires \usepackage[normalem]{ulem}:
+% \renewcommand\quotetextfont[1]{\color{orange}\itshape\sout{\ignorespaces #1}}
 % \end{verbatim}
 % which gives:
 % \renewcommand\quotetextstart{%
 %   \par\noindent\color{blue}\hrule height 0.8pt\vspace{2pt}\vspace{-\parskip}}
 % \renewcommand\quotetextend{%
 %   \begingroup\color{blue}\vspace{2pt}\hrule height 0.8pt\vspace{2pt}\endgroup}
-% \renewcommand\quotetextfont[1]{\color{orange}\sout{#1}}
-% \begin{quotetext}   Stuff which you want to display verbatim, but with automatic white   space formatting and re-flow.  \commands will not be expanded, and   will be displayed verbatim.  Percent signs also work 100%. \end{quotetext}
+% \renewcommand\quotetextfont[1]{\color{orange}\itshape\sout{\ignorespaces #1}}
+% \begin{quotetext} Stuff which you want to display verbatim, but with automatic white   space formatting and text re-flow.  \commands will not be expanded, and   will be displayed verbatim.  Percent signs also work 100%. \end{quotetext}
 % 
 %
 % \subsection{Customize Catcodes---Advanced Usage}
@@ -181,6 +186,17 @@
 %   \PrintChanges
 %}
 %
+%
+% \section{Known Caveats}
+%
+% \begin{itemize}
+% \item The leading space in the environment content is not trimmed
+%   from the argument passed on to |\quotetextfont|.  This just means
+%   that if |\quotetextfont| is defined to accept an argument, it must
+%   not forget to precede it with |\ignorespaces| as appropriate (as
+%   in the example above in \autoref{sec:customize-appearance}).
+%   I'm not sure how to remove trailing whitespace.
+% \end{itemize}
 %
 % \section{Implementation}
 %
@@ -302,8 +318,8 @@
   %
   \let\do\@makeother%
   \dospecials% verbatim catcodes -- \dospecials comes from LaTeX itself
-  \catcode`\ =10% exceptions
-  \relax%
+  \catcode`\ =10\relax% exception for space token
+  %
   \quotetextcatcodedefs%
   \phfquotetext@warg@%
 }
