@@ -27,18 +27,18 @@
 %
 %<*driver>
 \documentclass{ltxdoc}
-\usepackage[preset=pkgdoc]{phfnote}
+\usepackage{xcolor}
+\usepackage[preset=pkgdoc,abstract={noname}]{phfnote}
 \usepackage[normalem]{ulem}
 \usepackage{verbdef}
+\usepackage{tcolorbox}
+\newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
+\newtcolorbox{pkgwarning}{colback=red!5!white,colframe=red!5!white,coltitle=red!50!black,fonttitle=\bfseries,title={WARNING}}
 \EnableCrossrefs         
+\CodelineIndex
 \RecordChanges
-\let\oldPrintChanges\PrintChanges
-\def\PrintChanges{%
-  \begingroup%
-    \let\oldsection\section%
-    \def\section*##1{\oldsection*{##1}\addcontentsline{toc}{section}{##1}}%
-    \oldPrintChanges%
-  \endgroup}
+\phfnoteHackSectionStarWithTOCInCommand\PrintChanges
+\phfnoteHackSectionStarWithTOCInCommand\PrintIndex
 \begin{document}
   \DocInput{phfnote.dtx}
 \end{document}
@@ -81,7 +81,8 @@
 % \maketitle
 %
 % \begin{abstract}
-%   \textsf{phfnote}---A handy \LaTeX{} class for typesetting notes in various formats.
+%   \textsf{phfnote}---A handy \LaTeX{} class for typesetting short notes and
+%   medium-length reports, full of goodies to make it look just right.
 % \end{abstract}
 %
 % \inlinetoc
@@ -92,7 +93,8 @@
 %
 % support for:
 % \begin{itemize}
-% \item mostly designed for use with |article| class, but not necessary.  You mileage may vary.
+% \item mostly designed for use with |article| class, but not
+%   necessary.  Your mileage may vary.
 % \item |twocolumn|
 % \item |10pt|, |11pt|, |12pt|
 % \end{itemize}
@@ -121,14 +123,24 @@
 % \subsection{Abstract}
 %
 % \subsection{Predefined Package Sets}
+% \label{sec:package-sets}
 %
 % \subsection{General Formatting and Appearance}
 %
 % \subsubsection{Font/Spacing Goodies}
 %
-% \subsubsection{Paragraph Shape}
+% \subsubsection{Paragraph Spacing Presets}
+% \label{sec:paragraph-spacing-presets}
 %
-% \subsubsection{Section Title Formatting}
+% \subsubsection{Section Heading Formatting}
+% \label{sec:section-heading-styling}
+% Very limited styling. Use |titlesec| (or |sectsty|) directly if you
+% want anything serious.
+%
+% Section fonts are customized using the |sectsty| package.  If this
+% conflicts in your document, then use the |[secfmt={}]| package
+% option and take care of section styling manually.
+%
 %
 % \subsection{Page Geometry}
 %
@@ -138,16 +150,19 @@
 %
 %
 %
-% \StopEventually{\PrintChanges}
+% \StopEventually{\PrintChanges\PrintIndex}
 %
 % \section{Implementation}
 %
 % Here comes the gory code.
 %
-% Let's start by loading the |kvoptions| package, which we need to parse the package options.
+% Let's start by loading the |kvoptions| package, which we need to
+% parse the package options, and the |etoolbox|, because it's always
+% handy.
 %
 %    \begin{macrocode}
 \RequirePackage{kvoptions}
+\RequirePackage{etoolbox}
 %    \end{macrocode}
 %
 % \subsection{Internal Generic Code}
@@ -217,7 +232,7 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}
+% \begin{macro}{\title}
 %   Provide a ``long'' definition for |\title|, so that the title can have several
 %   paragraphs.  Our style handles this by putting the title on several lines, and it can
 %   be useful depending on how you want to format the title.
@@ -332,7 +347,7 @@
 % \end{macro}
 % 
 %
-% \paragraph{For those not using the main `default' title style}~
+% \paragraph{For those not using the main `default' title style}
 %
 % We use \LaTeX's own |\thanks| mechanism, however we patch on the possibility for using
 % |\thanks[N]{text}| and |\thanksmark[N]| for overriding the number which is used.
@@ -383,7 +398,7 @@
 %
 % \subsubsection{Title Styles Definition}
 %
-% \paragraph{Title style: `default'}~
+% \paragraph{Title style: `default'}
 %
 % Implementation our main `default' title style.  See \autoref{sec:main-default-title-style}.
 %
@@ -399,7 +414,9 @@
       \begin{singlespace}%
         \parskip=0pt\parindent=0pt\relax%
         {\let\phfnote@old@par\par%
-          \def\par{\phfnote@old@par\parskip=1.5ex\relax\parshape 1 0pt \textwidth\noindent\relax}%
+          \def\par{\phfnote@old@par%
+            \parskip=1.5ex\relax\parshape 1 0pt \textwidth\relax%
+            \noindent}%
           \par%
           \Large  {\notetitlefont \@title}\par}%
         \vskip 2mm\relax
@@ -427,7 +444,7 @@
 % \end{macro}
 %
 %
-% \paragraph{Title style: `small'}~
+% \paragraph{Title style: `small'}
 %
 % Implementation an alternate `small' title style.
 %
@@ -450,14 +467,14 @@
 % \end{macro}
 %
 % 
-% \paragraph{Title style: `article'}~
+% \paragraph{Title style: `article'}
 %
 % Implementation the `article' title style.
 %
 % \begin{macro}{\notetitle@style@article}
 %    The title style definition.  Nothing mysterious, hopefully.
 %    \begin{macrocode}
-\newcommand{\notetitle@style@article}{% `article' style title
+\newcommand{\notetitle@style@article}{%
   \vspace*{-3em}%
   \begingroup
     \centering
@@ -504,7 +521,8 @@
     \ifcsname notetitle@style@#1\endcsname
       \def\phfnote@tmp@titsty{#1}%
     \else
-      \PackageError{phfnote}{Unknown title style: '#1'. Using default style instead}
+      \PackageError{phfnote}{Unknown title style: '#1'.
+        Using default style instead}
       \def\phfnote@tmp@titsty{default}%
     \fi
 %    \end{macrocode}
@@ -731,9 +749,10 @@
 % \end{macro}
 %
 % \begin{macro}{\phfnote@pagegeomstyle@bigmargin}
-%   Makes the margins asymmetric, so that a wide margin note can fit.
+%   Makes the margins asymmetric, so that a wide margin note can fit.  Used in this
+%   package documentation, for example.
 %    \begin{macrocode}
-\def\phfnote@pagegeomstyle@bigmargin{% ( for big margins, e.g. for package documentation :)
+\def\phfnote@pagegeomstyle@bigmargin{%
   \if@twocolumn
     \PassOptionsToPackage{hmargin=1.5in,vmargin=0.75in,includeheadfoot}{geometry}%
   \else
@@ -769,9 +788,9 @@
 %
 % \subsection{Text, Paragraph and Line Spacing}
 %
-% \paragraph{Text \& Line Spacing}~
+% \paragraph{Text \& Line Spacing}
 %
-% \begin{macro}
+% \begin{macro}{\phfnote@do@spacing}
 %   Some cosmetic definitions to adjust line spacing.  The line spacing is slightly
 %   adjusted according to font size to make the document more readable.  Depending on
 %   whether the |setspace| package is loaded, we use it or go low-level with a
@@ -783,16 +802,19 @@
 %    \begin{macrocode}
 \def\phfnote@do@spacing{
   \@ifpackageloaded{setspace}{
-    \def\phfnote@dostretch##1{\setstretch{##1}\phfnote@docaptionstretch{##1}}
+    \def\phfnote@dostretch##1{%
+      \setstretch{##1}\phfnote@docaptionstretch{##1}}
   }{
-    \def\phfnote@dostretch##1{\renewcommand\baselinestretch{##1}\phfnote@docaptionstretch{##1}}
+    \def\phfnote@dostretch##1{%
+      \renewcommand\baselinestretch{##1}\phfnote@docaptionstretch{##1}}
   }
   \@ifpackageloaded{caption}{
     \def\phfnote@docaptionstretch##1{\captionsetup{font={stretch=##1}}}
   }{
-    \def\phfnote@docaptionstretch##1{\PackageWarning{phfnote}{Can't set line spacing for
-        captions, because the package `caption' is not loaded.  Please load it before
-        `phfnote', or use an appropriate (e.g. `rich') pkgset which loads this package
+    \def\phfnote@docaptionstretch##1{\PackageWarning{phfnote}{Can't
+        set line spacing for captions, because the package `caption'
+        is not loaded.  Please load it before `phfnote', or use an
+        appropriate (e.g. `rich') pkgset which loads this package
         automatically .}}
   }
   \if@twocolumn
@@ -813,9 +835,10 @@
 % \end{macro}
 % 
 %
-% \paragraph{Paragraph Presets}~
+% \paragraph{Paragraph Spacing Presets}
 %
-% Here again, we define several possibilities for paragraph settings as individual macros.
+% Here again, we define several possibilities for paragraph settings
+% as individual macros (see \autoref{sec:paragraph-spacing-presets}).
 % Depending on the package option, we execute the corresponding macro.
 %
 %    \begin{macrocode}
@@ -847,11 +870,12 @@
   \fi
 }
 %    \end{macrocode}
+% \end{macro}
 % 
 %
 % \subsection{Customized, ``Inline,'' Table of Contents}
 %
-% \begin{macro}
+% \begin{macro}{\inlinetoc}
 %   Just a customized table of contents.  Horizontal rules before and after, and spacing is adjusted.
 %    \begin{macrocode}
 \newcommand{\inlinetoc}{%
@@ -874,82 +898,146 @@
 %
 % \subsection{Section Styling}
 %
-%  TODO: DOCUMENT ME!
+% Very limited support for styling section and paragraph headers
+% (\autoref{sec:section-heading-styling}).  If you want anything
+% serious, use |sectsty| or |titlesec| directly.
+%
+% \begin{macro}{\notesectionallfont}
+% \begin{macro}{\notesectionallfontfamily}
+%   The macro |\notesectionallfont| is invoked for every sectioning
+%   command (for those which are styled, see the |section| and
+%   |paragraph| attributes).
+%
+%   |\notesectionallfont| internally invokes
+%   |\notesectionallfontfamily| to select which font family to use.
+%   The family should be given as the font code, e.g.: |pbk| = bookman
+%   ; |bch| = charter ; |ppl| = palatino ; |ptm| = Adobe Times ; |phv|
+%   = Adobe Helvetica ; |pcr| = Adobe Courier ; |put| = Utopia ; |cmr|
+%   = Computer Modern Roman ; |cmss| = CM Sans Serif ; |cmbr| = CM
+%   Bright ; google many more or look directly into the source of
+%   corresponding \LaTeX{} packages.
+%
+%   You may customize these either via attributes or by redefining
+%   them directly.  Beware that if you redefine |\notesectionallfont|
+%   then you are responsible for honoring, or ignoring, the value of
+%   |\notesectionallfontfamily|.
+%    \begin{macrocode}
+\newcommand{\notesectionallfont}{\fontfamily{\notesectionallfontfamily}\fontseries{bx}\selectfont}
+\newcommand{\notesectionallfontfamily}{ppl}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% 
+%
+% \begin{macro}{\notesectionfont}
+% \begin{macro}{\notesubsectionfont}
+% \begin{macro}{\notesubsubsectionfont}
+% \begin{macro}{\noteparagraphfont}
+% \begin{macro}{\notesubparagraphfont}
+%   These macros are called for their respective sectioning command,
+%   after |\notesectionallfont| has been invoked. (Again, only for
+%   those sectioning commands which are styled by us.)
 %
 %    \begin{macrocode}
-
-%
-% Section fonts are customized using the {sectsty} package.  If this conflicts
-% in your document, use the [nosectionfonts] package option, then sectsty won't
-% be loaded.
-%
-
-
-% Font Settings
-%
-% 	pbk = bookman ; bch = charter ; ppl = palatino ; ptm = Adobe Times ;
-% 	phv = Adobe Helvetica ; pcr = Adobe Courier ; put = Utopia ;
-% 	cmr = Comupter Modern Roman ; cmss = CM Sans Serif
-%
-
-%
-\newcommand{\notesectionfontsize}{\large}
-\newcommand{\notesubsectionfontsize}{\normalsize}
-\newcommand{\notesubsubsectionfontsize}{\small}
-\newcommand{\noteparagraphfontsize}{\normalsize}
-\newcommand{\notesubparagraphfontsize}{\normalsize}
-%
-\newcommand{\notesectionfont}{\fontfamily{\notesectionfontfamily}\fontseries{bx}\selectfont}
-\newcommand{\notesectionfontfamily}{ppl}
+\newcommand{\notesectionfont}{\large}
+\newcommand{\notesubsectionfont}{\normalsize}
+\newcommand{\notesubsubsectionfont}{\small}
+\newcommand{\noteparagraphfont}{\normalsize}
+\newcommand{\notesubparagraphfont}{\normalsize}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % 
-\newcommand{\notesectionfontsetsizes}[3]{%
-  \renewcommand{\notesectionfontsize}{#1}%
-  \renewcommand{\notesubsectionfontsize}{#2}%
-  \renewcommand{\notesubsubsectionfontsize}{#3}%
+%
+% \begin{macro}{\notesectionsetfonts}
+% \begin{macro}{\noteparagraphsetfonts}
+%   Helpers to directly set the font commands for |\section|,
+%   |\subsection| and |\subsubsection| (with |\notesectionsetfonts|),
+%   and for |\paragraph| and |\subparagraph| (with |\noteparagraphsetfonts|).
+%    \begin{macrocode}
+\newcommand{\notesectionsetfonts}[3]{%
+  \renewcommand{\notesectionfont}{#1}%
+  \renewcommand{\notesubsectionfont}{#2}%
+  \renewcommand{\notesubsubsectionfont}{#3}%
 }
+\newcommand{\noteparagraphsetfonts}[2]{%
+  \renewcommand{\noteparagraphfont}{#1}%
+  \renewcommand{\notesubparagraphfont}{#2}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % 
-\newcommand{\noteparagraphfontsetsizes}[2]{%
-  \renewcommand{\noteparagraphfontsize}{#1}%
-  \renewcommand{\notesubparagraphfontsize}{#2}%
-}
-
-
+%
+% Define the attributes which the user can set.  See
+% \autoref{sec:section-heading-styling}.
+%
+%    \begin{macrocode}
 \def\phfnote@do@secfmt@section{
-  \sectionfont{\notesectionfont\notesectionfontsize}
-  \subsectionfont{\notesectionfont\notesubsectionfontsize}
-  \subsubsectionfont{\notesectionfont\notesubsubsectionfontsize}
+  \sectionfont{\notesectionallfont\notesectionfont}
+  \subsectionfont{\notesectionallfont\notesubsectionfont}
+  \subsubsectionfont{\notesectionallfont\notesubsubsectionfont}
 }
 \def\phfnote@do@secfmt@paragraph{
-  \paragraphfont{\notesectionfont\noteparagraphfontsize}
-  \subparagraphfont{\notesectionfont\notesubparagraphfontsize}
+  \paragraphfont{\notesectionallfont\noteparagraphfont}
+  \subparagraphfont{\notesectionallfont\notesubparagraphfont}
 }
 \def\phfnote@do@secfmt@compact{
-  \notesectionfontsetsizes{\normalsize}{\small}{\small}
+  \notesectionsetfonts{\normalsize}{\small}{\small}
+}
+\def\phfnote@do@secfmt@larger{
+  \notesectionsetfonts{\Large}{\large}{\normalsize}
+}
+\def\phfnote@do@secfmt@secsquares{
+  \def\@seccntformat##1{%
+    \ifstrequal{##1}{section}{\makebox[0pt][r]{\raisebox{0.1ex}{{\notesmaller[0.7]\ensuremath{\blacksquare}}}\hspace*{1.2ex}}}{}%
+    \csname the##1\endcsname\quad%
+  }
 }
 \def\phfnote@do@secfmt@sffamily{
-  \renewcommand\notesectionfontfamily{\sfdefault}
+  \renewcommand\notesectionallfontfamily{\sfdefault}
 }
+\def\phfnote@do@secfmt@itpar{
+  \def\noteparagraphfont{\normalfont\normalsize\itshape}
+  \def\notesubparagraphfont{\normalfont\normalsize\itshape}
+}
+\def\phfnote@do@secfmt@blockpar{
+  \let\phfnote@old@paragraph\paragraph
+  \def\paragraph##1{%
+    \phfnote@old@paragraph{##1}%
+    \hspace*{0pt}\par%
+    %\begingroup\hspace*{0pt}\parskip=1em plus 0.8em minus 0.2em\relax\par\endgroup% ugly hack!
+  }
+}
+%    \end{macrocode}
+% 
+%
+% \begin{macro}{\phfnote@do@secfmt}
+%   Actually perform the required styling, according to the package
+%   options given as argument.  The argument is a comma-separated list
+%   of attributes specified by the user.
+%    \begin{macrocode}
 \def\phfnote@do@secfmt#1{%
   \RequirePackage{sectsty}
   \phfnote@internal@execattribs{phfnote@do@secfmt@}{section formatting preset}{#1}
 }
-
 %    \end{macrocode}
+% \end{macro}
 % 
 %
 %
 % \subsection{\LaTeX{} Package Sets}
 %
-%  TODO: DOCUMENT ME!
+% Define the package sets as macros.  Depending on the user-specified
+% options we load the corresponding one(s) (several may be specified).
+%
+% See \autoref{sec:package-sets} for a description of what these
+% package sets do.
 %
 %    \begin{macrocode}
-
-
-
-% ------------------------------------------------------------------------------
-%     INCLUDE DEFAULT SET OF USEFUL PACKAGES
-% ------------------------------------------------------------------------------
-
 \def\phfnote@do@pkgset@none{
 }
 
@@ -1000,71 +1088,46 @@
   \RequirePackage{mathtools}
 
 }
-
-\def\phfnote@do@pkgset#1{
-
-  \phfnote@internal@execattribs{phfnote@do@pkgset@}{package set}{#1}
-%  \ifcsname phfnote@do@pkgset@#1\endcsname
-%    \csname phfnote@do@pkgset@#1\endcsname
-%  \else
-%    \PackageWarning{phfnote}{Unknown package set to load: #1. Loading minimal set}
-%    \phfnote@do@pkgset@minimal
-%  \fi
-
-}
-
-
 %    \end{macrocode}
 % 
 %
+% \begin{macro}{\phfnote@do@pkgset}
+%   Finally, define the helper which will load the required package sets.
+%    \begin{macrocode}
+\def\phfnote@do@pkgset#1{
+  \phfnote@internal@execattribs{phfnote@do@pkgset@}{package set}{#1}
+}
+%    \end{macrocode}
+% \end{macro}
+% 
 %
 % \subsection{Hyperref Support and Hyperlinks}
 %
-%  TODO: DOCUMENT ME!
-%
+% \begin{pkgnote}
+%   The name `docnotelinkcolor' is historical and hard-coded in many
+%   other files I've used, so I'm DEFINITELY NOT changing it.
+% \end{pkgnote}
+% 
+% \begin{macro}{\phfnote@do@pdfhyperrefdefs}
+%   Load the |hyperref| package and provide sensible defaults.
 %    \begin{macrocode}
-
-
-%
-% NOTE: the name `docnotelinkcolor' is hard-coded in many other files I've used,
-% so I'm NOT changing it.
-%
-
-
-%
-% Set links color.  Use as \phfnotePdfLinkColor{<color specification or name>}.
-%
-% The pacakge {xcolor} must be loaded.
-%
-\newcommand{\phfnotePdfLinkColor}[1]{%
-  \@ifpackageloaded{xcolor}{%
-    \colorlet{docnotelinkcolor}{#1}%
-  }{% else:
-    \PackageWarning{phfnote}{\protect\phfnotePdfLinkColor may only be used if the package
-      xcolor is loaded.}%
-  }%
-}
-
 \newcommand{\phfnote@do@pdfhyperrefdefs}{%
-  %
-  % Make sure a color-managing package is loaded, {color} or {xcolor}
-  %
+%    \end{macrocode}
+% Make sure a color-managing package is loaded, {color} or {xcolor}, and define our default color:
+%    \begin{macrocode}
   \phfnote@requirecolorpackage%
-  % 
-  % Define our default color
-  % 
-  \definecolor{docnotelinkcolor}{rgb}{0,0,0.4}% actually define our PDF hyperref link color
-  % 
-  %
-  % Load URL package.
-  %
+  \definecolor{docnotelinkcolor}{rgb}{0,0,0.4}%
+%    \end{macrocode}
+% 
+% Load URL package, and save a version of |\url| which is not patched
+% by |hyperref|:
+%    \begin{macrocode}
   \RequirePackage{url}%
-  %
-  \DeclareUrlCommand\phfnote@format@url{}% a version of \url which is not patched by hyperref
-  % 
-  %
-  % Set up hyperref
-  %
+  \DeclareUrlCommand\phfnote@format@url{}%
+%    \end{macrocode}
+% 
+% Set up |hyperref| options:
+%    \begin{macrocode}
   \PassOptionsToPackage{bookmarks=true,backref=false}{hyperref}%
   \RequirePackage{hyperref}%
   %
@@ -1076,23 +1139,49 @@
     filecolor=docnotelinkcolor,linkcolor=docnotelinkcolor,%
     menucolor=docnotelinkcolor,runcolor=docnotelinkcolor,%
     urlcolor=docnotelinkcolor}%
-  %
-  %
-  % Provide an \email command.
-  %
+%    \end{macrocode}
+% 
+% Provide an |\email| command for specifying e-mails.
+%    \begin{macrocode}
   \let\email\phfnote@email%
-  %
-  %
-  % And set the default \url/\email style
-  %
+%    \end{macrocode}
+% 
+% And finally set a nicer default \url/\email style:
+%    \begin{macrocode}
   \urlstyle{notesf}%
-  %
 }
-
-
+%    \end{macrocode}
+% \end{macro}
 % 
-% and also provide an \email{} command for emails.
+% \begin{macro}{\phfnotePdfLinkColor}
+%   Set links color.  Use as |\phfnotePdfLinkColor|\marg{color}.
+%   Color may be any color name or specification recognized by the
+%   |xcolor| package.
+%
+%   \begin{pkgnote}
+%     The pacakge {xcolor} must be loaded for |\phfnotePdfLinkColor|
+%     to work.
+%   \end{pkgnote}
+%
+%    \begin{macrocode}
+\newcommand{\phfnotePdfLinkColor}[1]{%
+  \@ifpackageloaded{xcolor}{%
+    \colorlet{docnotelinkcolor}{#1}%
+  }{% else:
+    \PackageWarning{phfnote}{\protect\phfnotePdfLinkColor may only be
+      used if the package xcolor is loaded.}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
 % 
+%
+% 
+% Provide base macros to be able to build up |\email| command for
+% emails and other URL-like commands which should sanitize their
+% arguments.
+% 
+%    \begin{macrocode}
 \def\phfnote@sanitize@url{%
   \catcode`\$12%
   \catcode`\&12%
@@ -1107,14 +1196,14 @@
 \providecommand\phfnote@format@url{\texttt}
 \def\phfnote@email{\begingroup\phfnote@sanitize@url\phfnote@impl@email@}%
 \def\phfnote@impl@email@#1{\endgroup\href{mailto:#1}{\phfnote@format@url{#1}}}%
+%    \end{macrocode}
 % 
-
-
-
-
-
-
-
+%
+%
+%
+% \begin{macro}{\phfnote@requirecolorpackage}
+%   And finally define an internal utility to make sure that a color package is loaded
+%    \begin{macrocode}
 \def\phfnote@requirecolorpackage{%
   % require the 'color' or 'xcolor' package
   \@ifpackageloaded{color}{%
@@ -1127,16 +1216,16 @@
     }%
   }%
 }
-
-
-
 %    \end{macrocode}
+% \end{macro}
 % 
-%
 %
 % \subsection{Cosmetic Font Definitions}
 %
-%  TODO: DOCUMENT ME!
+% \begin{macro}{\phfnote@do@fontdefs}
+%   Minimalist cosmetic definition for fonts: load the |T1| font
+%   encoding which is better.  Also, use Computer Modern Bright as
+%   sans-serif font by default instead of Computer Modern Sans Serif.
 %
 %    \begin{macrocode}
 \def\phfnote@do@fontdefs{
@@ -1147,39 +1236,43 @@
   \renewcommand\sfdefault{cmbr}
   
 }
-
 %    \end{macrocode}
+% \end{macro}
 % 
-%
 %
 % \subsection{Bibliography Stuff}
 %
-%  TODO: DOCUMENT ME!
+%   Provide some fixes for the bibliography.
 %
+% \begin{macro}{\phfnote@bibstyle}
+% \begin{macro}{\phfnote@bibfont}
+%   Our default bibliography style is stored in |\phfnote@bibstyle|.
+%   By default, it's our own hacked version of the |naturemag| style.
+%   The font in which to typeset the bibliography is stored in
+%   |\phfnote@bibfont|.  By default, it's a little smaller than the
+%   main text.
 %    \begin{macrocode}
-
-%
-% our default bibliography style -- hacked version of naturemag
-%
 \newcommand{\phfnote@bibstyle}{naturemagdoi}
-
+\newcommand{\phfnote@bibfont}{\fontsize{9}{11}\selectfont}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% 
 %
-%
-%
-\newcommand{\phfnote@bibliographystyle}[1]{\renewcommand{\phfnote@bibstyle}{#1}}
-\newcommand{\phfnotebibfont}{\fontsize{9}{11}\selectfont}
-
+% \begin{macro}{\phfnote@bibliography}
+% \begin{macro}{\phfnote@bibliographystyle}
+%   These are tentative implementations for |\bibliography| and
+%   |\bibliographystyle|.  The latter will be set to these according
+%   to the user's package options.
+%    \begin{macrocode}
 \let\phfnote@old@bibliography\bibliography
 \let\phfnote@old@bibliographystyle\bibliographystyle
-
 \newcommand{\phfnote@bibliography}[1]{%
   \begingroup%
-    \phfnotebibfont%
-    % \bibliographystyle{unsrturl}
+    \phfnote@bibfont%
     \phfnote@old@bibliographystyle{\phfnote@bibstyle}%
     %
-    % \clearpage%
-    \addcontentsline{toc}{section}{\refname}
+    \phfnoteHackSectionStarWithTOC%
     % 
     % Some fixes for some special chars which may appear in ill-advised
     % bibliography managers -- such as the '&' symbol
@@ -1194,49 +1287,77 @@
     %
   \endgroup%
 }
-
+\newcommand{\phfnote@bibliographystyle}[1]{%
+  \renewcommand{\phfnote@bibstyle}{#1}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% 
+%
+% \begin{macro}{\phfnote@do@bibliographydefs}
+%   Make our changes live.  Will be called later according to package options.
+%    \begin{macrocode}
 \def\phfnote@do@bibliographydefs{%
   \let\bibliographystyle\phfnote@bibliographystyle%
   \let\bibliography\phfnote@bibliography%
 }
-
 %    \end{macrocode}
+% \end{macro}
 % 
 %
 %
 % \subsection{Better Footnote Style}
 %
-%  TODO: DOCUMENT ME!
-%
+% \begin{macro}{\phfnote@do@footnotedefs}
+%   Adjust the formatting of footnotes so they look better.  Again,
+%   this is called later according to the package options.
 %    \begin{macrocode}
-
 \def\phfnote@do@footnotedefs{
   \let\phfnote@orig@makefnmark\@makefnmark
-%  \def\@makefnmark{\hbox{\@textsuperscript{\normalfont\tiny\fontseries{sb}\selectfont\@thefnmark}}}
+%%  \def\@makefnmark{\hbox{\@textsuperscript{\normalfont\tiny\fontseries{sb}\selectfont\@thefnmark}}}
   \def\@makefnmark{\hbox{\@textsuperscript{\normalfont\tiny\bfseries\@thefnmark}}}
-%  \def\@makefnmark{\hbox{\@textsuperscript{\normalfont\scriptsize\bfseries\@thefnmark}}} % too large
+%%  \def\@makefnmark{\hbox{\@textsuperscript{\normalfont\scriptsize\bfseries\@thefnmark}}} % too large
 }
-
-
 %    \end{macrocode}
+% \end{macro}
+% 
 % 
 %
 %
 % \subsection{Other Stand-Alone Definitions and Helpers}
 %
-%  TODO: DOCUMENT ME!
+% \subsubsection{A \texttt{\textbackslash smaller} command}
 %
+%
+% \begin{macro}{\notesmaller}
+%   Relative font size command.  Makes the text a fraction smaller
+%   than its surroundings.  The fraction is either given explicitly as
+%   optional argument (1.0=same size) or is by default set by
+%   |\notesmallerfrac|.
+%
+%   To impalement this, we exploit the fact that \LaTeX{} saves the
+%   current font size in the macro |\f@size|.
 %    \begin{macrocode}
-
-\def\notesmallerfrac{0.9}
 \newcommand\notesmaller[1][\notesmallerfrac]{%
   \fontsize{#1\dimexpr\f@size pt\relax}{#1\dimexpr\f@baselineskip pt\relax}%
   \selectfont\ignorespaces%
 }
-
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\notesmallerfrac}
+%   Default fraction by which |\notesmaller| acts.  Redefine to change defaults.
+%    \begin{macrocode}
+\def\notesmallerfrac{0.9}
+%    \end{macrocode}
+% \end{macro}
 %
-% URL styles: 'notett', 'notesf', 'noteitsf', 'noterm', 'noteit' and 'notesml'
 %
+% \subsubsection{URL Styles}
+%
+% We also provide some URL styles.  These can directly set with |\urlstyle|\marg{style-name}.
+%
+%    \begin{macrocode}
 \def\url@notettstyle{%
   \def\UrlFont{\ttfamily\notesmaller}%
   \phfnote@urlstyle@common%
@@ -1265,7 +1386,14 @@
   \def\UrlFont{\notesmaller}%
   \phfnote@urlstyle@common%
 }
-
+%    \end{macrocode}
+% 
+%
+% The following code is common to all our styles. We do an ugly hack
+% in which the tilde character (`\textasciitilde') is fixed to the
+% tilde char in the Adobe Times font (|ptm| code), so that it looks
+% nicer and its alignment is correct.
+%    \begin{macrocode}
 \def\phfnote@url@tilde{\hbox{\fontfamily{ptm}\selectfont\textasciitilde}}
 \def\phfnote@urlstyle@common{%
 %  \def\UrlTildeSpecial{\do\~{\raise-0.8ex\hbox{\kern-0.2ex\fontfamily{cmbr}\selectfont\textasciitilde}}}
@@ -1273,23 +1401,61 @@
   \def\UrlTildeSpecial{\do\~{\phfnote@url@tilde}}%
   \let\Url@force@Tilde\UrlTildeSpecial%
 }
-
-%
-% Fix \path and \email commands to follow \urlstyle
-%
-\def\noteUrlFixCommands{%
-%  \DeclareUrlCommand\path{}
-%  \DeclareUrlCommand\email{}
-}
-
-
 %    \end{macrocode}
+%
+%
+%
+% \subsubsection{Utility to Add TOC Entry For Starred Section }
+%
+% Here we provide an ugly hack which introduces an entry in the table
+% of contents for |\section*| commands.
+%
+% \begin{pkgwarning}
+%   This is truly a hack, don't apply it globally!  It forces
+%   (locally) the |\section| command to be followed by a `|*|' !  Do this
+%   within a group, just before a command which you are sure is
+%   invoking |\section*| (such as |\bibliography| in the |article|
+%   class).
+% \end{pkgwarning}
+%
+% \begin{macro}{\phfnoteHackSectionStarWithTOC}
+%   Locally force |\section| to be followed by |*| and introduce an
+%   entry in the table of contents.
+%    \begin{macrocode}
+\def\phfnoteHackSectionStarWithTOC{%
+    \let\phfnote@old@section\section%
+    \def\section*##1{\phfnote@old@section*{##1}\addcontentsline{toc}{section}{##1}}%
+}
+%    \end{macrocode}
+% \end{macro}
 % 
+% \begin{macro}{\phfnoteHackSectionStarWithTOCInCommand}
+%   Patches the given command (|#1|), which is known to invoke
+%   |\section*|, to locally first invoke
+%   |\phfnoteHackSectionStarWithTOC|.
+%
+%    \begin{macrocode}
+\def\phfnoteHackSectionStarWithTOCInCommand#1{%
+  \expandafter\let\csname phfnote@old@\string#1\endcsname#1%
+  \gdef#1{%
+    \begingroup%
+    \phfnoteHackSectionStarWithTOC%
+    \csname phfnote@old@\string#1\endcsname%
+    \endgroup%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
 %
 %
-% \subsection{Parse and Handle Package Options}
+% \subsection{Handle Package Options}
 %
-%  TODO: DOCUMENT ME!
+% \begin{pkgnote}
+%   TODO: MOVE DOCUMENTATION IN COMMENTS FOR THE PACKAGE OPTIONS INTO
+%   THE USER SECTION OF THE DOCUMENTATION ABOVE.
+% \end{pkgnote}
+%
+% \subsubsection{Define and Parse Package Options}
 %
 %    \begin{macrocode}
 
@@ -1436,7 +1602,7 @@
 % 
 %
 %
-% \subsection{Define Global Presets}
+% \subsubsection{Define Global Presets}
 %
 %  TODO: DOCUMENT ME!
 %
@@ -1474,7 +1640,7 @@
   \phfnote@opt@footnotedefstrue
   \phfnote@opt@fontdefstrue
   \renewcommand\familydefault{\sfdefault}
-  \renewcommand{\notesectionfontfamily}{\sfdefault}
+  \renewcommand{\notesectionallfontfamily}{\sfdefault}
 }
 \def\phfnote@preset@sfssnote{
   % as sfnote, ...
@@ -1491,7 +1657,7 @@
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
   \RequirePackage{fourier}
-  \renewcommand{\notesectionfontfamily}{put}
+  \renewcommand{\notesectionallfontfamily}{put}
   \renewcommand{\notetitlefont}{\bfseries}
   \renewcommand{\sfdefault}{phv}
 }
@@ -1501,7 +1667,7 @@
   \phfnote@opt@fontdefsfalse
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
-  \renewcommand{\notesectionfontfamily}{\sfdefault}
+  \renewcommand{\notesectionallfontfamily}{\sfdefault}
   % require these AFTER the default package set, because some symbols may be defined in package sets etc...
   \g@addto@macro\phfnote@hook@atendload{
     \RequirePackage{MnSymbol}
@@ -1513,6 +1679,7 @@
 }
 \def\phfnote@preset@pkgdoc{% (preset for package documentations :-)
   \phfnote@preset@utopianote% inherits utopianote
+  \def\phfnote@opt@secfmt{section,paragraph,itpar,blockpar,larger,secsquares}
   \def\phfnote@opt@pagegeom{bigmargin}
   \def\phfnote@opt@abstract{noname,compact}
 }
@@ -1544,7 +1711,6 @@
 }
 
 
-
 %
 % NOW PROCESS THE OPTIONS
 %
@@ -1555,19 +1721,11 @@
 }
 
 \ProcessKeyvalOptions*
-
-
-% ==============================================================================
-% EXECUTE PACKAGE OPTIONS
-% ==============================================================================
-
-
-
+%    \end{macrocode}
 %
-% execute definitions controlled by options
+% \subsubsection{And Finally Execute the Package Options}
 %
-
-
+%    \begin{macrocode}
 \phfnote@do@pkgset{\phfnote@opt@pkgset}
 
 \phfnote@do@notetitle{\phfnote@opt@title}
@@ -1602,11 +1760,7 @@
   \phfnote@do@footnotedefs
 \fi
 
-
-
 \phfnote@hook@atendload
-
-
 %    \end{macrocode}
 %
 %\Finale
