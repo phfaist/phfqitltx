@@ -293,6 +293,20 @@
     \fi%
   \fi
 }
+\def\phfnote@pagegeomstyle@bigmargin{% ( for big margins, e.g. for package documentation :)
+  \if@twocolumn
+    \PassOptionsToPackage{hmargin=1.5in,vmargin=0.75in,includeheadfoot}{geometry}%
+  \else
+    % fix the margins a bit to make text wider
+    \ifcase\@ptsize% mods for 10 pt
+      \PassOptionsToPackage{hmargin={2.25in,1.75in},vmargin=1.25in}{geometry}%
+    \or% mods for 11 pt
+      \PassOptionsToPackage{hmargin={2.25in,1.75in},vmargin=1.25in}{geometry}%
+    \or% mods for 12 pt
+      \PassOptionsToPackage{hmargin={2in,1.5in},vmargin=1.25in}{geometry}%
+    \fi%
+  \fi
+}
 
 \newcommand{\phfnote@do@pagegeomdefs}[1]{
 
@@ -932,6 +946,7 @@
 \newcommand\phfnote@presetcommon@xnote[1][noteitsf]{% common settings to all "{sf|sfss|utopia}note" presets
   \def\phfnote@opt@title{default}
   \def\phfnote@opt@par{skip}
+  \phfnote@opt@pagegeomdefstrue
   \def\phfnote@opt@pagegeom{wide}
   \g@addto@macro\phfnote@hook@atendload{
     \ifdefined\urlstyle
@@ -980,6 +995,11 @@
     \PassOptionsToPackage{medfamily}{MyriadPro}
     \RequirePackage{MyriadPro}
   }
+}
+\def\phfnote@preset@pkgdoc{% (preset for package documentations :-)
+  \phfnote@preset@utopianote% inherits utopianote
+  \def\phfnote@opt@pagegeom{bigmargin}
+  \def\phfnote@opt@abstract{noname}
 }
 \def\phfnote@preset@reset{
   \def\phfnote@opt@pkgset{none}

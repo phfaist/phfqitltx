@@ -1,0 +1,315 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2016 by Philippe Faist <philippe.faist@bluewin.ch>
+% -------------------------------------------------------
+% 
+% This file may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in:
+%
+%    http://www.latex-project.org/lppl.txt
+%
+% and version 1.3 or later is part of all distributions of LaTeX 
+% version 2005/12/01 or later.
+%
+% \fi
+%
+% \iffalse
+%<*driver>
+\ProvidesFile{phfquotetext.dtx}
+%</driver>
+%<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
+%<package>\ProvidesPackage{phfquotetext}
+%<*package>
+    [2016/04/20 v1.0 phfquotetext package]
+%</package>
+%
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{phfquotetext}
+\usepackage[preset=pkgdoc]{phfnote}
+\usepackage[normalem]{ulem}
+\EnableCrossrefs         
+\RecordChanges
+\let\oldPrintChanges\PrintChanges
+\def\PrintChanges{%
+  \begingroup%
+    \let\oldsection\section%
+    \def\section*##1{\oldsection*{##1}\addcontentsline{toc}{section}{##1}}%
+    \oldPrintChanges%
+  \endgroup}
+\begin{document}
+  \DocInput{phfquotetext.dtx}
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+%
+% \changes{v1.0}{2016/04/20}{Initial version}
+%
+% \GetFileInfo{phfquotetext.dtx}
+%
+% \DoNotIndex{\newcommand,\newenvironment}
+% 
+% \title{The \textsf{phfquotetext} package\thanks{
+% This document corresponds to
+% \textsf{phfquotetext}~\fileversion, dated \filedate. It is part of
+% the Part of the
+% \href{https://github.com/phfaist/phfqitltx/}{\textsf{phfqitltx}}
+% package suite, see \url{https://github.com/phfaist/phfqitltx}.}}
+% \author{Philippe Faist\quad\email{philippe.faist@bluewin.ch}}
+%
+% \maketitle
+%
+% \begin{abstract}
+%   \textsf{phfquotetext}---Provides an environment for displaying
+%   block text with special characters, such as verbatim quotes from a
+%   referee report.
+% \end{abstract}
+%
+% \inlinetoc
+%
+% \section{Introduction}
+%
+% This package provides a quoting environment useful to quote, e.g., email text.  It is
+% somewhat like a verbatim environment (for instance, there is no macro expansion), but
+% with also no whitespace preformatting.
+%
+% For instance, you might find this useful for formatting replies to a referee:
+%
+% \changes{v1.0b}{2016/04/21}{test change.}
+%
+% \begin{verbatim}
+% \renewcommand\quotetextfont{\sffamily\color{blue}}
+% \begin{quotetext}
+%   This is some text which was provided in plain text, for example,
+%   by the referee.  The object \calE should probably be defined with
+%   a factor 1/2 to help the \sum_k \ket{k} states not overwhelm rho
+%   by this and that by more than 50%....
+% \end{quotetext}
+% \end{verbatim}
+% gives:
+%
+% \renewcommand\quotetextfont{\sffamily\color{blue}}
+% \begin{quotetext}   This is some text which was provided in plain text, for example, by a   referee.  The object \calE should probably be defined with a factor 1/2 to   help the \sum_k \ket{k} states not overwhelm rho by this and that by more than 50%.... \end{quotetext}
+%
+%
+%
+% \section{Usage}
+%
+% \subsection{The main environment}
+%
+% The main environment is simply |\begin{quotetext} ... \end{quotetext}|.
+%
+% \DescribeEnv{quotetext}
+% Delimit your email quote within this environment:
+%
+% \begin{verbatim}
+% \begin{quotetext}
+%   Stuff which you want to display verbatim, but with automatic white
+%   space formatting and re-flow.  \commands will not be expanded, and
+%   will be displayed verbatim.  Percent signs also work 100%.
+% \end{quotetext}
+% \end{verbatim}
+%
+%
+%
+% \subsection{Customize appearance}
+%
+% \DescribeMacro{\quotetextfont}
+% This macro contains the formatting commands to set up the quote font.  Redefine at will.
+% By default, the contents is displayed in typewriter font: |\newcommand\quotetextfont{\ttfamily}|.
+%
+% This macro may also be defined to accept one argument, which is the whole contents of
+% the quoted text.  Make sure you define this with |\newcommand\quotetextfont[1]{...}| or
+% |\long\def|, because the argument may contain pseveral paragraphs.
+%
+% \DescribeMacro{\quotetextstart}
+% This command gets called at the beginning of the quote environment.  It may be used
+% e.g.\@ to add space, a horizontal rule, or add other formatting goodies.  By default, it
+% is empty.
+%
+% \DescribeMacro{\quotetextend}
+% This command gets called at the end of the quote environment.  It may be used e.g.\@ to
+% add space, a horizontal rule, or add other formatting goodies.  By default, it is empty.
+%
+%
+% You may try, for instance, the following to get started with customization:
+% \begin{verbatim}
+% \renewcommand\quotetextstart{%
+%   \par\noindent\color{blue}\hrule height 0.8pt\vspace{2pt}\vspace{-\parskip}}
+% \renewcommand\quotetextend{%
+%   \begingroup\color{blue}\vspace{2pt}\hrule height 0.8pt\vspace{2pt}\endgroup}
+% \renewcommand\quotetextfont[1]{\sout{#1}} % \usepackage[normalem]{ulem}
+% \end{verbatim}
+% which gives:
+% \renewcommand\quotetextstart{%
+%   \par\noindent\color{blue}\hrule height 0.8pt\vspace{2pt}\vspace{-\parskip}}
+% \renewcommand\quotetextend{%
+%   \begingroup\color{blue}\vspace{2pt}\hrule height 0.8pt\vspace{2pt}\endgroup}
+% \renewcommand\quotetextfont[1]{\color{orange}\sout{#1}}
+% \begin{quotetext}   Stuff which you want to display verbatim, but with automatic white   space formatting and re-flow.  \commands will not be expanded, and   will be displayed verbatim.  Percent signs also work 100%. \end{quotetext}
+% 
+%
+% \subsection{Customize Catcodes---Advanced Usage}
+%
+% \DescribeMacro{\quotetextcatcodedefs}
+% You may redefine this command to set catcodes before parsing the bulk of the
+% |{quotetext}| environment.  This macro is called after \TeX's specials are already
+% assigned catcode |12| (other).  By default, this macro is empty.
+%
+% \StopEventually{^^A
+%   \PrintChanges
+%}
+%
+%
+% \section{Implementation}
+%
+% \subsection{Main Macros and Environment}
+%
+% \begin{macro}{\quotetextcatcodedefs}
+%   Allows to set custom catcodes for parsing of quotetext contents.
+%
+%   By default, all char catcodes are set as "other" characters, but you may
+%   redefine this macro to define you own catcodes.
+%   
+%    \begin{macrocode}
+\newcommand\quotetextcatcodedefs{%
+  % no defs by default
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\quotetextstart}
+% \begin{macro}{\quotetextend}
+%   Definitions which are called at the beginning or end of every quote environment.
+%    \begin{macrocode}
+\newcommand\quotetextstart{%
+  % nothing by default
+}
+\newcommand\quotetextend{%
+  % nothing by default
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\quotetextfont}
+% Set up the font and display for the quote text environment.
+%
+% This command may also be defined to take one single argument, which will be
+% the whole contents of the quotetext environment.
+%    \begin{macrocode}
+\newcommand\quotetextfont{\ttfamily}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{environment}{quotetext}
+%   The main environment.  Starts group and relays the call to |\phfquotetext@warg| to
+%   start reading the contents of the environment.
+%
+%   Start the environment definition.
+%    \begin{macrocode}
+\newenvironment{quotetext}{%
+%    \end{macrocode}
+%
+% Make sure to enclose the full quote text stuff into its own group to make definitions
+% such as catcode overrides local.
+%    \begin{macrocode}
+  \begingroup%
+%    \end{macrocode}
+%
+% Finally, relay the call to |\phfquotetext@warg| to read the whole contents of the
+% environment, and finish the environment definition.
+%    \begin{macrocode}
+  \phfquotetext@warg%
+}{}
+%    \end{macrocode}
+% \end{environment}
+%
+%
+%
+% \subsection{Internal Stuff}
+%
+% \begin{macro}{\phfquotetext@warg@}
+%   Reads an argument delimited by ....|\end{quotetext}|, ends the current \TeX{} group
+%   assumed open (in order to change the catcodes), and calls the start/show/end commands.
+%
+%   We need deep catcode dark magic to just even define this command.
+%   \begin{macrocode}
+\begingroup
+  \catcode`|=0
+  \catcode`\<=1
+  \catcode`\>=2
+  \catcode`\{=12
+  \catcode`\}=12
+  \catcode`\\=12
+  |long|gdef|phfquotetext@warg@#1\end{quotetext}<|endgroup
+    |quotetextstart|phfquotetext@show<#1>|quotetextend>
+|endgroup
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\phfquotetext@show}
+%   Shows the content given as argument with the proper formatting.  Includes an actual
+%   call to |\end{quotetext}| to make \LaTeX's bookcounting mechanism for |\begin|/|\end|
+%   happy.
+%   \begin{macrocode}
+\newtoks\qtt@mytoks
+\long\def\phfquotetext@show#1{%
+  \qtt@mytoks={#1}%
+  \begingroup%
+%    \end{macrocode}
+% Crucially, |\the\toks| only expands once and prohibits further
+% expansion.  This way, we may pass the argument directly to
+% |\quotetextfont|, with tokens expanded exactly as they were given:
+%    \begin{macrocode}
+  \edef\qtt@cmdarg{{\the\qtt@mytoks}}%
+  \expandafter\quotetextfont\qtt@cmdarg%
+  \endgroup%
+  \end{quotetext}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\phfquotetext@warg}
+%   Prepares to read the contents of the environment.  Opens a \TeX{} group, sets the
+%   catcodes and relays the call to |\phfquotetext@warg@|.
+%    \begin{macrocode}
+\def\phfquotetext@warg{%
+  %
+  \let\do\@makeother%
+  \dospecials% verbatim catcodes -- \dospecials comes from LaTeX itself
+  \catcode`\ =10% exceptions
+  \relax%
+  \quotetextcatcodedefs%
+  \phfquotetext@warg@%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+%\Finale
+\endinput
