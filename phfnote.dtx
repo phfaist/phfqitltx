@@ -1,12 +1,142 @@
-
-\NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{phfnote}[2016/04/19 phfnote package]
-
+% \iffalse meta-comment
+%
+% Copyright (C) 2016 by Philippe Faist <philippe.faist@bluewin.ch>
+% -------------------------------------------------------
+% 
+% This file may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in:
+%
+%    http://www.latex-project.org/lppl.txt
+%
+% and version 1.3 or later is part of all distributions of LaTeX 
+% version 2005/12/01 or later.
+%
+% \fi
+%
+% \iffalse
+%<*driver>
+\ProvidesFile{phfnote.dtx}
+%</driver>
+%<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
+%<package>\ProvidesPackage{phfnote}
+%<*package>
+    [2016/04/20 v1.0 phfnote package]
+%</package>
+%
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage[preset=pkgdoc]{phfnote}
+\usepackage[normalem]{ulem}
+\usepackage{verbdef}
+\EnableCrossrefs         
+\RecordChanges
+\let\oldPrintChanges\PrintChanges
+\def\PrintChanges{%
+  \begingroup%
+    \let\oldsection\section%
+    \def\section*##1{\oldsection*{##1}\addcontentsline{toc}{section}{##1}}%
+    \oldPrintChanges%
+  \endgroup}
+\begin{document}
+  \DocInput{phfnote.dtx}
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+%
+% \changes{v1.0}{2016/04/20}{Initial version}
+%
+% \GetFileInfo{phfnote.dtx}
+%
+% \DoNotIndex{\newcommand,\newenvironment}
+% 
+% \title{The \textsf{phfnote} package\thanks{\itshape
+% This document corresponds to
+% \textsf{phfnote}~\fileversion, dated \filedate. It is part of
+% the Part of the
+% \href{https://github.com/phfaist/phfqitltx/}{\textsf{phfqitltx}}
+% package suite, see \url{https://github.com/phfaist/phfqitltx}.}}
+% \author{Philippe Faist\quad\email{philippe.faist@bluewin.ch}}
+%
+% \maketitle
+%
+% \begin{abstract}
+%   \textsf{phfnote}---A handy \LaTeX{} class for typesetting notes in various formats.
+% \end{abstract}
+%
+% \inlinetoc
+%
+% \section{Introduction}
+%
+% Introduction to |phfnote|.
+%
+% support for:
+% \begin{itemize}
+% \item mostly designed for use with |article| class, but not necessary.  You mileage may vary.
+% \item |twocolumn|
+% \item |10pt|, |11pt|, |12pt|
+% \end{itemize}
+%
+%
+% \section{Usage}
+%
+% How to use |phfnote|.
+%
+% \section{Features}
+%
+% Lots of them.
+%
+% \subsection{Title Formatting}
+%
+% \subsection{Abstract}
+%
+% \subsection{Predefined Package Sets}
+%
+% \subsection{General Formatting and Appearance}
+%
+% \subsubsection{Font/Spacing Goodies}
+%
+% \subsubsection{Paragraph Shape}
+%
+% \subsubsection{Section Title Formatting}
+%
+% \subsection{Page Geometry}
+%
+% \subsection{Presets}
+%
+%
+%
+%
+%
+% \StopEventually{\PrintChanges}
+%
+% \section{Implementation}
+%
+% Implementation details here.
+%
+%    \begin{macrocode}
 
 \RequirePackage{kvoptions}
-
-
-
 
 %
 % internal -- execute all definitions given in list of attributes
@@ -1209,3 +1339,7 @@
 \phfnote@hook@atendload
 
 
+%    \end{macrocode}
+%
+%\Finale
+\endinput
