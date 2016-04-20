@@ -32,3 +32,7 @@ LaTeX packages for QIT stuff which I use often
 [Doc incomplete. Sorry. Check out the source code, there should be helpful
 comments.]
 
+IN PROGRESS -- the packages are currently migrating to fully documented DTX files.  Currently ready are:
+
+  - `phfquotetext`
+  - others hopefully coming soon!
