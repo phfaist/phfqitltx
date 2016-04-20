@@ -108,6 +108,16 @@
 %
 % \subsection{Title Formatting}
 %
+% \subsubsection{Title notes---\texttt{\textbackslash thanks}}
+%
+% \label{sec:main-default-title-style}
+%
+% |\thanks{text}|
+%
+% |\thanks[N]{text}| -- |N| is a number
+%
+% |\thanksmark[N]| -- same.
+%
 % \subsection{Abstract}
 %
 % \subsection{Predefined Package Sets}
@@ -132,23 +142,40 @@
 %
 % \section{Implementation}
 %
-% Implementation details here.
+% Here comes the gory code.
+%
+% Let's start by loading the |kvoptions| package, which we need to parse the package options.
 %
 %    \begin{macrocode}
-
 \RequirePackage{kvoptions}
-
+%    \end{macrocode}
 %
-% internal -- execute all definitions given in list of attributes
+% \subsection{Internal Generic Code}
 %
+% \begin{macro}{\phfnote@internal@execattribbs}
+%   An internal general-purpose macro to execute all definitions given in list of
+%   attributes.
+%
+%   Often, a list of attributes are given via a package option (e.g.\@ for the abstract),
+%   and these attributes need to be executed, or implemented, in the order they are given.
+%   This macro takes care of that.  Each possible attribute must be defined as a macro
+%   with a common prefix, to which the attribute is appended.
+%
+%   The arguments are:
+%   \begin{itemize}
+%   \item |#1| = prefix to look for attributes (e.g.\@ |noteabstract@attr@|);
+%   \item |#2| = a human-readable name of what |#1| represents, which is used in an error
+%     message in case the required attribute is not found (e.g.\@ |{abstract attribute}|);
+%   \item |#3| = the list of attributes specified by the user.
+%   \end{itemize}
+% 
+%   For example, |\phfnote@internal@execattribs{noteabstract@attr@}|\hskip0pt\relax
+%   |{abstract attribute}|\hskip0pt\relax |{noname,small}| causes the commands
+%   |\noteabstract@attr@noname| and |\noteabstract@attr@small| to be invoked, in this
+%   order.
+%
+%    \begin{macrocode}
 \def\phfnote@internal@execattribs#1#2#3{%
-  %
-  % #1 = prefix to look for attributes
-  % 
-  % #2 = name of what #1 represents, to use in message in case attribute is not found
-  %
-  % #3 = list of attributes
-  %
   \@for\next:=#3\do{%
     \ifcsname #1\next\endcsname%
       \csname #1\next\endcsname%
@@ -157,129 +184,216 @@
     \fi
   }
 }
-
-
-
-
-% ------------------------------------------------------------------------------
-%     TITLE
-% ------------------------------------------------------------------------------
-
+%    \end{macrocode}
+% \end{macro}
+% 
+% \subsection{Title Styling}
 %
-% -- common note title defs --
 %
+% \subsubsection{First, some common simple definitions for our different styles}
+%
+% \begin{macro}{\notetitlefont}
+% \begin{macro}{\notetitleauthorfont}
+% \begin{macro}{\notetitledatefont}
+%   These may be redefined to adapt the font of the title, author and date.
+%
+%    \begin{macrocode}
 \newcommand{\notetitlefont}{\sffamily\bfseries}
 \newcommand{\notetitleauthorfont}{}
 \newcommand{\notetitledatefont}{\footnotesize}
-
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}{\notetitlebelowspace}
+% \begin{macro}{\notetitletopspace}
+%   These macros may be redefined to adjust spacing above and after the title.  They are
+%   macros, not lengths, so they can be adjusted dynamically on the spot.
+%    \begin{macrocode}
 \newcommand{\notetitlebelowspace}{4mm}
-
+\newcommand{\notetitletopspace}{-1.2cm}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
-% common to several styles -- adjust top spacing for the title
+% \begin{macro}
+%   Provide a ``long'' definition for |\title|, so that the title can have several
+%   paragraphs.  Our style handles this by putting the title on several lines, and it can
+%   be useful depending on how you want to format the title.
+%    \begin{macrocode}
+\long\def\title#1{\gdef\@title{#1}}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\phfnote@title@checksetspace}
+%   Some of our title styles require the |setspace| package.  This utility checks that
+%   this package is loaded, and generates an error otherwise.
 %
-\def\phfnote@title@vskiptop{-1.2cm}
-
-
-\def\phfnote@title@checksetspace#1{%  #1 = title style, for the error message
+%   |#1| = the current title style name; this is required only for the error message.
+%    \begin{macrocode}
+\def\phfnote@title@checksetspace#1{%
   \ifdefined\singlespace\else%
     \PackageError{phfnote}{Note title style `#1' requires the `setspace' package to be
       loaded!  Please load it, or use a pkgset which loads it automatically}%
   \fi%
 }
-
-% \newcounter{phfnotethanks}
-% \setcounter{phfnotethanks}{0}
-% \renewcommand\thephfnotethanks{\arabic{phfnotethanks}}
-% \newcommand\phfnotethanksfont{\itshape\small}
-% \newcommand\phfnote@inlinethanks@thanks[2][]{%
-%   \if\relax\detokenize{#1}\relax% no identifier
-%     \stepcounter{phfnotethanks}%
-%     \phfnote@inlinethanks@thanks@store{\thephfnotethanks}{#2}% store directly
-%   \else%
-%     \ifcsname phfnote@thanks@internal@ident@#1\endcsname% ident already seen -- just display mark
-%       \phfnote@inlinethanks@showthanksmark{\csname phfnote@thanks@internal@ident@#1\endcsname}%
-%     \else% ident new -- create and remember.
-%       \begingroup%
-%         \stepcounter{phfnotethanks}%
-%         \expandafter\xdef\csname phfnote@thanks@internal@ident@#1\endcsname{\thephfnotethanks}%
-%         \phfnote@inlinethanks@thanks@store{\thephfnotethanks}{#2}%
-%       \endgroup%
-%     \fi%
-%   \fi%
-% }
-% \def\phfnote@inlinethanks@showthanksmark#1{%
-%   \edef\@thefnmark{#1}\@footnotemark\hspace*{1ex}%
-% }
-% \long\def\phfnote@inlinethanks@thanks@store#1#2{%
-%   \phfnote@inlinethanks@showthanksmark{#1}%
-%   \edef\phfnote@tmpA{{\noexpand\phfnote@inlinethanks[#1]{\unexpanded{#2}}}}%
-%   \expandafter\g@addto@macro\expandafter\@thanks\phfnote@tmpA%
-% }
-% \def\phfnote@inlinethanks[#1]#2{%
-%   \leavevmode\edef\@thefnmark{#1}\@footnotemark\hspace*{1ex}#2\hskip 1em\relax%
-% }
-
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsubsection{Implementation of \texttt{\textbackslash thanks}}
+%
+% Here we provide a few fixes for the implementation of |\thanks|, both for our main
+% `default' title style as well as for other simpler styles.  Our implementation supports
+% |\thanks[N]{...}| and |\thanksmark[N]| as for footnotes.
+%
+% \paragraph{Implementation of \texttt{\textbackslash thanks} and friends, for our main
+% `default' title style}
+%
+% \begin{macro}{\phfnote@setupthanksmpfootnote}
+%   Internal---called at the beginning of a |minipage| environment, it sets up necessary
+%   stuff to support |\thanks| notes within the minipage, in a single paragraph.
+%
+%   Some of this code was taken or really inspired directly from |latex.ltx|.
+%    \begin{macrocode}
 \def\phfnote@setupthanksmpfootnote{%
+%    \end{macrocode}
+% 
+% The |\thanks| macro is implemented as a |\footnote| in a minipage.  So we hack into the
+% `mpfootnote' mechanism.
+%    \begin{macrocode}
   \def\thempfootnote{\arabic{mpfootnote}}%
   \let\footnoterule\relax%
-%  \long\def\@makefntext##1{\parindent=0pt\parskip=0pt\noindent%
-%    \hb@xt@1.8em{\hss\@textsuperscript{\normalfont\@thefnmark}}##1\hskip 1em plus.5em minus.2em\relax%
-%  }%
-  \def\phfnote@mpfootmaterial{}%
-  \long\def\@mpfootnotetext##1{%
-    \protected@edef\@currentlabel
-         {\csname p@mpfootnote\endcsname\@thefnmark}%
-    \protected@edef\@tmpa{\protect\phfnote@mympfootnotemark{\@thefnmark}{##1}\protect\phfnote@mpfootnoteglue}%
-    \expandafter\g@addto@macro\expandafter\phfnote@mpfootmaterial\expandafter{\@tmpa}%
-  }%
-  \def\thanksmark[##1]{\phfnote@mympfootnotemark{##1}}%
   \let\thanks\footnote%
+%    \end{macrocode}
+%
+% All footnote material is stored in a macro |\phfnote@mpfootmaterial|, initially
+% empty:\footnote{NOTE: this differs from how footnotes are usually treated (directly
+% typeset into a vbox I think).  Not sure what the side-effects might be.  Because this is
+% just for simple email/institute info/etc. in the title, hopefully this shouldn't have
+% any serious consequences.}
+%    \begin{macrocode}
+  \def\phfnote@mpfootmaterial{}%
+%    \end{macrocode}
+% and locally define |\@mpfootnotetext| to store the footnote content into that buffer,
+%    \begin{macrocode}
+  \long\def\@mpfootnotetext##1{%
+    \protected@edef\@currentlabel%
+         {\csname p@mpfootnote\endcsname\@thefnmark}%
+    \protected@edef\@tmpa{\protect\phfnote@mympfootnotemark{\@thefnmark}{##1}%
+      \protect\phfnote@mpfootnoteglue}%
+    \expandafter\g@addto@macro\expandafter\phfnote@mpfootmaterial%
+      \expandafter{\@tmpa}%
+  }%
+%    \end{macrocode}
+% 
+% Also provide |\thanksmark|, so that we can refer to other thanks/footnote-marks.
+%    \begin{macrocode}
+  \def\thanksmark[##1]{\phfnote@mympfootnotemark{##1}}%
 }
-\def\thanksmark{\footnotemark}
-\def\phfnote@mympfootnotemark#1{\@textsuperscript{\normalfont#1}}
-\def\phfnote@mpfootnoteglue{\hskip 1.2em plus 2em minus 0.5em\relax}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\phfnote@finalizempfootnotes}
+%   Macro to call at the end of a |minipage| environment, to ensure that all |\footnote|'s
+%   (and thus |\thanks|'s) are properly formatted.
+%
+%   This simply takes all the tokens collected in |\phfnote@mpfootmaterial| (see just
+%   above), and typesets it in the |\@mpfootins| box.  The latter is automatically typeset
+%   by the minipage in |\end{minipage}|.
+%  \begin{macrocode}
 \def\phfnote@finalizempfootnotes{%
   \global\setbox\@mpfootins=\vbox{%
-    \parskip=0pt\parindent=0pt\parshape 1 0.04\textwidth 0.96\textwidth\relax\noindent\leavevmode%
+    \parskip=0pt\parindent=0pt\parshape 1 0.04\textwidth 0.96\textwidth\relax%
+    \noindent\leavevmode%
     \reset@font\footnotesize%
     \phfnote@fmt@titlefootnotes%
     \phfnote@mpfootmaterial}%
 }
-
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\phfnote@fmt@titlefootnotes}
+% \begin{macro}{\phfnote@mympfootnotemark}
+% \begin{macro}{\phfnote@mpfootnoteglue}
+%   Some formatting utilities which can be overridden if you know what you're doing.
+%   |\phfnote@fmt@titlefootnotes| allows you to override the font in which the
+%   title-footnotes/thanks are typeset.  |\phfnote@mympfootnotemark| is responsible for
+%   formatting its argument as a footnote mark, usually in superscript.
+%   |\phfnote@mpfootnoteglue| is the glue which is used between two footnote texts (as
+%   they are typeset in a single paragraph).
+%    \begin{macrocode}
 \def\phfnote@fmt@titlefootnotes{}
-
-\def\phfnote@fmt@institute{\emph}
-
-%\def\institute#1{\thanks{\protect\phfnote@fmt@institute{#1}}}  -- no, then better use RevTeX directly...
-
-
+\def\phfnote@mympfootnotemark#1{\@textsuperscript{\normalfont#1}}
+\def\phfnote@mpfootnoteglue{\hskip 1.2em plus 2em minus 0.5em\relax}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
 %
-% Extend LaTeX's \thanks{} to allow an optional argument as for footnotes.
+% \paragraph{For those not using the main `default' title style}~
 %
+% We use \LaTeX's own |\thanks| mechanism, however we patch on the possibility for using
+% |\thanks[N]{text}| and |\thanksmark[N]| for overriding the number which is used.
+%
+% \begin{macro}{\thanksmark}
+%   The |\thanksmark| is trivially implemented by |\footnotemark|.  Very handy indeed.
+%    \begin{macrocode}
+\def\thanksmark{\footnotemark}
+%    \end{macrocode}
+% \end{macro}
+% 
+% Start by saving the old |\thanks| macro, just in case.
+%    \begin{macrocode}
 \let\phfnote@old@thanks\thanks
+%    \end{macrocode}
 %
-\def\thanks{\@ifnextchar[\phfnote@thanks{\phfnote@thanks[]}} %]
+% \begin{macro}{\thanks}
+%   Now, we need to extend \LaTeX's |\thanks| to allow an optional argument as for
+%   footnotes.
+%
+%   Check whether there is an optional argument; if there is none we execute \LaTeX's
+%   original thanks code (replicated here), otherwise, we specify the optional argument
+%   explicitly at the relevant location in \LaTeX's implementation:
+%    \begin{macrocode}
+\def\thanks{\@ifnextchar[\phfnote@thanks{\phfnote@thanks[]}}%]
 \long\def\phfnote@thanks[#1]#2{%
-  \if\relax\detokenize{#1}\relax% no argument, use default implementation.
-    %  copied from default LaTeX implementation:
+  \if\relax\detokenize{#1}\relax%
+%    \end{macrocode}
+% 
+% The optional argument is empty---just execute \LaTeX's original |\thanks| code,
+% replicated here:
+%    \begin{macrocode}
     \footnotemark%
     \protected@xdef\@thanks{\@thanks\protect\footnotetext[\the\c@footnote]{#2}}%
+%  \end{macrocode}
+% 
+% Otherwise, execute \LaTeX's original |\thanks| code, but with the optional argument
+% inserted wherever needed:
+%    \begin{macrocode}
   \else% argument, pass on to sub-commands:
     \footnotemark[#1]%
     \protected@xdef\@thanks{\@thanks\protect\footnotetext[#1]{#2}}%
   \fi%
 }
-
-
-
-
-
-% -- STYLE: default --
-\newcommand{\notetitle@style@default}{% `default' style title
-  \begingroup\par\raggedright% \begin{flushleft}%
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% \subsubsection{Title Styles Definition}
+%
+% \paragraph{Title style: `default'}~
+%
+% Implementation our main `default' title style.  See \autoref{sec:main-default-title-style}.
+%
+% \begin{macro}{\notetitle@style@default}
+%    The default title style.  Nothing mysterious, hopefully.
+%    \begin{macrocode}
+\newcommand{\notetitle@style@default}{%
+  \begingroup\par\raggedright%
     \phfnote@setupthanksmpfootnote%
-%    \let\footnote\thanks%
-    \vspace*{\phfnote@title@vskiptop}%
+    \vspace*{\notetitletopspace}%
     \phfnote@title@checksetspace{default}%
     \begin{minipage}{\textwidth}%
       \begin{singlespace}%
@@ -309,11 +423,21 @@
   \endgroup%
   \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
 }
-% -- STYLE: small --
-\newcommand{\notetitle@style@small}{% `small' style title
-  \begingroup\par\raggedright% \begin{flushleft}%
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \paragraph{Title style: `small'}~
+%
+% Implementation an alternate `small' title style.
+%
+% \begin{macro}{\notetitle@style@small}
+%    The default title style.  Nothing mysterious, hopefully.
+%    \begin{macrocode}
+\newcommand{\notetitle@style@small}{%
+  \begingroup\par\raggedright%
     \let\footnote\thanks%
-    \vspace*{\phfnote@title@vskiptop}%
+    \vspace*{\notetitletopspace}%
     {\notetitlefont \@title}%
     \hfill\makebox{\fontsize{9pt}{10pt}\selectfont {\notetitleauthorfont \@author}%
       \hspace*{2mm}--\hspace*{2mm}{\emph{\notetitledatefont \@date}}}%
@@ -322,25 +446,17 @@
   \endgroup%
   \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
 }
-% % -- STYLE: titleonly -- [ big title only. Use paragraphs for several lines ]  ### USE 'default' INSTEAD. WORKS WELL NOW.
-% \newcommand{\notetitle@style@titleonly}{% `titleonly' style title
-%   \begingroup\par\raggedright% \begin{flushleft}%
-%     \vspace*{\phfnote@title@vskiptop}%
-%     \phfnote@title@checksetspace{titleonly}%
-%     \begin{singlespace}%
-%       \begingroup%
-%         \Large\notetitlefont{%
-%           \parindent=0pt%
-%           \parskip=1.5ex%
-%           \par  \@title\par\vspace{4mm}%
-%           }%
-%       \endgroup%
-%       \hrule%
-%     \par%
-%   \endgroup%
-%   \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
-% }
-% -- STYLE: article --
+%    \end{macrocode}
+% \end{macro}
+%
+% 
+% \paragraph{Title style: `article'}~
+%
+% Implementation the `article' title style.
+%
+% \begin{macro}{\notetitle@style@article}
+%    The title style definition.  Nothing mysterious, hopefully.
+%    \begin{macrocode}
 \newcommand{\notetitle@style@article}{% `article' style title
   \vspace*{-3em}%
   \begingroup
@@ -360,50 +476,74 @@
   \par%
   \vskip 2.5em\relax%
 }
-
-
-
+%    \end{macrocode}
+% \end{macro}
+% 
+% \subsubsection{Plugging into \texttt{\textbackslash maketitle}}
 %
-% Actually perform the definitions to make \maketitle produce the title with the
+% Actually perform the definitions to make |\maketitle| produce the title with the
 % given style.
 %
-% #1 = style name, e.g. 'default'
+% \begin{macro}{\phfnote@do@notetitle}
+%   This macro takes care of installing the correct title into the document, by overriding
+%   |\@maketitle|.
 %
+%   This macro is called later after processing the package options.  Its argument |#1| is
+%   the style name, e.g., |default|.
+%
+%    \begin{macrocode}
 \def\phfnote@do@notetitle#1{
+%    \end{macrocode}
+% If we have an empty title style, then we leave default title provided by the class. 
+%    \begin{macrocode}
   \if\relax\detokenize\expandafter{#1}\relax
-    %
-    % Empty definition -- leave default title
-    %
   \else
-    %
-    % Custom note title to set.
-    %
+%    \end{macrocode}
+% Otherwise, we have a title style to set.
+%    \begin{macrocode}
     \ifcsname notetitle@style@#1\endcsname
       \def\phfnote@tmp@titsty{#1}%
     \else
       \PackageError{phfnote}{Unknown title style: '#1'. Using default style instead}
       \def\phfnote@tmp@titsty{default}%
     \fi
-    %
-    % Actually overload title style
-    %
+%    \end{macrocode}
+% Now, actually overload the title style by redefining |\@maketitle|.
+%    \begin{macrocode}
     \def\@maketitle{\csname notetitle@style@\phfnote@tmp@titsty\endcsname}
   \fi
 }
-
+%    \end{macrocode}
+% \end{macro}
 %
-% Provide long definition for \title{}, so that several "paragraphs" can be put into the
-% title as different lines.
 %
-\long\def\title#1{\gdef\@title{#1}}
-
-% ------------------------------------------------------------------------------
-%     ABSTRACT
-% ------------------------------------------------------------------------------
-
+%
+% \subsection{Abstract}
+%
+% Now we can take care of the abstract.  Unlike the title styles, the abstract has a base
+% implementation.  Then, we may have attributes which change some parameters.
+%
+% 
+% \begin{environment}{notedefaultabstract}
+%   First, save the old environment |\begin{abstract}...\end{abstract}| provided by the
+%   class (if any).
+%    \begin{macrocode}
 \let\notedefaultabstract\abstract
 \let\endnotedefaultabstract\endabstract
-
+%    \end{macrocode}
+% \end{environment}
+%
+% \begin{macro}{\noteabstracttextfont}
+% \begin{macro}{\noteabstractnamefont}
+% \begin{macro}{\noteabstracttextwidth}
+% \begin{macro}{\noteabstractafterspacing}
+% \begin{macro}{\noteabstractbeforepacing}
+%   Basic parameters of the abstract---the font for the abstract text
+%   (|\noteabstracttextfont|), the font used to typeset the word ``Abstract''
+%   (|\noteabstractnamefont|), and the width of the whole abstract.  Also, the spacing
+%   below (|\noteabstractafterspacing|) and above (|\noteabstractbeforespacing|) the
+%   abstract.
+%    \begin{macrocode}
 \newcommand{\noteabstracttextfont}{}
 \newcommand{\noteabstractnamefont}{\bfseries\small}
 \if@twocolumn
@@ -411,13 +551,31 @@
 \else
   \newcommand{\noteabstracttextwidth}{0.9\hsize}
 \fi
-
-\def\noteabstract@nameline{
-  {\parskip=0pt\relax\par\centering\noteabstractnamefont\abstractname\par}\vskip 1ex\relax%
-}
-
 \newcommand\noteabstractafterspacing{1.5em}
 \newcommand\noteabstractbeforespacing{1.5em}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}{\noteabstract@nameline}
+%   Create the line which contains the title of the abstract, that is, the word
+%   ``Abstract.''  This can be overloaded, of course, for customization.
+%    \begin{macrocode}
+\def\noteabstract@nameline{
+  {\parskip=0pt\relax\par\centering\noteabstractnamefont%
+    \abstractname%
+    \par}\vskip 1ex\relax%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{environment}{noteabstract}
+%   The proper |noteabstract| environment.
+%
+%    \begin{macrocode}
 \newenvironment{noteabstract}{%
   \removelastskip%
   \vspace{\noteabstractbeforespacing}%
@@ -426,15 +584,18 @@
     \begin{minipage}{\noteabstracttextwidth}%
       \noteabstract@nameline%
       \noteabstracttextfont%
-    }% begin commands
-    {% end commands
+    }%
+    {%
     \end{minipage}%
     \par%
   \endgroup%
   \vspace{\noteabstractafterspacing}%
-} % end commands
-
-
+}
+%    \end{macrocode}
+% \end{environment}
+% 
+% The abstract can be customized by the attributes.  Here we define them:
+%    \begin{macrocode}
 \def\noteabstract@attr@wide{%
   \def\noteabstracttextwidth{\textwidth}%
 }
@@ -444,46 +605,52 @@
     \def\noteabstracttextwidth{0.8\textwidth}%
   \fi
 }
-
 \def\noteabstract@attr@noname{%
   \def\noteabstract@nameline{}%\vspace*{1ex}}%
 }
-
 \def\noteabstract@attr@original{%
   \let\abstract\notedefaultabstract
   \let\endabstract\endnotedefaultabstract
 }
-
 \def\noteabstract@attr@small{%
   \g@addto@macro\noteabstracttextfont{\small}%
 }
-
 \def\noteabstract@attr@compact{%
   \renewcommand\noteabstractafterspacing{1ex}%
   \renewcommand\noteabstractbeforespacing{1ex}%
 }
-
 \def\noteabstract@attr@it{%
   \g@addto@macro\noteabstracttextfont{\itshape}%
 }
-
-
+%    \end{macrocode}
+% 
+% \begin{macro}{\phfnote@do@noteabstract}
+%   This helper both defines the |abstract| environment, and also sets the abstract
+%   attributes.  This macro will be called according to the package options.
 %
-%  #1 = a comma-separated list of attributes
-%
+%  |#1| = a comma-separated list of attributes.
+%    \begin{macrocode}
 \def\phfnote@do@noteabstract#1{
-
   \let\abstract\noteabstract
   \let\endabstract\endnoteabstract
-
   \phfnote@internal@execattribs{noteabstract@attr@}{abstract attribute}{#1}
 }
-
-
-% ------------------------------------------------------------------------------
-%     PAGE GEOMETRY
-% ------------------------------------------------------------------------------
-
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+%
+% \subsection{Page Geometry Settings}
+%
+% For the page geometry settings, we just have a bunch of styles which we define as
+% macros.  The macros just set up |\PassOptionsToPackage| for the |geometry| package.
+% Then the correct macro will be selected according to the current |phfnote| package
+% options.
+%
+% \begin{macro}{\phfnote@pagegeomstyle@default}
+%   Default settings.  Not too wide, not too narrow.  Settings vary according to single or
+%   double column setting, and according to default font point size.
+%    \begin{macrocode}
 \def\phfnote@pagegeomstyle@default{
   \if@twocolumn
     \PassOptionsToPackage{hmargin=1in,vmargin=0.75in,includeheadfoot}{geometry}%
@@ -498,6 +665,14 @@
     \fi%
   \fi
 }
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\phfnote@pagegeomstyle@narrow}
+%   Narrower style.  For single-column documents, this is closer to the
+%   typographically-advertised-optimal of 50--80 characters per line, but it might look
+%   narrow to some.
+%    \begin{macrocode}
 \def\phfnote@pagegeomstyle@narrow{
   \if@twocolumn
     \PassOptionsToPackage{hmargin=1.25in,vmargin=0.75in,includeheadfoot}{geometry}%
@@ -512,6 +687,12 @@
     \fi%
   \fi
 }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\phfnote@pagegeomstyle@wide}
+%   Wide, comfortable style.  Wastes less paper.
+%    \begin{macrocode}
 \def\phfnote@pagegeomstyle@wide{
   \if@twocolumn
     \PassOptionsToPackage{hmargin=0.75in,vmargin=0.75in,includeheadfoot}{geometry}%
@@ -526,6 +707,12 @@
     \fi%
   \fi
 }
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\phfnote@pagegeomstyle@xwide}
+%   Extra wide.
+%    \begin{macrocode}
 \def\phfnote@pagegeomstyle@xwide{
   \if@twocolumn
     \PassOptionsToPackage{hmargin=0.5in,vmargin=0.5in,includeheadfoot}{geometry}%
@@ -540,6 +727,12 @@
     \fi%
   \fi
 }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\phfnote@pagegeomstyle@bigmargin}
+%   Makes the margins asymmetric, so that a wide margin note can fit.
+%    \begin{macrocode}
 \def\phfnote@pagegeomstyle@bigmargin{% ( for big margins, e.g. for package documentation :)
   \if@twocolumn
     \PassOptionsToPackage{hmargin=1.5in,vmargin=0.75in,includeheadfoot}{geometry}%
@@ -554,9 +747,14 @@
     \fi%
   \fi
 }
-
+%    \end{macrocode}
+% \end{macro}
+% 
+% 
+% \begin{macro}{\phfnote@do@pagegeomdefs}
+%   Finally, provide a helper to set the page geometry.  Just call the right macro.
+%    \begin{macrocode}
 \newcommand{\phfnote@do@pagegeomdefs}[1]{
-
   \ifcsname phfnote@pagegeomstyle@#1\endcsname
     \csname phfnote@pagegeomstyle@#1\endcsname
   \else
@@ -565,16 +763,25 @@
 
   \RequirePackage{geometry}%
 }
-
-
-
-% ------------------------------------------------------------------------------
-%     TEXT, PARAGRAPH, AND LINE SPACING
-% ------------------------------------------------------------------------------
-
-
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \subsection{Text, Paragraph and Line Spacing}
+%
+% \paragraph{Text \& Line Spacing}~
+%
+% \begin{macro}
+%   Some cosmetic definitions to adjust line spacing.  The line spacing is slightly
+%   adjusted according to font size to make the document more readable.  Depending on
+%   whether the |setspace| package is loaded, we use it or go low-level with a
+%   redefinition of \LaTeX{}' |\baselinestretch|.  If the |captions| package is loaded,
+%   the figure captions' line spacing is also adjusted.
+%   
+%   Also set an |\emergencystretch| so that lines get spaced out for underfull boxes,
+%   rather than overflowing far into the margin.
+%    \begin{macrocode}
 \def\phfnote@do@spacing{
-
   \@ifpackageloaded{setspace}{
     \def\phfnote@dostretch##1{\setstretch{##1}\phfnote@docaptionstretch{##1}}
   }{
@@ -588,7 +795,6 @@
         `phfnote', or use an appropriate (e.g. `rich') pkgset which loads this package
         automatically .}}
   }
-
   \if@twocolumn
     \phfnote@dostretch{1.0} % leave default
     \emergencystretch=3em\relax
@@ -596,18 +802,23 @@
     \ifcase\@ptsize% 10pt
       \phfnote@dostretch{1.1}
     \or% 11pt
-      \phfnote@dostretch{1.0} %1.05
+      \phfnote@dostretch{1.0} % 1.05? better 1.0...
     \or% 12pt
-      \phfnote@dostretch{1.0} %1.03
+      \phfnote@dostretch{1.0} % 1.03? not really noticeable...
     \fi
     \emergencystretch=6em\relax
   \fi
-
 }
-
+%    \end{macrocode}
+% \end{macro}
 % 
-% Paragraph Settings
-% 
+%
+% \paragraph{Paragraph Presets}~
+%
+% Here again, we define several possibilities for paragraph settings as individual macros.
+% Depending on the package option, we execute the corresponding macro.
+%
+%    \begin{macrocode}
 \def\phfnote@par@original{%
 }
 \def\phfnote@par@indent{%
@@ -622,7 +833,12 @@
   \setlength{\parindent}{0em}
   \setlength{\parskip}{0.8em}
 }
-
+%    \end{macrocode}
+% 
+% \begin{macro}{\phfnote@do@par}
+%   Execute the given paragraph setting.  The argument |#1| is the setting, for example,
+%   |skip|.
+%    \begin{macrocode}
 \def\phfnote@do@par#1{%
   \ifcsname phfnote@par@#1\endcsname
     \csname phfnote@par@#1\endcsname
@@ -630,13 +846,14 @@
     \PackageWarning{phfnote}{Bad paragraph setting: #1. Leaving original}
   \fi
 }
-
-
-% ------------------------------------------------------------------------------
-%     INLINE TABLE OF CONTENTS
-% ------------------------------------------------------------------------------
-
-
+%    \end{macrocode}
+% 
+%
+% \subsection{Customized, ``Inline,'' Table of Contents}
+%
+% \begin{macro}
+%   Just a customized table of contents.  Horizontal rules before and after, and spacing is adjusted.
+%    \begin{macrocode}
 \newcommand{\inlinetoc}{%
   {%
     \vspace*{2mm}%
@@ -649,12 +866,17 @@
     \vspace*{6mm}%
   }%
 }
-
-
-
-% ------------------------------------------------------------------------------
-%     FONTS
-% ------------------------------------------------------------------------------
+%    \end{macrocode}
+% 
+% \end{macro}
+%
+%
+%
+% \subsection{Section Styling}
+%
+%  TODO: DOCUMENT ME!
+%
+%    \begin{macrocode}
 
 %
 % Section fonts are customized using the {sectsty} package.  If this conflicts
@@ -712,6 +934,15 @@
   \phfnote@internal@execattribs{phfnote@do@secfmt@}{section formatting preset}{#1}
 }
 
+%    \end{macrocode}
+% 
+%
+%
+% \subsection{\LaTeX{} Package Sets}
+%
+%  TODO: DOCUMENT ME!
+%
+%    \begin{macrocode}
 
 
 
@@ -783,10 +1014,15 @@
 }
 
 
-
-% ------------------------------------------------------------------------------
-%     PDF & HYPERLINKS - HYPERREF
-% ------------------------------------------------------------------------------
+%    \end{macrocode}
+% 
+%
+%
+% \subsection{Hyperref Support and Hyperlinks}
+%
+%  TODO: DOCUMENT ME!
+%
+%    \begin{macrocode}
 
 
 %
@@ -892,10 +1128,17 @@
   }%
 }
 
-% ------------------------------------------------------------------------------
-%     NICE FONT DEFS
-% ------------------------------------------------------------------------------
 
+
+%    \end{macrocode}
+% 
+%
+%
+% \subsection{Cosmetic Font Definitions}
+%
+%  TODO: DOCUMENT ME!
+%
+%    \begin{macrocode}
 \def\phfnote@do@fontdefs{
  
   \PassOptionsToPackage{T1}{fontenc}
@@ -905,9 +1148,15 @@
   
 }
 
-% ------------------------------------------------------------------------------
-%     BIBLIOGRAPHY
-% ------------------------------------------------------------------------------
+%    \end{macrocode}
+% 
+%
+%
+% \subsection{Bibliography Stuff}
+%
+%  TODO: DOCUMENT ME!
+%
+%    \begin{macrocode}
 
 %
 % our default bibliography style -- hacked version of naturemag
@@ -951,10 +1200,15 @@
   \let\bibliography\phfnote@bibliography%
 }
 
-
-% ------------------------------------------------------------------------------
-%     FOOTNOTES
-% ------------------------------------------------------------------------------
+%    \end{macrocode}
+% 
+%
+%
+% \subsection{Better Footnote Style}
+%
+%  TODO: DOCUMENT ME!
+%
+%    \begin{macrocode}
 
 \def\phfnote@do@footnotedefs{
   \let\phfnote@orig@makefnmark\@makefnmark
@@ -964,11 +1218,15 @@
 }
 
 
-% ==============================================================================
-
-%
-% OTHER, STAND-ALONE USEFUL DEFINITIONS
+%    \end{macrocode}
 % 
+%
+%
+% \subsection{Other Stand-Alone Definitions and Helpers}
+%
+%  TODO: DOCUMENT ME!
+%
+%    \begin{macrocode}
 
 \def\notesmallerfrac{0.9}
 \newcommand\notesmaller[1][\notesmallerfrac]{%
@@ -1025,11 +1283,15 @@
 }
 
 
-
-% ==============================================================================
-% DEFINE PACKAGE OPTIONS
-% ==============================================================================
-
+%    \end{macrocode}
+% 
+%
+%
+% \subsection{Parse and Handle Package Options}
+%
+%  TODO: DOCUMENT ME!
+%
+%    \begin{macrocode}
 
 \SetupKeyvalOptions{
   family=phfnote,
@@ -1170,9 +1432,15 @@
 
 
 
-% ----------------------------
-%          PRESETS
-% ----------------------------
+%    \end{macrocode}
+% 
+%
+%
+% \subsection{Define Global Presets}
+%
+%  TODO: DOCUMENT ME!
+%
+%    \begin{macrocode}
 
 %
 % A hook for presets to do stuff at the end of package load.
