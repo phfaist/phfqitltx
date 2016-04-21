@@ -27,19 +27,19 @@
 %
 %<*driver>
 \documentclass{ltxdoc}
+\usepackage{xcolor}
 \usepackage{phfquotetext}
 \usepackage[preset=pkgdoc]{phfnote}
 \usepackage[normalem]{ulem}
 \usepackage{verbdef}
+\usepackage{tcolorbox}
+\newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
+\newtcolorbox{pkgwarning}{colback=red!5!white,colframe=red!5!white,coltitle=red!50!black,fonttitle=\bfseries,title={WARNING}}
 \EnableCrossrefs         
+\CodelineIndex
 \RecordChanges
-\let\oldPrintChanges\PrintChanges
-\def\PrintChanges{%
-  \begingroup%
-    \let\oldsection\section%
-    \def\section*##1{\oldsection*{##1}\addcontentsline{toc}{section}{##1}}%
-    \oldPrintChanges%
-  \endgroup}
+\phfnoteHackSectionStarWithTOCInCommand\PrintChanges
+\phfnoteHackSectionStarWithTOCInCommand\PrintIndex
 \begin{document}
   \DocInput{phfquotetext.dtx}
 \end{document}
@@ -69,7 +69,7 @@
 %
 % \GetFileInfo{phfquotetext.dtx}
 %
-% \DoNotIndex{\newcommand,\newenvironment}
+% \DoNotIndex{\newcommand,\newenvironment,\def,\gdef,\edef,\xdef,\if,\else,\fi,\ifx}
 % 
 % \title{The \textsf{phfquotetext} package\thanks{\itshape
 % This document corresponds to
@@ -194,6 +194,7 @@
 %
 % \StopEventually{^^A
 %   \PrintChanges
+%   \PrintIndex
 %}
 %
 %

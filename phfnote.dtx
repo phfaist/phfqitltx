@@ -28,8 +28,7 @@
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{xcolor}
-\usepackage[preset=pkgdoc,abstract={noname}]{phfnote}
-\usepackage[normalem]{ulem}
+\usepackage[preset=pkgdoc]{phfnote}
 \usepackage{verbdef}
 \usepackage{tcolorbox}
 \newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
@@ -1744,7 +1743,7 @@
   \phfnote@preset@utopianote% inherits utopianote
   \def\phfnote@opt@secfmt{section,paragraph,itpar,blockpar,larger,secsquares}
   \def\phfnote@opt@pagegeom{bigmargin}
-  \def\phfnote@opt@abstract{noname,compact}
+  \def\phfnote@opt@abstract{noname}
 }
 \def\phfnote@preset@reset{
   \def\phfnote@opt@pkgset{none}
