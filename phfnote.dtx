@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfnote}
 %<*package>
-    [2016/04/20 v1.0 phfnote package]
+    [2016/04/21 v1.0 phfnote package]
 %</package>
 %
 %<*driver>
@@ -68,7 +68,8 @@
 %
 % \GetFileInfo{phfnote.dtx}
 %
-% \DoNotIndex{\newcommand,\newenvironment}
+% \iffalse Bypass indexing for following commands: \fi
+% \DoNotIndex{\newcommand,\newenvironment,\renewcommand,\def,\edef,\gdef,\xdef,\if,\else,\fi,\par,\relax,\vspace,\vskip,\hspace,\hskip,\vbox,\hbox}
 % 
 % \title{The \textsf{phfnote} package\thanks{\itshape
 % This document corresponds to
@@ -157,12 +158,10 @@
 % Here comes the gory code.
 %
 % Let's start by loading the |kvoptions| package, which we need to
-% parse the package options, and the |etoolbox|, because it's always
-% handy.
+% parse the package options.
 %
 %    \begin{macrocode}
 \RequirePackage{kvoptions}
-\RequirePackage{etoolbox}
 %    \end{macrocode}
 %
 % \subsection{Internal Generic Code}
@@ -237,7 +236,7 @@
 %   paragraphs.  Our style handles this by putting the title on several lines, and it can
 %   be useful depending on how you want to format the title.
 %    \begin{macrocode}
-\long\def\title#1{\gdef\@title{#1}}
+\long\def\title#1{\long\gdef\@title{#1}}
 %    \end{macrocode}
 % \end{macro}
 % 
@@ -991,12 +990,19 @@
 \def\phfnote@do@secfmt@larger{
   \notesectionsetfonts{\Large}{\large}{\normalsize}
 }
+
 \def\phfnote@do@secfmt@secsquares{
-  \def\@seccntformat##1{%
-    \ifstrequal{##1}{section}{\makebox[0pt][r]{\raisebox{0.1ex}{{\notesmaller[0.7]\ensuremath{\blacksquare}}}\hspace*{1.2ex}}}{}%
-    \csname the##1\endcsname\quad%
-  }
+  \RequirePackage{amssymb}
+  \let\@seccntformat\phfnote@secfmt@secsquares@seccntformat
 }
+\def\phfnote@secfmt@secsquares@seccntformat#1{%
+  \expandafter\ifx\csname #1\endcsname\section\relax%
+    \unexpanded{\makebox[0pt][r]{\raisebox{0.15ex}{{\notesmaller[0.6]\ensuremath{\blacksquare}}}%
+        \hspace*{1.2ex}}}%
+  \fi%
+  \csname the#1\endcsname\quad%
+}
+
 \def\phfnote@do@secfmt@sffamily{
   \renewcommand\notesectionallfontfamily{\sfdefault}
 }
@@ -1037,6 +1043,12 @@
 % See \autoref{sec:package-sets} for a description of what these
 % package sets do.
 %
+% \begin{macro}{\phfnote@do@pkgset@none}
+% \begin{macro}{\phfnote@do@pkgset@minimal}
+% \begin{macro}{\phfnote@do@pkgset@rich}
+% \begin{macro}{\phfnote@do@pkgset@extended}
+%   Macros which implement the package sets.  Each macro invokes |\RequirePackage|
+%   for the appropriate packages.
 %    \begin{macrocode}
 \def\phfnote@do@pkgset@none{
 }
@@ -1089,7 +1101,11 @@
 
 }
 %    \end{macrocode}
-% 
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
 %
 % \begin{macro}{\phfnote@do@pkgset}
 %   Finally, define the helper which will load the required package sets.
@@ -1109,6 +1125,8 @@
 % \end{pkgnote}
 % 
 % \begin{macro}{\phfnote@do@pdfhyperrefdefs}
+% \begin{macro}{\email}
+% \begin{macro}{\url}
 %   Load the |hyperref| package and provide sensible defaults.
 %    \begin{macrocode}
 \newcommand{\phfnote@do@pdfhyperrefdefs}{%
@@ -1141,16 +1159,19 @@
     urlcolor=docnotelinkcolor}%
 %    \end{macrocode}
 % 
-% Provide an |\email| command for specifying e-mails.
+% Provide an |\email| command for specifying e-mails.  Note that the |\url| command is
+% already provided by the packages |url| and |hyperref|.
 %    \begin{macrocode}
   \let\email\phfnote@email%
 %    \end{macrocode}
 % 
-% And finally set a nicer default \url/\email style:
+% And finally set a nicer default |\url|/|\email| style:
 %    \begin{macrocode}
   \urlstyle{notesf}%
 }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % 
 % \begin{macro}{\phfnotePdfLinkColor}
@@ -1177,9 +1198,14 @@
 % 
 %
 % 
-% Provide base macros to be able to build up |\email| command for
-% emails and other URL-like commands which should sanitize their
-% arguments.
+% \begin{macro}{\phfnote@sanitize@url}
+% \begin{macro}{\phfnote@format@url}
+% \begin{macro}{\phfnote@email}
+%   Provide base macros to be able to build up |\email| command for emails and other
+%   URL-like commands which should sanitize their arguments.
+%
+%   Also prepare the command |\phfnote@email| which will be renamed |\email| in our
+%   |hyperref| package setup (see above).
 % 
 %    \begin{macrocode}
 \def\phfnote@sanitize@url{%
@@ -1197,21 +1223,21 @@
 \def\phfnote@email{\begingroup\phfnote@sanitize@url\phfnote@impl@email@}%
 \def\phfnote@impl@email@#1{\endgroup\href{mailto:#1}{\phfnote@format@url{#1}}}%
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+%
 % 
-%
-%
-%
 % \begin{macro}{\phfnote@requirecolorpackage}
-%   And finally define an internal utility to make sure that a color package is loaded
+%   And finally define an internal utility to make sure that a color package (either
+%   |color| or |xcolor|) is loaded.  If none are loaded, the |xcolor| package is loaded.
 %    \begin{macrocode}
 \def\phfnote@requirecolorpackage{%
-  % require the 'color' or 'xcolor' package
   \@ifpackageloaded{color}{%
-    % all fine
-  }{% else
+  }{%
     \@ifpackageloaded{xcolor}{%
-      % all fine again
-    }{% else - no color package loaded
+    }{%
       \RequirePackage{xcolor}%
     }%
   }%
@@ -1260,10 +1286,8 @@
 % 
 %
 % \begin{macro}{\phfnote@bibliography}
-% \begin{macro}{\phfnote@bibliographystyle}
-%   These are tentative implementations for |\bibliography| and
-%   |\bibliographystyle|.  The latter will be set to these according
-%   to the user's package options.
+%   These are a tentative implementation for |\bibliography|.  The latter will be set to
+%   this implementation according to the user's package options.
 %    \begin{macrocode}
 \let\phfnote@old@bibliography\bibliography
 \let\phfnote@old@bibliographystyle\bibliographystyle
@@ -1271,27 +1295,48 @@
   \begingroup%
     \phfnote@bibfont%
     \phfnote@old@bibliographystyle{\phfnote@bibstyle}%
-    %
+%    \end{macrocode}
+% 
+% Our hack: make sure that the next instance of |\section*| will generate a TOC
+% entry. (See |\phfnoteHackSectionStarWithTOC|.)
+%    \begin{macrocode}
     \phfnoteHackSectionStarWithTOC%
-    % 
-    % Some fixes for some special chars which may appear in ill-advised
-    % bibliography managers -- such as the '&' symbol
-    % 
+%    \end{macrocode}
+% 
+% Some special chars may appear in output of some ill-advised bibliography
+% managers. Mostly the |&| symbol, such as in |Taylor & Francis|.  We won't be needing a
+% \LaTeX{} alignment operator here, so just make |&| a normal printable character
+% (``other'' catcode).
+%    \begin{macrocode}
     \catcode`\&=12\relax% normal char
-    %
-    % Defs for appearance
-    %
+%    \end{macrocode}
+%
+% Adjust the appearance of e-prints. We assume e-prints refer to the arXiv; here we
+% generate a hyperlink and format them better.
+%
+%    \begin{macrocode}
     \providecommand\eprint[2][]{\href{http://arxiv.org/abs/##2}{arXiv:##2}}
-    %
+%    \end{macrocode}
+% 
+% Relay the call to the ``old'' |\bibliography| command to actually implement the
+% bibliography.
+%    \begin{macrocode}
     \phfnote@old@bibliography{#1}%
-    %
   \endgroup%
 }
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\phfnote@bibliographystyle}
+%   Tentative implementation of |\bibliographystyle|.  Just register the new style in an
+%   internal variable, so that the style is actually loaded in |\phfnote@bibliography|.
+%
+%   This will be renamed to replace |\bibliographystyle| later, according to package
+%   options.
+%    \begin{macrocode}
 \newcommand{\phfnote@bibliographystyle}[1]{%
   \renewcommand{\phfnote@bibstyle}{#1}%
 }
 %    \end{macrocode}
-% \end{macro}
 % \end{macro}
 % 
 %
@@ -1315,9 +1360,12 @@
 %    \begin{macrocode}
 \def\phfnote@do@footnotedefs{
   \let\phfnote@orig@makefnmark\@makefnmark
-%%  \def\@makefnmark{\hbox{\@textsuperscript{\normalfont\tiny\fontseries{sb}\selectfont\@thefnmark}}}
-  \def\@makefnmark{\hbox{\@textsuperscript{\normalfont\tiny\bfseries\@thefnmark}}}
-%%  \def\@makefnmark{\hbox{\@textsuperscript{\normalfont\scriptsize\bfseries\@thefnmark}}} % too large
+%%  \def\@makefnmark{\hbox{\@textsuperscript{%
+%%      \normalfont\tiny\fontseries{sb}\selectfont\@thefnmark}}}
+  \def\@makefnmark{\hbox{\@textsuperscript{%
+        \normalfont\tiny\bfseries\@thefnmark}}}
+%%  \def\@makefnmark{\hbox{\@textsuperscript{%
+%%      \normalfont\scriptsize\bfseries\@thefnmark}}}% too large
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1355,7 +1403,15 @@
 %
 % \subsubsection{URL Styles}
 %
-% We also provide some URL styles.  These can directly set with |\urlstyle|\marg{style-name}.
+% \begin{macro}{\url@notettstyle}
+% \begin{macro}{\url@notesfstyle}
+% \begin{macro}{\url@notesfssstyle}
+% \begin{macro}{\url@noteitsfstyle}
+% \begin{macro}{\url@notermstyle}
+% \begin{macro}{\url@noteitstyle}
+% \begin{macro}{\url@notesmlstyle}
+%   We also provide some URL styles.  These can directly set with
+%   |\urlstyle|\marg{style-name}.
 %
 %    \begin{macrocode}
 \def\url@notettstyle{%
@@ -1387,23 +1443,30 @@
   \phfnote@urlstyle@common%
 }
 %    \end{macrocode}
-% 
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
+% \begin{macro}{\phfnote@urlstyle@common}
 % The following code is common to all our styles. We do an ugly hack
 % in which the tilde character (`\textasciitilde') is fixed to the
 % tilde char in the Adobe Times font (|ptm| code), so that it looks
 % nicer and its alignment is correct.
 %    \begin{macrocode}
 \def\phfnote@url@tilde{\hbox{\fontfamily{ptm}\selectfont\textasciitilde}}
+%%\def\phfnote@url@tilde{\raise-0.8ex\hbox{%
+%%    \kern-0.2ex\fontfamily{cmbr}\selectfont\textasciitilde}}
 \def\phfnote@urlstyle@common{%
-%  \def\UrlTildeSpecial{\do\~{\raise-0.8ex\hbox{\kern-0.2ex\fontfamily{cmbr}\selectfont\textasciitilde}}}
-  % \raise-0.8ex\hbox{\kern-0.2ex\textasciitilde}}}%
   \def\UrlTildeSpecial{\do\~{\phfnote@url@tilde}}%
   \let\Url@force@Tilde\UrlTildeSpecial%
 }
 %    \end{macrocode}
-%
-%
+% \end{macro}
+% 
 %
 % \subsubsection{Utility to Add TOC Entry For Starred Section }
 %
@@ -1432,7 +1495,7 @@
 % \begin{macro}{\phfnoteHackSectionStarWithTOCInCommand}
 %   Patches the given command (|#1|), which is known to invoke
 %   |\section*|, to locally first invoke
-%   |\phfnoteHackSectionStarWithTOC|.
+%   |\phfnoteHackSectionStarWithTOC| and thus generate a TOC entry.
 %
 %    \begin{macrocode}
 \def\phfnoteHackSectionStarWithTOCInCommand#1{%
