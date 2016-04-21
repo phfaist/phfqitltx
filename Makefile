@@ -1,16 +1,17 @@
 
 
 LATEX = latex
+
 PDFLATEX = pdflatex
-
 PDFLATEXOPTS = -interaction=batchmode
-
 
 MAKEINDEX = makeindex
 
 ALLDTX = phfnote.dtx phfquotetext.dtx
 ALLSTY = phfnote.sty phfquotetext.sty
 ALLPDF = phfnote.pdf phfquotetext.pdf
+
+.PHONY: help pdf sty cleanall clean cleanaux cleansty cleanpdf
 
 help:
 	@echo ""
@@ -23,7 +24,8 @@ help:
 	@echo "    - 'make pdf' to generate all package documentation;"
 	@echo "    - 'make cleanaux' to clean up TeX aux files;"
 	@echo "    - 'make cleansty' to clean up generated .sty files;"
-	@echo "    - 'make cleanpdf' to clean up generated pdf documentation."
+	@echo "    - 'make cleanpdf' to clean up generated pdf documentation;"
+	@echo "    - 'make cleanall' to clean up all generated files."
 	@echo ""
 
 pdf: $(ALLPDF)
