@@ -52,6 +52,7 @@ cleanpdf:
 %.aux: %.dtx %.sty
 	$(PDFLATEX) $(PDFLATEXOPTS) $<
 	$(PDFLATEX) $(PDFLATEXOPTS) $<
+	$(PDFLATEX) $(PDFLATEXOPTS) $<
 
 %.idx: %.dtx %.aux
 

@@ -85,6 +85,7 @@
 %   medium-length reports, full of goodies to make it look just right.
 % \end{abstract}
 %
+% \phantomsection\label{sec:toc}
 % \inlinetoc
 %
 % \section{Introduction}
@@ -380,7 +381,7 @@
 %    \begin{macrocode}
     \footnotemark%
     \protected@xdef\@thanks{\@thanks\protect\footnotetext[\the\c@footnote]{#2}}%
-%  \end{macrocode}
+%    \end{macrocode}
 % 
 % Otherwise, execute \LaTeX's original |\thanks| code, but with the optional argument
 % inserted wherever needed:
@@ -496,15 +497,19 @@
 % 
 % \subsubsection{Plugging into \texttt{\textbackslash maketitle}}
 %
-% Actually perform the definitions to make |\maketitle| produce the title with the
-% given style.
+% Actually perform the definitions to make |\maketitle| produce the
+% title with the given style.  Specifically, we override
+% |\@maketitle|. The latter is called internally by |\maketitle|, and
+% the advantage of overriding |\@maketitle| only is that we inherit
+% the mechanism provided by the style class to deal with two-column
+% layouts.
 %
 % \begin{macro}{\phfnote@do@notetitle}
-%   This macro takes care of installing the correct title into the document, by overriding
-%   |\@maketitle|.
+%   This macro takes care of installing the correct title into the
+%   document, by overriding |\@maketitle|.
 %
-%   This macro is called later after processing the package options.  Its argument |#1| is
-%   the style name, e.g., |default|.
+%   This macro is called later after processing the package options.
+%   Its argument |#1| is the style name, e.g., |default|.
 %
 %    \begin{macrocode}
 \def\phfnote@do@notetitle#1{
@@ -874,14 +879,17 @@
 % \subsection{Customized, ``Inline,'' Table of Contents}
 %
 % \begin{macro}{\inlinetoc}
-%   Just a customized table of contents.  Horizontal rules before and after, and spacing is adjusted.
+%   Just a customized table of contents.  Horizontal rules before and
+%   after, and spacing is adjusted, and no ``Contents'' title.  Check
+%   out the \hyperref[sec:toc]{top of this document}.
 %    \begin{macrocode}
 \newcommand{\inlinetoc}{%
   {%
     \vspace*{2mm}%
     \hrule%
-    \vspace*{-2mm}%
+    \vspace*{2mm}%
     \parskip=2pt\relax%
+    \def\section*##1{}% no sectioning.
     \tableofcontents{}%
     \vspace*{4mm}%
     \hrule%
@@ -908,19 +916,26 @@
 %
 %   |\notesectionallfont| internally invokes
 %   |\notesectionallfontfamily| to select which font family to use.
-%   The family should be given as the font code, e.g.: |pbk| = bookman
-%   ; |bch| = charter ; |ppl| = palatino ; |ptm| = Adobe Times ; |phv|
-%   = Adobe Helvetica ; |pcr| = Adobe Courier ; |put| = Utopia ; |cmr|
-%   = Computer Modern Roman ; |cmss| = CM Sans Serif ; |cmbr| = CM
-%   Bright ; google many more or look directly into the source of
-%   corresponding \LaTeX{} packages.
+%   The family should be given as the font code, e.g.: |pbk| =
+%   {\fontfamily{pbk}\selectfont Bookman}; |bch| =
+%   {\fontfamily{bch}\selectfont Charter}; |ppl| =
+%   {\fontfamily{ppl}\selectfont palatino}; |ptm| =
+%   {\fontfamily{ptm}\selectfont Adobe Times}; |phv| =
+%   {\fontfamily{phv}\selectfont Adobe Helvetica}; |pcr| =
+%   {\fontfamily{pcr}\selectfont Adobe Courier}; |put| =
+%   {\fontfamily{put}\selectfont Utopia}; |cmr| =
+%   {\fontfamily{cmr}\selectfont Computer Modern Roman}; |cmss| =
+%   {\fontfamily{cmss}\selectfont CM Sans Serif}; |cmbr| =
+%   {\fontfamily{cmbr}\selectfont CM Bright}; google many more or look
+%   directly into the source of corresponding \LaTeX{} packages.
 %
 %   You may customize these either via attributes or by redefining
 %   them directly.  Beware that if you redefine |\notesectionallfont|
 %   then you are responsible for honoring, or ignoring, the value of
 %   |\notesectionallfontfamily|.
 %    \begin{macrocode}
-\newcommand{\notesectionallfont}{\fontfamily{\notesectionallfontfamily}\fontseries{bx}\selectfont}
+\newcommand{\notesectionallfont}{%
+  \fontfamily{\notesectionallfontfamily}\fontseries{bx}\selectfont}
 \newcommand{\notesectionallfontfamily}{ppl}
 %    \end{macrocode}
 % \end{macro}
@@ -996,7 +1011,8 @@
 }
 \def\phfnote@secfmt@secsquares@seccntformat#1{%
   \expandafter\ifx\csname #1\endcsname\section\relax%
-    \unexpanded{\makebox[0pt][r]{\raisebox{0.15ex}{{\notesmaller[0.6]\ensuremath{\blacksquare}}}%
+    \unexpanded{\makebox[0pt][r]{\raisebox{0.15ex}{{%
+            \notesmaller[0.6]\ensuremath{\blacksquare}}}%
         \hspace*{1.2ex}}}%
   \fi%
   \csname the#1\endcsname\quad%
@@ -1013,8 +1029,7 @@
   \let\phfnote@old@paragraph\paragraph
   \def\paragraph##1{%
     \phfnote@old@paragraph{##1}%
-    \hspace*{0pt}\par%
-    %\begingroup\hspace*{0pt}\parskip=1em plus 0.8em minus 0.2em\relax\par\endgroup% ugly hack!
+    \hspace*{0pt}\par% ugly hack!!
   }
 }
 %    \end{macrocode}
