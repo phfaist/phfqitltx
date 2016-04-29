@@ -37,10 +37,10 @@ help:
 	@echo "Run:"
 	@echo "    - 'make sty' to generate the style files;"
 	@echo "    - 'make pdf' to generate all package documentation;"
-	@echo "    - 'make cleanaux' to clean up TeX aux files;"
-	@echo "    - 'make cleansty' to clean up generated .sty files;"
-	@echo "    - 'make cleanpdf' to clean up generated pdf documentation;"
-	@echo "    - 'make cleanall' to clean up all generated files, including tds.zip;"
+	@echo "    - 'make cleanaux' to remove TeX aux files;"
+	@echo "    - 'make cleansty' to remove generated .sty files;"
+	@echo "    - 'make cleanpdf' to remove generated pdf documentation;"
+	@echo "    - 'make cleanall' to remove all generated files, including tds.zip and distribution zip;"
 	@echo "    - 'make install' to install to local TEXMF directory;"
 	@echo "    - 'make install PREFIX=/path/to/texlive/texmf' to install to custom texmf directory;"
 	@echo "    - 'make tdszip' to create TDS.ZIP file for automated installation in TEXMF tree;"
@@ -63,7 +63,7 @@ sty_from_ins: $(ALLDTX)
 # make cleanall
 # ------------------------------------------------
 
-cleanall:  cleanaux cleansty cleanpdf cleantdszip
+cleanall:  cleanaux cleansty cleanpdf cleandist cleantdszip
 
 
 # ------------------------------------------------
