@@ -1,5 +1,20 @@
+
+# generated documentation and aux tex files
 *.pdf
+*.log
+*.aux
+*.idx
+*.ind
+*.glo
+*.gls
+*.ilg
+*.toc
+*.out
+
+# auto-generated sty files
 phfquotetext.sty
 phfnote.sty
-skeleton.dtx
-skeleton.ins
+
+# distribution files
+phfqitltx.tds.zip
+phfqitltx.zip
