@@ -34,8 +34,8 @@
 \phfnoteSaveDefs{verbatimstuff}{verbatim,@verbatim,endverbatim}
 
 \usepackage{tcolorbox}% includes {verbatim} package, so hack around that...
-\newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
-\newtcolorbox{pkgwarning}{colback=red!5!white,colframe=red!5!white,coltitle=red!50!black,fonttitle=\bfseries,title={WARNING}}
+\newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,toptitle=1.5ex,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
+\newtcolorbox{pkgwarning}{colback=red!5!white,colframe=red!5!white,toptitle=1.5ex,coltitle=red!50!black,fonttitle=\bfseries,title={WARNING}}
 
 \makeatletter
 \newsavebox\phfnoteDocVirtualPage@contents
@@ -64,7 +64,7 @@
   \end{lrbox}%
   %%\centering%
   \begin{tcolorbox}[text width=6cm,sharp corners,%
-    before={\par\centering\nopagebreak\parindent=0pt},after={\par},%
+    before={\par\vspace{5pt}\centering\nopagebreak\parindent=0pt},after={\par\vspace{5pt}},%
     leftrule=0.4pt,toprule=0.4pt,rightrule=0.6pt,bottomrule=0.6pt,%
     colframe=black,colback=white]%
     \scalebox{0.5}{\usebox{\phfnoteDocVirtualPage@contents}}%
@@ -73,6 +73,8 @@
   \endgroup%
 }
 \makeatother
+
+\def\RevTeX{\textsc{Rev}\TeX}
 
 \EnableCrossrefs
 \CodelineIndex
@@ -150,6 +152,10 @@
 % |twocolumn| option of for example the |article| class.  Settings such as the
 % page margins and font goodies are automatically adapted to look best according
 % to the standard document font size (10pt, 11pt, or 12pt).
+%
+% Be aware that this package is not meant as a full-fledged formatting class for
+% complicated articles.  For that, you should use a specialized class such as
+% \RevTeX.\footnote{See \url{https://journals.aps.org/revtex}}
 %
 % In the following, we detail individual features of this class, and explain how
 % to activate, deactivate, and customize them.
@@ -270,29 +276,113 @@
 % directly by including an external package.  In those cases, you may have a
 % look at the preset's definition for inspiration (see \autoref{impl:presets}).
 %
+% For a summary of package options, see ...... .
+%
+%
 % \subsection{Title Formatting}
+% \label{sec:title-styles}
 %
-% The |phfnote| package allows a set of alternative title styles.  The default
-% title style looks like this:
-% \begin{phfnoteDocVirtualPage}
-% \notetitle@style@default\null
-% \shortlipsum
-% \morepagecontents
-% \end{phfnoteDocVirtualPage}
-% As you can see, it saves more space on the page compared to the default
-% article title.
-% 
-% \subsubsection{Title notes---\texttt{\textbackslash thanks}}
-%
+% \subsubsection{Title Styles}
 % \label{sec:main-default-title-style}
 %
-% |\thanks{text}|
+% The |phfnote| package allows a set of alternative title styles.  By default,
+% the |default| title style is used.  You may change this setting with the
+% |title=...| package option.
 %
-% |\thanks[N]{text}| -- |N| is a number
+% \begin{pkgoptions}
+% \item[title=default] The default title style displays the title in large bold
+%   sans serif font, left-aligned.  Below the title appears the information
+%   about author and date, indented, followed by a horizontal rule.  It looks
+%   like this:
+%   \begin{phfnoteDocVirtualPage}
+%     \notetitle@style@default\null \shortlipsum \morepagecontents
+%   \end{phfnoteDocVirtualPage}
+%   As you can see, it saves more space on the page compared to the default
+%   article title.
 %
-% |\thanksmark[N]| -- same.
+% \item[title=small] A smaller title style which displays all the relevant
+%   information on a single line.  This is useful for when even the default
+%   title style appears too large.  It looks like this:
+%   \begin{phfnoteDocVirtualPage}
+%     \notetitle@style@small\null \shortlipsum \morepagecontents
+%   \end{phfnoteDocVirtualPage}
 %
-% \subsection{Abstract}
+% \item[title=article] Mimics the default title style from the |article| class,
+%   but saves more space.  It looks like this:
+%   \begin{phfnoteDocVirtualPage}
+%     \vspace*{3em}\notetitle@style@article\null \shortlipsum \morepagecontents
+%   \end{phfnoteDocVirtualPage}
+%
+% \item[title=] An empty argument to |title| instructs |phfnote| not to override
+%   any title definition, thus preserving the default class title style.
+%
+%   Beware that some other title goodies, such as our more advanced |\thanks|
+%   notes, or spacing adjustments for the abstract, will probably not work.
+% \end{pkgoptions}
+%
+% \subsubsection{Title notes: \phfverb\thanks{} and \phfverb\thanksmark}
+%
+% \DescribeMacro{\thanks}
+% Notes in the title can be introduced with the |\thanks| macro.  You may use
+% this to specify an e-mail address, an affiliation, or any other more specific
+% information.  |\thanks| may appear in all three title, authors and date.
+%
+% The appearance of this additional information depends on the title style.  In
+% the default note title style, such thanks-notes appear directly below the
+% title.  For example, with
+% {\ttfamily|\|author\{Ph.\@ Faist|\|thanks\{|\|itshape Institute for Theoretical Physics, ETH Zurich\}\}}, you get:
+% \begin{phfnoteDocVirtualPage}
+%   \author{Ph. Faist\thanks{\itshape Institute for Theoretical Physics, ETH Zurich}}\relax
+%   \notetitle@style@default\null \morepagecontents
+% \end{phfnoteDocVirtualPage}
+% whereas with the other styles, this information is typeset as regular footnotes.
+%
+% \leavevmode\marginpar{\raggedleft \phfverb\thanks\phfverb{[N]}}\relax
+% You may specify an optional argument to |\thanks|, forcing the footnote to a
+% specific number (it must be a number).  For example, with
+% {\ttfamily|\|author\{Ph.\@ Faist|\|thanks[9]\{|\|itshape Institute for
+% Theoretical Physics, ETH Zurich\}\}}, you get:
+% \begin{phfnoteDocVirtualPage}
+%   \author{Ph. Faist\thanks[9]{\itshape Institute for Theoretical Physics, ETH Zurich}}\relax
+%   \notetitle@style@default\null \morepagecontents
+% \end{phfnoteDocVirtualPage}
+%
+% \DescribeMacro{\thanksmark} |\thanksmark[N]| works with |\thanks| as
+% |\footnotemark| works with |\footnote|.  It just displays the given number as
+% a footnote mark.  In this way, you can have for example several shared
+% affiliations:
+% \begin{phfnoteDocVirtualPage}
+%   \title{Notes about Stuff}
+%   \date{25.12.2015}
+%   \author{First Author\thanks[1]{\itshape Institute ABC}, Second Author\thanks[2]{\itshape Somewhere else},
+%      and Third Author\thanksmark[1]}\relax
+%   \notetitle@style@default\null \morepagecontents
+% \end{phfnoteDocVirtualPage}
+% the author code was:
+% \begin{verbatim}
+% \author{First Author\thanks[1]{\itshape Institute ABC},
+%     Second Author\thanks[2]{\itshape Somewhere else},
+%     and Third Author\thanksmark[1]}
+% \end{verbatim}
+%
+% Unfortunately, you still have to provide the numbering manually.  On the other
+% hand, this package is not meant to replace \RevTeX, so if you're writing a
+% complicated article with many authors and affiliations, you probably shouldn't
+% be using |phfnote| in the first place.
+%
+% \begin{pkgwarning}
+%   The optional argument to |\thanks|, as well as the command |\thanksmark|,
+%   are not made available if you don't use one of |\phfnote|'s title styles.
+%
+%   This behavior is such as to prevent interference with more advanced class
+%   mechanisms, such as \RevTeX's.
+% \end{pkgwarning}
+%
+%
+% \subsection{Abstract and Table of Contents}
+%
+% \DescribeEnv{abstract}
+% 
 %
 % \subsection{Predefined Package Sets}
 % \label{sec:package-sets}
@@ -322,7 +412,9 @@
 % \subsection{URL Styles}
 %
 %
-% \StopEventually{\PrintChanges\PrintIndex}
+% \section{Summary of Package Options}
+%
+% \StopEventually{\vskip 2cm plus 2cm minus 2cm\relax\PrintChanges\vskip 2cm plus 2cm minus 2cm\relax\PrintIndex}
 %
 % \section{Implementation}
 %
@@ -379,6 +471,8 @@
 % 
 % \subsection{Title Styling}
 %
+% See \autoref{sec:title-styles} for a description of the styles and which
+% features are available.
 %
 % \subsubsection{First, some common simple definitions for our different styles}
 %
@@ -427,23 +521,24 @@
 %    \begin{macrocode}
 \def\phfnote@title@checksetspace#1{%
   \ifdefined\singlespace\else%
-    \PackageError{phfnote}{Note title style `#1' requires the `setspace' package to be
-      loaded!  Please load it, or use a pkgset which loads it automatically}%
+    \PackageError{phfnote}{Note title style `#1' requires the
+      `setspace' package to be loaded!  Please load it, or use a
+      pkgset which loads it automatically}%
   \fi%
 }
 %    \end{macrocode}
 % \end{macro}
 %
-% \subsubsection{Implementation of \texttt{\textbackslash thanks}}
+% \subsubsection{Implementation of \phfverb\thanks{} and \phfverb\thanksmark}
 %
 % Here we provide a few fixes for the implementation of |\thanks|, both for our main
 % `default' title style as well as for other simpler styles.  Our implementation supports
 % |\thanks[N]{...}| and |\thanksmark[N]| as for footnotes.
 %
 % These newer implementations are only applied if one of our title styles is set.
-% Otherwise, the class defaults are left (which may be needed, e.g., for |RevTeX|).
+% Otherwise, the class defaults are left (which may be needed, e.g., for \RevTeX).
 %
-% \paragraph{Implementation of \texttt{\textbackslash thanks} and friends, for our main
+% \paragraph{Implementation of \phfverb{\thanks} and friends for our main
 % `default' title style}
 %
 % \begin{macro}{\phfnote@setupthanksmpfootnote}
@@ -582,6 +677,8 @@
 %
 % \subsubsection{Title Styles Definition}
 %
+% See \autoref{sec:title-styles}........
+%
 % \paragraph{Title style: `default'}
 %
 % Implementation our main `default' title style.  See \autoref{sec:main-default-title-style}.
@@ -680,7 +777,7 @@
 %    \end{macrocode}
 % \end{macro}
 % 
-% \subsubsection{Plugging into \texttt{\textbackslash maketitle}}
+% \subsubsection{Plugging into \phfverb{\maketitle}}
 %
 % Actually perform the definitions to make |\maketitle| produce the
 % title with the given style.  Specifically, we override
@@ -716,7 +813,7 @@
     \fi
 %    \end{macrocode}
 % Apply new (default) definitions of |\thanks|, |\thanksmark| and |\title|.  Do this here
-% only, because this can clash with more complicated versions from, e.g., |RevTeX|.
+% only, because this can clash with more complicated versions from, e.g., \RevTeX.
 %    \begin{macrocode}
     \let\title\notetitle@title
     \let\thanks\notetitle@thanks
@@ -1583,7 +1680,7 @@
 %
 % \subsection{Other Stand-Alone Definitions and Helpers}
 %
-% \subsubsection{A \texttt{\textbackslash smaller} command}
+% \subsubsection{A \phfverb{\smaller} command}
 %
 %
 % \begin{macro}{\notesmaller}
@@ -1742,6 +1839,23 @@
 }
 %    \end{macrocode}
 %
+% \subsubsection{A utility for verbatim stuff in arguments of other macros}
+%
+% FIXME: DOCUMENT ME!
+%
+% A utility for using verbatim stuff in arguments of other macros---exploit
+% |\detokenize|
+%
+%    \begin{macrocode}
+\def\phfverb#1{%
+  \ifx\protect\relax%
+    \phfverbfmt{\detokenize{#1}\unskip}%
+  \else%
+    \noexpand\phfverb{\unexpanded{#1}}%
+  \fi%
+}
+\def\phfverbfmt#1{\texttt{#1}}
+%    \end{macrocode}
 %
 % \subsection{Handle Package Options}
 %
@@ -2003,7 +2117,13 @@
   % 
   \newlist{pkgoptions}{description}{1}
   \setlist[pkgoptions]{font=\phfnotePkgOptionsLabelFmt,style=nextline}
-  \def\phfnotePkgOptionsLabelFmt##1{\fbox{\ttfamily ##1}\vspace*{5pt}}
+  \def\phfnotePkgOptionsLabelFmt##1{\fbox{\ttfamily ##1}\vspace*{5pt}\phfnote@pkgdoc@index{##1}}
+  \def\phfnote@pkgdoc@index##1{%
+    \begingroup\lccode`\= = `\-%  hack around \index format for pkgdoc... \index{sortkey=display-key} or sth like that
+      \def\x{\lowercase{\edef\@tmpa{##1}}\edef\@tmpb{{\@tmpa=\string\verb!*+\@tmpa+}}\expandafter\index\@tmpb}%
+      \x%
+    \endgroup%
+  }
 }
 \def\phfnote@preset@reset{
   \def\phfnote@opt@pkgset{none}
