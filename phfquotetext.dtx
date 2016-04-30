@@ -30,6 +30,7 @@
 \usepackage{xcolor}
 \usepackage{phfquotetext}
 \usepackage[preset=pkgdoc]{phfnote}
+\phfnoteSaveDefs{verbatimstuff}{verbatim,@verbatim,endverbatim}
 \usepackage[normalem]{ulem}
 \usepackage{verbdef}
 \usepackage{tcolorbox}
@@ -38,8 +39,7 @@
 \EnableCrossrefs         
 \CodelineIndex
 \RecordChanges
-\phfnoteHackSectionStarWithTOCInCommand\PrintChanges
-\phfnoteHackSectionStarWithTOCInCommand\PrintIndex
+\phfnoteRestoreDefs{verbatimstuff}
 \begin{document}
   \DocInput{phfquotetext.dtx}
 \end{document}

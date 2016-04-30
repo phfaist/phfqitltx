@@ -28,16 +28,56 @@
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{xcolor}
+\usepackage{lipsum}
 \usepackage[preset=pkgdoc]{phfnote}
-\usepackage{verbdef}
-\usepackage{tcolorbox}
+
+\phfnoteSaveDefs{verbatimstuff}{verbatim,@verbatim,endverbatim}
+
+\usepackage{tcolorbox}% includes {verbatim} package, so hack around that...
 \newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
 \newtcolorbox{pkgwarning}{colback=red!5!white,colframe=red!5!white,coltitle=red!50!black,fonttitle=\bfseries,title={WARNING}}
-\EnableCrossrefs         
+
+\makeatletter
+\newsavebox\phfnoteDocVirtualPage@contents
+\newenvironment{phfnoteDocVirtualPage}{%
+  \par%
+  \begingroup%
+  \makeatletter%
+  \begin{lrbox}{\phfnoteDocVirtualPage@contents}%
+  \begin{minipage}{12cm}\vspace*{0.5cm}\relax%
+    \def\rmdefault{cmr}\def\sfdefault{cmbr}\normalfont%
+    \def\shortlipsum{Lorem ipsum dolor sit amet, consectetuer
+      adipiscing elit. Ut purus elit, vestibulum ut, placerat ac,
+      adipiscing vitae, felis. Curabitur dictum gravida
+      mauris. Nam arcu libero, nonummy eget, consectetuer id,
+      vulputate a, magna.}%
+    \def\@title{Notes on Lambda-Majorization}%
+    \def\@author{Ph. Faist}%
+    \def\@date{23.12.2011}%
+    \def\notetitletopspace{0pt}%
+    \def\notetitlefont{\sffamily\bfseries}%
+    \def\morepagecontents{\par\vspace{1em}\centering\ldots}%
+    \ignorespaces%
+  }%
+  {%
+  \end{minipage}%
+  \end{lrbox}%
+  %%\centering%
+  \begin{tcolorbox}[text width=6cm,sharp corners,%
+    before={\par\centering\nopagebreak\parindent=0pt},after={\par},%
+    leftrule=0.4pt,toprule=0.4pt,rightrule=0.6pt,bottomrule=0.6pt,%
+    colframe=black,colback=white]%
+    \scalebox{0.5}{\usebox{\phfnoteDocVirtualPage@contents}}%
+  \end{tcolorbox}%
+  %%\par%
+  \endgroup%
+}
+\makeatother
+
+\EnableCrossrefs
 \CodelineIndex
 \RecordChanges
-\phfnoteHackSectionStarWithTOCInCommand\PrintChanges
-\phfnoteHackSectionStarWithTOCInCommand\PrintIndex
+\phfnoteRestoreDefs{verbatimstuff}
 \begin{document}
   \DocInput{phfnote.dtx}
 \end{document}
@@ -68,7 +108,7 @@
 % \GetFileInfo{phfnote.dtx}
 %
 % \iffalse Bypass indexing for following commands: \fi
-% \DoNotIndex{\newcommand,\newenvironment,\renewcommand,\def,\edef,\gdef,\xdef,\if,\else,\fi,\par,\relax,\vspace,\vskip,\hspace,\hskip,\vbox,\hbox}
+% \DoNotIndex{\newcommand,\newenvironment,\renewcommand,\long,\def,\edef,\gdef,\xdef,\if,\else,\fi,\par,\relax,\vspace,\vskip,\hspace,\hskip,\vbox,\hbox}
 % 
 % \title{The \textsf{phfnote} package\thanks{\itshape
 % This document corresponds to
@@ -90,27 +130,158 @@
 %
 % \section{Introduction}
 %
-% Introduction to |phfnote|.
+% Have you ever thought, ``let me write up these short notes using \LaTeX,'' but
+% then disliked the default style of the |article| class?  Have you ever asked
+% yourself why half the page should be taken up by the title?  Yes?  Then
+% welcome to |phfnote|.
 %
-% support for:
-% \begin{itemize}
-% \item mostly designed for use with |article| class, but not
-%   necessary.  Your mileage may vary.
-% \item |twocolumn|
-% \item |10pt|, |11pt|, |12pt|
-% \end{itemize}
+% The package |phfnote| provides basic formatting for short documents, such as
+% notes on a specific topic, short documentation, or quick memos.  It aims to
+% cover all basic needs for such purposes: include a standard set of relevant
+% packages, a nice title which doesn't take up too much space, better page
+% margin sizes, and some basic styling to make the note look nicer.  At the same
+% time, it is highly configurable so that nothing is really unchangeable.  And
+% all overridden features can be restored individually to their class-provided
+% defaults.
+%
+% This package has been designed to work optimally along with the |article|
+% document class, but in principle any relatively standard \LaTeX{} class should
+% work.  Notes can be typeset in \index{two-column} two-column mode with the
+% |twocolumn| option of for example the |article| class.  Settings such as the
+% page margins and font goodies are automatically adapted to look best according
+% to the standard document font size (10pt, 11pt, or 12pt).
+%
+% In the following, we detail individual features of this class, and explain how
+% to activate, deactivate, and customize them.
 %
 %
 % \section{Basic Usage}
 %
-% How to use |phfnote|.
+% \subsection{Loading the Package}
+%
+% You can get started with the minimal template:
+%
+% \begin{verbatim}
+% \documentclass[11pt,a4paper]{article}
+% \usepackage{phfnote}
+%
+% \begin{document}
+% \title{Title of my notes}
+% \author{Me}
+% \date{\today}
+% \maketitle
+%
+% ...
+%
+% \end{document}
+% \end{verbatim}
+%
+% The package |phfnote| introduces its default note formatting style, with a
+% more compact title, and some formatting adjustments in the text and section
+% headings.
+%
+% \subsection{Presets}
+% \label{sec:presets}
+%
+% There are a number of package options which can be provided to activate,
+% deactivate or adjust the formatting.  The most straightforward way of changing
+% the formatting is to use \emph{presets}.
+%
+% Presets are processed immediately when given in the package option list,
+% meaning that their position in the list is meaningful.  For example, the
+% option list
+% \begin{verbatim}
+%   \usepackage[title=small,preset=article,par=skip]{phfnote}
+% \end{verbatim}
+% will set |title=small| only if it is not overridden by the |article| preset,
+% but will enforce |par=skip| in any case.  You may in theory load several
+% presets, e.g. |preset=sfnote,preset=article|, but this is essentially useless
+% since presets tend to set a wide range of settings such that in any case the
+% last preset specified is effectively applied.
+%
+% First, there is a set of presets which are different alternative ``note''
+% styles.  All the following define the note to have spacing between paragraphs
+% and no first line indentation, use the default note title style, and use a
+% wider page geometry.
+%
+% \begin{pkgoptions}
+% \item[preset=sfnote] {\fontfamily{cmbr}\selectfont Format the note in \LaTeX'
+%   sans-serif ``Computer Modern Bright'' font.  This is a nice, light, font for
+%   short notes, but I find it more difficult to read at smaller font sizes or
+%   in longer paragraphs.}
+% \item[preset=sfssnote] {\fontfamily{cmss}\selectfont Format the note in
+%   \LaTeX' default sans-serif font.  A very nice sans serif font.  It might
+%   look heavy though, depending on your taste.}
+% \item[preset=utopianote] {\fontfamily{futs}\selectfont Format the note in
+%   Utopia font (by using the |fourier| package).  Perfectly to my taste for
+%   documenting code for example, but a bit heavy for scientific documents I
+%   find.}
+% \item[preset=mnmynote] Format the note in Minion Pro font, with sans serif
+%   text formatted with |MyriadPro| (professional fonts by Adobe which can be
+%   used in \LaTeX{} with the |MinionPro| and |MyriadPro| packages\footnote{See
+%   \url{https://github.com/sebschub/FontPro}; the fonts themselves ship with
+%   some Adobe Products}).  These beautiful fonts can be used for any purpose.
+% \end{pkgoptions}
+% 
+% Based on |utopianote|, the preset |pkgdoc| combines additional definitions to
+% aid in documenting \LaTeX{} packages.
+% \begin{pkgoptions}
+% \item[preset=pkgdoc] Basic formatting and settings for documenting \LaTeX{}
+%   packages. This preset was used for the current document.
+% \end{pkgoptions}
+%
+% The following preset makes the document look more like an article.  There are
+% some slight minor differences with respect to the default |article| class'
+% title in the choice of formatting the title and text.
+%
+% \begin{pkgoptions}
+% \item[preset=article] Sets a more title style closer to |article|'s default
+%   title style (but slightly more compact) and sets paragraphs to indent with
+%   no skip.
+% \end{pkgoptions}
+%
+% The last preset, |reset|, guarantees that including this package is
+% non-invasive, meaning that only new \LaTeX{} macros are made available without
+% altering any appearance.  This is useful if you want to use a small feature
+% provided by this package, but you already have all the page geometry, title,
+% etc.\@ set up and want to make sure those aren't touched.
+%
+% \begin{pkgoptions}
+% \item[preset=reset] Deactivates all features of this package by default.
+%   Individual settings can still later be switched on via specific package
+%   options.  Use this to activate only a specific set of features:
+%   |[preset=reset,...]| will ensure that only the additional given features are
+%   set.
+%
+%   This is safer than deactivating individually all other features, because in
+%   the future we may add new features which may be on by default.  In this
+%   case, the preset |reset| will guarantee all features to be deactivated.
+% \end{pkgoptions}
 %
 % \section{Features}
 %
-% Lots of them.
+% This package provides a large collection of small features, which, put all
+% together, make the document look nicer (hopefully).  Let's go through these
+% features, one by one.
+%
+% Note also that some features provided in the presets, such changing the
+% document font, are not provided as individual features here.  This is because
+% they may be set and customized directly using few lines of \LaTeX{} code or
+% directly by including an external package.  In those cases, you may have a
+% look at the preset's definition for inspiration (see \autoref{impl:presets}).
 %
 % \subsection{Title Formatting}
 %
+% The |phfnote| package allows a set of alternative title styles.  The default
+% title style looks like this:
+% \begin{phfnoteDocVirtualPage}
+% \notetitle@style@default\null
+% \shortlipsum
+% \morepagecontents
+% \end{phfnoteDocVirtualPage}
+% As you can see, it saves more space on the page compared to the default
+% article title.
+% 
 % \subsubsection{Title notes---\texttt{\textbackslash thanks}}
 %
 % \label{sec:main-default-title-style}
@@ -148,7 +319,7 @@
 % \subsection{Presets}
 %
 %
-%
+% \subsection{URL Styles}
 %
 %
 % \StopEventually{\PrintChanges\PrintIndex}
@@ -162,6 +333,11 @@
 %
 %    \begin{macrocode}
 \RequirePackage{kvoptions}
+%    \end{macrocode}
+%
+% Also load |etoolbox|, for various utilities.
+%    \begin{macrocode}
+\RequirePackage{etoolbox}
 %    \end{macrocode}
 %
 % \subsection{Internal Generic Code}
@@ -231,12 +407,15 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\title}
+% \begin{macro}{\notetitle@title}
 %   Provide a ``long'' definition for |\title|, so that the title can have several
 %   paragraphs.  Our style handles this by putting the title on several lines, and it can
 %   be useful depending on how you want to format the title.
+%
+%   This macro will replace |\title| when a title style is actually selected in
+%   |\phfnote@do@notetitle|.
 %    \begin{macrocode}
-\long\def\title#1{\long\gdef\@title{#1}}
+\long\def\notetitle@title#1{\long\gdef\@title{#1}}
 %    \end{macrocode}
 % \end{macro}
 % 
@@ -260,6 +439,9 @@
 % Here we provide a few fixes for the implementation of |\thanks|, both for our main
 % `default' title style as well as for other simpler styles.  Our implementation supports
 % |\thanks[N]{...}| and |\thanksmark[N]| as for footnotes.
+%
+% These newer implementations are only applied if one of our title styles is set.
+% Otherwise, the class defaults are left (which may be needed, e.g., for |RevTeX|).
 %
 % \paragraph{Implementation of \texttt{\textbackslash thanks} and friends, for our main
 % `default' title style}
@@ -351,10 +533,13 @@
 % We use \LaTeX's own |\thanks| mechanism, however we patch on the possibility for using
 % |\thanks[N]{text}| and |\thanksmark[N]| for overriding the number which is used.
 %
-% \begin{macro}{\thanksmark}
+% \begin{macro}{\notetitle@thanksmark}
 %   The |\thanksmark| is trivially implemented by |\footnotemark|.  Very handy indeed.
+%
+%   Again, this macro is only made available as |\thanksmark| when a title style is set in
+%   |\phfnote@do@notetitle|.
 %    \begin{macrocode}
-\def\thanksmark{\footnotemark}
+\def\notetitle@thanksmark{\footnotemark}
 %    \end{macrocode}
 % \end{macro}
 % 
@@ -363,15 +548,15 @@
 \let\phfnote@old@thanks\thanks
 %    \end{macrocode}
 %
-% \begin{macro}{\thanks}
+% \begin{macro}{\notetitle@thanks}
 %   Now, we need to extend \LaTeX's |\thanks| to allow an optional argument as for
-%   footnotes.
+%   footnotes.  This macro will be renamed |\thanks| in |\phfnote@do@notetitle|.
 %
 %   Check whether there is an optional argument; if there is none we execute \LaTeX's
 %   original thanks code (replicated here), otherwise, we specify the optional argument
 %   explicitly at the relevant location in \LaTeX's implementation:
 %    \begin{macrocode}
-\def\thanks{\@ifnextchar[\phfnote@thanks{\phfnote@thanks[]}}%]
+\def\notetitle@thanks{\@ifnextchar[\phfnote@thanks{\phfnote@thanks[]}}%]
 \long\def\phfnote@thanks[#1]#2{%
   \if\relax\detokenize{#1}\relax%
 %    \end{macrocode}
@@ -519,7 +704,8 @@
   \if\relax\detokenize\expandafter{#1}\relax
   \else
 %    \end{macrocode}
-% Otherwise, we have a title style to set.
+% Otherwise, we have a title style to set.  Do some checks that the given style is indeed
+% defined.
 %    \begin{macrocode}
     \ifcsname notetitle@style@#1\endcsname
       \def\phfnote@tmp@titsty{#1}%
@@ -528,6 +714,13 @@
         Using default style instead}
       \def\phfnote@tmp@titsty{default}%
     \fi
+%    \end{macrocode}
+% Apply new (default) definitions of |\thanks|, |\thanksmark| and |\title|.  Do this here
+% only, because this can clash with more complicated versions from, e.g., |RevTeX|.
+%    \begin{macrocode}
+    \let\title\notetitle@title
+    \let\thanks\notetitle@thanks
+    \let\thanksmark\notetitle@thanksmark
 %    \end{macrocode}
 % Now, actually overload the title style by redefining |\@maketitle|.
 %    \begin{macrocode}
@@ -888,7 +1081,7 @@
     \vspace*{2mm}%
     \hrule%
     \vspace*{2mm}%
-    \parskip=2pt\relax%
+    \parskip=1pt\relax%
     \def\section*##1{}% no sectioning.
     \tableofcontents{}%
     \vspace*{4mm}%
@@ -990,11 +1183,13 @@
 %
 %    \begin{macrocode}
 \def\phfnote@do@secfmt@section{
+  \RequirePackage{sectsty}
   \sectionfont{\notesectionallfont\notesectionfont}
   \subsectionfont{\notesectionallfont\notesubsectionfont}
   \subsubsectionfont{\notesectionallfont\notesubsubsectionfont}
 }
 \def\phfnote@do@secfmt@paragraph{
+  \RequirePackage{sectsty}
   \paragraphfont{\notesectionallfont\noteparagraphfont}
   \subparagraphfont{\notesectionallfont\notesubparagraphfont}
 }
@@ -1029,7 +1224,7 @@
   \let\phfnote@old@paragraph\paragraph
   \def\paragraph##1{%
     \phfnote@old@paragraph{##1}%
-    \hspace*{0pt}\par% ugly hack!!
+    \hspace*{0pt}\par\nopagebreak% ugly hack!!
   }
 }
 %    \end{macrocode}
@@ -1041,7 +1236,6 @@
 %   of attributes specified by the user.
 %    \begin{macrocode}
 \def\phfnote@do@secfmt#1{%
-  \RequirePackage{sectsty}
   \phfnote@internal@execattribs{phfnote@do@secfmt@}{section formatting preset}{#1}
 }
 %    \end{macrocode}
@@ -1525,6 +1719,30 @@
 % \end{macro}
 %
 %
+% \subsubsection{Hack to save \& restore a set of commands}
+%
+%    \begin{macrocode}
+\def\phfnoteSaveDefs#1#2{%
+  \csgdef{phfnote@restoredefs@#1}{}%
+  \def\@tmpa{#2}%
+  \@for\next:=\@tmpa\do{%
+    \global\csletcs{phfnote@restoredefs@#1@\next}{\next}%
+    \expandafter\xappto\csname phfnote@restoredefs@#1\endcsname{%
+      \noexpand\csletcs{\next}{phfnote@restoredefs@#1@\next}%
+    }%
+  }%
+}
+\def\phfnoteRestoreDefs#1{%
+  \ifcsname phfnote@restoredefs@#1\endcsname%
+    \csname phfnote@restoredefs@#1\endcsname%
+  \else%
+    \PackageError{phfnote}{\string\phfnoteRestoreDefs: no such
+      definitions stored (#1)}
+  \fi%
+}
+%    \end{macrocode}
+%
+%
 % \subsection{Handle Package Options}
 %
 % \begin{pkgnote}
@@ -1680,6 +1898,9 @@
 %
 %
 % \subsubsection{Define Global Presets}
+% \label{impl:presets}
+%
+% See \autoref{sec:presets}.
 %
 %  TODO: DOCUMENT ME!
 %
@@ -1706,6 +1927,7 @@
   \def\phfnote@opt@par{skip}
   \phfnote@opt@pagegeomdefstrue
   \def\phfnote@opt@pagegeom{wide}
+  \setlength{\footnotesep}{5pt}
   \g@addto@macro\phfnote@hook@atendload{
     \ifdefined\urlstyle
       \urlstyle{#1}
@@ -1759,6 +1981,29 @@
   \def\phfnote@opt@secfmt{section,paragraph,itpar,blockpar,larger,secsquares}
   \def\phfnote@opt@pagegeom{bigmargin}
   \def\phfnote@opt@abstract{noname}
+  %
+  % Patch up \PrintChanges and \PrintIndex, if they are defined (for if we are using the
+  % {ltxdoc} package for latex package documentation)
+  %
+  \ifdefined\PrintChanges
+    \phfnoteHackSectionStarWithTOCInCommand\PrintChanges
+  \fi
+  \ifdefined\PrintIndex
+    \phfnoteHackSectionStarWithTOCInCommand\PrintIndex
+  \fi
+  %
+  % Set the index to two columns only.
+  %
+  \ifdefined\c@IndexColumns% for index in
+    \setcounter{IndexColumns}{2}
+  \fi
+  \RequirePackage{enumitem}
+  % 
+  % To document package options.
+  % 
+  \newlist{pkgoptions}{description}{1}
+  \setlist[pkgoptions]{font=\phfnotePkgOptionsLabelFmt,style=nextline}
+  \def\phfnotePkgOptionsLabelFmt##1{\fbox{\ttfamily ##1}\vspace*{5pt}}
 }
 \def\phfnote@preset@reset{
   \def\phfnote@opt@pkgset{none}
