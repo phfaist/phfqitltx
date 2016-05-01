@@ -74,7 +74,7 @@
 }
 \makeatother
 
-\def\RevTeX{\textsc{Rev}\TeX}
+\def\RevTeX{{\small R\raise-0.2ex\hbox{\textsc{ev}}}\TeX}
 
 \EnableCrossrefs
 \CodelineIndex
@@ -280,9 +280,9 @@
 %
 %
 % \subsection{Title Formatting}
-% \label{sec:title-styles}
 %
 % \subsubsection{Title Styles}
+% \label{sec:title-styles}
 % \label{sec:main-default-title-style}
 %
 % The |phfnote| package allows a set of alternative title styles.  By default,
@@ -380,12 +380,109 @@
 %
 %
 % \subsection{Abstract and Table of Contents}
+% \label{sec:abstract-attributes}
+% \label{sec:inline-toc}
 %
-% \DescribeEnv{abstract}
+% \DescribeEnv{abstract} The |abstract| environment renders a paragraph of
+% indented text aimed to provide a short summary of the document.  We might use,
+% for example, the following code:
+% \begin{verbatim}
+% \begin{abstract}
+% Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut purus
+% elit, vestibulum ut, placerat ac, adipiscing vitae, felis.
+% Curabitur dictum gravida mauris. Nam arcu libero, nonummy eget,
+% consectetuer id, vulputate a, magna.
+% \end{abstract}
+% \end{verbatim}
+%
+% which would look like this:
+% \begin{phfnoteDocVirtualPage}
+%   \title{Notes about Stuff}\relax
+%   \date{25.12.2015}\relax
+%   \author{Me}\relax
+%   \notetitle@style@default
+%   \def\noteabstract@nameline{{\parskip=0pt\relax\par\centering\noteabstractnamefont\abstractname\par}\vskip 1ex\relax}%
+%   \def\noteabstracttextwidth{0.8\textwidth}%
+%   \begin{abstract}
+% Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut purus
+% elit, vestibulum ut, placerat ac, adipiscing vitae, felis.
+% Curabitur dictum gravida mauris. Nam arcu libero, nonummy eget,
+% consectetuer id, vulputate a, magna.
+%   \end{abstract}
+%   \morepagecontents
+% \end{phfnoteDocVirtualPage}
+%
+% The |abstract| environment should be given \emph{after} the |\maketitle|
+% command.  (In contrast to, e.g., \RevTeX.)
+%
+% You may customize the appearance of the abstract via a list of attributes
+% given as argument to a package option.  When you combine arguments, make sure
+% to put them in a braced group: |[abstract={wide,noname,it}]|.
+%
+% \begin{pkgoptions}
+% \item[abstract=wide] The abstract should not be indented, and should instead
+%   be aligned to the rest of the text.
+% \item[abstract=narrow] The abstract should be indented narrower then by
+%   default.
+% \item[abstract=noname] The title ``Abstract.'' above the text will not be
+%   typeset.  The abstract text is typeset directly instead.
+% \item[abstract=original] Revert to the class' default implementation of the
+%   |abstract| environment.  The class' implementation is restored and no longer
+%   tampered with.
+% \item[abstract=small] Use a smaller font for the abstract text (|\small| font).
+% \item[abstract=compact] Reduce spacing before and after the abstract.  If the
+%   abstract is short, this might look slightly better.
+% \item[abstract=it] Typeset the abstract text using an italic typeface.
+% \end{pkgoptions}
+%
 % 
+% The abstract environment's appearance can be customized more finely
+% by redefining some macros.  (In fact, this is what the package
+% options |abstract=...| actually do.)  The font used for the text of
+% the abstract is set by \DescribeMacro{\noteabstracttextfont}
+% |\noteabstracttextfont|.  This macro should expand to font selection
+% commands, such as |\itshape|, |\bfseries|, |\small|, etc.  The title
+% of the abstract (the word ``Abstract.\@'') is typeset in the font set
+% by \DescribeMacro\noteabstractnamefont |\noteabstractnamefont|.  The
+% width of the whole abstract text is determined by
+% \DescribeMacro{\noteabstracttextwidth} |\noteabstracttextwidth|.
+% Observe that |\noteabstracttextwidth| is a macro, and not a proper
+% length, so that it can determine more dynamically the length.  The
+% spacing below \DescribeMacro{\noteabstractafterspacing}
+% (|\noteabstractafterspacing|) and above
+% \DescribeMacro{\noteabstractbeforespacing}
+% (|\noteabstractbeforespacing|) the abstract can further be
+% specified, also as macros.
+%
 %
 % \subsection{Predefined Package Sets}
 % \label{sec:package-sets}
+%
+% The |phfnote| package also provides sets of standard \LaTeX{}
+% packages to load.  You may choose between a varying degree of
+% ``richness'' of packages included.
+%
+% \begin{pkgoptions}
+% \item[pkgset=none] Do not include any package set.
+%
+% \item[pkgset=minimal] Include some basic minimal set useful for
+%   scientific notes: the \AmS{} packages |amsmath|, |amssymb|,
+%   |amsfonts|, and |amsthm|.  The |xcolor| package is also loaded.
+%
+% \item[pkgset=rich] Include a fair amount of packages which may be
+%   useful.  On top of the |minimal| package set, this set includes
+%   the packages |enumitem|, |graphicx|, |microtype|, |caption|,
+%   |setspace|, as well as |inputenc| with the |utf8| option and
+%   |fontenc| with the |T1| option.
+%
+%   This package set is loaded by default.
+%
+% \item[pkgset=extended] Additionally, include packages |float|,
+%   |verbdef|, |csquotes|, |dsfont|, |bbm| and |mathtools|.
+%
+% \end{pkgoptions}
+%
+%
 %
 % \subsection{General Formatting and Appearance}
 %
@@ -414,7 +511,25 @@
 %
 % \section{Summary of Package Options}
 %
-% \StopEventually{\vskip 2cm plus 2cm minus 2cm\relax\PrintChanges\vskip 2cm plus 2cm minus 2cm\relax\PrintIndex}
+% \begin{pkgoptions}
+% \item[preset=\meta{preset name}] Load a preset specifying a predefined set of
+%   options for the general appearance of the document.  See documentation in
+%   \autoref{sec:presets}
+% \item[title=\meta{title style}] Set the title style.  Documentation in
+%   \autoref{sec:title-styles}
+% \item[abstract=\meta{abstract attributes}] Set the abstract style by
+%   specifying a comma-separated list of attributes.  Don't forget to
+%   put the list of attributes within braces,
+%   |[abstract={wide,noname,it}]|.  Documentation in
+%   \autoref{sec:abstract-attributes}
+% \item[pkgset=\meta{package set}] Specify a standard set of \LaTeX{}
+%   packages to load.  See \autoref{sec:package-sets}.
+% \end{pkgoptions}
+%
+%
+%
+% \StopEventually{\vskip 2cm plus 2cm minus 2cm\relax\PrintChanges
+%     \vskip 2cm plus 2cm minus 2cm\relax\PrintIndex}
 %
 % \section{Implementation}
 %
@@ -849,11 +964,8 @@
 % \begin{macro}{\noteabstracttextwidth}
 % \begin{macro}{\noteabstractafterspacing}
 % \begin{macro}{\noteabstractbeforepacing}
-%   Basic parameters of the abstract---the font for the abstract text
-%   (|\noteabstracttextfont|), the font used to typeset the word ``Abstract''
-%   (|\noteabstractnamefont|), and the width of the whole abstract.  Also, the spacing
-%   below (|\noteabstractafterspacing|) and above (|\noteabstractbeforespacing|) the
-%   abstract.
+%   Macros which can be overridden to customize the abstract.  See
+%   \autoref{sec:abstract-attributes}.
 %    \begin{macrocode}
 \newcommand{\noteabstracttextfont}{}
 \newcommand{\noteabstractnamefont}{\bfseries\small}
@@ -2119,9 +2231,21 @@
   \setlist[pkgoptions]{font=\phfnotePkgOptionsLabelFmt,style=nextline}
   \def\phfnotePkgOptionsLabelFmt##1{\fbox{\ttfamily ##1}\vspace*{5pt}\phfnote@pkgdoc@index{##1}}
   \def\phfnote@pkgdoc@index##1{%
-    \begingroup\lccode`\= = `\-%  hack around \index format for pkgdoc... \index{sortkey=display-key} or sth like that
-      \def\x{\lowercase{\edef\@tmpa{##1}}\edef\@tmpb{{\@tmpa=\string\verb!*+\@tmpa+}}\expandafter\index\@tmpb}%
+    \begingroup\lccode`\= = `\,%  hack around \index format for pkgdoc... \index{sortkey=display-key} or sth like that
+      \def\x{\lowercase{\def\@tmpa{##1}}}%
       \x%
+      \let\meta\@gobble
+      \let\marg\@gobble
+      \let\oarg\@gobble
+      \let\parg\@gobble
+      \def\handleitemindex####1{%
+        \ifx\relax\detokenize{####1}\relax\else
+          \edef\@tmpb{{####1=\string\verb!*+####1+ (pkg. opt.)}}%
+          \expandafter\index\@tmpb%
+        \fi
+      }%
+      \def\@tmpc{\forcsvlist{\handleitemindex}}%
+      \expandafter\@tmpc\expandafter{\@tmpa}%
     \endgroup%
   }
 }
