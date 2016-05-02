@@ -192,12 +192,6 @@
 % |{quotetext}| environment.  This macro is called after \TeX's specials are already
 % assigned catcode |12| (other).  By default, this macro is empty.
 %
-% \StopEventually{^^A
-%   \PrintChanges
-%   \PrintIndex
-%}
-%
-%
 % \section{Known Caveats}
 %
 % \begin{itemize}
@@ -213,6 +207,14 @@
 % \item The contents of |\quotetextstart| is protected within a \TeX{} group, but NOT that
 %   of |\quotetextend|.
 % \end{itemize}
+%
+%
+%
+%
+% \StopEventually{^^A
+%   \PrintChanges
+%   \PrintIndex
+%}
 %
 % \section{Implementation}
 %

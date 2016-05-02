@@ -1,0 +1,932 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2016 by Philippe Faist <philippe.faist@bluewin.ch>
+% -------------------------------------------------------
+% 
+% This file may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in:
+%
+%    http://www.latex-project.org/lppl.txt
+%
+% and version 1.3 or later is part of all distributions of LaTeX 
+% version 2005/12/01 or later.
+%
+% \fi
+%
+% \iffalse
+%<*driver>
+\ProvidesFile{phffullpagefigure.dtx}
+%</driver>
+%<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
+%<package>\ProvidesPackage{phffullpagefigure}
+%<*package>
+    [2016/05/02 v1.0 phffullpagefigure package]
+%</package>
+%
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{xcolor}
+\usepackage{phffullpagefigure}
+\usepackage[preset=pkgdoc]{phfnote}
+\phfnoteSaveDefs{verbatimstuff}{verbatim,@verbatim,endverbatim}
+\usepackage[normalem]{ulem}
+\usepackage{verbdef}
+\usepackage{tcolorbox}
+\newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
+\newtcolorbox{pkgwarning}{colback=red!5!white,colframe=red!5!white,coltitle=red!50!black,fonttitle=\bfseries,title={WARNING}}
+\EnableCrossrefs         
+\CodelineIndex
+\RecordChanges
+\phfnoteRestoreDefs{verbatimstuff}
+\begin{document}
+  \DocInput{phffullpagefigure.dtx}
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+%
+% \changes{v1.0}{2016/04/20}{Initial version}
+%
+% \GetFileInfo{phffullpagefigure.dtx}
+%
+% \DoNotIndex{\newcommand,\newenvironment,\def,\gdef,\edef,\xdef,\if,\else,\fi,\ifx}
+% 
+% \title{The \textsf{phffullpagefigure} package\thanks{\itshape
+% This document corresponds to
+% \textsf{phffullpagefigure}~\fileversion, dated \filedate. It is part of
+% the Part of the
+% \href{https://github.com/phfaist/phfqitltx/}{\textsf{phfqitltx}}
+% package suite, see \url{https://github.com/phfaist/phfqitltx}.}}
+% \author{Philippe Faist\quad\email{philippe.faist@bluewin.ch}}
+%
+% \maketitle
+%
+% \begin{abstract}
+%   \textsf{phffullpagefigure}---Figures which fill up a full page of a document.
+% \end{abstract}
+%
+% \inlinetoc
+%
+% \section{Introduction}
+%
+% User documentation goes here.
+%
+% User documentation goes here.
+%
+% User documentation goes here.
+%
+% User documentation goes here.
+%
+%
+% \section{The Full-Page-Figure Environment}
+%
+% \DescribeEnv{fullpagefigure} The |\begin{fullpagefigure}| |...|
+%   |\end{fullpagefigure}| environment starts a full-page-figure.  Inside
+% this environment, only the following commands may be used:
+% \begin{itemize}
+% \item one of the |\fig***| commands;
+% \item the |\caption| command, to provide a figure caption as for regular
+%   figures;
+% \item the |\label| command to set a label for text references to this
+%   figure, also as for regular figures.
+% \end{itemize}
+%
+% A simple example to get started:
+%
+% \begin{verbatim}
+% \begin{fullpagefigure}
+%   \figpdf{fig/my-figure} % my PDF file
+%   \caption{The figure caption goes here.}
+%   \label{fig:test}
+% \end{fullpagefigure}
+% \end{verbatim}
+%
+% \begin{fullpagefigure}%
+%   \iffalse meta-comment
+%     In this documentation code, we cheat and provide LaTeX code for the
+%     figure instead of a PDF file.  This is really just so that we don't
+%     have to ship an extra PDF file (and for no other reason).
+%   \fi
+%   \figcontents{\thispagestyle{empty}\null\vfil%
+%     \sffamily\fontsize{36pt}{42pt}\fontseries{bx}\selectfont
+%     \rotatebox{20}{\kern-0.15\paperwidth\fbox{\vbox to 0.8\textheight{\vfil\vfil\centering
+%         \leavevmode\noindent\hbox to 0.8\textwidth{ T H I S }\par\vfil
+%         \leavevmode\noindent\hbox to 0.8\textwidth{ F I G U R E }\par\vfil
+%         \leavevmode\noindent\hbox to 0.8\textwidth{ F I L L S }\par\vfil
+%         \leavevmode\noindent\hbox to 0.8\textwidth{ U P }\par\vfil
+%         \leavevmode\noindent\hbox to 0.8\textwidth{ T H E }\par\vfil
+%         \leavevmode\noindent\hbox to 0.8\textwidth{ W H O L E }\par\vfil
+%         \leavevmode\noindent\hbox to 0.8\textwidth{ P A G E }\par\vfil
+%         \vfil\vfil}}}%
+%     \vfil\null\newpage}%
+%   \caption{The figure caption goes here.}%
+%   \label{fig:test}%
+% \end{fullpagefigure}
+%
+% The |\figpdf| command sets the PDF file to be displayed in full page (see
+% more details below).  You may contemplate the result of this code in
+% \autoref{fig:test}.
+%
+% Some wizard once told me that old wise men had determined that the
+% |fullpagefigure| environment should be placed at the beginning of a
+% paragraph, or on its own paragraph.  (TODO: I'm not too sure why this is
+% the case or if this is still relevant.)
+%
+%
+% The contents and appearance of the figure can be adjusted by the
+% following commands, which must be issued within the |fullpagefigure|
+% environment.
+%
+% \DescribeMacro{\figcontents} Specify the contents of the figure by
+% calling |\figcontents|\marg{\LaTeX{} commands}.  The contents can be any
+% \LaTeX{} commands which will generate the figure content.  These commands
+% will be called within an |afterpage| block.
+%
+% \DescribeMacro{\figpdf} As a shorthand, you may use
+% |\figpdf|\oarg{options}\marg{pdf-file} as a shorthand for
+% |\figcontents{\includepdf|\oarg{options}\marg{pdf-file}|}|.
+%
+%
+% \DescribeMacro{\caption} \DescribeMacro{\label} The |\caption|\oarg{short
+% caption}\marg{caption} and |\label|\marg{identifier} macros may be used
+% as for a normal figure.  Be warned, though, that some dark manipulations
+% occur here, so it may be for example that the code passed as argument to
+% these commands is expanded only later.
+%
+% \DescribeMacro{\figpageside} Use the commands |\figpageside{odd}|,
+% |\figpageside{}|, or |\figpageside{even}| to specify on which side the
+% figure should appear on if the document is two-sided.  This command has
+% no effect if the document is not two-sided (|twoside| class option for
+% the |article| or |book| classes, for example).  Calling |\figpageside{}|,
+% i.e.\@ with an empty argument, instructs |fullpagefigure| to use either
+% side, whichever is more convenient.
+%
+% \DescribeMacro{\figplacement} Specify the figure caption placement with
+% |\figplacement||{b|$\mid$|t|$\mid$|p}|.  Each of |b| (bottom), |t| (top)
+% and |p| (own page) work as for usual LaTeX floats.  If you specify |p|,
+% do NOT combine it with any other option.  You may leave the argument
+% empty (|\figplacement{}|) to use defaults.
+%
+% The figure placement can also be specified as an optional argument to the
+% environment (e.g., |\begin{fullpagefigure}[p]| \ldots{} |\end{fullpagefigure}|).
+%
+% \DescribeMacro{\figcapmaxheight} Specify the maximum estimated height of
+% the caption with |\figcapmaxheight|\marg{length}.  This is used to see
+% whether the figure caption still fits on the current page.
+%
+% TODO: This is ugly, the height of the caption should be calculated
+% automatically\ldots{} for next time.
+%
+% By default (if no |\figcapmaxheight| is present), the figure will never
+% be assumed to fit in the remainder of the page.
+%
+% \DescribeMacro{\fullpagefigurecaptionfmt}
+% The figure label in the caption may be changed (e.g. ``Figure X (on facing page): \ldots'') by
+% redefining the command |\fullpagefigurecaptionfmt|.  See the default implementation for
+% more info (\autoref{sec:impl}).
+%
+% \DescribeMacro{\FlushAllFullPageFigures} If you need to make sure that
+% all full-page-figures have been placed up to a certain point, you may
+% issue the command |\FlushAllFullPageFigures|.  (You may wish to do so
+% before starting a new chapter.)  An optional argument
+% |\FlushAllFullPageFigures[\clearpage]| or
+% |\FlushAllFullPageFigures[\cleardoublepage]| specifies whether to
+% continue on any page or on an odd-side page only.
+% 
+%
+%
+% \section{Package Options}
+%
+% Only a single package option is recognized:
+%
+% \begin{verbatim} \usepackage[nopdfpages]{phffullpagefigure} \end{verbatim}
+%
+% If this package option is given, then the |pdfpages| package is not
+% loaded, and the command |\figpdf| is not made available.  You may use
+% this package option if the |pdfpages| package conflicts with your setup.
+%
+%
+%
+%
+%
+%
+%
+%
+%
+% \StopEventually{\vskip 2cm plus 2cm minus 2cm\relax\PrintChanges
+%     \vskip 2cm plus 2cm minus 2cm\relax\PrintIndex}
+%
+% \section{Implementation}
+% \label{sec:impl}
+%
+% Include some general useful packages first.
+%    \begin{macrocode}
+\RequirePackage{etoolbox}
+\RequirePackage{ifoddpage}
+\RequirePackage{afterpage}
+%    \end{macrocode}
+% 
+% The |placeins| package provies the |\FloatBarrier| command, which we use
+% to ensure that no other float gets in the way.
+%    \begin{macrocode}
+\RequirePackage{placeins}
+%    \end{macrocode}
+% 
+% \begin{macro}{phffpf@internal@pending}
+%   Counter which stores how many full-page-figures still haven't been
+%   placed.  Used for |\FlushAllFullPageFigures| as well as making sure
+%   that the full-page-figures don't interfere with one another.
+%    \begin{macrocode}
+\newcounter{phffpf@internal@pending}
+\setcounter{phffpf@internal@pending}{0}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\phffpfFloatBarrier}
+%   Redefine this if you don't want to use a |\FloatBarrier|.  Be warned of
+%   the following points:
+%
+%   \begin{itemize}
+%   \item |\FloatBarrier| introduces automatically a new paragraph.
+%     Nothing you can do about that a priori.
+%
+%   \item If you remove |\FloatBarrier|, you need to either be sure that
+%     there are no floats which can mess up placement of the
+%     fullpagefigure.  Alternatively, you need to provide your own
+%     mechanism that ensures that.
+%   \end{itemize}
+%
+%    \begin{macrocode}
+\def\phffpfFloatBarrier{\FloatBarrier}
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% \subsection{The Main Environment Definition}
+%
+% \begin{environment}{fullpagefigure}
+%   The main |fullpagefigure| environment.
+%    \begin{macrocode}
+\newenvironment{fullpagefigure}[1][b]{% 
+%    \end{macrocode}
+% 
+% Remember that we have a float pending to be placed:
+%    \begin{macrocode}
+\addtocounter{phffpf@internal@pending}{1}%
+%    \end{macrocode}
+% 
+% Don't allow any other floats to meddle with our calculations.
+%    \begin{macrocode}
+  \phffpfFloatBarrier%
+  %[YYY]% -- debugging [where is a space being inserted?]
+%    \end{macrocode}
+% 
+% The following variables will store the relevant values of options
+% collected in the definition of the figure with e.g. |\figplacement|,
+% |\figcontents|, etc.
+% 
+% NOTE TO SELF: If you add a |\phffpf@val@...| storage variable, don't
+% forget to fix that value in |\phffpf@takecareofplacingfigure|.
+% 
+%    \begin{macrocode}
+  \xdef\phffpf@val@pageside{\phffpf@side@}%
+  \gdef\phffpf@val@captionopt{}%
+  \gdef\phffpf@val@caption{}%
+  \gdef\phffpf@val@label{}%
+  \gdef\phffpf@val@placement{#1}%
+  \gdef\phffpf@val@capmaxheight{\paperheight}%
+  \gdef\phffpf@val@figcontents{}%
+%    \end{macrocode}
+%
+% If this document is two-sided (facing odd/even pages), then by default
+% place the float on an odd page.  Otherwise, we don't care.
+% 
+%    \begin{macrocode}
+  \if@twoside%
+    \xdef\phffpf@val@pageside{\phffpf@side@odd}%
+  \else\fi%
+%    \end{macrocode}
+%
+% Provide a set of commands within this figure block which allow to specify
+% the figure contents and appearance:
+%    \begin{macrocode}
+  \begingroup%
+  \let\figcontents\phffpf@impl@figcontents%
+  \let\figpageside\phffpf@impl@figpageside%
+  \let\caption\phffpf@impl@caption%
+  \let\label\phffpf@impl@label%
+  \let\figplacement\phffpf@impl@placement%
+  \let\figcapmaxheight\phffpf@impl@capmaxheight%
+%    \end{macrocode}
+% 
+% Provide |\figpdf| as a shorthand, but only if applicable (i.e., the
+% |nopdfpages| package option was not specified and the |pdfpages| package
+% was loaded):
+%    \begin{macrocode}
+  \phffpf@provide@figpdf%
+%    \end{macrocode}
+%
+% Finally, ignore any spaces following this command, as well as after the
+% |\endenvironment| command.
+%    \begin{macrocode}
+  \ignorespacesafterend%
+  \ignorespaces%
+}
+%    \end{macrocode}
+% 
+% Now, the definitions for the end of the environment:
+%    \begin{macrocode}
+{%
+%    \end{macrocode}
+%
+% Remove any spaces which might have been inserted.
+%    \begin{macrocode}
+  \ifhmode\unskip\fi%
+%    \end{macrocode}
+%
+% Restore |\caption|, |\label|, etc.\@ to their original meaning:
+%    \begin{macrocode}
+  \endgroup%
+%    \end{macrocode}
+% 
+% Finally we should actually take care of placing the figure.
+%    \begin{macrocode}
+  \phffpf@takecareofplacingfigure%
+%    \end{macrocode}
+% 
+% Finally finally, ignore any spaces following this command.  Note that
+% because the expansion of |\endfullpagefigure| is inside the definition of
+% \LaTeX' ``|\end|'' and has internal commands after that, we can't just
+% simply issue a |\ignorespaces|.
+%
+%    \begin{macrocode}
+  \phfpf@useignorespacesandallpars%
+}
+%    \end{macrocode}
+% \end{environment}
+%
+% \begin{macro}{\phffpf@useignorespacesandallpars}
+%   Utility to ignore spaces and paragraphs after the
+%   |\end{fullpagefigure}| command.\footnote{This solution was adapted from
+% \url{http://tex.stackexchange.com/a/179034/32188} and
+% \url{http://tex.stackexchange.com/a/23101/32188}.}
+%    \begin{macrocode}
+\def\phfpf@useignorespacesandallpars#1\ignorespaces\fi{%
+  #1\fi\phffpf@ignorespacesandallpars}
+\def\phffpf@ignorespacesandallpars{%
+  \begingroup%
+  \catcode`\^^M=10\relax%
+  \catcode`\^^J=10\relax%
+  \@ifnextchar\par%
+    {\endgroup\expandafter\phffpf@ignorespacesandallpars\@gobble}%
+    {\endgroup}%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+%
+% \begin{macro}{\fullpagefigurecaptionfmt}
+% \begin{macro}{\fullpagefigurecaptionfmt@paren@O}
+% \begin{macro}{\fullpagefigurecaptionfmt@paren@E}
+% \begin{macro}{\fullpagefigurecaptionfmt@paren@x}
+%   The macro |\fullpagefigurecaptionfmt| is called to generate the text
+%   which is prepended to the figure caption.  It should essentially say
+%   ``Figure X (on next page): ''.
+%
+%   The argument to |\fullpagefigurecaptionfmt| is |#1| = |O|, |E| or |x|
+%   for if the figure is on an odd page, an even page, or an unspecified
+%   page.
+%    \begin{macrocode}
+\def\fullpagefigurecaptionfmt#1{%
+  \figurename\nobreakspace\thefigure\nobreakspace%
+  (\csname fullpagefigurecaptionfmt@paren@#1\endcsname)%
+}
+\def\fullpagefigurecaptionfmt@paren@O{on facing page} % for odd page figures
+\def\fullpagefigurecaptionfmt@paren@E{on next page}   % for even page figures
+\def\fullpagefigurecaptionfmt@paren@x{on next page}   % for next-page figures
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+%
+%
+% \subsection{Implementation of \phfverb{\fig}\phfverb{****} Commands}
+%
+% These macros really just store their values for later use.
+%
+% \begin{macro}{\figcontents}
+%   This macro will become |\figcontents| inside the |fullpagefigure|
+%   environment.
+%    \begin{macrocode}
+\newtoks\phffpf@tmp@toks
+\long\def\phffpf@impl@figcontents#1{%
+  \phffpf@tmp@toks={#1}%
+  \xdef\phffpf@val@figcontents{\the\phffpf@tmp@toks}%
+  \ignorespaces%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\phffpf@side@odd}
+% \begin{macro}{\phffpf@side@even}
+% \begin{macro}{\phffpf@side@}
+%   These hold one-character codes to signify ``odd side,'' ``even side,''
+%   or ``no specification.''
+%
+%    \begin{macrocode}
+\def\phffpf@side@odd{O}
+\def\phffpf@side@even{E}
+\def\phffpf@side@{x}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}{\figpageside}
+%   This will become |\figpageside| inside the |fullpagefigure|
+%   environment.
+%    \begin{macrocode}
+\def\phffpf@impl@figpageside#1{%
+  \ifcsname phffpf@side@#1\endcsname%
+    \xdef\phffpf@val@pageside{\csname phffpf@side@#1\endcsname}%
+  \else%
+    \PacakgeError{phffullpagefigure}{Unknown page side designation: '#1'. Please use 'odd',
+      'even', or '' for no preference.}%
+  \fi%
+  \ignorespaces%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\caption}
+%   This will become |\caption| inside the |fullpagefigure| environment.
+%    \begin{macrocode}
+\def\phffpf@NOARG{}
+\def\phffpf@test@NOARG{\phffpf@NOARG}
+\newcommand\phffpf@impl@caption[2][\phffpf@NOARG]{%
+  \gdef\phffpf@val@captionopt{#1}%
+  \gdef\phffpf@val@caption{#2}%
+  \ignorespaces%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\label}
+%   This will become |\label| inside the |fullpagefigure| environment.
+%    \begin{macrocode}
+\def\phffpf@impl@label#1{%
+  \gdef\phffpf@val@label{#1}%
+  \ignorespaces%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\figplacement}
+%   This will become |\figplacement| inside the |fullpagefigure| environment.
+%    \begin{macrocode}
+\def\phffpf@impl@placement#1{%
+  \gdef\phffpf@val@placement{#1}%
+  \ignorespaces%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\figcapmaxheight}
+%   This will become |\figcapmaxheight| inside the |fullpagefigure|
+%   environment.
+%    \begin{macrocode}
+\def\phffpf@impl@capmaxheight#1{%
+  \gdef\phffpf@val@capmaxheight{#1}%
+  \ignorespaces%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+%
+% \subsection{Placing the figures}
+%
+% Here's the gory details of how the figures are placed.
+%
+%
+% \begin{macro}{\phffpf@place@pending@figs@code}
+%   This macro will store code to be executed after the next figure has
+%   been placed.  This can be used to queue other figures to be placed
+%   later.
+%    \begin{macrocode}
+\def\phffpf@place@pending@figs@code{\phffpf@place@pending@figs@code@start}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\phffpf@place@pending@figs@code@start}
+%   When another figure is placed, and the
+%   |\phffpf@place@pending@figs@code| is updated, then the macro
+%   |\phffpf@place@pending@figs@code@start| contains the code which
+%   reinitializes |\phffpf@place@pending@figs@code|.
+%
+%   This reinitialization code consists in precisely making sure that a
+%   future execution of |\phffpf@place@pending@igs@code@start| will start
+%   by reinitializing that macro.
+%    \begin{macrocode}
+\def\phffpf@place@pending@figs@code@start{%
+  \gdef\phffpf@place@pending@figs@code{\phffpf@place@pending@figs@code@start}}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\phffpf@impl@figcode}
+%   The code to be inserted to generate the figure.
+%
+%   The argument |#1| is the prefix for macro names where to look up the
+%   contents of the figure and values of the figure settings.  The macro
+%   names are determined as |\csname #1@|\meta{field-name}|\endcsname|.
+%    \begin{macrocode}
+\gdef\phffpf@impl@figcode#1{%
+%    \end{macrocode}
+% 
+% Do we have a figure placement position request (|p|, |t|, |b|)?  If yes,
+% then define a macro which we will expand in front of the |\begin{figure}|
+%   command for the caption.
+%    \begin{macrocode}
+  \expandafter\ifblank\expandafter{\csname #1@placement\endcsname}{% don't have placement arg
+    \edef\phffpf@tmp@figplacementarg{}%
+  }{% have placement arg
+    \edef\phffpf@tmp@figplacementarg{[\csname #1@placement\endcsname]}%
+  }
+%    \end{macrocode}
+% 
+% Invoke the |figure| environment, which we use to typeset the caption.
+% Use specified placement if applicable.  Set up some basic stuff in the
+% figure: the contents, caption and label.
+%    \begin{macrocode}
+  \expandafter\figure\phffpf@tmp@figplacementarg%
+  \centering%
+  \begingroup%
+  \def\fnum@figure{\fullpagefigurecaptionfmt{\csname #1@pageside\endcsname}}%
+  \expandafter\afterpage\expandafter{\csname #1@figcontents\endcsname}%
+  \expandafter\ifx\csname #1@captionopt\endcsname\phffpf@test@NOARG%
+    \expandafter\caption\expandafter{\csname #1@caption\endcsname}%
+  \else%
+    \def\phffpf@tmp@captioncmdopt{%
+      \expandafter\caption\expandafter[\csname #1@captionopt\endcsname]}%
+    \expandafter\phffpf@tmp@captioncmdopt\expandafter{\csname #1@caption\endcsname}%
+  \fi%
+  \expandafter\notblank\expandafter{\csname #1@label\endcsname}{%
+    \expandafter\label\expandafter{\csname #1@label\endcsname}%
+  }{%
+  }
+  \endgroup%
+  \endfigure%
+%    \end{macrocode}
+%
+% Now we have placed the |figure|, so decrease our ``pending-to-be-placed''
+% counter.
+%    \begin{macrocode}
+  \addtocounter{phffpf@internal@pending}{-1}%
+%    \end{macrocode}
+%
+% \ldots{} and execute the code to place any other pending figures.  (We
+% set |\ifphffpf@flag@forcenextmaybequeuetoplacefigure| to TRUE to force
+% the next figure in queue to be placed now.)
+%    \begin{macrocode}
+  \afterpage{%
+    \phffpf@flag@forcenextmaybequeuetoplacefiguretrue%
+    \phffpf@place@pending@figs@code%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% Now, all options have been set etc., the fullpagefigure environment has finished, so
+% calculate the commands to place the figure appropriately.
+%
+%
+% \begin{macro}{\phffpf@takecareofplacingfigure}
+%   First, fix the values of the contents and settings (in case another
+%   full-page-figure comes along and messes up the |\phffpf@val@...|
+%   commands).
+%
+%   After the values have been fixed (in fact they are stored in the form
+%   of ``restore code''), then we delegate to
+%   |\phffpf@maybequeuefigurecode|, which checks whether we can place a
+%   figure or if we should queue.
+%    \begin{macrocode}
+\def\phffpf@takecareofplacingfigure{%
+%    \end{macrocode}
+%
+% A tricky part: make sure we save the values of |phffpf@val@|\meta{field}
+% in a fixed way so that several figures won't overwrite each other's
+% values.
+%
+% We build a bunch of tokens which are in fact restore code for the given
+% variables, i.e., which is a list of commands of the form
+% |\gdef\phffpf@val@|\meta{field}|{|\meta{first-level-expanded-value-of-this-field}|}|.
+% This set of tokens have the values of these variables expanded to the
+% first level, so that it is OK if the variables |\phffpf@val@|\meta{field}
+% are overwritten.
+%    \begin{macrocode}
+  \edef\phffpf@tmp@fixallfieldvalues{%
+    \noexpand\gdef\noexpand\phffpf@val@pageside{\expandonce\phffpf@val@pageside}%
+    \noexpand\gdef\noexpand\phffpf@val@captionopt{\expandonce\phffpf@val@captionopt}%
+    \noexpand\gdef\noexpand\phffpf@val@caption{\expandonce\phffpf@val@caption}%
+    \noexpand\gdef\noexpand\phffpf@val@label{\expandonce\phffpf@val@label}%
+    \noexpand\gdef\noexpand\phffpf@val@placement{\expandonce\phffpf@val@placement}%
+    \noexpand\gdef\noexpand\phffpf@val@capmaxheight{\expandonce\phffpf@val@capmaxheight}%
+    \noexpand\gdef\noexpand\phffpf@val@figcontents{\expandonce\phffpf@val@figcontents}%
+  }%
+%    \end{macrocode}
+% 
+% Finally, relay the call to
+% |\phffpf@maybequeuefigurecode|\marg{restore-code-for-figure-settings}\hspace{0pt}\marg{full-figure-code}.
+%    \begin{macrocode}
+  \edef\phffpf@tmp@figcodetwoargs{%
+    {\expandonce\phffpf@tmp@fixallfieldvalues}%
+    {\noexpand\phffpf@impl@figcode{phffpf@val}}%
+  }%
+  \expandafter\phffpf@maybequeuefigurecode\phffpf@tmp@figcodetwoargs%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\phffpf@maybequeuefigurecode}
+%   USAGE: |\phffpf@maybequeuefigurecode|\marg{restore-code-for-figure-settings}\hspace{0pt}\marg{full-figure-code}.
+%
+%   Checks if we can place the figure; if yes then place it on the right
+%   page, if no, then add it to the queue.
+%
+%   The arguments are: |#1| = code to restore correct |\phffpf@val@XYZ|
+%   values; |#2| = figure code.  Make sure it's expanded.
+%    \begin{macrocode}
+\long\def\phffpf@maybequeuefigurecode#1#2{%
+%    \end{macrocode}
+% 
+% Possibly we have been told to place the next figure now via the flag
+% |\ifphffpf@flag@forcenextmaybequeuetoplacefigure|.  In this case, reset
+% the flag and place the figure now (relay to |\phffpf@doplacefigure|).
+%    \begin{macrocode}
+  \ifphffpf@flag@forcenextmaybequeuetoplacefigure%
+    \phffpf@flag@forcenextmaybequeuetoplacefigurefalse
+    \phffpf@doplacefigure{#1}{#2}%
+    %
+  \else
+%    \end{macrocode}
+%
+% See if there are other figures waiting to be placed first.  If so, add
+% ours to the queue.
+%    \begin{macrocode}
+    \ifnum\value{phffpf@internal@pending}>1\relax%
+      \xdef\phffpf@place@pending@figs@code{%
+          \expandonce\phffpf@place@pending@figs@code%
+          \unexpanded{\phffpf@maybequeuefigurecode{#1}{#2}}%
+        }%
+        %\show\phffpf@place@pending@figs@code
+        %[figure queued:  \texttt{\detokenize{#1}}]%  -- DEBUGGING
+    \else%
+%    \end{macrocode}
+%
+% If not, deal with placing the figure now:
+%    \begin{macrocode}
+      \phffpf@doplacefigure{#1}{#2}%
+      %[figure placed: \texttt{\detokenize{#1}}]  -- DEBUGGING
+    \fi%
+  \fi%
+}
+%    \end{macrocode}
+% 
+% Define also the flag which will force a next call to
+% |\phffpf@maybequeuefigurecode| to place the next figure in the queue.
+%    \begin{macrocode}
+\newif\ifphffpf@flag@forcenextmaybequeuetoplacefigure
+\phffpf@flag@forcenextmaybequeuetoplacefigurefalse
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% \begin{macro}{\phffpf@doplacefigure}
+%   Place the figure now.  Determine the correct number of |\afterpage|'s
+%   to use so that the figure caption ends up on the correct page side.
+%
+%   The arguments to this macro are: |#1| = code to restore correct
+%   |phffpf@val@XYZ| values, |#2| = the figure code. Make sure it's
+%   expanded.
+%    \begin{macrocode}
+\long\def\phffpf@doplacefigure#1#2{%
+%    \end{macrocode}
+%
+% Make sure the correct values of |phffpf@val@XYZ| are restored, because we
+% need e.g. |\phffpf@val@pageside|.  They may be wrong because this might
+% be called after a figure has been queued.
+%    \begin{macrocode}
+  #1%
+%    \end{macrocode}
+%
+% Now, determine where exactly to place the figure code.  There are no other pending
+% figures.  If there is no side preference, just place the figure pretty much now.
+%    \begin{macrocode}
+  \ifx\phffpf@val@pageside\phffpf@side@%
+    \let\phffpf@tmp@doplace\@firstofone%
+  \else%
+%    \end{macrocode}
+%
+% If, however, we have a side preference, then check everything more
+% carefully.  Use the helper macros
+% |\phffpf@placecode@on|\meta{\phfverb{same}$\mid$\phfverb{other}}|parity|.
+% (The latter essentially expand to the correct number of |\afterpage|'s.)
+%    \begin{macrocode}
+    \ifx\phffpf@val@pageside\phffpf@side@odd%
+      %[CHECK DONE HERE/WANT ODD] % -- for debugging
+      \checkoddpage\ifoddpage%
+      %[IS ODD] % -- for debugging
+        \let\phffpf@tmp@doplace\phffpf@placecode@onotherparity%
+      \else%
+        %[IS NOT ODD] % -- for debugging
+        \let\phffpf@tmp@doplace\phffpf@placecode@onsameparity%
+      \fi%
+    \else%
+      %[CHECK DONE HERE/WANT EVEN] % -- for debugging
+      \checkoddpage\ifoddpage%
+        %[IS ODD] % -- for debugging
+        \let\phffpf@tmp@doplace\phffpf@placecode@onsameparity%
+      \else%
+        %[IS NOT ODD] % -- for debugging
+        \let\phffpf@tmp@doplace\phffpf@placecode@onotherparity%
+      \fi%
+    \fi%
+  \fi%
+%    \end{macrocode}
+% 
+% I think an |\hbox{}| might help to place the anchor which determines
+% which page side we are currently on.  Note that this starts a new
+% paragraph and enters horizontal mode.
+%    \begin{macrocode}
+  \leavevmode\hbox{}%
+%    \end{macrocode}
+%
+% Now, do place the figure somewhere.
+%    \begin{macrocode}
+  \phffpf@tmp@doplace{#1#2}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\phffpf@placecode@onsameparity}
+%   Place the figure code on the same parity (page side) as we are
+%   currently.  If enough space remains on the current page, place the
+%   figure immediately.  Otherwise, use two |\afterpage|'s so as the figure
+%   caption to appear in two pages.
+%
+%    \begin{macrocode}
+\newdimen\phffpf@tmp@spaceleft
+\newdimen\phffpf@tmp@compareto
+\long\def\phffpf@placecode@onsameparity#1{%
+%    \end{macrocode}
+%
+% First, see if the caption itself requires to be on its own page (and thus
+% no height calculations are necessary, and an additional |\clearpage| is
+% required)
+% 
+%    \begin{macrocode}
+  \def\@tmpa{p}%
+  \ifx\phffpf@val@placement\@tmpa%
+    \afterpage{\vspace*{0pt}\afterpage{#1\clearpage}}%
+  \else%
+%    \end{macrocode}
+%
+% Otherwise, the figure caption is there along with some text on the page.
+% 
+% See if there is enough place left on this page to place the figure
+% caption; otherwise use two |\afterpage|'s.
+%    \begin{macrocode}
+    %[PLACING FIG CODE ON SAME PARITY]% -- debugging
+    \phffpf@tmp@spaceleft=\textheight\relax%
+    \phffpf@tmp@compareto=\phffpf@val@capmaxheight\relax%
+    \advance\phffpf@tmp@spaceleft by -\pagetotal%
+    %[DIM LEFT: \the\phffpf@tmp@spaceleft]%
+    \ifdim\phffpf@tmp@spaceleft>\phffpf@tmp@compareto%
+      %[ENOUGH DIM LEFT.] % -- debugging
+      #1%\phffpf@tmp@figcode%
+    \else%
+      %[*NOT ENOUGH* DIM LEFT.] % -- debugging
+      \afterpage{\vspace*{0pt}\afterpage{#1}}%
+    \fi%
+  \fi%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\phffpf@placecode@onotherparity}
+%   Place the figure caption on the opposite parity as the current page.
+%   This just requires one |\afterpage| so as the figure code to appear on
+%   the following page.
+%
+%    \begin{macrocode}
+\def\phffpf@placecode@onotherparity#1{%
+  %[PLACING FIG CODE ON OTHER PARITY]% -- debugging
+%    \end{macrocode}
+% 
+% First, see if the caption requires to be on its own page (and thus no
+% height calculations are necessary, and an additional |\clearpage| is
+% required).
+%    \begin{macrocode}
+  \def\@tmpa{p}%
+  \ifx\phffpf@val@placement\@tmpa%
+    \afterpage{#1\clearpage}%
+  \else%
+%    \end{macrocode}
+%
+% The figure caption is not on its own page.  Just use a simple |\afterpage|.
+%    \begin{macrocode}
+    \afterpage{#1}%
+  \fi%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% \subsection{Commands to Flush All Full-Page-Figures}
+%
+%
+% Here are a set of commands which can be used to ensure that all full-page
+% figure floats have been placed.
+%
+% \begin{macro}{\FlushAllFullPageFigures}
+%   The name is pretty self-explanatory.  The command is documented in the user doc above.
+%    \begin{macrocode}
+\newcommand\FlushAllFullPageFigures[1][\phffpf@clearpage]{%
+%    \end{macrocode}
+% 
+% As long as there are full-page-figures pending, clear pages until those
+% figures have been placed.
+%    \begin{macrocode}
+  \ifnumcomp{\value{phffpf@internal@pending}}{>}{0}{%
+    \clearpage%
+    %[page cleared.]% DEBUG
+    \FlushAllFullPageFigures[#1]% recurse again.
+  }{%
+%    \end{macrocode}
+%
+% All figures placed, all fine.  We still need to flush one last time
+% because at this point the figure code (ie. caption) has been placed only,
+% and we want the text that follows to come after the figure itself.  Here
+% finally we use the clear command in |#1| to continue on any page or on an
+% odd-side page only.
+%    \begin{macrocode}
+    #1%
+  }%
+}
+\def\phffpf@clearpage{\if@twoside\cleardoublepage\else\clearpage\fi}
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+%
+% \subsection{Package Option Parsing}
+%
+% Note the singular form of the word ``option.''
+% 
+%    \begin{macrocode}
+\def\phffpf@provide@figpdf{}
+\newcommand\phffpf@impl@figpdf[2][]{%
+  \figcontents{\includepdf[#1]{#2}}%
+}
+\def\phffpf@do@pdfpages{%
+  \RequirePackage{pdfpages}%
+  \def\phffpf@provide@figpdf{\let\figpdf\phffpf@impl@figpdf}%
+}
+%
+\DeclareOption{nopdfpages}{\def\phffpf@do@pdfpages{}}
+\DeclareOption*{%
+  \@unknownoptionerror%
+}
+\ProcessOptions\relax
+%
+\phffpf@do@pdfpages
+%    \end{macrocode}
+%
+%\Finale
+\endinput
