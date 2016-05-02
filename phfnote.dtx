@@ -2568,10 +2568,19 @@
 % \begin{macro}{\phfnote@preset@pkgdoc}
 %   Preset for my package documentation.  Also provide some handy commands.
 %
-%   This preset inherits all definitions from the |utopianote| preset.
+%   Start by setting the same settings as for other |Xnote| presets.
 %    \begin{macrocode}
 \def\phfnote@preset@pkgdoc{%
-  \phfnote@preset@utopianote%
+  \phfnote@presetcommon@xnote[noteit]
+  \phfnote@opt@fontdefsfalse
+%    \end{macrocode}
+% 
+% Then set up the font, which is done in a separate macro
+% |\phfnote@pkgdoc@setupfont| in case individual documents would like more
+% specific settings.  (For example, some packages may want a different math
+% font.)
+%    \begin{macrocode}
+  \phfnote@pkgdoc@setupfont
 %    \end{macrocode}
 % 
 % Set up general appearance.
@@ -2643,6 +2652,20 @@
 % \autoref{sec:abstract-attributes}.
 %    \begin{macrocode}
   \def\pkgoptattrib##1{\{##1,...\}}
+}
+%    \end{macrocode}
+%
+% Also provide a helper macro which is to load the font packages we want.  By
+% default, we use Utopia fonts via the |fourier| package, but some package
+% documentations may want a different math font.
+%    \begin{macrocode}
+\providecommand\phfnote@pkgdoc@setupfont{
+  \PassOptionsToPackage{T1}{fontenc}
+  \RequirePackage{fontenc}
+  \RequirePackage{fourier}
+  \renewcommand{\notesectionallfontfamily}{put}
+  \renewcommand{\notetitlefont}{\bfseries}
+  \renewcommand{\sfdefault}{phv}
 }
 %    \end{macrocode}
 % \end{macro}

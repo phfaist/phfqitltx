@@ -28,6 +28,15 @@
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{xcolor}
+\makeatletter
+\providecommand\phfnote@pkgdoc@setupfont{
+  \PassOptionsToPackage{T1}{fontenc}
+  \RequirePackage{fontenc}
+  \renewcommand{\rmdefault}{futs}% only rm font, not math
+  \renewcommand{\notesectionallfontfamily}{put}
+  \renewcommand{\notetitlefont}{\bfseries}
+  \renewcommand{\sfdefault}{phv}
+}\makeatother
 \usepackage[preset=pkgdoc]{phfnote}
 \usepackage{phfqit}
 \phfnoteSaveDefs{verbatimstuff}{verbatim,@verbatim,endverbatim}
@@ -36,6 +45,7 @@
 \usepackage{tcolorbox}
 \newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
 \newtcolorbox{pkgwarning}{colback=red!5!white,colframe=red!5!white,coltitle=red!50!black,fonttitle=\bfseries,title={WARNING}}
+\usepackage{needspace}
 \EnableCrossrefs         
 \CodelineIndex
 \RecordChanges
@@ -91,20 +101,79 @@
 %
 % \section{Introduction}
 %
-% DOCUMENTATION HERE
+% This package provides some useful definitions, mainly for notation of
+% mathematical expressions which are used in quantum information theory (at
+% least by me).
+%
+% Are included utilities for:
+% \begin{itemize}
+% \item General symbols and mathematical expressions (identity operator,
+%   trace, rank, diagonal, \ldots)  (\autoref{sec:symbols})
+% \item Formatting of bits and bit strings (\autoref{sec:bits})
+% \item Formatting of names of logical gates (\autoref{sec:gates})
+% \item Typesetting the names of Lie groups and algebras, for example $\su(N)$
+%   (\autoref{sec:Lie-groups-algebras})
+% \item Bra-ket notation, and delimited expressions such as average, norm,
+%   \ldots (\autoref{sec:delimited})
+% \item Typesetting entropy measures, including the Shannon/von Neumann entropy,
+%   the smooth entropies, relative entropies, as well as my coherent relative
+%   entropy
+% \end{itemize}
 %
 %
 % \section{Basic Usage}
 %
-% Straightforward. No package options.
+% This package is straightforward to use.  There are no package options.
+% \begin{verbatim}
+% \usepackage{phfqit}
+% \end{verbatim}
 %
-% TODO: In the future, declare specific parts of the package, defined by package
-% options?
+% [TODO: In the future, use package options to control which definitions we
+% want?]
+%
+% \subsection{Semantic vs. Syntactic Notation}
+%
+% The macros in this package are meant to represent a \emph{mathematical
+% quantity}, independently of its final \emph{notation}.  For example, |\Hmaxf|
+% indicates corresponds to the ``new-style'' max-entropy defined with the
+% fidelity,\footnote{see Marco Tomamichel, Ph. D., ETH Zurich (2012)
+% \href{https://arxiv.org/abs/1203.2142}{arXiv:1203.2142}} independently of the
+% notation.  Then, if the default notation ``$\Hmaxf{}$'' doesn't suit your
+% taste, you may then simply redefine this command to display whatever you like
+% (see for example instructions in \autoref{sec:entropy-measures}).  This allows
+% to keep better distinction between different measures which may share the same
+% notation in different works of literature.
+%
 %
 % \subsection{Size Specification}
 % \label{topic:size-specification-backtick}
-% some macros accept a size specification with a backtick, as in
-% |\IdentProc`<SIZE>...|. DOCUMENT ME PLEASE ..........
+%
+% Many of the macros in this package allow their delimiters to be sized
+% according to your taste.  For example, if there is a large symbol in an
+% entropy measure, say
+% \begin{align}
+%  \Hmin{\displaystyle\bigotimes_i A_i}[B]\ ,
+% \end{align}
+% then it may be necessary to tune the size of the parenthesis delimiters.
+%
+% This is done with the optional size specification \meta{size-spec}.  The
+% \meta{size-spec}, whenever it is accepted, is always optional.
+%
+% The \meta{size-spec} starts with the backtick character ``|`|'', and is
+% followed by a single token which may be a star |*| or a size modifier macro
+% such as |\big|, |\Big|, |\bigg| and |\Bigg|.  If the star is specified, then
+% the delimiters are sized with |\left| and |\right|; otherwise the
+% corresponding size modifier is used.  When no size specification is present,
+% then the normal character size is used.
+%
+% For example:
+% \begin{center}
+%   \begin{tabular}{ll}
+%       |\Hmin{\bigotimes_i A_i}[B]|  & gives\quad  $\Hmin{\displaystyle\bigotimes_i A_i}[B]$, \\[1.5em]
+%       |\Hmin`\Big{\bigotimes_i A_i}[B]|  & gives\quad  $\Hmin`\Big{\displaystyle\bigotimes_i A_i}[B]$,~~and \\[1.5em]
+%       |\Hmin`*{\bigotimes_i A_i}[B]|  & gives\quad  $\Hmin`*{\displaystyle\bigotimes_i A_i}[B]$. \\
+%   \end{tabular}
+% \end{center}
 %
 %
 % \section{General Symbols (and Math Operators)}
@@ -176,20 +245,22 @@
 %
 % This command works both in math mode and in text mode.
 %
+% \needspace{5\baselineskip}
 % \DescribeMacro{\AND} \DescribeMacro{\XOR} \DescribeMacro{\CNOT}
 % \DescribeMacro{\NOT} \DescribeMacro{\NOOP} Some standard gates.  These typeset
-% respectively as \AND, \XOR, \CNOT, \NOT, and \NOOP.  \vspace{1cm}
+% respectively as \AND, \XOR, \CNOT, \NOT, and \NOOP. \vspace{3\baselineskip}
 %
 %
 % \section{Lie Groups and Algebras}
 % \label{sec:Lie-groups-algebras}
 %
+% \needspace{7\baselineskip}
 % \DescribeMacro{\uu(N)} \DescribeMacro{\UU(N)} \DescribeMacro{\su(N)}
 % \DescribeMacro{\SU(N)} \DescribeMacro{\so(N)} \DescribeMacro{\SO(N)}
 % \DescribeMacro{\SN(N)} Format some common Lie groups and algebras.
 %
 % |\SN(N)| is the symmetric group of $N$ items, and formats by default as
-% $\SN(N)$.  \vspace{2cm}
+% $\SN(N)$. \vspace{4\baselineskip}
 %   
 % \section{Bra-Ket Notation and Delimited Expressions}
 % \label{sec:bra-ket} \label{sec:delimited}
@@ -200,11 +271,11 @@
 % Usage for example is:
 % \begin{center}
 %   \begin{tabular}{lc}
-%       |\ket{\psi}|  &  $\ket{\psi}$ \\
-%       |\ket[\big]{\psi}|  &  $\ket[\big]{\psi}$ \\
-%       |\ket[\Big]{\psi}|  &  $\ket[\Big]{\psi}$ \\
-%       |\ket[\bigg]{\psi}|  &  $\ket[\bigg]{\psi}$ \\
-%       |\ket[\Bigg]{\psi}|  &  $\ket[\Bigg]{\psi}$ \\
+%       |\ket{\psi}|  &  $\ket{\psi}$ \\[1em]
+%       |\ket[\big]{\psi}|  &  $\ket[\big]{\psi}$ \\[1em]
+%       |\ket[\Big]{\psi}|  &  $\ket[\Big]{\psi}$ \\[1em]
+%       |\ket[\bigg]{\psi}|  &  $\ket[\bigg]{\psi}$ \\[1em]
+%       |\ket[\Bigg]{\psi}|  &  $\ket[\Bigg]{\psi}$ \\[1em]
 %       |\ket*{\displaystyle\sum_k \psi_k}|  &  $\ket*{\displaystyle\sum_k \psi_k}$ \\
 %   \end{tabular}
 % \end{center}
@@ -277,7 +348,14 @@
 % $H_\mathrm{max,old}$.  This allows you to change the notation by redefining
 % the command |\Hzero|, while making sure that the correct quantity is
 % addressed.  (You might have both ``old''-style and ``new''-style max-entropy
-% in the same paper.)
+% in the same paper.)  The macros |\Hmin|, |\Hzero|, |\Hmaxf| and |\HH| may be
+% redefined to change the subscript by using the following code (change
+% ``|\mathrm{max},0|'' to your favorite subscript text):
+% \begin{verbatim}
+% \makeatletter
+% \renewcommand\Hzero{\@HHbase{\HHSym}{\mathrm{max},0}}
+% \makeatother
+% \end{verbatim}
 %
 % These commands are robust, meaning they can be used for example in figure
 % captions and section headings.
@@ -304,14 +382,6 @@
 % arguments as for |\Hmin|.  For example, |\Hzero[][\epsilon]{X}[Y]| gives
 % $\Hzero[][\epsilon]{X}[Y]$.
 %
-% You may redefine this macro to change the subscript by using the following
-% code (change ``|\mathrm{max},0|'' to your favorite subscript text):
-% \begin{verbatim}
-% \makeatletter
-% \renewcommand\Hzero{\@HHbase{\HHSym}{\mathrm{max},0}}
-% \makeatother
-% \end{verbatim}
-%
 % \DescribeMacro{\Hmaxf} The max-entropy.  This macro has the same
 % arguments as for |\Hmin|.  For example, |\Hmaxf[][\epsilon]{X}[Y]| gives
 % $\Hmaxf[][\epsilon]{X}[Y]$.
@@ -321,6 +391,12 @@
 % |\Hfunc(p_1\rho_1 + p_2\rho_2)|).  Sizing specifications also work, e.g.\@
 % |\Hfunc`\big(x)| or |\Hfunc`*(x)|.  However there is neither support for an
 % epsilon-like superscript nor for a conditioning system.
+%
+% \DescribeMacro{\HHSym} You may redefine this macro if you want to change the
+% ``$H$'' symbol of all entropy measures.
+% \begingroup \def\HHSym{\spadesuit} For example, with
+% |\renewcommand\HHSym{\spadesuit}|, |\Hmin{A}[B]| would give $\Hmin{A}[B]$.
+% \endgroup
 %
 % \subsection{Relative Entropy Measures}
 % \label{sec:relative-entropies}
@@ -389,11 +465,42 @@
 % in, and it is not a zero-error quantity which is smoothed with the purified
 % distance.)
 %
+% \DescribeMacro{\DDSym} The symbol to use to denote a relative entropy.  You
+% may redefine this command to change the symbol.  (This works like |\HHSym|
+% above.)
 %
+%
+% \subsection{Coherent Relative Entropy}
+% \label{sec:coh-rel-entr}
+%
+% A macro for a new quantity, the coherent relative entropy, is also available.
+%
+% \DescribeMacro{\DCoh}
+% Typeset a coherent relative entropy.  The syntax is
+% |\DCoh|\hspace{0pt}\oarg{epsilon}\hspace{0pt}\meta{size-spec}\hspace{0pt}\marg{rho}\hspace{0pt}\relax
+% \marg{A}\hspace{0pt}\marg{B}\hspace{0pt}\marg{Gamma-1}\hspace{0pt}\marg{Gamma-2}.
+%
+% For example, |\DCoh[\epsilon]{\rho}{A}{B}{\Gamma_A}{\Gamma_B}| gives
+% $\DCoh[\epsilon]{\rho}{A}{B}{\Gamma_A}{\Gamma_B}$.
+%
+% The subscript |BA| is automatically added to the \meta{rho} argument.  If this
+% is not desired, then begin the \meta{rho} argument with a star.  For example,
+% |\DCoh{*\sigma_A\otimes\rho_B}{A}{B}{\Gamma_A}{\Gamma_B}| gives
+% $\DCoh{*\sigma_A\otimes\rho_B}{A}{B}{\Gamma_A}{\Gamma_B}$.
 % 
+% The \meta{size-spec} is of course optional and follows the same syntax as
+% everywhere else (\autoref{topic:size-specification-backtick}).
 %
-%
+% \DescribeMacro{\emptysystem} Use the |\emptysystem| macro to denote a trivial
+% system.  For example, |\DCoh{\rho}{X}{\emptysystem}{\Gamma}{1}| gives
+% $\DCoh{\rho}{X}{\emptysystem}{\Gamma}{1}$.
 % 
+% \DescribeMacro{\DCSym} The symbol to use to denote a coherent relative
+% entropy.  You may redefine this command to change the symbol.  (This works
+% like |\HHSym| and |\DDSym| above.)
+%
+%
+%
 %
 %
 %
@@ -417,8 +524,6 @@
 %
 % \subsection{Simple Symbols and Shorthands}
 % 
-% Some simple symbols.  See \autoref{sec:symbols}.
-%
 % 
 % \subsubsection{General Symbols}
 %
@@ -580,6 +685,8 @@
 %
 %
 % \subsection{Logical Gates}
+%
+% See user documentation in \autoref{sec:gates}.
 %
 % \begin{macro}{\gate}
 %   Generic macro to format a gate name.
@@ -1141,64 +1248,60 @@
 }
 %    \end{macrocode}
 % \end{macro}
+%
+%
+% \subsubsection{Coherent Relative Entropy}
 % 
+% See user documentation in \autoref{sec:coh-rel-entr}.
+% 
+% \begin{macro}{\DC@inner}
+%   Format the contents of the coherent relative entropy.  This is simply a
+%   |\DeclarePariedDelimiter|-style command.  The syntax is
+%   |\DC@inner|\hspace{0pt}\marg{rho}\hspace{0pt}\marg{Gamma1}\hspace{0pt}\marg{Gamma2}, and
+%   this typesets as $\bigl(\meta{rho}\big\Vert\meta{Gamma1},\meta{Gamma2}\bigr)$.
 %    \begin{macrocode}
-
-
-% -----------------------
-
-
-%
-% \DC@inner{rho}{Gamma1}{Gamma2}        -->  produces (rho||Gamma1,Gamma2)
-% \DC@inner*{rho}{Gamma1}{Gamma2}       -->  produces \left(rho||Gamma1,Gamma2\right)
-% \DC@inner[\big]{rho}{Gamma1}{Gamma2}  -->  produces \bigl(rho||Gamma1,Gamma2\bigr)
-%
-% If rho starts with the token *, then adds the subscript in \DC@tmp@rhosub to rho
-%
 \DeclarePairedDelimiterX\DC@inner[3]{(}{)}{%
   #1\mathclose{}\,\delimsize\Vert\,\mathopen{}#2\mathclose{},\mathopen{}#3%
 }
-
-
+%    \end{macrocode}
+% \end{macro}
 %
-% Symbol to use for the coherent relative entropy
-%
+% \begin{macro}{\DCSym}
+%   Symbol to use for the coherent relative entropy
+%    \begin{macrocode}
 \newcommand\DCSym{\bar\DDSym}
-
+%    \end{macrocode}
+% \end{macro}
 %
-% Designates the trivial system (uses symbol for empty set)
-%
+% \begin{macro}{\emptysystem}
+%   Designates the trivial system (uses symbol for empty set).  It is important
+%   to this, because of the automatic indexes set on the ``rho'' argument.
+%    \begin{macrocode}
 \def\emptysystem{\ensuremath{\emptyset}}
-
-
+%    \end{macrocode}
+% \end{macro}
+% 
 %
-% Coherent Relative Entropy.
+% \begin{macro}{\DCoh}
+%   The Coherent Relative Entropy.
 %
-% USAGE:
+%   TODO: Use our generic size parser, don't duplicate code!
 %
-%   \DCond[\epsilon]{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
-%   \DCond[\epsilon]{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
-%   \DCond[\epsilon]<size-spec>{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
-%   \DCond[\epsilon]<size-spec>{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
-%
-%   with an optional <size-spec> =  "`*"  or  "`\Big"
-%
-
-\newcommand\DCond[1][]{%
+%   First part: read the first few arguments (epsilon superscript, optional size
+%   specification).
+%    \begin{macrocode}
+\newcommand\DCoh[1][]{%
   \def\DC@tmp@sup{#1}%
-%\message{*********|\detokenize{#1}|*********}%
+  %\message{*********|\detokenize{#1}|*********}%
   \begingroup\mathcode`\`="0060\relax
   \DC@parsesize%
 }
-
 \def\DC@parsesize#1{%
   \gdef\DC@tmp@sizeargs{}%
   \ifstrequal{#1}{`}\DC@withsize{\endgroup\DC@rest{#1}}%
-%  \@ifnextchar`\DC@withsize\DC@rest%
 }
-
 \def\DC@withsize#1{%
-%\message{*********\detokenize{#1}********}%
+  %\message{*********\detokenize{#1}********}%
   \def\@tmp@arg{#1}%
   \def\@tmp@star{*}%
   \ifx\@tmp@arg\@tmp@star\relax%
@@ -1211,14 +1314,24 @@
     \expandafter\DC@rest%
   \fi%
 }
-
-\def\DC@rest#1#2#3#4#5{% #1=rho, #2=system-in, #3=system-out, #4=Gamma_in, #5=Gamma_out
-%\message{*********\detokenize{#1}|\detokenize{#2}|\detokenize{#3}|\detokenize{#4}|\detokenize{#5}|********}%
+%    \end{macrocode}
+% 
+% Read the rest and typeset the output.  |#1|=rho, |#2|=system-in,
+% |#3|=system-out, |#4|=Gamma-in, |#5|=Gamma-out:
+%    \begin{macrocode}
+\def\DC@rest#1#2#3#4#5{%
+  %\message{*********\detokenize{#1}|\detokenize{#2}|\detokenize{#3}%
+  %    |\detokenize{#4}|\detokenize{#5}|********}%
   \def\DC@tmp@rho{\DC@fmtrhosub#1\DC@ENDSTATE{#2}{#3}}%
   \DCSym_{#2\to #3}^{\DC@tmp@sup}%
   \expandafter\DC@inner\DC@tmp@sizeargs{\DC@tmp@rho}{#4}{#5}%
 }
-
+%    \end{macrocode}
+% 
+% Read the following tokens until the marker |\DC@ENDSTATE|, and format this as
+% a state with or without the automatic system subscripts (depending on if the
+% argument starts with a `|*|').
+%    \begin{macrocode}
 \def\DC@fmtrhosub{%
   \@ifnextchar*\DC@fmtrhosub@nosub\DC@fmtrhosub@wsub%
 }
@@ -1231,8 +1344,8 @@
     #1_{#3#2}%
   \endgroup%
 }
-
-
 %    \end{macrocode}
-%\Finale
+% \end{macro}
+%
+% \Finale
 \endinput

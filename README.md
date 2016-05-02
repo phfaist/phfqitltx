@@ -46,4 +46,5 @@ IN PROGRESS -- the packages are currently migrating to fully documented DTX file
 
   - `phfquotetext` --- ready
   - `phfnote` --- ready
+  - `phfqit` --- ready
   - others hopefully coming soon!
