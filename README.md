@@ -26,6 +26,16 @@ LaTeX packages for QIT stuff which I use often
   may occupy the full next page.
 
 
+# Installation
+
+From source: clone this repo, then type
+
+    > make install
+    
+to install into your local TEXMF tree.  For a list of available actions, type
+
+    > make
+
 
 # Package Documentation
 
