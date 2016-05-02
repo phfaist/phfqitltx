@@ -36,6 +36,7 @@
 \usepackage{tcolorbox}% includes {verbatim} package, so hack around that...
 \newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,toptitle=1.5ex,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
 \newtcolorbox{pkgwarning}{colback=red!5!white,colframe=red!5!white,toptitle=1.5ex,coltitle=red!50!black,fonttitle=\bfseries,title={WARNING}}
+\newtcolorbox{pkgtip}{colback=green!5!white,colframe=green!5!white,toptitle=1.5ex,coltitle=green!50!black,fonttitle=\bfseries,title={TIP}}
 
 \makeatletter
 \newsavebox\phfnoteDocVirtualPage@contents
@@ -226,14 +227,15 @@
 %   text formatted with |MyriadPro| (professional fonts by Adobe which can be
 %   used in \LaTeX{} with the |MinionPro| and |MyriadPro| packages\footnote{See
 %   \url{https://github.com/sebschub/FontPro}; the fonts themselves ship with
-%   some Adobe Products}).  These beautiful fonts can be used for any purpose.
+%   some Adobe products}).  These beautiful fonts can be used for any purpose.
 % \end{pkgoptions}
 % 
 % Based on |utopianote|, the preset |pkgdoc| combines additional definitions to
 % aid in documenting \LaTeX{} packages.
 % \begin{pkgoptions}
 % \item[preset=pkgdoc] Basic formatting and settings for documenting \LaTeX{}
-%   packages. This preset was used for the current document.
+%   packages. This preset was used for the current document.  This preset also
+%   defines some additional handy commands.
 % \end{pkgoptions}
 %
 % The following preset makes the document look more like an article.  There are
@@ -276,7 +278,7 @@
 % directly by including an external package.  In those cases, you may have a
 % look at the preset's definition for inspiration (see \autoref{impl:presets}).
 %
-% For a summary of package options, see ...... .
+% For a summary of package options, see \autoref{sec:package-options}.
 %
 %
 % \subsection{Title Formatting}
@@ -379,9 +381,8 @@
 % \end{pkgwarning}
 %
 %
-% \subsection{Abstract and Table of Contents}
+% \subsection{Abstract}
 % \label{sec:abstract-attributes}
-% \label{sec:inline-toc}
 %
 % \DescribeEnv{abstract} The |abstract| environment renders a paragraph of
 % indented text aimed to provide a short summary of the document.  We might use,
@@ -420,19 +421,21 @@
 % to put them in a braced group: |[abstract={wide,noname,it}]|.
 %
 % \begin{pkgoptions}
-% \item[abstract=wide] The abstract should not be indented, and should instead
-%   be aligned to the rest of the text.
-% \item[abstract=narrow] The abstract should be indented narrower then by
-%   default.
-% \item[abstract=noname] The title ``Abstract.'' above the text will not be
-%   typeset.  The abstract text is typeset directly instead.
-% \item[abstract=original] Revert to the class' default implementation of the
-%   |abstract| environment.  The class' implementation is restored and no longer
-%   tampered with.
-% \item[abstract=small] Use a smaller font for the abstract text (|\small| font).
-% \item[abstract=compact] Reduce spacing before and after the abstract.  If the
-%   abstract is short, this might look slightly better.
-% \item[abstract=it] Typeset the abstract text using an italic typeface.
+% \item[abstract=\pkgoptattrib{wide}] The abstract should not be indented, and
+%   should instead be aligned to the rest of the text.
+% \item[abstract=\pkgoptattrib{narrow}] The abstract should be indented narrower
+%   then by default.
+% \item[abstract=\pkgoptattrib{noname}] The title ``Abstract.'' above the text
+%   will not be typeset.  The abstract text is typeset directly instead.
+% \item[abstract=\pkgoptattrib{original}] Revert to the class' default
+%   implementation of the |abstract| environment.  The class' implementation is
+%   restored and no longer tampered with.
+% \item[abstract=\pkgoptattrib{small}] Use a smaller font for the abstract text
+%   (|\small| font).
+% \item[abstract=\pkgoptattrib{compact}] Reduce spacing before and after the
+%   abstract.  If the abstract is short, this might look slightly better.
+% \item[abstract=\pkgoptattrib{it}] Typeset the abstract text using an italic
+%   typeface.
 % \end{pkgoptions}
 %
 % 
@@ -453,6 +456,36 @@
 % \DescribeMacro{\noteabstractbeforespacing}
 % (|\noteabstractbeforespacing|) the abstract can further be
 % specified, also as macros.
+%
+% \subsection{Table of Contents}
+% \label{sec:inline-toc}
+%
+% \DescribeMacro{\inlinetoc}
+% The package |phfnote| also provides a table of contents typeset with
+% reduced spacing to be more compact, and with horizontal rules before
+% and after.  You can insert the table of contents with the command
+% |\inlinetoc|.  It looks like this:
+%
+% \begin{phfnoteDocVirtualPage}
+%   \title{Notes about Stuff}\relax
+%   \date{25.12.2015}\relax
+%   \author{Me}\relax
+%   \notetitle@style@default
+%   \def\noteabstract@nameline{{\parskip=0pt\relax\par\centering\noteabstractnamefont\abstractname\par}\vskip 1ex\relax}%
+%   \def\noteabstracttextwidth{0.8\textwidth}%
+%   \begin{abstract}
+% Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut purus
+% elit, vestibulum ut, placerat ac, adipiscing vitae, felis.
+%   \end{abstract}
+%   \def\@starttoc#1{\relax
+%     \contentsline {section}{\numberline {1}Introduction}{2}{section.1}
+%     \contentsline {section}{\numberline {2}Basic Usage}{3}{section.2}
+%     \contentsline {subsection}{\numberline {2.1}Loading the Package}{3}{subsection.2.1}
+%     \contentsline {subsection}{\numberline {2.2}Presets}{3}{subsection.2.2}
+%   }\relax
+%   \inlinetoc
+%   \morepagecontents
+% \end{phfnoteDocVirtualPage}
 %
 %
 % \subsection{Predefined Package Sets}
@@ -483,33 +516,336 @@
 % \end{pkgoptions}
 %
 %
-%
-% \subsection{General Formatting and Appearance}
-%
-% \subsubsection{Font/Spacing Goodies}
-%
-% \subsubsection{Paragraph Spacing Presets}
-% \label{sec:paragraph-spacing-presets}
-%
-% \subsubsection{Section Heading Formatting}
-% \label{sec:section-heading-styling}
-% Very limited styling. Use |titlesec| (or |sectsty|) directly if you
-% want anything serious.
-%
-% Section fonts are customized using the |sectsty| package.  If this
-% conflicts in your document, then use the |[secfmt={}]| package
-% option and take care of section styling manually.
-%
-%
 % \subsection{Page Geometry}
+% \label{sec:pagegeomdefs}
 %
-% \subsection{Presets}
+% Another important aspect of |phfnote| is the handling of page margins.  Often
+% the default page margins of the |article| class are quite narrow.  While it is
+% a good typographical practice to avoid long lines, on occasion we prefer to
+% have notes typeset with wider text.  The general answer is the |geometry|
+% package, which allows to set all margins in full detail.
+%
+% The |phfnote| package provides some standard choices of options for the
+% |geometry| package, which are adjusted according to the document font size,
+% and whether the document is typeset in two columns.
+%
+% If you want anything more complicated than what is provided by a default
+% setting here, just use |pagegeomdefs=false| and invoke the |geometry| package
+% directly with your preferred set of options.
+%
+% \begin{pkgoptions}
+% \item[pagegeomdefs=true] Include the |geometry| package, using the default
+%   settings or whatever is specified with the |pagegeom| option.
+% \item[pagegeomdefs=false] Do not attempt to change the document margins, and
+%   don't load the |geometry| package.
+% \item[nopagegeomdefs] Same as |pagegeomdefs=false|.
+% \end{pkgoptions}
+%
+% The page geometry predefined settings are the following.
+%
+% \begin{pkgoptions}
+% \item[pagegeom=default] Default settings. Not too wide, not too
+%   narrow. Settings vary according to single or double column setting, and
+%   according to default font point size.
+% \item[pagegeom=narrow] Narrower style.  For single-column documents, this is
+%   closer to the typographically-advertised-optimal of 50--80 characters per
+%   line, but it might look narrow to some.
+% \item[pagegeom=wide] Wide, comfortable style.  Wastes less paper.
+% \item[pagegeom=xwide] Extra wide.  Use if you pity trees.
+% \item[pagegeom=bigmargin] Makes the margins asymmetric, so that a wide margin
+%   note can fit.  This style is used in this package documentation, for
+%   example.
+% \end{pkgoptions}
+% 
+%
+% \subsection{Section Headers Styling}
+% \label{sec:secfmt}
+%
+% The |phfnote| package provides some limited styling of section headers.  The
+% font, size and ``compactness'' of the headers can be adjusted with title options.
+% But really, these options are quite basic.  You should use |titlesec| or
+% |sectsty| directly if you want anything serious.
+%
+% The section headings are customized using the |sectsty| package.  If this
+% conflicts in your document, then use the |[secfmt={}]| package option to
+% indicate that section headings should be styled by this package.  Then take
+% care of section styling manually.
+%
+% Package options may be used to customize the appearance of the section
+% headings by specifying a list of attributes.  When you combine arguments, make
+% sure to put them in a braced group: |[secfmt={section,compact}]|.  Beware that
+% attributes are not merged between different occurrences of the |secfmt|
+% keyword in the package options; the last occurrence defines all set
+% attributes.  If the |secfmt| package option is not given, then by default only
+% the |section| attribute is set.
+% 
+% \begin{pkgoptions}
+% \item[secfmt=\pkgoptattrib{section}] Use the |section| attribute to activate
+%   the styling of section-level headings, that is, |\section|, |\subsection|
+%   and |\subsubsection|.
+% \item[secfmt=\pkgoptattrib{paragraph}] This attribute indicates that the
+%   styling should apply to paragraph-level headings as well (|\paragraph| and
+%   |\subparagraph|).
+% \item[secfmt=\pkgoptattrib{compact}] Reduce the sizes of the section headings
+%   (if the section-level headings are styled, i.e.\@ you need to specify the
+%   |section| attribute), giving the document a more ``compact'' appearance.
+% \item[secfmt=\pkgoptattrib{larger}] Increase the sizes of the section
+%   headings.  Suitable for longer documents or for small document font sizes.
+% \item[secfmt=\pkgoptattrib{secsquares}] Display black squares on the left side
+%   of |\section|-level commands, making them stand out better.  This is useful
+%   for documents (such as the present one) with several layers of sub-sections.
+% \item[secfmt=\pkgoptattrib{sffamily}] Typeset headings in a sans-serif font.
+%   The default document sans serif font is used.  This applies to section-level
+%   and/or paragraph-level headings, depending on which of the attributes
+%   |section| and/or |paragraph| have been specified.
+% \item[secfmt=\pkgoptattrib{itpar}] Typeset paragraph-level headings in italic.
+% \item[secfmt=\pkgoptattrib{blockpar}] Change the paragraph-level headings not
+%   to be in ``run-in'' style, but to be typeset on their own line like section
+%   headings.
+% \item[secfmt=\{\}] Leave the argument empty to keep the original class styling;
+%   nothing will be overridden and the |sectsty| package is not loaded.
+% \end{pkgoptions}
+%
+% You can also directly modify the section heading style by redefining some
+% macros.  Note that these macros only affect those sectioning commands which we
+% have decided to style, which is specified by the |section| and |paragraph|
+% attributes to be specified in the |secfmt={...}| package option.
+%
+% \DescribeMacro{\notesectionallfont} The macro |\notesectionallfont| is invoked
+% for every sectioning command (for those which are styled, see the |section|
+% and |paragraph| attributes). The macro |\notesectionallfont| internally
+% invokes \DescribeMacro{\notesectionallfontfamily} |\notesectionallfontfamily|
+% to select which font family to use.  The family should be given as the font
+% code, e.g.: |pbk| = {\fontfamily{pbk}\selectfont Bookman}; |bch| =
+% {\fontfamily{bch}\selectfont Charter}; |ppl| = {\fontfamily{ppl}\selectfont
+% Palatino}; |ptm| = {\fontfamily{ptm}\selectfont Adobe Times}; |phv| =
+% {\fontfamily{phv}\selectfont Adobe Helvetica}; |pcr| =
+% {\fontfamily{pcr}\selectfont Adobe Courier}; |put| =
+% {\fontfamily{put}\selectfont Utopia}; |cmr| = {\fontfamily{cmr}\selectfont
+% Computer Modern Roman}; |cmss| = {\fontfamily{cmss}\selectfont CM Sans Serif};
+% |cmbr| = {\fontfamily{cmbr}\selectfont CM Bright}; google many more or look
+% directly into the source of corresponding \LaTeX{} packages.
+%
+% You may customize these either via attributes or by redefining them directly.
+% Beware that if you redefine |\notesectionallfont| then you are responsible for
+% honoring, or ignoring, the value of |\notesectionallfontfamily|.
+%
+% \DescribeMacro{\notesectionfont} \DescribeMacro{\notesubsectionfont}
+% \DescribeMacro{\notesubsubsectionfont} \DescribeMacro{\noteparagraphfont}
+% \DescribeMacro{\notesubparagraphfont} These macros define the font commands to
+% apply for the section heading corresponding to the given sectioning command.
+% This macro is invoked after |\notesectionallfont|, which means that font
+% definitions in these macros take precedence over those in
+% |\notesectionallfont|.
+%
+% \DescribeMacro{\notesectionsetfonts} The macro |\notesectionsetfonts| is a
+% shorthand to set all section font definitions for the section-level commands
+% |\section|, |\subsection|, and |\subsubsection|.  For example,
+% \begin{verbatim}
+%   \notesectionsetfonts{\Large}{\large}{\normalsize}
+% \end{verbatim}
+% will set the font sizes for |\section|, |\subsection| and |\subsubsection| in
+% this order.
+%
+% \DescribeMacro{\noteparagraphsetfonts} The macro |\noteparagraphsetfonts| is
+% the corresponding shorthand for the paragraph-level commands.  It takes two
+% arguments, the font definitions to apply for headings of level |\paragraph|
+% and |\subparagraph|.
+%
+% \subsection{Appearance of Paragraphs}
+% \label{sec:par-defs}
+%
+% Several presets may be set to define the appearance of paragraphs.  
+%
+% \begin{pkgoptions}
+% \item[par=indent] Paragraphs are indented, bearing some
+%   similarity to the |article| class' default paragraph style.
+% \item[par=skip] Paragraphs are separated by additional spacing,
+%   and not indented.
+% \item[par=indentminiskip] Paragraphs are indented, but there is also a small
+%   space between each paragraph.
+% \item[par=original] Do not modify the appearance of paragraphs, and leave the
+%   class default.
+% \end{pkgoptions}
+%
+% \subsection{Adjusting Spacing of Lines and Words}
+% \label{sec:spacingdefs}
+%
+% The |phfnote| package also provides definitions to adjust spacing of lines and
+% words.
+%
+% This includes definitions to avoid overflowing words in the margin in case of
+% long words.
+% 
+% \begin{pkgoptions}
+% \item[spacingdefs=true] Apply adjustments to line and word spacing.
+% \item[spacingdefs=false] Do not attempt any adjustments of line or word
+%   spacing.
+% \item[nospacingdefs] Alias for |spacingdefs=false|.
+% \end{pkgoptions}
+%
+%
+% \subsection{Adjustments for Fonts}
+% \label{sec:fontdefs}
+%
+% The |phfnote| package provides as well some adjustments for fonts to make some
+% fonts look nicer.
+%
+% Concretely, the {\fontfamily{cmbr}\selectfont Computer Modern Bright} font is
+% used as sans serif font instead of {\fontfamily{cmss}\selectfont \LaTeX's
+% default sans serif font}, and the more universal |T1| font encoding is used
+% instead of the default |OT1|.
+%
+% \begin{pkgoptions}
+% \item[fontdefs=true] Apply adjustments to fonts.
+% \item[fontdefs=false] Do not apply adjustments to fonts.
+% \item[nofontdefs] Same as |fontdefs=false|.
+% \end{pkgoptions}
+%
+% \subsection{Footnote Figure Style}
+% \label{sec:footnotedefs}
+%
+% The footnotes' appearance can also be slightly enhanced.
+%
+% \begin{pkgoptions}
+% \item[footnotedefs=true] Changes the symbol appearance a little bit---the
+%   footnote number is smaller and typeset in boldface.
+% \item[footnotedefs=false] Do not change the footnote appearance.
+% \item[nofootnotedefs] Same as |footnotedefs=false|.
+% \end{pkgoptions}
+% 
+%
+% \subsection{Hyperref Loading}
+% \label{sec:hyperrefdefs}
+%
+% There are many options for setting up the |hyperref| package, and often, the
+% defaults (with boxed links) are pretty ugly in my opinion.  Enable the
+% |hyperrefdefs| feature of |phfnote| to alter the defaults to something I
+% personally like better (dark blue links as in this document).
+%
+% \begin{pkgoptions}
+% \item[hyperrefdefs=true] Load the |hyperref| package, and set some sensible
+%   settings.  Also ensures the |\email| and |\url| commands are made available.
+% \item[hyperrefdefs=false] Do not load the |hyperref| package, do not set
+%   sensible settings.
+% \item[nohyperrefdefs] Same as |hyperrefdefs=false|.
+% \end{pkgoptions}
+%
+% \DescribeMacro{\url} In order to typeset URLs, the |\url| command is made
+% available from the package |url| (which is then linkified by |hyperref|).  For
+% example, you can type |\url{https://github.com/phfaist/}|.
+%
+% \DescribeMacro{\email} A similar command allows to typeset e-mail addresses.
+% The text is displayed as a hyperlink, which when clicked opens a e-mail
+% composer to that address (via a |mailto:XXX| link).  For example, try
+% |\email{pulp_fiction@tarantino.com}|.
+%
+% \DescribeMacro{\phfnotePdfLinkColor} The command |\phfnotePdfLinkColor| may by
+% used to set the color of the links.  It takes one argument, a color
+% specification understood by the |xcolor| package.  For example:
+% \begin{verbatim}
+%   \phfnotePdfLinkColor{green!50!black}
+% \end{verbatim}
+%
+% \begin{pkgnote}
+%   The pacakge |xcolor| must be loaded for |\phfnotePdfLinkColor| to work.
+%   (The |xcolor| package is automatically loaded as part of a package set as
+%   long as you're not using the option |pkgset=none|; see
+%   \autoref{sec:package-sets}.)
+% \end{pkgnote}
+%
+%
+% \subsection{Bibliography Definitions}
+% \label{sec:bibliographydefs}
+%
+% This package also provides some definitions for the bibliography.
+%
+% It sets the |naturemagdoi| style by default, which is a hacked (by yours
+% truly) version of the |naturemag| style to include the journal name as a
+% hyperlink (as in APS bibliography styles).
+%
+% The bibliography is also typeset in a smaller font.
+%
+% Finally, an entry in the table of contents is generated.
+%
+% \begin{pkgoptions}
+% \item[bibliographydefs=true] Load the |hyperref| package, and set some sensible
+%   settings.  Also ensures the |\email| and |\url| commands are made available.
+% \item[bibliographydefs=false] Do not load the |hyperref| package, do not set
+%   sensible settings.
+% \item[nobibliographydefs] Same as |bibliographydefs=false|.
+% \end{pkgoptions}
+%
+% \DescribeMacro{\bibliography} \DescribeMacro{\bibliographystyle} The
+% |\bibliographystyle| and |\bibliography| macros can be used as usual, for
+% example:
+% \begin{verbatim}
+%   \bibliographystyle{apsrmp4-1} % optional
+%   \bibliography{mybibfile}
+% \end{verbatim}
+% bearing in mind that if the |\bibliographystyle| command is not present, our
+% custom |naturemagdoi| bibliography style is used.
 %
 %
 % \subsection{URL Styles}
+% \label{sec:url-styles}
+%
+% As a bonus, the |phfnote| package provides an alternative set of URL styles to
+% use with the |\url| and |\email| commands (see \autoref{sec:hyperrefdefs}).
+%
+% All the styles described below typeset the URL in a slightly smaller size, so
+% as to avoid a common issue with URLs that they tend to appear too large.
+% Also, the tilde character is fixed so that it appears nicely, as in:\\
+% \url{https://people.phys.ethz.ch/~pfaist/}.
+%
+% The URL style can be set with the command |\urlstyle|\marg{name of style}.
+%
+% \begin{description}[font=\ttfamily,labelwidth=8em]
+% \item[notett] typewriter font
+% \item[notesf] default sans serif font
+% \item[notesfss] Computer Modern Sans Serif font
+% \item[noteitsf] italic using default sans serif font 
+% \item[noterm] normal roman typeface
+% \item[noteit] just italic typeface
+% \item[notesml] just smaller than surrounding text
+% \end{description}
+%
+%
+% \subsection{A \phfverb{\notesmaller} Command}
+%
+% This general-purpose command is handy to typeset text smaller than its
+% surrounding text, for when you don't know what size the surrounding text is
+% typeset at.  In some sense, this is a very very lightweight analogue of what
+% the |relsize| package does.  (This is used, for example, in our implementation
+% of URL styles introduced in \autoref{sec:url-styles}.)
+%
+% \DescribeMacro{\notesmaller}\DescribeMacro{\notesmaller[0.8]} Set the font
+% size to a fraction of the surrounding font size.  The fraction may be
+% specified as an optional argument.  A fraction of 0.8 makes the text size 0.8
+% times that of the surrounding text, that is, smaller than the surrounding
+% text.  A value of 1 does not change the font size.  If the fraction is not
+% specified, the value stored in |\notesmallerfrac| is used.
+%
+% \DescribeMacro{\notesmallerfrac} The fraction by which |\notesmaller| typesets
+% smaller text when no optional argument is given.  You may redefine this
+% command to set the default ``smaller'' size fraction.
+%
+% \subsection{Tools Mostly for Hackers}
+%
+% The |phfnote| package also provides some small hacks.  They are documented
+% further in \autoref{sec:impl-other-stand-alone-defs}.  These are:
+% \DescribeMacro{\phfnoteHackSectionStarWithTOC} a macro
+% |\phfnoteHackSectionStarWithTOC| to hack into a command which generates a
+% |\section*|, in order for that command to also generate a corresponding entry
+% in the table of contents; and
+% \DescribeMacro{\phfnoteSaveDefs}\DescribeMacro{\phfnoteRestoreDefs} a pair of
+% commands to save and restore \LaTeX{} definitions.
+%
+% 
 %
 %
 % \section{Summary of Package Options}
+% \label{sec:package-options}
 %
 % \begin{pkgoptions}
 % \item[preset=\meta{preset name}] Load a preset specifying a predefined set of
@@ -524,8 +860,31 @@
 %   \autoref{sec:abstract-attributes}
 % \item[pkgset=\meta{package set}] Specify a standard set of \LaTeX{}
 %   packages to load.  See \autoref{sec:package-sets}.
+% \item[pagegeomdefs=\meta{true or false}] Whether to care about page
+%   margins. |nopagegeomdefs| is synonym for |pagegeomdefs=false|.
+% \item[pagegeom=\meta{geom style}] Set a page margin style.  Only has effect if
+%   |pagegeomdefs=true|.  Options are documented in \autoref{sec:pagegeomdefs}.
+% \item[secfmt=\meta{section formatting attributes}] A list of attributes
+%   defining how section (and possibly paragraph) headings should look like.
+%   See \autoref{sec:secfmt}.
+% \item[par=\meta{par style}] Define how paragraphs should be spaced.  Refer to
+%   \autoref{sec:par-defs}.
+% \item[spacingdefs=\meta{true or false}] Adjust spacing of lines and words
+%   (\autoref{sec:spacingdefs}).
+% \item[fontdefs=\meta{true or false}] Adjust some fonts
+%   (\autoref{sec:fontdefs}).
+% \item[footnotedefs=\meta{true or false}] Adjust slighly the appearance of
+%   footnotes.  See \autoref{sec:footnotedefs}.
+% \item[hyperrefdefs=\meta{true or false}] Load the |hyperref| package, and set
+%   some defaults settings.  See \autoref{sec:hyperrefdefs}.
+% \item[bibliographydefs=\meta{true or false}] Adjust the appearance and style
+%   of the bibliography.  See \autoref{sec:bibliographydefs}.
 % \end{pkgoptions}
 %
+% \begin{pkgtip}
+%   To activate only a small set of features, use \fbox{\phfverb{preset=reset}}
+%   and then enable only the features required.
+% \end{pkgtip}
 %
 %
 % \StopEventually{\vskip 2cm plus 2cm minus 2cm\relax\PrintChanges
@@ -792,7 +1151,7 @@
 %
 % \subsubsection{Title Styles Definition}
 %
-% See \autoref{sec:title-styles}........
+% The title styles are documented in \autoref{sec:title-styles}.
 %
 % \paragraph{Title style: `default'}
 %
@@ -1070,9 +1429,10 @@
 % Then the correct macro will be selected according to the current |phfnote| package
 % options.
 %
+% The description of these settings are given in \autoref{sec:pagegeomdefs}.
+%
 % \begin{macro}{\phfnote@pagegeomstyle@default}
-%   Default settings.  Not too wide, not too narrow.  Settings vary according to single or
-%   double column setting, and according to default font point size.
+%   Default setting.
 %    \begin{macrocode}
 \def\phfnote@pagegeomstyle@default{
   \if@twocolumn
@@ -1092,9 +1452,7 @@
 % \end{macro}
 % 
 % \begin{macro}{\phfnote@pagegeomstyle@narrow}
-%   Narrower style.  For single-column documents, this is closer to the
-%   typographically-advertised-optimal of 50--80 characters per line, but it might look
-%   narrow to some.
+%   Narrow style.
 %    \begin{macrocode}
 \def\phfnote@pagegeomstyle@narrow{
   \if@twocolumn
@@ -1114,7 +1472,7 @@
 % \end{macro}
 %
 % \begin{macro}{\phfnote@pagegeomstyle@wide}
-%   Wide, comfortable style.  Wastes less paper.
+%   Wide style.
 %    \begin{macrocode}
 \def\phfnote@pagegeomstyle@wide{
   \if@twocolumn
@@ -1154,8 +1512,7 @@
 % \end{macro}
 %
 % \begin{macro}{\phfnote@pagegeomstyle@bigmargin}
-%   Makes the margins asymmetric, so that a wide margin note can fit.  Used in this
-%   package documentation, for example.
+%   |bigmargin| style.
 %    \begin{macrocode}
 \def\phfnote@pagegeomstyle@bigmargin{%
   \if@twocolumn
@@ -1242,24 +1599,24 @@
 %
 % \paragraph{Paragraph Spacing Presets}
 %
-% Here again, we define several possibilities for paragraph settings
-% as individual macros (see \autoref{sec:paragraph-spacing-presets}).
-% Depending on the package option, we execute the corresponding macro.
+% Here again, we define several possibilities for paragraph settings as
+% individual macros (see \autoref{sec:par-defs}).  Depending on the package
+% option, we execute the corresponding macro.
 %
 %    \begin{macrocode}
 \def\phfnote@par@original{%
 }
 \def\phfnote@par@indent{%
-  \setlength{\parindent}{1.5em}
-  \setlength{\parskip}{0em} %0.3em
+  \parindent=1.5em\relax
+  \parskip=0pt\relax
 }
 \def\phfnote@par@indentminiskip{%
-  \setlength{\parindent}{1.5em}
-  \setlength{\parskip}{0.3em}
+  \parindent=1.5em\relax
+  \parskip=0.3em plus 0.1em\relax
 }
 \def\phfnote@par@skip{%
-  \setlength{\parindent}{0em}
-  \setlength{\parskip}{0.8em}
+  \parindent=0pt\relax
+  \parskip=0.8em plus 0.2em minus 0.1em\relax
 }
 %    \end{macrocode}
 % 
@@ -1278,63 +1635,18 @@
 % \end{macro}
 % 
 %
-% \subsection{Customized, ``Inline,'' Table of Contents}
-%
-% \begin{macro}{\inlinetoc}
-%   Just a customized table of contents.  Horizontal rules before and
-%   after, and spacing is adjusted, and no ``Contents'' title.  Check
-%   out the \hyperref[sec:toc]{top of this document}.
-%    \begin{macrocode}
-\newcommand{\inlinetoc}{%
-  {%
-    \vspace*{2mm}%
-    \hrule%
-    \vspace*{2mm}%
-    \parskip=1pt\relax%
-    \def\section*##1{}% no sectioning.
-    \tableofcontents{}%
-    \vspace*{4mm}%
-    \hrule%
-    \vspace*{6mm}%
-  }%
-}
-%    \end{macrocode}
-% 
-% \end{macro}
-%
 %
 %
 % \subsection{Section Styling}
 %
 % Very limited support for styling section and paragraph headers
-% (\autoref{sec:section-heading-styling}).  If you want anything
-% serious, use |sectsty| or |titlesec| directly.
+% (\autoref{sec:secfmt}).  If you want anything serious, use |sectsty| or
+% |titlesec| directly.
 %
 % \begin{macro}{\notesectionallfont}
 % \begin{macro}{\notesectionallfontfamily}
-%   The macro |\notesectionallfont| is invoked for every sectioning
-%   command (for those which are styled, see the |section| and
-%   |paragraph| attributes).
-%
-%   |\notesectionallfont| internally invokes
-%   |\notesectionallfontfamily| to select which font family to use.
-%   The family should be given as the font code, e.g.: |pbk| =
-%   {\fontfamily{pbk}\selectfont Bookman}; |bch| =
-%   {\fontfamily{bch}\selectfont Charter}; |ppl| =
-%   {\fontfamily{ppl}\selectfont palatino}; |ptm| =
-%   {\fontfamily{ptm}\selectfont Adobe Times}; |phv| =
-%   {\fontfamily{phv}\selectfont Adobe Helvetica}; |pcr| =
-%   {\fontfamily{pcr}\selectfont Adobe Courier}; |put| =
-%   {\fontfamily{put}\selectfont Utopia}; |cmr| =
-%   {\fontfamily{cmr}\selectfont Computer Modern Roman}; |cmss| =
-%   {\fontfamily{cmss}\selectfont CM Sans Serif}; |cmbr| =
-%   {\fontfamily{cmbr}\selectfont CM Bright}; google many more or look
-%   directly into the source of corresponding \LaTeX{} packages.
-%
-%   You may customize these either via attributes or by redefining
-%   them directly.  Beware that if you redefine |\notesectionallfont|
-%   then you are responsible for honoring, or ignoring, the value of
-%   |\notesectionallfontfamily|.
+%   Define the |\notesectionallfont| and |\notesectionallfontfamily|, which
+%   control the general font used in section headings.
 %    \begin{macrocode}
 \newcommand{\notesectionallfont}{%
   \fontfamily{\notesectionallfontfamily}\fontseries{bx}\selectfont}
@@ -1388,7 +1700,7 @@
 % 
 %
 % Define the attributes which the user can set.  See
-% \autoref{sec:section-heading-styling}.
+% \autoref{sec:secfmt}.
 %
 %    \begin{macrocode}
 \def\phfnote@do@secfmt@section{
@@ -1596,11 +1908,6 @@
 %   Color may be any color name or specification recognized by the
 %   |xcolor| package.
 %
-%   \begin{pkgnote}
-%     The pacakge {xcolor} must be loaded for |\phfnotePdfLinkColor|
-%     to work.
-%   \end{pkgnote}
-%
 %    \begin{macrocode}
 \newcommand{\phfnotePdfLinkColor}[1]{%
   \@ifpackageloaded{xcolor}{%
@@ -1791,8 +2098,9 @@
 %
 %
 % \subsection{Other Stand-Alone Definitions and Helpers}
+% \label{sec:impl-other-stand-alone-defs}
 %
-% \subsubsection{A \phfverb{\smaller} command}
+% \subsubsection{A \phfverb{\notesmaller} command}
 %
 %
 % \begin{macro}{\notesmaller}
@@ -1817,6 +2125,31 @@
 %    \end{macrocode}
 % \end{macro}
 %
+%
+% \subsubsection{Customized, ``Inline,'' Table of Contents}
+%
+% \begin{macro}{\inlinetoc}
+%   Just a customized table of contents.  Horizontal rules before and
+%   after, and spacing is adjusted, and no ``Contents'' title.  The
+%   table of contents looks just like at the \hyperref[sec:toc]{top of
+%   this document}.  The command is described in
+%   \autoref{sec:inline-toc}.
+%    \begin{macrocode}
+\newcommand{\inlinetoc}{%
+  {%
+    \vspace*{2mm}%
+    \hrule%
+    \vspace*{2mm}%
+    \parskip=1pt\relax%
+    \@starttoc{toc}% see definition of \tableofcontents
+    \vspace*{4mm}%
+    \hrule%
+    \vspace*{6mm}%
+  }%
+}
+%    \end{macrocode}
+% 
+% \end{macro}
 %
 % \subsubsection{URL Styles}
 %
@@ -1930,17 +2263,57 @@
 %
 % \subsubsection{Hack to save \& restore a set of commands}
 %
+% Exactly what it sounds like.  You can store a set of commands, specified by
+% their name, by specifying an identifier.  The commands corresponding to a
+% given identifier can then later be restored.
+%
+% \begin{macro}{\phfnoteSaveDefs}
+%   The command |\phfnoteSaveDefs|\marg{identifier}\marg{list of macro names}
+%   saves the current definitions of the given list of macro and associates them
+%   to the given identifier.
+%   The list of macros is specified as a comma-separated list of macro names.
 %    \begin{macrocode}
 \def\phfnoteSaveDefs#1#2{%
+%    \end{macrocode}
+% 
+% The macro |\phfnote@restoredefs@<identifier>| will store the code necessary to
+% restore the macros.
+%    \begin{macrocode}
   \csgdef{phfnote@restoredefs@#1}{}%
+%    \end{macrocode}
+% 
+% Iterate over the macros we are supposed to store.
+%    \begin{macrocode}
   \def\@tmpa{#2}%
   \@for\next:=\@tmpa\do{%
+%    \end{macrocode}
+% 
+% For each macro we are supposed to store (whose name is given in |\next|), we
+% |\let| |\phfnote@restoredefs@<identifier>@<macro-name>| store the current value
+% of the macro.
+%    \begin{macrocode}
     \global\csletcs{phfnote@restoredefs@#1@\next}{\next}%
+%    \end{macrocode}
+% 
+% Then, we append to |\phfnote@restoredefs@<identifier>| the code necessary to
+% restore this macro.  That code is simply a |\cslet| instruction.
+%
+% Recall that |\xappto| expands its second argument (as |\xdef| does), allowing
+% us to expand the value of |\next|.
+%    \begin{macrocode}
     \expandafter\xappto\csname phfnote@restoredefs@#1\endcsname{%
       \noexpand\csletcs{\next}{phfnote@restoredefs@#1@\next}%
     }%
   }%
 }
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\phfnoteRestoreDefs}
+%   Restores the macro saved by |\phfnoteSaveDefs|.  We simply execute the macro
+%   |\phfnote@restoredefs@<identifier>|, in which we duly stored the code
+%   necessary to restore all the saved macros.
+%    \begin{macrocode}
 \def\phfnoteRestoreDefs#1{%
   \ifcsname phfnote@restoredefs@#1\endcsname%
     \csname phfnote@restoredefs@#1\endcsname%
@@ -1950,6 +2323,8 @@
   \fi%
 }
 %    \end{macrocode}
+% \end{macro}
+%
 %
 % \subsubsection{A utility for verbatim stuff in arguments of other macros}
 %
@@ -1971,184 +2346,146 @@
 %
 % \subsection{Handle Package Options}
 %
-% \begin{pkgnote}
-%   TODO: MOVE DOCUMENTATION IN COMMENTS FOR THE PACKAGE OPTIONS INTO
-%   THE USER SECTION OF THE DOCUMENTATION ABOVE.
-% \end{pkgnote}
-%
 % \subsubsection{Define and Parse Package Options}
 %
+% Initialization code for |kvoptions| for our package options.  See \autoref{sec:package-options}.
+%
 %    \begin{macrocode}
-
 \SetupKeyvalOptions{
   family=phfnote,
   prefix=phfnote@opt@
 }
-
+%    \end{macrocode}
 %
-% e.g. [pkgset=minimal]
 %
-% Package set to load, for convenience.  'none', 'minimal', 'rich', or 'extended'
-%
-\DeclareStringOption[rich]{pkgset}
-
-
-%
-% e.g. [title=small]
-%
-% The title style to use. By default, the 'default' style.  May be 'default', 'small', or
-% 'article'.  You may leave empty to avoid overriding the title style, and leaving the
-% class default.
-%
+% The title style to use. \marginpar{\raggedleft \phfverb{[title=...]}}
+% See \autoref{sec:title-styles}.
+%    \begin{macrocode}
 \DeclareStringOption[default]{title}
-
+%    \end{macrocode}
+% 
 %
-% e.g. [pagegeomdefs=false]
+% Option for abstract attributes \marginpar{\raggedleft
+% \phfverb{[abstract=...]}}  (\autoref{sec:abstract-attributes}).
+%    \begin{macrocode}
+\DeclareStringOption[]{abstract}
+%    \end{macrocode}
 %
-% Define the page geometry.  This tries to come up with nice margin widths
-% depending on note font size (10pt,11pt,12pt) and whether it is [twocolumn] or
-% not.
+% Option for Package sets \marginpar{\raggedleft \phfverb{[pkgset=...]}}
+% (\autoref{sec:package-sets})
+%    \begin{macrocode}
+\DeclareStringOption[rich]{pkgset}
+%    \end{macrocode}
 %
-% [nopagegeomdefs] is equivalent to [pagegeomdefs=false]
-%
+% Define the page geometry.  \marginpar{\raggedleft
+% \phfverb{[pagegeomdefs=...]}} \marginpar{\raggedleft \phfverb{[pagegeom=...]}}
+% See \autoref{sec:pagegeomdefs}.
+%    \begin{macrocode}
 \DeclareBoolOption[true]{pagegeomdefs}
 \DeclareComplementaryOption{nopagegeomdefs}{pagegeomdefs}
-
-%
-% e.g. [pagegeom=narrow]
-%
-% The style of page geometry to use.  Available are 'narrow', 'default', 'wide' and
-% 'xwide'
-%
-% This has no effect if [pagegeomdefs=false] was given.
-%
 \DeclareStringOption[default]{pagegeom}
-
-%
-% e.g. [spacingdefs=false]
-%
-% Add definitions to adjust spacing of lines and words.  Includes definitions to
-% avoid overflowing words in the margin in case of long words.
-%
-% [nospacingdefs] is equivalent to [spacingdefs=false]
-%
-\DeclareBoolOption[true]{spacingdefs}
-\DeclareComplementaryOption{nospacingdefs}{spacingdefs}
-
-
-%
-% e.g. [par=skip] or [par=indent]
-%
-% How to treat paragraphs.  Can be indented ('indent'), with an empty line ('skip'),
-% indented with small skip ('indentminiskip') or no change from LaTeX default
-% ('original').
-%
-\DeclareStringOption[skip]{par}
-
-
-%
-% e.g. [abstract={noname,narrow}]
-%
-% Abstract flags.  May be a comma-separated list of the following: 'wide',
-% 'narrow', 'noname', 'small', 'it', 'original', 'compact'
-%
-\DeclareStringOption[]{abstract}
-
-%
-% e.g. [hyperrefdefs=false]
-%
-% Load hyperref and corresponding definitions.
-%
-\DeclareBoolOption[true]{hyperrefdefs}
-%
-% [nohyperrefdefs] is equivalent to [hyperrefdefs=false]
-%
-\DeclareComplementaryOption{nohyperrefdefs}{hyperrefdefs}
-
-
-%
-% e.g. [fontdefs=true]
-%
-% Do some adjustments to the fonts. In particular, use the Computer Modern Bright sans
-% serif font instead of the default sans serif font, e.g. for the title.
-%
-\DeclareBoolOption[true]{fontdefs}
-%
-% [nofontdefs] is equivalent to [fontdefs=false]
-%
-\DeclareComplementaryOption{nofontdefs}{fontdefs}
-
-%
-% e.g. [secfmt={section,compact}]
-%
-% Styling of section headings.  Value is comma-separated list of actions to
-% take, chosen among:
-%
-%  - "section"  style section/subsection/subsubsection headings
-%
-%  - "compact"  make section/subsection/subsubsection headings more compact. Needs to be
-%    used in conjunction with 'section'
-%
-%  - "paragraph"  style paragraph/subparagraph headings
-%
-% Leave empty to keep the original styling.
-%
-\DeclareStringOption[section]{secfmt}
-
-%
-% e.g. [footnotedefs=false]
-%
-% Adjustments for footnotes. Changes the symbol appearance a little bit.
-%
-\DeclareBoolOption[true]{footnotedefs}
-%
-% [nofootnotedefs] is equivalent to [footnotedefs=false]
-%
-\DeclareComplementaryOption{nofootnotedefs}{footnotedefs}
-
-%
-% e.g. [bibliographydefs=false]
-%
-% Adjustments for bibliography, including default style
-%
-\DeclareBoolOption[true]{bibliographydefs}
-%
-% [nobibliographydefs] is equivalent to [bibliographydefs=false]
-%
-\DeclareComplementaryOption{nobibliographydefs}{bibliographydefs}
-
-
-
 %    \end{macrocode}
 % 
 %
 %
+% Styling of section headings.  \marginpar{\raggedleft \phfverb{[secfmt=...]}}
+% See \autoref{sec:secfmt}.
+%    \begin{macrocode}
+\DeclareStringOption[section]{secfmt}
+%    \end{macrocode}
+%
+% How to treat paragraphs.  \marginpar{\raggedleft \phfverb{[par=...]}} See
+% \autoref{sec:par-defs}.
+%    \begin{macrocode}
+\DeclareStringOption[skip]{par}
+%    \end{macrocode} 
+% 
+% Add definitions to adjust spacing of lines and words. \marginpar{\raggedleft
+% \phfverb{[spacingdefs=...]}}  See \autoref{sec:spacingdefs}.
+%    \begin{macrocode}
+\DeclareBoolOption[true]{spacingdefs}
+\DeclareComplementaryOption{nospacingdefs}{spacingdefs}
+%    \end{macrocode}
+%
+% Do some adjustments to the fonts. \marginpar{\raggedleft
+% \phfverb{[fontdefs=...]}} See \autoref{sec:fontdefs}.
+%    \begin{macrocode}
+\DeclareBoolOption[true]{fontdefs}
+\DeclareComplementaryOption{nofontdefs}{fontdefs}
+%    \end{macrocode}
+%
+% Adjustments for footnotes. \marginpar{\raggedleft
+% \phfverb{[footnotedefs=...]}}  See \autoref{sec:footnotedefs}.
+%    \begin{macrocode}
+\DeclareBoolOption[true]{footnotedefs}
+\DeclareComplementaryOption{nofootnotedefs}{footnotedefs}
+%    \end{macrocode}
+%
+% Load hyperref and corresponding definitions. \marginpar{\raggedleft
+% \phfverb{[hyperrefdefs=...]}} See \autoref{sec:hyperrefdefs}.
+%    \begin{macrocode}
+\DeclareBoolOption[true]{hyperrefdefs}
+\DeclareComplementaryOption{nohyperrefdefs}{hyperrefdefs}
+%    \end{macrocode}
+%
+% Adjustments for bibliography, including default style. \marginpar{\raggedleft
+% \phfverb{[bibliographydefs=...]}} See \autoref{sec:bibliographydefs}.
+%    \begin{macrocode}
+\DeclareBoolOption[true]{bibliographydefs}
+\DeclareComplementaryOption{nobibliographydefs}{bibliographydefs}
+%    \end{macrocode}
+% 
+% 
+% Preset option.  \marginpar{\raggedleft \phfverb{[preset=...]}} See
+% \autoref{sec:presets}.
+%    \begin{macrocode}
+\define@key{phfnote}{preset}{%
+  \ifcsname phfnote@preset@#1\endcsname%
+    \csname phfnote@preset@#1\endcsname%
+  \else%
+    \PackageWarning{phfnote}{Unknown preset: `#1'!}
+  \fi%
+}
+%    \end{macrocode}
+% 
+%
+% Provide the standard error message for unknown options.
+%    \begin{macrocode}
+\DeclareDefaultOption{%
+  \@unknownoptionerror
+}
+%    \end{macrocode}
+%
 % \subsubsection{Define Global Presets}
 % \label{impl:presets}
 %
-% See \autoref{sec:presets}.
+% Define the global presets here.  See \autoref{sec:presets} for a description
+% of what these presets do.
 %
-%  TODO: DOCUMENT ME!
-%
+% \begin{macro}{\phfnote@hook@atendload}
+%   A hook for presets to do stuff at the end of package load.
 %    \begin{macrocode}
-
-%
-% A hook for presets to do stuff at the end of package load.
-%
-
 \def\phfnote@hook@atendload{}
-
+%    \end{macrocode}
+% \end{macro}
 %
-% DEFINE PRESETS
-% --------------------
 %
+% \begin{macro}{\phfnote@preset@article}
+%   Article preset.
+%    \begin{macrocode}
 \def\phfnote@preset@article{
   \def\phfnote@opt@title{article}
   \def\phfnote@opt@par{indent}
   \def\phfnote@opt@pagegeom{default}
 }
-% -------------
-\newcommand\phfnote@presetcommon@xnote[1][noteitsf]{% common settings to all "{sf|sfss|utopia}note" presets
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\phfnote@presetcommon@xnote}
+%   Specify some common definitions for all our |*note| preset styles.  The
+%   optional argument is the URL style to set.
+%    \begin{macrocode}
+\newcommand\phfnote@presetcommon@xnote[1][noteitsf]{
   \def\phfnote@opt@title{default}
   \def\phfnote@opt@par{skip}
   \phfnote@opt@pagegeomdefstrue
@@ -2160,6 +2497,15 @@
     \fi
   }
 }
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\phfnote@preset@sfnote}
+% \begin{macro}{\phfnote@preset@sfssnote}
+% \begin{macro}{\phfnote@preset@utopianote}
+% \begin{macro}{\phfnote@preset@mnmynote}
+%   Define the different |*note| styles.
+%    \begin{macrocode}
 \def\phfnote@preset@sfnote{
   \phfnote@presetcommon@xnote
   \phfnote@opt@footnotedefstrue
@@ -2168,9 +2514,13 @@
   \renewcommand{\notesectionallfontfamily}{\sfdefault}
 }
 \def\phfnote@preset@sfssnote{
-  % as sfnote, ...
+%    \end{macrocode}
+% set up all the settings as for |sfnote| \ldots
+%    \begin{macrocode}
   \phfnote@preset@sfnote
-  % ... but:
+%    \end{macrocode}
+% \ldots but override:
+%    \begin{macrocode}
   \phfnote@opt@fontdefsfalse
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
@@ -2193,7 +2543,12 @@
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
   \renewcommand{\notesectionallfontfamily}{\sfdefault}
-  % require these AFTER the default package set, because some symbols may be defined in package sets etc...
+%    \end{macrocode}
+%
+% Require these packages AFTER the default package set, because some symbols may
+% be defined in package sets, and I've had problems with re-definitions
+% etc\ldots anyway this seems to work this way:
+%    \begin{macrocode}
   \g@addto@macro\phfnote@hook@atendload{
     \RequirePackage{MnSymbol}
     \PassOptionsToPackage{medfamily,textosf,mathlf,minionint,footnotefigures}{MinionPro}
@@ -2202,53 +2557,99 @@
     \RequirePackage{MyriadPro}
   }
 }
-\def\phfnote@preset@pkgdoc{% (preset for package documentations :-)
-  \phfnote@preset@utopianote% inherits utopianote
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+%
+% \begin{macro}{\phfnote@preset@pkgdoc}
+%   Preset for my package documentation.  Also provide some handy commands.
+%
+%   This preset inherits all definitions from the |utopianote| preset.
+%    \begin{macrocode}
+\def\phfnote@preset@pkgdoc{%
+  \phfnote@preset@utopianote%
+%    \end{macrocode}
+% 
+% Set up general appearance.
+%    \begin{macrocode}
   \def\phfnote@opt@secfmt{section,paragraph,itpar,blockpar,larger,secsquares}
   \def\phfnote@opt@pagegeom{bigmargin}
   \def\phfnote@opt@abstract{noname}
-  %
-  % Patch up \PrintChanges and \PrintIndex, if they are defined (for if we are using the
-  % {ltxdoc} package for latex package documentation)
-  %
+%    \end{macrocode}
+%
+% Patch up |\PrintChanges| and |\PrintIndex|, if they are defined (for if we are
+% using the |ltxdoc| package for latex package documentation).  We want these to
+% generate an entry in the table of contents. 
+%    \begin{macrocode}
   \ifdefined\PrintChanges
     \phfnoteHackSectionStarWithTOCInCommand\PrintChanges
   \fi
   \ifdefined\PrintIndex
     \phfnoteHackSectionStarWithTOCInCommand\PrintIndex
   \fi
-  %
-  % Set the index to two columns only.
-  %
-  \ifdefined\c@IndexColumns% for index in
+%    \end{macrocode}
+%
+% Set the index to TWO columns only (three is too tight).
+%    \begin{macrocode}
+  \ifdefined\c@IndexColumns
     \setcounter{IndexColumns}{2}
   \fi
+%    \end{macrocode}
+%
+% Set up an elaborate environment (based on a |description| environment) to
+% describe package options.
+%    \begin{macrocode}
   \RequirePackage{enumitem}
-  % 
-  % To document package options.
-  % 
   \newlist{pkgoptions}{description}{1}
   \setlist[pkgoptions]{font=\phfnotePkgOptionsLabelFmt,style=nextline}
-  \def\phfnotePkgOptionsLabelFmt##1{\fbox{\ttfamily ##1}\vspace*{5pt}\phfnote@pkgdoc@index{##1}}
+  \def\phfnotePkgOptionsLabelFmt##1{%
+    \fbox{\ttfamily ##1}\vspace*{5pt}\phfnote@pkgdoc@index{##1}}
+%    \end{macrocode}
+% 
+% within this environment, we want to keep package options in the index.
+% Because package options may be of the form |key=val|, we want to split keys
+% from values and put them independently in the index.  This is done by entering
+% a \TeX{} group, and using an |\lccode| trick: the code is prepared to iterate
+% over a list of comma-separated stuff, but then the ``lowercase'' version of
+% that code is executed instead, where the |=|'s have been replaced by |,|'s.
+%    \begin{macrocode}
   \def\phfnote@pkgdoc@index##1{%
-    \begingroup\lccode`\= = `\,%  hack around \index format for pkgdoc... \index{sortkey=display-key} or sth like that
+    \begingroup\lccode`\= = `\,%
       \def\x{\lowercase{\def\@tmpa{##1}}}%
       \x%
-      \let\meta\@gobble
-      \let\marg\@gobble
-      \let\oarg\@gobble
-      \let\parg\@gobble
+      \let\meta\@gobble%
+      \let\marg\@gobble%
+      \let\oarg\@gobble%
+      \let\parg\@gobble%
+      \let\pkgoptattrib\@firstofone%
       \def\handleitemindex####1{%
-        \ifx\relax\detokenize{####1}\relax\else
+        \ifx\relax\detokenize{####1}\relax\else%
           \edef\@tmpb{{####1=\string\verb!*+####1+ (pkg. opt.)}}%
           \expandafter\index\@tmpb%
-        \fi
+        \fi%
       }%
       \def\@tmpc{\forcsvlist{\handleitemindex}}%
       \expandafter\@tmpc\expandafter{\@tmpa}%
     \endgroup%
   }
+%    \end{macrocode}
+% 
+% Finally, also provide the |\pkgoptattrib| command, which typesets its argument
+% as |\{arg, ...\}|---useful to typeset attributes such as in
+% \autoref{sec:abstract-attributes}.
+%    \begin{macrocode}
+  \def\pkgoptattrib##1{\{##1,...\}}
 }
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% \begin{macro}{\phfnote@preset@reset}
+%   |reset| preset:
+%    \begin{macrocode}
 \def\phfnote@preset@reset{
   \def\phfnote@opt@pkgset{none}
   \def\phfnote@opt@title{}
@@ -2261,35 +2662,33 @@
   \def\phfnote@opt@secfmt{}
   \phfnote@opt@bibliographydefsfalse
   \phfnote@opt@footnotedefsfalse
-% ADD RESET DEF HERE for new options.
+%    \end{macrocode}
+% 
+% \begin{pkgwarning}
+%   SELF-NOTE: DO NOT FORGET TO ADD HERE RESET COMMANDS FOR ANY NEW OPTION THAT
+%   WE PROVIDE IN THE FUTURE.
+% \end{pkgwarning}
+% 
+%    \begin{macrocode}
 }
-
-
+%    \end{macrocode}
+% \end{macro}
+% 
 %
-% Allow to set a preset, which may set other options, for example.
 %
-\define@key{phfnote}{preset}{%
-  \ifcsname phfnote@preset@#1\endcsname%
-    \csname phfnote@preset@#1\endcsname%
-  \else%
-    \PackageWarning{phfnote}{Unknown preset: `#1'!}
-  \fi%
-}
-
-
 %
-% NOW PROCESS THE OPTIONS
+% \subsubsection{Finally, Process and Execute the Package Options}
 %
-
-\DeclareDefaultOption{%
-  % We provide the standard LaTeX error.
-  \@unknownoptionerror
-}
-
+%
+%
+% Process the options:
+%
+%    \begin{macrocode}
 \ProcessKeyvalOptions*
 %    \end{macrocode}
 %
-% \subsubsection{And Finally Execute the Package Options}
+%
+% Take action according to the user options.
 %
 %    \begin{macrocode}
 \phfnote@do@pkgset{\phfnote@opt@pkgset}
@@ -2325,7 +2724,11 @@
 \ifphfnote@opt@footnotedefs
   \phfnote@do@footnotedefs
 \fi
-
+%    \end{macrocode}
+% 
+% Finally, execute the hook we set up for definitions at the end of the package
+% loading:
+%    \begin{macrocode}
 \phfnote@hook@atendload
 %    \end{macrocode}
 %
