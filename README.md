@@ -35,5 +35,5 @@ comments.]
 IN PROGRESS -- the packages are currently migrating to fully documented DTX files.  Currently ready are:
 
   - `phfquotetext` --- ready
-  - `phfnote` --- in progress
+  - `phfnote` --- ready
   - others hopefully coming soon!
