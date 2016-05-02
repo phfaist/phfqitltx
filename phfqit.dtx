@@ -1,0 +1,1082 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2016 by Philippe Faist <philippe.faist@bluewin.ch>
+% -------------------------------------------------------
+% 
+% This file may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in:
+%
+%    http://www.latex-project.org/lppl.txt
+%
+% and version 1.3 or later is part of all distributions of LaTeX 
+% version 2005/12/01 or later.
+%
+% \fi
+%
+% \iffalse
+%<*driver>
+\ProvidesFile{phfqit.dtx}
+%</driver>
+%<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
+%<package>\ProvidesPackage{phfqit}
+%<*package>
+    [2016/05/02 v1.0 phfqit package]
+%</package>
+%
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{xcolor}
+\usepackage[preset=pkgdoc]{phfnote}
+\usepackage{phfqit}
+\phfnoteSaveDefs{verbatimstuff}{verbatim,@verbatim,endverbatim}
+\usepackage[normalem]{ulem}
+\usepackage{verbdef}
+\usepackage{tcolorbox}
+\newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
+\newtcolorbox{pkgwarning}{colback=red!5!white,colframe=red!5!white,coltitle=red!50!black,fonttitle=\bfseries,title={WARNING}}
+\EnableCrossrefs         
+\CodelineIndex
+\RecordChanges
+\phfnoteRestoreDefs{verbatimstuff}
+\begin{document}
+  \DocInput{phfqit.dtx}
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+%
+% \changes{v1.0}{2016/04/20}{Initial version}
+%
+% \GetFileInfo{phfqit.dtx}
+%
+% \DoNotIndex{\newcommand,\newenvironment,\def,\gdef,\edef,\xdef,\if,\else,\fi,\ifx}
+% 
+% \title{The \textsf{phfqit} package\thanks{\itshape
+% This document corresponds to
+% \textsf{phfqit}~\fileversion, dated \filedate. It is part of
+% the Part of the
+% \href{https://github.com/phfaist/phfqitltx/}{\textsf{phfqitltx}}
+% package suite, see \url{https://github.com/phfaist/phfqitltx}.}}
+% \author{Philippe Faist\quad\email{philippe.faist@bluewin.ch}}
+%
+% \maketitle
+%
+% \begin{abstract}
+%   \textsf{phfqit}---Utilities for what I do in Quantum Information Theory, in particular
+%   shorthands for entropy measures.
+% \end{abstract}
+%
+% \inlinetoc
+%
+% \section{Introduction}
+%
+% DOCUMENTATION HERE
+%
+%
+% \section{Common Stuff}
+%
+% \subsection{Size Specification}
+% \label{topic:size-specification-backtick}
+% some macros accept a size specification with a backtick, as in
+% |\IdentProc`<SIZE>...|. DOCUMENT ME PLEASE ..........
+%
+%
+% \section{General Symbols (and Math Operators)}
+% \label{sec:symbols}
+%
+% \DescribeMacro{\Hs}
+% Hilbert space = $\Hs$.
+%
+% \DescribeMacro{\Ident}
+% Identity operator = $\Ident$.
+%
+% \DescribeMacro{\IdentProc}
+% Identity process.  Possible usage syntax is:
+% \begin{center}
+% \begin{tabular}{lc}
+%     |\IdentProc[A][A']{\rho}| &  $\IdentProc[A][A']{\rho}$ \\
+%     |\IdentProc[A]{\rho}| &  $\IdentProc[A]{\rho}$ \\
+%     |\IdentProc[A][A']{}| &  $\IdentProc[A][A']{}$ \\
+%     |\IdentProc[A]{}| &  $\IdentProc[A]{}$ \\
+%     |\IdentProc{}| &  $\IdentProc{}$ \\
+%     |\IdentProc{\rho}| &  $\IdentProc{\rho}$ \\
+%     |\IdentProc`\big[A]{\rho}| &  $\IdentProc`\big[A]{\rho}$ \\
+% \end{tabular}
+% \end{center}
+% This macro accepts a size specification with the backtick (`|`|'), see
+% \autoref{topic:size-specification-backtick}.
+%
+% \begingroup\catcode`\^=12\relax
+% \DescribeMacro{\ee^X}\endgroup
+% A macro for the exponential.  Type the \LaTeX{} code as if |\ee| were just the symbol,
+% i.e.\@ as |\ee^{<ARGUMENT>}|.  The ideas is that this macro may be redefined to change
+% the appearance of the $e$ symbol, or even to change the notation to |\exp{<ARGUMENT>}|
+% if needed for inline math.
+%
+%
+% \subsection{Math Operators}
+% \label{sec:math-operators}
+%
+% \DescribeMacro{\tr} \DescribeMacro{\supp} \DescribeMacro{\rank}
+% \DescribeMacro{\linspan} \DescribeMacro{\spec} \DescribeMacro{\diag} Provide
+% some common math operators.  The trace $\tr$, the support $\supp$, the rank
+% $\rank$, the linear span $\linspan$, the spectrum $\spec$ and the diagonal
+% matrix $\diag$.  (Note that |\span| is already defined by \LaTeX{}, so that we
+% resort to |\linspan|.)  \vspace{1.5cm}
+%
+% \DescribeMacro{\Re} \DescribeMacro{\Im} Also, redefine |\Re| and |\Im| (real
+% and imaginary parts of a complex number), to the more readable $\Re(z)$ and
+% $\Im(z)$.  (The original symbols were {\makeatletter $\phfqit@Re(z)$ and
+% $\phfqit@Im(z)$}.)
+%
+% \subsection{Bits and Bit Strings}
+% \label{sec:bits}
+%
+% \DescribeMacro{\bit} Format a bit value, for example |\bit{0}| or |\bit0|
+% gives $\bit0$ or $\bit1$.  This command works both in math mode and text mode.
+%
+% \DescribeMacro{\bitstring} Format a bit string.  For example
+% |\bitstring{01100101}| is rendered as \bitstring{01100101}.  This command
+% works both in math mode and text mode.
+%
+% \subsection{Logical Gates}
+% \label{sec:gates}
+%
+% \DescribeMacro{\gate} Format a logical gate.  Essentially, this command
+% typesets its argument in small-caps font.  For example, with |\gate{C-not}|
+% you get \gate{C-not}.  (The default formatting ignores the given
+% capitalization, but if you redefine this command you could exploit this,
+% e.g.\@ by making the ``C'' in ``Cnot'' larger than the ``not''.)
+%
+% \DescribeMacro{\AND} \DescribeMacro{\XOR} \DescribeMacro{\CNOT}
+% \DescribeMacro{\NOT} \DescribeMacro{\NOOP} Some standard gates.  These typeset
+% respectively as \AND, \XOR, \CNOT, \NOT, and \NOOP.  \vspace{1cm}
+%
+%
+% \section{Lie Groups and Algebras}
+% \label{sec:Lie-groups-algebras}
+%
+% \DescribeMacro{\uu(N)} \DescribeMacro{\UU(N)} \DescribeMacro{\su(N)}
+% \DescribeMacro{\SU(N)} \DescribeMacro{\so(N)} \DescribeMacro{\SO(N)}
+% \DescribeMacro{\SN(N)} Format some common Lie groups and algebras.
+%
+% |\SN(N)| is the symmetric group of $N$ items, and formats by default as
+% $\SN(N)$.  \vspace{2cm}
+%   
+% \section{Bra-Ket Notation and Delimited Expressions}
+% \label{sec:bra-ket} \label{sec:delimited}
+%
+% All commands here work in math mode only.  They all accept an optional
+% argument, which is a size modifier.  Use the starred form to enclose the
+% delimiters with |\left...\right| and have the size determined automatically.
+% Usage for example is:
+% \begin{center}
+%   \begin{tabular}{lc}
+%       |\ket{\psi}|  &  $\ket{\psi}$ \\
+%       |\ket[\big]{\psi}|  &  $\ket[\big]{\psi}$ \\
+%       |\ket[\Big]{\psi}|  &  $\ket[\Big]{\psi}$ \\
+%       |\ket[\bigg]{\psi}|  &  $\ket[\bigg]{\psi}$ \\
+%       |\ket[\Bigg]{\psi}|  &  $\ket[\Bigg]{\psi}$ \\
+%       |\ket*{\displaystyle\sum_k \psi_k}|  &  $\ket*{\displaystyle\sum_k \psi_k}$ \\
+%   \end{tabular}
+% \end{center}
+%
+% \DescribeMacro{\ket}
+% Typeset a quantum mechanical ket.  |\ket{\psi}| gives $\ket{\psi}$.
+%
+% \DescribeMacro{\bra}
+% Typeset a bra.  |\bra{\psi}| gives $\bra{\psi}$.
+%
+% \DescribeMacro{\braket}
+% Typeset a bra-ket inner product.  |\braket{\phi}{\psi}| gives $\braket{\phi}{\psi}$.
+%
+% \DescribeMacro{\ketbra}
+% Typeset a ket-bra outer product.  |\ketbra{\phi}{\psi}| gives $\ketbra{\phi}{\psi}$.
+%
+% \DescribeMacro{\proj}
+% Typeset a rank-1 projector determined by a ket.  |\proj{\psi}| gives $\proj{\psi}$.
+%
+% \DescribeMacro{\matrixel} Typeset a matrix element.
+% |\matrixel{\phi}{A}{\psi}| gives $\matrixel{\phi}{A}{\psi}$.
+%
+% \DescribeMacro{\dmatrixel} Typeset a diagonal matrix element of an operator.
+% |\dmatrixel{\phi}{A}| gives $\dmatrixel{\phi}{A}$.
+%
+% \DescribeMacro{\innerprod} Typeset an inner product using the mathematicians' notation.
+% |\innerprod{\phi}{\psi}| gives $\innerprod{\phi}{\psi}$.
+%
+%
+% There are also some further delimited expressions defined, for convenience.
+%
+% \DescribeMacro{\abs} The absolute value of an expression.  |\abs{A}| gives
+% $\abs{A}$.
+%
+% \DescribeMacro{\avg} The average of an expression. |\avg[\big]{\sum_k A_k}|
+% gives $\avg[\big]{\sum_k A_k}$.
+%
+% \DescribeMacro{\norm} The norm of an expression.  |\norm{A_k}| gives
+% $\norm{A_k}$.  (You can add subscripts, e.g.\@ |\norm{A_k}_\infty| is
+% $\norm{A_k}_\infty$.)
+%
+% \DescribeMacro{\intervalc} A closed interval. |\intervalc{x}{y}| gives
+% $\intervalc{x}{y}$.
+%
+% \DescribeMacro{\intervalo} An open interval. |\intervalo{x}{y}| gives
+% $\intervalo{x}{y}$.
+%
+% \DescribeMacro{\intervalco} A semi-open interval, closed on the lower bound
+% and open on the upper bound. |\intervalco{x}{y}| gives $\intervalco{x}{y}$.
+%
+% \DescribeMacro{\intervaloc} A semi-open interval, open on the lower bound
+% and closed on the upper bound. |\intervaloc{x}{y}| gives $\intervaloc{x}{y}$.
+%
+%
+%
+% \section{Entropy Measures}
+% \label{sec:entropy-measures}
+%
+%
+% 
+%
+%
+%
+%
+%
+% \StopEventually{\vskip 2cm plus 2cm minus 2cm\relax\PrintChanges
+%     \vskip 2cm plus 2cm minus 2cm\relax\PrintIndex}
+%
+% \section{Implementation}
+%
+% First, load dependent packages.  Toolboxes, fonts and so on.
+%    \begin{macrocode}
+\RequirePackage{calc}
+\RequirePackage{etoolbox}
+\RequirePackage{amsmath}
+\RequirePackage{dsfont}
+\RequirePackage{mathrsfs}
+\RequirePackage{mathtools}
+%    \end{macrocode}
+%
+% \subsection{Simple Symbols and Shorthands}
+% 
+% Some simple symbols.  See \autoref{sec:symbols}.
+%
+% 
+% \subsubsection{General Symbols}
+%
+% These symbols are documented in \autoref{sec:symbols}.
+%
+% \begin{macro}{\Hs}
+%   Hilbert space.
+%    \begin{macrocode}
+\newcommand{\Hs}{\mathscr{H}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\Ident}
+%   Identity operator, $\Ident$.
+%    \begin{macrocode}
+\newcommand{\Ident}{\mathds{1}}
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% \begin{macro}{\IdentProc}
+%   Identity process.
+%    \begin{macrocode}
+\def\IdentProc{%
+  \phfqit@parsesizearg\phfqit@IdentProc@maybeA%
+}
+\newcommand\phfqit@IdentProc@maybeA[1][]{%
+  \def\phfqit@IdentProc@val@A{#1}%
+  \phfqit@IdentProc@maybeB%
+}
+\newcommand\phfqit@IdentProc@maybeB[1][]{%
+  \def\phfqit@IdentProc@val@B{#1}%
+  \phfqit@IdentProc@arg%
+}
+\def\phfqit@IdentProc@arg#1{%
+  \def\phfqit@IdentProc@val@arg{#1}%
+%    \end{macrocode}
+% 
+% At this point, prepare the three arguments, each expanded exactly as they were when
+% given to these macros, and delegate the formatting to |\phfqit@IdentProc@do|.
+%    \begin{macrocode}
+  \edef\@tmp@args{%
+    {\expandonce{\phfqit@IdentProc@val@A}}%
+    {\expandonce{\phfqit@IdentProc@val@B}}%
+    {\expandonce{\phfqit@IdentProc@val@arg}}%
+  }%
+  \expandafter\phfqit@IdentProc@do\@tmp@args%
+}
+\def\phfqit@IdentProc@do#1#2#3{%
+  \operatorname{id}_{#1\notblank{#2}{\to #2}{}}%
+  \notblank{#3}{\expandafter\phfqit@inner@parens\phfqit@val@sizearg{#3}}{}%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+%
+% \begingroup\catcode`\^=12\relax
+% \begin{macro}{\ee^...}
+%   Macro for the exponential.
+%    \begin{macrocode}
+\def\ee^#1{e^{#1}} % we could imagine that in inlines, we replace this by exp()...
+%    \end{macrocode}
+% \end{macro}
+% \endgroup
+%
+% \subsection{Math Operators}
+%
+% See user documentation in \autoref{sec:math-operators}.
+%
+% \begin{macro}{\tr}
+% \begin{macro}{\supp}
+% \begin{macro}{\rank}
+% \begin{macro}{\linspan}
+% \begin{macro}{\spec}
+% \begin{macro}{\diag}
+%   Some common math operators.  Note that |\span| is already defined by \LaTeX{}, so we
+%   resort to |\linspan| for the linear span of a set of vectors.
+%    \begin{macrocode}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\linspan}{span}
+\DeclareMathOperator{\spec}{spec}
+\DeclareMathOperator{\diag}{diag}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}{\Re}
+% \begin{macro}{\Im}
+%   Also, alter the appearance of |\Re| and |\Im| to something more readable.
+%    \begin{macrocode}
+\let\phfqit@Re\Re
+\DeclareMathOperator{\phfqit@Realpart}{Re}%
+\renewcommand{\Re}{\phfqit@Realpart}
+\let\phfqit@Im\Im
+\DeclareMathOperator{\phfqit@Imagpart}{Im}%
+\renewcommand{\Im}{\phfqit@Imagpart}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \subsubsection{Bits and Bit Strings}
+% 
+% See documentation in \autoref{sec:bits}
+%
+% \begin{macro}{\bit}
+% \begin{macro}{\bitstring}
+%   Bits and bit strings.
+%    \begin{macrocode}
+\newcommand\bit[1]{\texttt{#1}} % bit values, formatted possibly differently.
+\newcommand\bitstring[1]{\phfqit@bitstring{#1}}%  a string of bits, fixes spacing
+%    \end{macrocode}
+% 
+% The implementation of |\bitstring| needs some auxiliary internal macros.
+%    \begin{macrocode}
+\def\phfqit@bitstring#1{%
+  \begingroup%
+  \setlength{\phfqit@len@bit}{\maxof{\widthof{\bit{0}}}{\widthof{\bit{1}}}}%
+  \phfqitBitstringFormat{\phfqit@bitstring@#1\phfqit@END}%
+  \endgroup%
+} % 
+\def\phfqit@bitstring@#1#2\phfqit@END{%
+  \makebox[\phfqit@len@bit][c]{\phfqitBitstringFormatBit{#1}}%
+  \if\relax\detokenize\expandafter{#2}\relax%
+  \else%
+    \phfqitBitstringSep\phfqit@bitstring@#2\phfqit@END% recurse for the rest of the bitstring
+  \fi%
+}
+\newlength\phfqit@len@bit
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}{\phfqitBitstringSep}
+% \begin{macro}{\phfqitBitstringFormat}
+%   Redefine these to customize the bit string appearance.
+%    \begin{macrocode}
+\newcommand\phfqitBitstringSep{\hspace{0.3ex}}
+\newcommand\phfqitBitstringFormat[1]{\ensuremath{\underline{\overline{#1}}}}
+\def\phfqitBitstringFormatBit{\bit}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+%
+% \subsection{Logical Gates}
+%
+% \begin{macro}{\gate}
+%   Generic macro to format a gate name.
+%    \begin{macrocode}
+\DeclareRobustCommand\gate[1]{\ifmmode\textsc{\lowercase{#1}}\else{\rmfamily\textsc{\lowercase{#1}}}\fi}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\AND}
+% \begin{macro}{\XOR}
+% \begin{macro}{\CNOT}
+% \begin{macro}{\NOT}
+% \begin{macro}{\NOOP}
+%   Some common gates.
+%    \begin{macrocode}
+\newcommand{\AND}{\gate{And}}
+\newcommand{\XOR}{\gate{Xor}}
+\newcommand{\CNOT}{\gate{C-Not}}
+\newcommand{\NOT}{\gate{Not}}
+\newcommand{\NOOP}{\gate{No-Op}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
+%
+% \subsubsection{Lie Groups \& Algebras}
+%
+% \begin{macro}{\uu(N)}
+% \begin{macro}{\UU(N)}
+% \begin{macro}{\su(N)}
+% \begin{macro}{\SU(N)}
+% \begin{macro}{\so(N)}
+% \begin{macro}{\SO(N)}
+% \begin{macro}{\SN(N)}
+%   Some Lie Groups \& Algebras.  See \autoref{sec:Lie-groups-algebras}
+%    \begin{macrocode}
+\def\uu(#1){\phfqit@fmtLieAlgebra{u}(#1)}
+\def\UU(#1){\phfqit@fmtGroup{U}(#1)}
+\def\su(#1){\phfqit@fmtLieAlgebra{su}(#1)}
+\def\SU(#1){\phfqit@fmtGroup{SU}(#1)}
+\def\so(#1){\phfqit@fmtLieAlgebra{so}(#1)}
+\def\SO(#1){\phfqit@fmtGroup{SO}(#1)}
+\def\SN(#1){\mathrm{S}_{#1}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}{\phfqit@fmtLieAlgebra}
+% \begin{macro}{\phfqit@fmtLieGroup}
+%   Override these to change the appearance of the group names or algebra names.  The
+%   argument is the name of the group or algebra (e.g. |su| or |SU|).
+%    \begin{macrocode}
+\def\phfqit@fmtLieAlgebra#1{\mathrm{#1}}
+\def\phfqit@fmtGroup#1{\mathrm{#1}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+%
+%
+%
+%
+% \subsection{Bra-Ket Notation}
+%
+%
+% Bras, kets, norms, some delimiter stuff.  User documentation in
+% \autoref{sec:bra-ket}.
+% \begin{macro}{\ket}
+% \begin{macro}{\bra}
+% \begin{macro}{\braket}
+% \begin{macro}{\ketbra}
+% \begin{macro}{\proj}
+% \begin{macro}{\matrixel}
+% \begin{macro}{\dmatrixel}
+% \begin{macro}{\innerprod}
+%    \begin{macrocode}
+\DeclarePairedDelimiterX\ket[1]{\lvert}{\rangle}{{#1}}
+\DeclarePairedDelimiterX\bra[1]{\langle}{\rvert}{{#1}}
+\DeclarePairedDelimiterX\braket[2]{\langle}{\rangle}{%
+  {#1}\hspace*{0.2ex}\delimsize\vert\hspace*{0.2ex}{#2}%
+}
+\DeclarePairedDelimiterX\ketbra[2]{\lvert}{\rvert}{%
+  {#1}\delimsize\rangle\hspace*{-0.25ex}\delimsize\langle{#2}%
+}
+\DeclarePairedDelimiterX\proj[1]{\lvert}{\rvert}{%
+  {#1}\delimsize\rangle\hspace*{-0.25ex}\delimsize\langle{#1}%
+}
+\DeclarePairedDelimiterX\matrixel[3]{\langle}{\rangle}{%
+  {#1}\hspace*{0.2ex}\delimsize\vert\hspace*{0.2ex}{#2}%
+  \hspace*{0.2ex}\delimsize\vert\hspace*{0.2ex}{#3}%
+}
+\DeclarePairedDelimiterX\dmatrixel[2]{\langle}{\rangle}{%
+  {#1}\hspace*{0.2ex}\delimsize\vert\hspace*{0.2ex}{#2}%
+  \hspace*{0.2ex}\delimsize\vert\hspace*{0.2ex}{#1}%
+}
+\DeclarePairedDelimiterX\innerprod[2]{\langle}{\rangle}{%
+  {#1},\hspace*{0.2ex}{#2}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+%
+% \subsection{Delimited Expressions}
+% Delimited expressions are documented in \autoref{sec:delimted}.
+% 
+% \begin{macro}{\abs}
+% \begin{macro}{\avg}
+% \begin{macro}{\norm}
+%   Other delimited expressions.
+%    \begin{macrocode}
+\DeclarePairedDelimiterX\abs[1]{\lvert}{\rvert}{{#1}}
+\DeclarePairedDelimiterX\avg[1]{\langle}{\rangle}{{#1}}
+\DeclarePairedDelimiterX\norm[1]{\lVert}{\rVert}{{#1}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
+% 
+% \begin{macro}{\phfqit@insideinterval}
+%   Format the contents of an interval.  Utility for defining |\intervalc| and
+%   friends.
+%    \begin{macrocode}
+\def\phfqit@insideinterval#1#2{{#1\mathclose{},\mathopen{}#2}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\intervalc}
+% \begin{macro}{\intervalo}
+% \begin{macro}{\intervalco}
+% \begin{macro}{\intervaloc}
+% Open/Closed/Semi-Open Intervals
+%    \begin{macrocode}
+\DeclarePairedDelimiterX\intervalc[2]{[}{]}{\phfqit@insideinterval{#1}{#2}}
+\DeclarePairedDelimiterX\intervalo[2]{]}{[}{\phfqit@insideinterval{#1}{#2}}
+\DeclarePairedDelimiterX\intervalco[2]{[}{[}{\phfqit@insideinterval{#1}{#2}}
+\DeclarePairedDelimiterX\intervaloc[2]{]}{]}{\phfqit@insideinterval{#1}{#2}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+%
+%
+%
+% \subsection{Entropy Measures}
+%
+% \subsubsection{Some Internal Utilities}
+%
+% \begin{macro}{\phfqit@parsesizearg}
+%   Internal utility to parse size argument with the backtick specification
+%   (\autoref{topic:size-specification-backtick}).
+%
+%   Parses a size argument, if any, and stores it into |\phfqit@val@sizearg|.
+%   The value stored can directly be expanded as an optional argument to a
+%   |\DeclarePairedDelimiter|-compatible command (see |mathtools| package).
+%
+%   |#1| should be a command token.  It is the next action to take, after
+%   argument has been parsed.
+%    \begin{macrocode}
+\def\phfqit@parsesizearg#1{%
+  \begingroup%
+  \mathcode`\`="0060\relax%
+  \gdef\phfqit@val@sizearg{}%
+  \@ifnextchar`{\phfqit@parsesizearg@withsize{#1}}{\endgroup#1}%
+}
+\def\phfqit@parsesizearg@withsize#1`#2{%
+  \def\@tmp@arg{#2}%
+  \def\@tmp@star{*}%
+  \def\@tmp@endgroupandcontinue{\endgroup#1}%
+  \ifx\@tmp@arg\@tmp@star\relax%
+    \gdef\phfqit@val@sizearg{*}%
+    \expandafter\@tmp@endgroupandcontinue%
+  \else%
+    \gdef\phfqit@val@sizearg{[#2]}%
+    \expandafter\@tmp@endgroupandcontinue%
+  \fi%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% \begin{macro}{\phfqit@inner@parens}
+%   Simple parenthesis-delimited expression, with
+%   |\DeclarePairedDelimiter|-compatible syntax.  For example,
+%   \par |\phfqit@inner@parens|\marg{content} \quad$\to$\quad
+%   \fbox{\phfverb( \meta{content} \phfverb)}
+%   \par |\phfqit@inner@parens*|\marg{content} \quad$\to$\quad
+%   \fbox{\phfverb\left\phfverb( \meta{content} \phfverb\right\phfverb)}
+%   \par |\phfqit@inner@parens[\big]|\marg{content} \quad$\to$\quad
+%   \fbox{\phfverb\bigl\phfverb( \meta{content} \phfverb\bigr\phfverb)}
+%
+%    \begin{macrocode}
+\DeclarePairedDelimiterX\phfqit@inner@parens[1]{(}{)}{#1}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+%
+% \subsubsection{Entropy and Conditional Entropy}
+%
+% See user documentation in \autoref{sec:entropy-measures}.
+%
+% \begin{macro}{\HHSym}
+%   The symbol used to designate an entropy measure (not relative).
+%    \begin{macrocode}
+\newcommand\HHSym{H}
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% ............................................................
+%
+%
+%
+%
+%
+%
+%
+%
+%    \begin{macrocode}
+
+
+%
+% \@HHbase  base macro for relative entropy macros.
+%
+% USAGE:
+%
+%   \@HHbase{H-symbol}{subscript}{superscript}<size-spec>[state][epsilon]{target system}[conditioning system]
+%
+% with optional <size-spec> =  "`*"  or  "`\Big"
+% 
+% Examples:
+%
+% \@HHbase{H-symbol}{subscript}{superscript}[\rho][\epsilon]{E}[X']
+% \@HHbase{H-symbol}{subscript}{superscript}`*[\rho][\epsilon]{E}[X']     -> with \left( \right)
+% \@HHbase{H-symbol}{subscript}{superscript}`\big[\rho][\epsilon]{E}[X']  -> with \bigl( \bigr)
+%
+%
+\def\@HHbase#1#2{%
+  #1_{#2}%
+  \@HHbase@parsesize%
+}
+\robustify\@HHbase
+
+\def\@HHbase@parsesize{%
+  \begingroup\mathcode`\`="0060\relax%
+  \gdef\HH@tmp@sizearg{}%
+  \@ifnextchar`\@HHbase@withsize\@HHbase@endgroupandparseinner%
+}
+
+\def\@HHbase@withsize`#1{%
+  \def\@tmp@arg{#1}%
+  \def\@tmp@star{*}%
+  \ifx\@tmp@arg\@tmp@star\relax%
+    \gdef\HH@tmp@sizearg{*}%
+    \expandafter\@HHbase@endgroupandparseinner%
+  \else%
+    \gdef\HH@tmp@sizearg{[#1]}%
+    \expandafter\@HHbase@endgroupandparseinner%
+  \fi%
+}
+\def\@HHbase@endgroupandparseinner{\endgroup\@HHbase@parseinner}
+
+\newcommand\@HHbase@parseinner[1][]{%  arg: state
+  \def\HH@tmpstore@state{#1}%
+  \@HHbase@parseinner@%
+}
+\newcommand\@HHbase@parseinner@[2][]{% arg: epsilon and target system
+  \def\HH@tmpstore@epsilon{#1}%
+  \def\HH@tmpstore@system{#2}%
+  \@HHbase@parseinner@@%
+}
+\newcommand\@HHbase@parseinner@@[1][]{% arg: conditioning system
+  \def\HH@tmpstore@condsys{#1}%
+  \@HHbase@do@inner%
+}
+
+
+\newtoks\HH@tmp@toks
+\def\HH@addtoks#1\@HH@END@ADD@TOKS{\HH@tmp@toks=\expandafter{\the\HH@tmp@toks#1}}%
+
+\def\@HHbase@do@inner{%
+  %
+  % Add the superscript
+  %
+  ^{\HH@tmpstore@epsilon}%
+  % 
+  % if system is blank, we just want the symbol itself with no argument.
+  % 
+  \expandafter\notblank\expandafter{\HH@tmpstore@system}{%
+    % 
+    % Construct the parenthetic argument to the entropy
+    % 
+    \HH@tmp@toks={}%
+    %
+    % ... add system:
+    % 
+    \expandafter\HH@addtoks\HH@tmpstore@system\@HH@END@ADD@TOKS%
+    %
+    % ... add conditional system, if specified:
+    %
+    \expandafter\notblank\expandafter{\HH@tmpstore@condsys}{%
+      \HH@addtoks\mathclose{}\,\delimsize\vert\,\mathopen{}\@HH@END@ADD@TOKS%
+      \expandafter\HH@addtoks\HH@tmpstore@condsys\@HH@END@ADD@TOKS%
+    }{}%
+    % 
+    % tokens ready now. Prepare argument to command, and go.
+    %
+    \edef\tmp@args{\expandonce{\HH@tmp@sizearg}{\the\HH@tmp@toks}}%
+    \expandafter\phfqit@inner@parens\tmp@args%
+    % 
+    _{\HH@tmpstore@state}% the state as subscript, if any
+    %
+  }{}%
+  %
+}
+
+
+
+
+% 
+% Entropy commands.
+%
+% Usage: \HH[state][epsilon]{target system}[conditioning system]
+%        \HH`*[state][epsilon]{target system}[conditioning system]     -> within \left(...\right)
+%        \HH`\big[state][epsilon]{target system}[conditioning system]  -> within \bigl(...\bigr)
+% 
+\newcommand\HH{\@HHbase{\HHSym}{}}
+\newcommand\Hzero{\@HHbase{\HHSym}{\mathrm{max},0}}
+\newcommand\Hmin{\@HHbase{\HHSym}{\mathrm{min}}}
+\newcommand\Hmaxf{\@HHbase{\HHSym}{\mathrm{max}}}
+
+%
+% Entropy function:
+%
+%  \Hfunc(x)
+%  \Hfunc`*(x)
+%  \Hfunc`\big(x)
+%
+\DeclareRobustCommand\Hfunc{%
+  \begingroup\mathcode`\`="0060\relax%
+  \gdef\Hfunc@tmp@sizearg{}%
+  \@ifnextchar`\Hfunc@withsize\Hfunc@next%
+}
+\def\Hfunc@withsize`#1{%
+  \def\@tmp@arg{#1}%
+  \def\@tmp@star{*}%
+  \ifx\@tmp@arg\@tmp@star\relax%
+    \gdef\Hfunc@tmp@sizearg{*}%
+    \endgroup%
+    \expandafter\Hfunc@inner%
+  \else%
+    \gdef\Hfunc@tmp@sizearg{[#1]}%
+    \endgroup%
+    \expandafter\Hfunc@inner%
+  \fi%
+}
+\def\Hfunc@next{\endgroup\Hfunc@inner}
+\def\Hfunc@inner(#1){%
+  \HHSym%  ({#1})%
+  \expandafter\phfqit@inner@parens\Hfunc@tmp@sizearg{#1}%
+}
+
+
+
+% ------------------------------------------------
+% Relative Entropies
+% ------------------------------------------------
+
+
+\newcommand\DDSym{D}
+
+
+%
+% \@DDbase@inner{rho}{Gamma}  -->  produces (\rho||\Gamma)
+% \@DDbase@inner*{rho}{Gamma}  -->  produces \left(\rho||\Gamma\right)
+% \@DDbase@inner[\big]{rho}{Gamma}  -->  produces \bigl(\rho||\Gamma\bigr)
+%
+\DeclarePairedDelimiterX\@DDbase@inner[2]{(}{)}{%
+  #1\mathclose{}\,\delimsize\Vert\,\mathopen{}#2%
+}
+
+%
+% \@DDbase  base macro for relative entropy macros.
+%
+% USAGE:
+%
+%   \@DDbase{D-symbol}{subscript}{superscript}<states-spec>
+%
+% with  <states-spec> =     {\rho}{\sigma}
+%                       or  `*{\rho}{\sigma}
+%                       or  `\big{\rho}{\sigma}
+%                       or  *{\rho}{\sigma}
+%                       or  [\big]{\rho}{\sigma}
+% 
+% Examples:
+%
+% \@DDbase{D-symbol}{subscript}{superscript}{\rho}{\Gamma}
+% \@DDbase{D-symbol}{subscript}{superscript}*{\rho}{\Gamma} -> with \left( \right)
+% \@DDbase{D-symbol}{subscript}{superscript}[\big]{\rho}{\Gamma} -> with \bigl( \bigr)
+%
+% and also alternative syntax, useful for higher-level macros which have already tons of [] options:
+%
+% \@DDbase{D-symbol}{subscript}{superscript}`*{\rho}{\Gamma} -> with \left( \right)
+% \@DDbase{D-symbol}{subscript}{superscript}`\big{\rho}{\Gamma} -> with \bigl( \bigr)
+%
+%
+\def\@DDbase#1#2#3{%
+  #1_{#2}^{#3}%
+  \@DDbase@parsesize%
+}
+\robustify\@DDbase
+
+\def\@DDbase@parsesize{%
+  \@ifnextchar`\@DDbase@withsize\@DDbase@inner%
+}
+
+\def\@DDbase@withsize`#1{%
+  \def\@tmp@arg{#1}%
+  \def\@tmp@star{*}%
+  \ifx\@tmp@arg\@tmp@star\relax%
+    \def\tmp@cmd{\@DDbase@inner*}%
+    \expandafter\tmp@cmd%
+  \else%
+    \def\tmp@cmd{\@DDbase@inner[#1]}%
+    \expandafter\tmp@cmd%
+  \fi%
+}
+
+%
+% \DD{\rho}{\sigma}
+% \DD*{\rho}{\sigma}
+% \DD`\big{\rho}{\sigma}
+% (i.e. \DD<states-spec> )
+%
+% \DD^{superscript}<states-spec>
+% \DD_{subscript}^{superscript}<states-spec>
+%
+% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
+%
+% Where optional  <size-spec>  =  "`*"  or  "`\Big"
+
+\DeclareRobustCommand\DD{%
+  \def\DD@tmp@sub{}%
+  \def\DD@tmp@sup{}%
+  \DD@%
+}
+
+\def\DD@{%
+  \@ifnextchar_\DD@parsesub\DD@@%
+}
+\def\DD@@{%
+  \@ifnextchar^\DD@parsesup\DD@@@%
+}
+\def\DD@@@{% sub/super-scripts have been parsed, move on to rest of command
+  \@DDbase{\DDSym}{\DD@tmp@sub}{\DD@tmp@sup}%
+}
+\def\DD@parsesub_#1{%
+  \def\DD@tmp@sub{#1}%
+  \DD@% continue parsing maybe another sub or superscript
+}
+\def\DD@parsesup^#1{%
+  \def\DD@tmp@sup{#1}%
+  \DD@% continue parsing maybe another sub or superscript
+}
+
+
+%
+% \Dminf{\rho}{\sigma}
+% \Dminf[\epsilon]{\rho}{\sigma}
+% \Dminf<states-spec>
+% \Dminf[\epsilon]<states-spec>
+%
+% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
+%
+% Where optional  <size-spec>  =  "`*"  or  "`\Big"
+% 
+\DeclareRobustCommand\Dminf[1][]{%
+  \@DDbase{\DDSym}{\mathrm{min}}{#1}%
+}
+
+%
+% \Dminz{\rho}{\sigma}
+% \Dminz[\epsilon]{\rho}{\sigma}
+% \Dminz<states-spec>
+% \Dminz[\epsilon]<states-spec>
+%
+% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
+%
+% Where optional  <size-spec>  =  "`*"  or  "`\Big"
+% 
+\DeclareRobustCommand\Dminz[1][]{%
+  \@DDbase{\DDSym}{\mathrm{min,0}}{#1}%
+}
+
+%
+% \Dmax{\rho}{\sigma}
+% \Dmax[\epsilon]{\rho}{\sigma}
+% \Dmax<states-spec>
+% \Dmax[\epsilon]<states-spec>
+%
+% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
+%
+% Where optional  <size-spec>  =  "`*"  or  "`\Big"
+% 
+\DeclareRobustCommand\Dmax[1][]{%
+  \@DDbase{\DDSym}{\mathrm{max}}{#1}%
+}
+
+%
+% \Dr{\rho}{\sigma}
+% \Dr[\epsilon]{\rho}{\sigma}
+% \Dr<states-spec>
+% \Dr[\epsilon]<states-spec>
+%
+% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
+%
+% Where optional  <size-spec>  =  "`*"  or  "`\Big"
+% 
+\DeclareRobustCommand\Dr[1][]{%
+  \@DDbase{\DDSym}{\mathrm{r}}{#1}%
+}
+
+
+%
+% \DHyp{\rho}{\sigma}
+% \DHyp[\eta]{\rho}{\sigma}
+% \DHyp<states-spec>
+% \DHyp[\eta]<states-spec>
+%
+% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
+%
+% Where optional  <size-spec>  =  "`*"  or  "`\Big"
+% 
+\DeclareRobustCommand\DHyp[1][\eta]{%
+  \@DDbase{\DDSym}{\mathrm{H}}{#1}%
+}
+
+
+% -----------------------
+
+
+%
+% \DC@inner{rho}{Gamma1}{Gamma2}        -->  produces (rho||Gamma1,Gamma2)
+% \DC@inner*{rho}{Gamma1}{Gamma2}       -->  produces \left(rho||Gamma1,Gamma2\right)
+% \DC@inner[\big]{rho}{Gamma1}{Gamma2}  -->  produces \bigl(rho||Gamma1,Gamma2\bigr)
+%
+% If rho starts with the token *, then adds the subscript in \DC@tmp@rhosub to rho
+%
+\DeclarePairedDelimiterX\DC@inner[3]{(}{)}{%
+  #1\mathclose{}\,\delimsize\Vert\,\mathopen{}#2\mathclose{},\mathopen{}#3%
+}
+
+
+%
+% Symbol to use for the coherent relative entropy
+%
+\newcommand\DCSym{\bar\DDSym}
+
+%
+% Designates the trivial system (uses symbol for empty set)
+%
+\def\emptysystem{\ensuremath{\emptyset}}
+
+
+%
+% Coherent Relative Entropy.
+%
+% USAGE:
+%
+%   \DCond[\epsilon]{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
+%   \DCond[\epsilon]{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
+%   \DCond[\epsilon]<size-spec>{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
+%   \DCond[\epsilon]<size-spec>{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}}
+%
+%   with an optional <size-spec> =  "`*"  or  "`\Big"
+%
+
+\newcommand\DCond[1][]{%
+  \def\DC@tmp@sup{#1}%
+%\message{*********|\detokenize{#1}|*********}%
+  \begingroup\mathcode`\`="0060\relax
+  \DC@parsesize%
+}
+
+\def\DC@parsesize#1{%
+  \gdef\DC@tmp@sizeargs{}%
+  \ifstrequal{#1}{`}\DC@withsize{\endgroup\DC@rest{#1}}%
+%  \@ifnextchar`\DC@withsize\DC@rest%
+}
+
+\def\DC@withsize#1{%
+%\message{*********\detokenize{#1}********}%
+  \def\@tmp@arg{#1}%
+  \def\@tmp@star{*}%
+  \ifx\@tmp@arg\@tmp@star\relax%
+    \gdef\DC@tmp@sizeargs{*}%
+    \endgroup%
+    \expandafter\DC@rest%
+  \else%
+    \gdef\DC@tmp@sizeargs{[#1]}%
+    \endgroup%
+    \expandafter\DC@rest%
+  \fi%
+}
+
+\def\DC@rest#1#2#3#4#5{% #1=rho, #2=system-in, #3=system-out, #4=Gamma_in, #5=Gamma_out
+%\message{*********\detokenize{#1}|\detokenize{#2}|\detokenize{#3}|\detokenize{#4}|\detokenize{#5}|********}%
+  \def\DC@tmp@rho{\DC@fmtrhosub#1\DC@ENDSTATE{#2}{#3}}%
+  \DCSym_{#2\to #3}^{\DC@tmp@sup}%
+  \expandafter\DC@inner\DC@tmp@sizeargs{\DC@tmp@rho}{#4}{#5}%
+}
+
+\def\DC@fmtrhosub{%
+  \@ifnextchar*\DC@fmtrhosub@nosub\DC@fmtrhosub@wsub%
+}
+\def\DC@fmtrhosub@nosub*#1\DC@ENDSTATE#2#3{%
+  #1%
+}
+\def\DC@fmtrhosub@wsub#1\DC@ENDSTATE#2#3{%
+  \begingroup%
+    \let\emptysystem\relax%
+    #1_{#3#2}%
+  \endgroup%
+}
+
+
+%    \end{macrocode}
+%\Finale
+\endinput
