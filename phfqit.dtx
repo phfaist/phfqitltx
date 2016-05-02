@@ -82,8 +82,9 @@
 % \maketitle
 %
 % \begin{abstract}
-%   \textsf{phfqit}---Utilities for what I do in Quantum Information Theory, in particular
-%   shorthands for entropy measures.
+%   \textsf{phfqit}---Utilities to typeset stuff in Quantum Information Theory
+%   (quite biased towards theory), in particular general mathematical symbols,
+%   operators, and shorthands for entropy measures.
 % \end{abstract}
 %
 % \inlinetoc
@@ -93,7 +94,12 @@
 % DOCUMENTATION HERE
 %
 %
-% \section{Common Stuff}
+% \section{Basic Usage}
+%
+% Straightforward. No package options.
+%
+% TODO: In the future, declare specific parts of the package, defined by package
+% options?
 %
 % \subsection{Size Specification}
 % \label{topic:size-specification-backtick}
@@ -167,6 +173,8 @@
 % you get \gate{C-not}.  (The default formatting ignores the given
 % capitalization, but if you redefine this command you could exploit this,
 % e.g.\@ by making the ``C'' in ``Cnot'' larger than the ``not''.)
+%
+% This command works both in math mode and in text mode.
 %
 % \DescribeMacro{\AND} \DescribeMacro{\XOR} \DescribeMacro{\CNOT}
 % \DescribeMacro{\NOT} \DescribeMacro{\NOOP} Some standard gates.  These typeset
@@ -253,10 +261,140 @@
 %
 %
 % \section{Entropy Measures}
+%
+% \subsection{Entropy, Conditional Entropy}
 % \label{sec:entropy-measures}
+%
+% The entropy measures (except for |\Hfunc|) all share the same syntax.  This
+% syntax is only described for the min-entropy |\Hmin|, but the other entropy
+% measures enjoy the same features.
+%
+% The name of the macros are chosen such that they identify the \emph{abstract
+% entropy measure}, and not necessarily the way one uses to write it down in a
+% specific context.  For example, for the ``old'' max-entropy
+% $H_\mathrm{max,old}(X)_\rho = \log\rank\rho$, you should use |\Hzero|
+% independently of whether it should be denoted by $H_0$, $H_\mathrm{max}$ or
+% $H_\mathrm{max,old}$.  This allows you to change the notation by redefining
+% the command |\Hzero|, while making sure that the correct quantity is
+% addressed.  (You might have both ``old''-style and ``new''-style max-entropy
+% in the same paper.)
+%
+% These commands are robust, meaning they can be used for example in figure
+% captions and section headings.
+%
+% \DescribeMacro{\Hmin} Min-entropy.  The general syntax is
+% |\Hmin|\hspace{0pt}\oarg{state}\hspace{0pt}\oarg{epsilon}\hspace{0pt}\relax
+% \marg{target system}\hspace{0pt}\oarg{conditioning system}.  For example:
+% \begin{center}
+%   \begin{tabular}{lc}
+%       |\Hmin{X}|   & $\Hmin{X}$ \\
+%       |\Hmin[\rho]{X}|   & $\Hmin[\rho]{X}$ \\
+%       |\Hmin[\rho][\epsilon]{X}[Y]|   & $\Hmin[\rho][\epsilon]{X}[Y]$ \\
+%       \verb+\Hmin[\rho|\rho][\epsilon]{X}[Y]+   & $\Hmin[\rho\mid\rho][\epsilon]{X}[Y]$ \\
+%       |\Hmin[][\epsilon]{X}[Y]|   & $\Hmin[][\epsilon]{X}[Y]$ \\
+%   \end{tabular}
+% \end{center}
+%
+% \DescribeMacro{\HH} Shannon/von Neumann entropy.  This macro has the same
+% arguments as for |\Hmin| (even though, of course, there is no real use in
+% smoothing the Shannon/von Neumann entropy\ldots).  For example,
+% |\HH[\rho]{X}[Y]| gives $\HH[\rho]{X}[Y]$.
+%
+% \DescribeMacro{\Hzero} R\'enyi-zero max-entropy.  This macro has the same
+% arguments as for |\Hmin|.  For example, |\Hzero[][\epsilon]{X}[Y]| gives
+% $\Hzero[][\epsilon]{X}[Y]$.
+%
+% You may redefine this macro to change the subscript by using the following
+% code (change ``|\mathrm{max},0|'' to your favorite subscript text):
+% \begin{verbatim}
+% \makeatletter
+% \renewcommand\Hzero{\@HHbase{\HHSym}{\mathrm{max},0}}
+% \makeatother
+% \end{verbatim}
+%
+% \DescribeMacro{\Hmaxf} The max-entropy.  This macro has the same
+% arguments as for |\Hmin|.  For example, |\Hmaxf[][\epsilon]{X}[Y]| gives
+% $\Hmaxf[][\epsilon]{X}[Y]$.
+%
+% \DescribeMacro{\Hfunc} The entropy, written as a mathematical function.  It is
+% useful to write, e.g., $\Hfunc(p_1\rho_1 + p_2\rho_2)$ (code:
+% |\Hfunc(p_1\rho_1 + p_2\rho_2)|).  Sizing specifications also work, e.g.\@
+% |\Hfunc`\big(x)| or |\Hfunc`*(x)|.  However there is neither support for an
+% epsilon-like superscript nor for a conditioning system.
+%
+% \subsection{Relative Entropy Measures}
+% \label{sec:relative-entropies}
+%
+% Relative entropies also have a corresponding set of commands.
+%
+% \DescribeMacro{\DD}
+% Generic relative entropy.  The syntax of this command is either of the following:\\
+% |\DD|\hspace{0pt}\meta{size-spec}\hspace{0pt}\marg{state}\hspace{0pt}\marg{relative-to state},\\
+% |\DD_|\marg{subscript}\hspace{0pt}\meta{size-spec}\hspace{0pt}\marg{state}\hspace{0pt}\marg{relative-to state},\\
+% |\DD_|\marg{subscript}|^|\marg{superscript}\hspace{0pt}\meta{size-spec}\relax
+% \hspace{0pt}\marg{state}\hspace{0pt}\marg{relative-to state},\\
+% |\DD^|\marg{superscript}\hspace{0pt}\meta{size-spec}\hspace{0pt}\marg{state}\hspace{0pt}\marg{relative-to state}.
+%
+% In all cases, the argument is typeset as:
+% $\bigl(\meta{state}\big\Vert\meta{relative-to state}\bigr)$.  The size of the
+% delimiters can be set with a size specification using the standard backtick
+% syntax, as for the other entropies and as described in
+% \autoref{topic:size-specification-backtick}.
+% 
+% Examples:
+% \begin{center}
+%   \begin{tabular}{lc}
+%       |\DD{\rho}{\sigma}|  & $\DD{\rho}{\sigma}$ \\
+%       |\DD*{\rho}{\sigma}|  & $\DD*{\rho}{\sigma}$ \\
+%       |\DD`\big{\rho}{\sigma}|  & $\DD`\big{\rho}{\sigma}$ \\
+%   \end{tabular}
+% \end{center}
+%
+% You can also play around with subscripts and superscripts, but it is
+% recommended to use the macros |\Dminf|, |\Dminz| and |\Dmax| directly.
+% Specifying the subscripts and superscripts to |\DD| should only be done within
+% new custom macros to define new relative entropy measures.
+% \begin{center}
+%   \begin{tabular}{lc}
+%       |\DD_{\mathrm{Rob}}^{\epsilon}{\rho}{\sigma}|  & $\DD_{\mathrm{Rob}}^{\epsilon}{\rho}{\sigma}$ \\
+%       |\DD^{sup}{\rho}{\sigma}|  & $\DD^{sup}{\rho}{\sigma}$ \\
+%   \end{tabular}
+% \end{center}
+%
+% \DescribeMacro{\Dmax} The max-relative entropy.  The syntax is
+% |\Dmax|\hspace{0pt}\oarg{epsilon}\hspace{0pt}\meta{size-spec}\relax
+% \hspace{0pt}\marg{state}\hspace{0pt}\marg{relative-to state}
+%
+% For example |\Dmax[\epsilon]{\rho}{\sigma}| gives
+% $\Dmax[\epsilon]{\rho}{\sigma}$ and |\Dmax[\epsilon]`\big{\rho}{\sigma}| gives
+% $\Dmax[\epsilon]`\big{\rho}{\sigma}$.
+% 
+% The size-spec is as always given using the backtick syntax described in
+% \autoref{topic:size-specification-backtick}.
+%
+% \DescribeMacro{\Dminz} The ``old'' min-relative entropy, based on the
+% R\'enyi-zero relative entropy.  The syntax is the same as for
+% |\Dmax|.
+% 
+% \DescribeMacro{\Dminf} The ``new'' min-relative entropy, defined using the
+% fidelity.  The syntax is the same as for |\Dmax|.
+%
+% \DescribeMacro{\Dr} The Rob-relative entropy.  The syntax is the same as for
+% |\Dmax|.
+%
+% \DescribeMacro{\DHyp} The hypothesis testing relative entropy.  The syntax is
+% the same as for |\Dmax|, except that by default the optional argument is
+% |\eta|.  That is, |\DHyp{\rho}{\sigma}| gives $\DHyp{\rho}{\sigma}$.  (This is
+% because this quantity is directly defined with a $\eta$ (or $\epsilon$) built
+% in, and it is not a zero-error quantity which is smoothed with the purified
+% distance.)
 %
 %
 % 
+%
+%
+% 
+%
 %
 %
 %
@@ -396,8 +534,8 @@
 % \begin{macro}{\bitstring}
 %   Bits and bit strings.
 %    \begin{macrocode}
-\newcommand\bit[1]{\texttt{#1}} % bit values, formatted possibly differently.
-\newcommand\bitstring[1]{\phfqit@bitstring{#1}}%  a string of bits, fixes spacing
+\newcommand\bit[1]{\texttt{#1}}
+\newcommand\bitstring[1]{\phfqit@bitstring{#1}}
 %    \end{macrocode}
 % 
 % The implementation of |\bitstring| needs some auxiliary internal macros.
@@ -407,12 +545,21 @@
   \setlength{\phfqit@len@bit}{\maxof{\widthof{\bit{0}}}{\widthof{\bit{1}}}}%
   \phfqitBitstringFormat{\phfqit@bitstring@#1\phfqit@END}%
   \endgroup%
-} % 
+}
+%    \end{macrocode}
+% 
+% The internal |\phfqit@bitstring@| macro picks up the next bit, and puts it
+% into a \LaTeX{} |\makebox| on its own with a fixed width.
+%    \begin{macrocode}
 \def\phfqit@bitstring@#1#2\phfqit@END{%
   \makebox[\phfqit@len@bit][c]{\phfqitBitstringFormatBit{#1}}%
   \if\relax\detokenize\expandafter{#2}\relax%
   \else%
-    \phfqitBitstringSep\phfqit@bitstring@#2\phfqit@END% recurse for the rest of the bitstring
+%    \end{macrocode}
+%
+% If there are bits left, then recurse for the rest of the bitstring:
+%    \begin{macrocode}
+    \phfqitBitstringSep\phfqit@bitstring@#2\phfqit@END%
   \fi%
 }
 \newlength\phfqit@len@bit
@@ -437,7 +584,8 @@
 % \begin{macro}{\gate}
 %   Generic macro to format a gate name.
 %    \begin{macrocode}
-\DeclareRobustCommand\gate[1]{\ifmmode\textsc{\lowercase{#1}}\else{\rmfamily\textsc{\lowercase{#1}}}\fi}
+\DeclareRobustCommand\gate[1]{\ifmmode\textsc{\lowercase{#1}}%
+  \else{\rmfamily\textsc{\lowercase{#1}}}\fi}
 %    \end{macrocode}
 % \end{macro}
 % 
@@ -551,7 +699,7 @@
 %
 %
 % \subsection{Delimited Expressions}
-% Delimited expressions are documented in \autoref{sec:delimted}.
+% Delimited expressions are documented in \autoref{sec:delimited}.
 % 
 % \begin{macro}{\abs}
 % \begin{macro}{\avg}
@@ -648,7 +796,7 @@
 %
 %
 %
-% \subsubsection{Entropy and Conditional Entropy}
+% \subsubsection{Entropy, Conditional Entropy, and Entropy Function}
 %
 % See user documentation in \autoref{sec:entropy-measures}.
 %
@@ -658,48 +806,51 @@
 \newcommand\HHSym{H}
 %    \end{macrocode}
 % \end{macro}
+%
+%
+% \begingroup\makeatletter
+% \begin{macro}{\@HHbase}
+%   Base macro for entropy macros.
+%
+%   USAGE:
+%   |\@HHbase|\marg{H-symbol}\hspace{0pt}\marg{subscript}\hspace{0pt}\relax
+%   \marg{superscript}\hspace{0pt}\meta{size-spec}\hspace{0pt}\oarg{state}\hspace{0pt}\relax
+%   \oarg{epsilon}\hspace{0pt}\marg{target system}\hspace{0pt}\oarg{conditioning system}
+%
+%   The argument \meta{size-spec} is optional, and is documented in
+%   \autoref{topic:size-specification-backtick}.  For example \meta{size-spec} =
+%   |`*| or |`\Big|.
+%
+%   This command is robust.
 % 
-%
-% ............................................................
-%
-%
-%
-%
-%
-%
-%
-%
+%   Examples: 
+%   \par |\@HHbase{HSYMBOL}{\mathrm{max}}[\rho][\epsilon]{E}[X']|
+%   \quad$\to$\quad
+%   \fbox{$\@HHbase{HSYMBOL}{\mathrm{max}}[\rho][\epsilon]{E}[X']$}
+%   \par |\@HHbase{HSYMBOL}{\mathrm{max}}`*[\rho][\epsilon]{\bigotimes_i E}[X']|
+%   \quad$\to$\quad
+%   \fbox{$\@HHbase{HSYMBOL}{\mathrm{max}}`*[\rho][\epsilon]{\displaystyle\bigotimes_i E}[X']$}
+%   \par |\@HHbase{HSYMBOL}{\mathrm{max}}`\big[\rho][\epsilon]{E}[X']|
+%   \quad$\to$\quad
+%   \fbox{$\@HHbase{HSYMBOL}{\mathrm{max}}`\big[\rho][\epsilon]{E}[X']$}
+%   
 %    \begin{macrocode}
-
-
-%
-% \@HHbase  base macro for relative entropy macros.
-%
-% USAGE:
-%
-%   \@HHbase{H-symbol}{subscript}{superscript}<size-spec>[state][epsilon]{target system}[conditioning system]
-%
-% with optional <size-spec> =  "`*"  or  "`\Big"
-% 
-% Examples:
-%
-% \@HHbase{H-symbol}{subscript}{superscript}[\rho][\epsilon]{E}[X']
-% \@HHbase{H-symbol}{subscript}{superscript}`*[\rho][\epsilon]{E}[X']     -> with \left( \right)
-% \@HHbase{H-symbol}{subscript}{superscript}`\big[\rho][\epsilon]{E}[X']  -> with \bigl( \bigr)
-%
-%
 \def\@HHbase#1#2{%
   #1_{#2}%
   \@HHbase@parsesize%
 }
 \robustify\@HHbase
-
+%    \end{macrocode}
+% 
+%
+% TODO: use our generic size parser, don't duplicate code....  this is
+% historical and I don't dare change it without thorough testing:
+%    \begin{macrocode}
 \def\@HHbase@parsesize{%
   \begingroup\mathcode`\`="0060\relax%
   \gdef\HH@tmp@sizearg{}%
   \@ifnextchar`\@HHbase@withsize\@HHbase@endgroupandparseinner%
 }
-
 \def\@HHbase@withsize`#1{%
   \def\@tmp@arg{#1}%
   \def\@tmp@star{*}%
@@ -712,7 +863,6 @@
   \fi%
 }
 \def\@HHbase@endgroupandparseinner{\endgroup\@HHbase@parseinner}
-
 \newcommand\@HHbase@parseinner[1][]{%  arg: state
   \def\HH@tmpstore@state{#1}%
   \@HHbase@parseinner@%
@@ -726,69 +876,86 @@
   \def\HH@tmpstore@condsys{#1}%
   \@HHbase@do@inner%
 }
-
-
 \newtoks\HH@tmp@toks
 \def\HH@addtoks#1\@HH@END@ADD@TOKS{\HH@tmp@toks=\expandafter{\the\HH@tmp@toks#1}}%
-
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\@HHbase@do@inner}
+%   Format the entropy measure.  All information is stored in macros of the form
+%   |\HH@tmpstore@<FIELD>|.  The base string (entropy symbol and subscript) have
+%   already been typeset.
+%    \begin{macrocode}
 \def\@HHbase@do@inner{%
-  %
-  % Add the superscript
-  %
+%    \end{macrocode}
+% Add the superscript:
+%    \begin{macrocode}
   ^{\HH@tmpstore@epsilon}%
-  % 
-  % if system is blank, we just want the symbol itself with no argument.
-  % 
+%    \end{macrocode}
+% If system is blank, we just want the symbol itself with no
+% argument. (|\notblank| is from the |etoolbox| package.)  Otherwise, add the
+% rest:
+%    \begin{macrocode}
   \expandafter\notblank\expandafter{\HH@tmpstore@system}{%
-    % 
-    % Construct the parenthetic argument to the entropy
-    % 
+%    \end{macrocode}
+% Construct the parenthetic argument to the entropy, which we will store in the
+% token register |\HH@tmp@toks|:
+%    \begin{macrocode}
     \HH@tmp@toks={}%
-    %
-    % ... add system:
-    % 
+%    \end{macrocode}
+% \ldots{} add system name:
+%    \begin{macrocode}
     \expandafter\HH@addtoks\HH@tmpstore@system\@HH@END@ADD@TOKS%
-    %
-    % ... add conditional system, if specified:
-    %
+%    \end{macrocode}
+% \ldots{} add conditional system, if specified:
+%    \begin{macrocode}
     \expandafter\notblank\expandafter{\HH@tmpstore@condsys}{%
       \HH@addtoks\mathclose{}\,\delimsize\vert\,\mathopen{}\@HH@END@ADD@TOKS%
       \expandafter\HH@addtoks\HH@tmpstore@condsys\@HH@END@ADD@TOKS%
     }{}%
-    % 
-    % tokens ready now. Prepare argument to command, and go.
-    %
+%    \end{macrocode}
+% The tokens are ready now. Prepare the argument to the |\phfqit@inner@parens|
+% command, and go:
+%    \begin{macrocode}
     \edef\tmp@args{\expandonce{\HH@tmp@sizearg}{\the\HH@tmp@toks}}%
     \expandafter\phfqit@inner@parens\tmp@args%
-    % 
-    _{\HH@tmpstore@state}% the state as subscript, if any
+%    \end{macrocode}
+% Finally, add the state as subscript, if any:
+%    \begin{macrocode}
+    _{\HH@tmpstore@state}% 
     %
   }{}%
   %
 }
-
-
-
-
-% 
-% Entropy commands.
+%    \end{macrocode}
+% \end{macro}
+% \endgroup
 %
-% Usage: \HH[state][epsilon]{target system}[conditioning system]
-%        \HH`*[state][epsilon]{target system}[conditioning system]     -> within \left(...\right)
-%        \HH`\big[state][epsilon]{target system}[conditioning system]  -> within \bigl(...\bigr)
-% 
+%
+%
+% Now, we have the proper entropy commands.
+%
+% \begin{macro}{\HH}
+% \begin{macro}{\Hzero}
+% \begin{macro}{\Hmin}
+% \begin{macro}{\Hmaxf}
+%   The definition of individual entropy macros just delegates to |\@HHbase|
+%   with the relevant subscript.
+%    \begin{macrocode}
 \newcommand\HH{\@HHbase{\HHSym}{}}
 \newcommand\Hzero{\@HHbase{\HHSym}{\mathrm{max},0}}
 \newcommand\Hmin{\@HHbase{\HHSym}{\mathrm{min}}}
 \newcommand\Hmaxf{\@HHbase{\HHSym}{\mathrm{max}}}
-
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
-% Entropy function:
+% \begin{macro}{\Hfunc}
+%   Entropy function.  Usage: |\Hfunc(x)|, |\Hfunc`*(x)|, |\Hfunc`\big(x)|.
 %
-%  \Hfunc(x)
-%  \Hfunc`*(x)
-%  \Hfunc`\big(x)
-%
+%   TODO: Use our generic size-specification parser! Don't duplicate code!
+%    \begin{macrocode}
 \DeclareRobustCommand\Hfunc{%
   \begingroup\mathcode`\`="0060\relax%
   \gdef\Hfunc@tmp@sizearg{}%
@@ -812,61 +979,69 @@
   \HHSym%  ({#1})%
   \expandafter\phfqit@inner@parens\Hfunc@tmp@sizearg{#1}%
 }
-
-
-
-% ------------------------------------------------
-% Relative Entropies
-% ------------------------------------------------
-
-
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% \subsubsection{Relative Entropies}
+% 
+% User documentation in \autoref{sec:relative-entropies}
+%
+% \begin{macro}{\DDSym}
+%   Symbol to use to denote a relative entropy.
+%    \begin{macrocode}
 \newcommand\DDSym{D}
-
-
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\@DDbase@inner}
+%   Internal macro to format the inner contents of a relative entropy.
+%   \begingroup\makeatletter
+%   \par |\@DDbase@inner{\rho}{\Gamma}| \quad$\to$\quad \fbox{$\@DDbase@inner{\rho}{\Gamma}$}
+%   \endgroup
 %
-% \@DDbase@inner{rho}{Gamma}  -->  produces (\rho||\Gamma)
-% \@DDbase@inner*{rho}{Gamma}  -->  produces \left(\rho||\Gamma\right)
-% \@DDbase@inner[\big]{rho}{Gamma}  -->  produces \bigl(\rho||\Gamma\bigr)
+%   You can also specify the optional size specifier compatible with the
+%   |\DeclarePariedDelimiter| syntax: |\@DDbase@inner*{\rho}{\Gamma}| and
+%   |\@DDbase@inner[\big]{\rho}{\Gamma}|, for example.
 %
+%    \begin{macrocode}
 \DeclarePairedDelimiterX\@DDbase@inner[2]{(}{)}{%
   #1\mathclose{}\,\delimsize\Vert\,\mathopen{}#2%
 }
-
+%    \end{macrocode}
+% \end{macro}
 %
-% \@DDbase  base macro for relative entropy macros.
+% \begin{macro}{\@DDbase}
+%   Base macro for relative entropy macros.
 %
-% USAGE:
+%   USAGE:
+%   |\@DDbase|\marg{D-symbol}\hspace{0pt}\marg{subscript}\hspace{0pt}\relax
+%   \marg{superscript}\meta{size-spec}\marg{state}\marg{relative to state}
+%   
+%   The \meta{size-spec} may be either a backtick-style specification, or a star
+%   or an optional argument (``|[\big]|'').
 %
-%   \@DDbase{D-symbol}{subscript}{superscript}<states-spec>
+%   \begingroup\makeatletter
+%   Examples:
+%   \par|\@DDbase{DSYMBOL}{subscript}{superscript}{\rho}{\Gamma}|  \quad$\to$\quad
+%   $\@DDbase{DSYMBOL}{subscript}{superscript}{\rho}{\Gamma}$, and similarly\\
+%   |\@DDbase{DSYMBOL}{subscript}{superscript}*{\rho}{\Gamma}|,
+%   |\@DDbase{DSYMBOL}{subscript}{superscript}[\big]{\rho}{\Gamma}|,
+%   |\@DDbase{D-symbol}{subscript}{superscript}`*{\rho}{\Gamma}|,
+%   |\@DDbase{D-symbol}{subscript}{superscript}`\big{\rho}{\Gamma}|.
+%   \endgroup
 %
-% with  <states-spec> =     {\rho}{\sigma}
-%                       or  `*{\rho}{\sigma}
-%                       or  `\big{\rho}{\sigma}
-%                       or  *{\rho}{\sigma}
-%                       or  [\big]{\rho}{\sigma}
-% 
-% Examples:
+%  This command is robust.
 %
-% \@DDbase{D-symbol}{subscript}{superscript}{\rho}{\Gamma}
-% \@DDbase{D-symbol}{subscript}{superscript}*{\rho}{\Gamma} -> with \left( \right)
-% \@DDbase{D-symbol}{subscript}{superscript}[\big]{\rho}{\Gamma} -> with \bigl( \bigr)
-%
-% and also alternative syntax, useful for higher-level macros which have already tons of [] options:
-%
-% \@DDbase{D-symbol}{subscript}{superscript}`*{\rho}{\Gamma} -> with \left( \right)
-% \@DDbase{D-symbol}{subscript}{superscript}`\big{\rho}{\Gamma} -> with \bigl( \bigr)
-%
-%
+%    \begin{macrocode}
 \def\@DDbase#1#2#3{%
   #1_{#2}^{#3}%
   \@DDbase@parsesize%
 }
 \robustify\@DDbase
-
 \def\@DDbase@parsesize{%
   \@ifnextchar`\@DDbase@withsize\@DDbase@inner%
 }
-
 \def\@DDbase@withsize`#1{%
   \def\@tmp@arg{#1}%
   \def\@tmp@star{*}%
@@ -878,26 +1053,18 @@
     \expandafter\tmp@cmd%
   \fi%
 }
-
-%
-% \DD{\rho}{\sigma}
-% \DD*{\rho}{\sigma}
-% \DD`\big{\rho}{\sigma}
-% (i.e. \DD<states-spec> )
-%
-% \DD^{superscript}<states-spec>
-% \DD_{subscript}^{superscript}<states-spec>
-%
-% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
-%
-% Where optional  <size-spec>  =  "`*"  or  "`\Big"
-
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\DD}
+%   (Usual) quantum relative entropy.  Actually this is more versatile, because
+%   you can also specify subscript and superscript.
+%    \begin{macrocode}
 \DeclareRobustCommand\DD{%
   \def\DD@tmp@sub{}%
   \def\DD@tmp@sup{}%
   \DD@%
 }
-
 \def\DD@{%
   \@ifnextchar_\DD@parsesub\DD@@%
 }
@@ -915,7 +1082,21 @@
   \def\DD@tmp@sup{#1}%
   \DD@% continue parsing maybe another sub or superscript
 }
-
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\Dminz}
+%   ``Old'' min-relative entropy, based on the R\'enyi-zero relative entropy.
+%    \begin{macrocode}
+\DeclareRobustCommand\Dminz[1][]{%
+  \@DDbase{\DDSym}{\mathrm{min,0}}{#1}%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\Dminf}
+%   Min-relative entropy (``new'' version).
+%    \begin{macrocode}
 
 %
 % \Dminf{\rho}{\sigma}
@@ -930,63 +1111,38 @@
 \DeclareRobustCommand\Dminf[1][]{%
   \@DDbase{\DDSym}{\mathrm{min}}{#1}%
 }
-
+%    \end{macrocode}
+% \end{macro}
 %
-% \Dminz{\rho}{\sigma}
-% \Dminz[\epsilon]{\rho}{\sigma}
-% \Dminz<states-spec>
-% \Dminz[\epsilon]<states-spec>
-%
-% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
-%
-% Where optional  <size-spec>  =  "`*"  or  "`\Big"
-% 
-\DeclareRobustCommand\Dminz[1][]{%
-  \@DDbase{\DDSym}{\mathrm{min,0}}{#1}%
-}
-
-%
-% \Dmax{\rho}{\sigma}
-% \Dmax[\epsilon]{\rho}{\sigma}
-% \Dmax<states-spec>
-% \Dmax[\epsilon]<states-spec>
-%
-% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
-%
-% Where optional  <size-spec>  =  "`*"  or  "`\Big"
-% 
+% \begin{macro}{\Dmax}
+%   Max-relative entropy.
+%    \begin{macrocode}
 \DeclareRobustCommand\Dmax[1][]{%
   \@DDbase{\DDSym}{\mathrm{max}}{#1}%
 }
-
+%    \end{macrocode}
+% \end{macro}
 %
-% \Dr{\rho}{\sigma}
-% \Dr[\epsilon]{\rho}{\sigma}
-% \Dr<states-spec>
-% \Dr[\epsilon]<states-spec>
-%
-% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
-%
-% Where optional  <size-spec>  =  "`*"  or  "`\Big"
-% 
+% \begin{macro}{\Dr}
+%   Rob-relative entropy.
+%    \begin{macrocode}
 \DeclareRobustCommand\Dr[1][]{%
   \@DDbase{\DDSym}{\mathrm{r}}{#1}%
 }
-
-
+%    \end{macrocode}
+% \end{macro}
 %
-% \DHyp{\rho}{\sigma}
-% \DHyp[\eta]{\rho}{\sigma}
-% \DHyp<states-spec>
-% \DHyp[\eta]<states-spec>
 %
-% Where <states-spec>  =  <size-spec>{\rho}{\sigma}
-%
-% Where optional  <size-spec>  =  "`*"  or  "`\Big"
-% 
+% \begin{macro}{\DHyp}
+%   Hypothesis testing relative entropy.
+%    \begin{macrocode}
 \DeclareRobustCommand\DHyp[1][\eta]{%
   \@DDbase{\DDSym}{\mathrm{H}}{#1}%
 }
+%    \end{macrocode}
+% \end{macro}
+% 
+%    \begin{macrocode}
 
 
 % -----------------------
