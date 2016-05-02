@@ -18,7 +18,7 @@ ALLSTY = phfnote.sty phfquotetext.sty # only *generated* .sty
 ALLPDF = phfnote.pdf phfquotetext.pdf
 
 # for installation -- other style files to install, which aren't generated from DTX files
-MANUALSTYLIST = phfsvnwatermark.sty phfparen.sty phfqit.sty
+MANUALSTYLIST = phfsvnwatermark.sty phfparen.sty phfqit.sty phfthm.sty phffullpagefigure.sty
 
 
 .PHONY: help sty sty_from_ins cleanall install tdszip cleantdszip dist cleandist pdf clean cleanaux cleansty cleanpdf
