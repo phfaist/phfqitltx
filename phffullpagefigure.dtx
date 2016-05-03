@@ -89,13 +89,24 @@
 %
 % \section{Introduction}
 %
-% User documentation goes here.
+% The package \textsf{phffullpagefigure} provides an implementation for figures which are
+% to be displayed to occupy a full page.
 %
-% User documentation goes here.
+% A typical use case: suppose you have a figure in PDF format of the size of the document
+% paper, for example, and wants to include it as a figure.
 %
-% User documentation goes here.
+% This package takes care to display the caption of the figure on the preceeding page,
+% with a caption of the form ``Figure X (on facing page): \meta{caption}.''
 %
-% User documentation goes here.
+% For two-sided documents, you may specify on which (odd/even) page side
+% you want the figure to appear.  If the document is not two-sided, the
+% figure may appear on any page.
+%
+% A number of options allow you to set the exact figure contents (usually a
+% PDF file, but it can be constructed from arbitrary \LaTeX{} commands),
+% the figure caption placement (top, own page, bottom), the caption and
+% label as usual, and the formatting of the caption if you want to replace
+% the default ``(on facing page)'' or ``(on next page).''
 %
 %
 % \section{The Full-Page-Figure Environment}
@@ -116,7 +127,8 @@
 % \begin{verbatim}
 % \begin{fullpagefigure}
 %   \figpdf{fig/my-figure} % my PDF file
-%   \caption{The figure caption goes here.}
+%   \caption{A colorful figure with letters and words.  The table design
+%   may remind you of going to the optician.}
 %   \label{fig:test}
 % \end{fullpagefigure}
 % \end{verbatim}
@@ -126,20 +138,30 @@
 %     In this documentation code, we cheat and provide LaTeX code for the
 %     figure instead of a PDF file.  This is really just so that we don't
 %     have to ship an extra PDF file (and for no other reason).
+%     
+%     See a trick in http://tex.stackexchange.com/a/278101/32188.
 %   \fi
-%   \figcontents{\thispagestyle{empty}\null\vfil%
+%   \figcontents{\newpage\thispagestyle{empty}\relax
+%     \newgeometry{margin=0.25in}\relax
 %     \sffamily\fontsize{36pt}{42pt}\fontseries{bx}\selectfont
-%     \rotatebox{20}{\kern-0.15\paperwidth\fbox{\vbox to 0.8\textheight{\vfil\vfil\centering
-%         \leavevmode\noindent\hbox to 0.8\textwidth{ T H I S }\par\vfil
-%         \leavevmode\noindent\hbox to 0.8\textwidth{ F I G U R E }\par\vfil
-%         \leavevmode\noindent\hbox to 0.8\textwidth{ F I L L S }\par\vfil
-%         \leavevmode\noindent\hbox to 0.8\textwidth{ U P }\par\vfil
-%         \leavevmode\noindent\hbox to 0.8\textwidth{ T H E }\par\vfil
-%         \leavevmode\noindent\hbox to 0.8\textwidth{ W H O L E }\par\vfil
-%         \leavevmode\noindent\hbox to 0.8\textwidth{ P A G E }\par\vfil
-%         \vfil\vfil}}}%
-%     \vfil\null\newpage}%
-%   \caption{The figure caption goes here.}%
+%     \hbox to 0.9\textwidth{\fcolorbox{red}{yellow}{\vbox to 0.99\textheight{\vfil\vfil\vfil\centering
+%         \leavevmode\noindent\hbox to 0.8\textwidth{ \color{red!50!black} T H I S }\par\vfil
+%         \vfil
+%         \leavevmode\noindent\hbox to 0.8\textwidth{ \color{green!70!red} F I G U R E }\par\vfil
+%         \vfil
+%         \leavevmode\noindent\hbox to 0.8\textwidth{ \color{black!40!blue} F I L L S }\par\vfil
+%         \vfil
+%         \leavevmode\noindent\hbox to 0.8\textwidth{ \color{green!40!blue} U P }\par\vfil
+%         \vfil
+%         \leavevmode\noindent\hbox to 0.8\textwidth{ \color{red!50!gray} T H E }\par\vfil
+%         \vfil
+%         \leavevmode\noindent\hbox to 0.8\textwidth{ \color{blue} W H O L E }\par\vfil
+%         \vfil
+%         \leavevmode\noindent\hbox to 0.8\textwidth{ \color{red!50!yellow} P A G E }\par\vfil
+%         \vfil\vfil\vfil}}}%
+%       \clearpage\aftergroup\restoregeometry}%
+%   \caption{A colorful figure with letters and words.  The table design
+%   may remind you of going to the optician.}%
 %   \label{fig:test}%
 % \end{fullpagefigure}
 %
@@ -162,9 +184,19 @@
 % \LaTeX{} commands which will generate the figure content.  These commands
 % will be called within an |afterpage| block.
 %
+% If you want a figure to occupy several pages, you may use for example
+% |\figcontents{\includepdf{pdf-1}\includepdf{pdf-2}}|, and request that
+% the figure start on an even-side page with |\figpageside{even}|.
+%
 % \DescribeMacro{\figpdf} As a shorthand, you may use
 % |\figpdf|\oarg{options}\marg{pdf-file} as a shorthand for
 % |\figcontents{\includepdf|\oarg{options}\marg{pdf-file}|}|.
+% 
+% You should explore the options provided by |\includepdf| (from the
+% \textsf{pdfpages} package\footnote{See documentation at
+% \url{https://www.ctan.org/pkg/pdfpages}}).  For example, the figure can
+% be resized to fill the page, pages may be selected individually from a
+% mult-page PDF, the image may be rotated, etc.
 %
 %
 % \DescribeMacro{\caption} \DescribeMacro{\label} The |\caption|\oarg{short
@@ -224,7 +256,6 @@
 % If this package option is given, then the |pdfpages| package is not
 % loaded, and the command |\figpdf| is not made available.  You may use
 % this package option if the |pdfpages| package conflicts with your setup.
-%
 %
 %
 %
@@ -473,8 +504,8 @@
   \ifcsname phffpf@side@#1\endcsname%
     \xdef\phffpf@val@pageside{\csname phffpf@side@#1\endcsname}%
   \else%
-    \PacakgeError{phffullpagefigure}{Unknown page side designation: '#1'. Please use 'odd',
-      'even', or '' for no preference.}%
+    \PacakgeError{phffullpagefigure}{Unknown page side designation:
+      '#1'. Please use 'odd', 'even', or '' for no preference.}%
   \fi%
   \ignorespaces%
 }
@@ -569,11 +600,12 @@
 % 
 % Do we have a figure placement position request (|p|, |t|, |b|)?  If yes,
 % then define a macro which we will expand in front of the |\begin{figure}|
-%   command for the caption.
+%   command for the caption.  If no, then that macro should be left blank
+%   (first case below):
 %    \begin{macrocode}
-  \expandafter\ifblank\expandafter{\csname #1@placement\endcsname}{% don't have placement arg
+  \expandafter\ifblank\expandafter{\csname #1@placement\endcsname}{%
     \edef\phffpf@tmp@figplacementarg{}%
-  }{% have placement arg
+  }{%
     \edef\phffpf@tmp@figplacementarg{[\csname #1@placement\endcsname]}%
   }
 %    \end{macrocode}
