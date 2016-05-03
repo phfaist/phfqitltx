@@ -28,7 +28,8 @@
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{xcolor}
-\usepackage{phfsvnwatermark}
+\usepackage[id=svn-multi,watermark=false]{phfsvnwatermark}
+\svnid{$Id$}
 \usepackage[preset=pkgdoc]{phfnote}
 \phfnoteSaveDefs{verbatimstuff}{verbatim,@verbatim,endverbatim}
 \usepackage[normalem]{ulem}
@@ -99,27 +100,8 @@
 % - works well with multiple source files with \textsf{svn-multi} with \textsf{currfile} ...
 %
 %
+% \section{Modes of Operation}
 %
-%
-%
-% \StopEventually{\vskip 2cm plus 2cm minus 2cm\relax\PrintChanges
-%     \vskip 2cm plus 2cm minus 2cm\relax\PrintIndex}
-%
-% \section{Implementation}
-%
-%    \begin{macrocode}
-\RequirePackage{kvoptions}
-\RequirePackage{calc}
-
-
-% make sure the 'color' or 'xcolor' package is loaded
-\@ifpackageloaded{xcolor}{}{%
-  \@ifpackageloaded{color}{}{%
-    \RequirePackage{xcolor}%
-  }
-}
-
-
 % SVN Version ID watermark -- code recycled from my old docnote package
 %
 % Different possibilities:
@@ -131,123 +113,151 @@
 % - with the {svn-multi} package
 %
 %
-
-
-
-
 %
-% common exterior formatting for Version ID tag
 %
+%
+% \StopEventually{\vskip 2cm plus 2cm minus 2cm\relax\PrintChanges
+%     \vskip 2cm plus 2cm minus 2cm\relax\PrintIndex}
+%
+% \section{Implementation}
+%
+% Include useful packages.
+%    \begin{macrocode}
+\RequirePackage{kvoptions}
+\RequirePackage{calc}
+%    \end{macrocode}
+% 
+%
+% make sure the 'color' or 'xcolor' package is loaded
+%    \begin{macrocode}
+\@ifpackageloaded{xcolor}{}{%
+  \@ifpackageloaded{color}{}{%
+    \RequirePackage{xcolor}%
+  }
+}
+%    \end{macrocode}
+% 
+%
+% \subsection{Common Formatting of ID tag}
+%
+% common exterior formatting for Version ID tag.
+%
+%    \begin{macrocode}
 \definecolor{phfsvnversionidcolor}{rgb}{0.6,0.6,0.6}
 \def\phfsvnVersionIdTagOuterFont{\normalfont\scriptsize}
 \def\phfsvnVersionIdTagInnerFont{\ttfamily}
 \def\phfsvn@versionidtag{%
   \begingroup%
     \color{phfsvnversionidcolor}\phfsvnVersionIdTagOuterFont%
-    [\,\begingroup\phfsvnVersionIdTagInnerFont {\phfsvn@versionidtag@contents}\endgroup\,]%
+    [\,\begingroup\phfsvnVersionIdTagInnerFont%
+        {\phfsvn@versionidtag@contents}\endgroup\,]%
   \endgroup%
 }
-
+%    \end{macrocode}
+% 
 %
-% for manual placement.  Starred version does not smash the thing.
-%
+% \begin{macro}{\phfsvnVersionIdTag}
+%   For manual placement.  Starred version does not smash the thing.
+%    \begin{macrocode}
 \newcommand\phfsvnVersionIdTag{%
   \@ifstar\phfsvn@smashedsvnversionidtag\phfsvn@versionidtag
 }
 \def\phfsvn@smashedsvnversionidtag{%
   \hspace*{0pt}\smash{\phfsvn@clap{\phfsvn@versionidtag}}
 }
-
-% see https://www.tug.org/TUGboat/tb22-4/tb72perlS.pdf
+%    \end{macrocode}
+% \end{macro}
+% 
+% Helper macro\footnote{see \url{https://www.tug.org/TUGboat/tb22-4/tb72perlS.pdf}}:
+%    \begin{macrocode}
 \def\phfsvn@clap#1{\hbox to 0pt{\hss#1\hss}}
-
-
-
-
-
+%    \end{macrocode}
+% 
 %
-% definitions for method id=svn
 %
+% \subsection{Definitions for the different SVN info engines}
+%
+% Definitions for method \phfverb{id=svn}:
+%    \begin{macrocode}
 \def\phfsvn@versionidtag@contents@svn{%
   \SVNId%
 }
 \def\phfsvn@doincludesvn@svn{
   \RequirePackage{svn}
 }
-
-
-
-%
-% definitions for method id=gitnotsvn
-%
+%    \end{macrocode}
+% 
+% 
+% Definitions for method \phfverb{id=gitnotsvn}.  Use the \textsf{svn} package because the
+% files have fake SVN tags with in fact the GIT meta-info
+%    \begin{macrocode}
 \def\phfsvn@versionidtag@contents@gitnotsvn{%
   \SVNId\hspace*{1.5em}\SVNDate~\SVNTime\hspace*{1.5em}\SVNAuthor%
 }
 \def\phfsvn@doincludesvn@gitnotsvn{
-  \RequirePackage{svn}% because the files have fake SVN tags with in fact the GIT meta-info
+  \RequirePackage{svn}%
 }
-
-
-
+%    \end{macrocode}
+% 
 %
-% definitions for method id=svn-multi
 %
+% Definitions for method \phfverb{id=svn-multi}:
+%    \begin{macrocode}
 \def\phfsvn@versionidtag@contents@svnmulti{%
   SVN Document Version:\hspace*{1ex}%
   \svnmainfilename~r\svnrev~\svndate~\svnauthor%
 }
 \def\phfsvn@doincludesvn@svnmulti{
-  \RequirePackage[filehooks]{svn-multi}
+  \PassOptionsToPackage{filehooks}{svn-multi}
+  \RequirePackage{svn-multi}
 }
-
-
+%    \end{macrocode}
+% 
 %
-% definitions for method id=svn-multi-currfile
-%
+% Definitions for method \phfverb{id=svn-multi-currfile}:
+%    \begin{macrocode}
 \def\phfsvn@svnmulticurrfile@maxwidth{0.8\paperwidth}
 \newsavebox\phfsvn@box@upperline
 \newsavebox\phfsvn@box@lowerline
-\def\phfsvn@svnmulticurrfile@upperline{SVN Document Version:\hspace{1.5ex}r\svnrev~\svndate~\svnauthor}%
-\def\phfsvn@svnmulticurrfile@lowerline{\svnkw{Filename}:\hspace{1.5ex}r\svnfilerev~\svnfiledate~\svnfileauthor}%
+\def\phfsvn@svnmulticurrfile@upperline{%
+  SVN Document Version:\hspace{1.5ex}r\svnrev~\svndate~\svnauthor}%
+\def\phfsvn@svnmulticurrfile@lowerline{%
+  \svnkw{Filename}:\hspace{1.5ex}r\svnfilerev~\svnfiledate~\svnfileauthor}%
 \def\phfsvn@versionidtag@for@svnmulticurrfile{%
   \begingroup%
-  \color{phfsvnversionidcolor}\phfsvnVersionIdTagOuterFont\phfsvnVersionIdTagInnerFont%
+  \color{phfsvnversionidcolor}%
+  \phfsvnVersionIdTagOuterFont\phfsvnVersionIdTagInnerFont%
   \sbox\phfsvn@box@upperline{\phfsvn@svnmulticurrfile@upperline}%
   \sbox\phfsvn@box@lowerline{\phfsvn@svnmulticurrfile@lowerline}%
-  \begin{minipage}[t]{\minof{\phfsvn@svnmulticurrfile@maxwidth}{\maxof{\wd\phfsvn@box@upperline}{\wd\phfsvn@box@lowerline}}}%
+  \begin{minipage}[t]{\minof{\phfsvn@svnmulticurrfile@maxwidth}%
+      {\maxof{\wd\phfsvn@box@upperline}{\wd\phfsvn@box@lowerline}}}%
     \parindent=0pt\relax\parskip=0pt\relax%
     \raggedleft%
-    % don't just \usebox the saved boxes, because if the filenames are long we want to re-layout and allow line breaks
+%    \end{macrocode}
+% Don't just |\usebox| the saved boxes, because if the filenames are long we want to
+% re-layout and allow line breaks:
+%    \begin{macrocode}
     \par\phfsvn@svnmulticurrfile@upperline%
     \par\phfsvn@svnmulticurrfile@lowerline%
   \end{minipage}%
   \endgroup%
 }%
-
 \def\phfsvn@doincludesvn@svnmulticurrfile{%
   \RequirePackage{currfile}%
   \RequirePackage[filehooks]{svn-multi}%
 }%
-
-
-
+%    \end{macrocode}
+% 
 %
-% PLACEMENT METHODS
 %
-
-
-
 %
-% shipout placement method
-% ------------------------------------------------
+% \subsection{Placement Methods}
 %
-
+% The |shipout| placement method:
+%    \begin{macrocode}
 \def\phfsvnShipoutWatermarkXposRight{0.9\paperwidth}
 \def\phfsvnShipoutWatermarkYposBaseline{0.05\paperheight}
-
-\def\phfsvn@doplace@manual{% nothing. precisely, it's placed manually by user and not by us
-}
-
+\def\phfsvn@doplace@manual{}
 \def\phfsvn@doplace@shipout{%
   \RequirePackage{eso-pic}
   \AddToShipoutPicture{%
@@ -259,21 +269,25 @@
       {\hfill\phfsvn@versionidtag}}%
   }%
 }
-
-
-
-
-
+%    \end{macrocode}
+% 
 %
-% PACKAGE OPTIONS & SETUP
+% NOTE: there is nothing to do for the |manual| placement, since the info is placed
+% manually anyway.
 %
-
-
+%
+%
+% \subsection{Package Options \& Setup}
+%
+%    \begin{macrocode}
 \SetupKeyvalOptions{
   family=phfsvn,
   prefix=phfsvn@
 }
-
+%    \end{macrocode}
+% 
+% Setup code for a given ID method: 
+%    \begin{macrocode}
 \def\phfsvn@SetupForId#1{%
   \ifcsname phfsvn@SetupForId@#1\endcsname%
     \csname phfsvn@SetupForId@#1\endcsname%
@@ -281,7 +295,7 @@
      \PackageError{phfsvn}{Unknown SvnId method: '#1'}%
   \fi
 }
-
+\def\phfsvn@doincludesvn{}
 \def\phfsvn@SetupForId@svn{
   \message{phfsvn: Using SvnId method = svn}
   \let\phfsvn@doincludesvn\phfsvn@doincludesvn@svn
@@ -307,9 +321,12 @@
   \PackageWarning{phfsvn}{*** No SvnId method provided, no watermark will be displayed.}
   \phfsvn@watermarkfalse
 }
-
-
-
+%    \end{macrocode}
+% 
+%
+%
+% Setup code for the placement:
+%    \begin{macrocode}
 \def\phfsvn@SetupPlacement#1{%
   \ifcsname phfsvn@doplace@#1\endcsname%
     \csname phfsvn@doplace@#1\endcsname%
@@ -317,42 +334,46 @@
      \PackageError{phfsvn}{Unknown placement method: '#1'}%
   \fi
 }
-
-
-
+%    \end{macrocode}
+% 
+% Declare the |keyval| options:
+%
+%    \begin{macrocode}
 \DeclareStringOption[]{id}[svn]
 \DeclareBoolOption[true]{watermark}
-
 \DeclareStringOption[shipout]{placement}
-
 \DeclareDefaultOption{%
   % We provide the standard LaTeX error.
   \@unknownoptionerror
 }
-
+%    \end{macrocode}
+% 
+%
+% Process \& execute options:
+%    \begin{macrocode}
 \ProcessKeyvalOptions*
-
-
-
-
+%    \end{macrocode}
+% 
+%
+% Now, take action according to the given options.
+%
+% Set up the correct ID method:
+%    \begin{macrocode}
 \phfsvn@SetupForId{\phfsvn@id}
-
-
-\phfsvn@doincludesvn % always include the relevant SVN package, so all files can have their meta-info tags
-
-
+%    \end{macrocode}
+% 
+% Always include the relevant SVN package, so all files can have their meta-info tags
+% regardless of whether the watermark is displayed or not:
+%    \begin{macrocode}
+\phfsvn@doincludesvn
+%    \end{macrocode}
+% 
+%
+% Finish setting up, set up  the watermark if we want it on.
+%    \begin{macrocode}
 \ifphfsvn@watermark
-
-  % set up watermark, according to placement preference
   \phfsvn@SetupPlacement{\phfsvn@placement}
-
-\else
-
-  % no watermark requested.
-
 \fi
-
-
 %    \end{macrocode}
 %
 %\Finale
