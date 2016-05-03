@@ -13,13 +13,13 @@ MAKEINDEX = makeindex
 DEFAULT_PREFIX := $(shell kpsewhich -var-value TEXMFHOME)
 PREFIX ?= $(DEFAULT_PREFIX)
 
-ALLDTX = phfnote.dtx phfquotetext.dtx phfqit.dtx phffullpagefigure.dtx
+ALLDTX = phfnote.dtx phfquotetext.dtx phfqit.dtx phffullpagefigure.dtx phfsvnwatermark.dtx
 # ALLSTY should only list the *generated* .sty files
-ALLSTY = phfnote.sty phfquotetext.sty phfqit.sty phffullpagefigure.sty
-ALLPDF = phfnote.pdf phfquotetext.pdf phfqit.pdf phffullpagefigure.pdf
+ALLSTY = phfnote.sty phfquotetext.sty phfqit.sty phffullpagefigure.sty phfsvnwatermark.sty
+ALLPDF = phfnote.pdf phfquotetext.pdf phfqit.pdf phffullpagefigure.pdf phfsvnwatermark.pdf
 
 # for installation -- other style files to install, which aren't generated from DTX files
-MANUALSTYLIST = phfsvnwatermark.sty phfparen.sty phfthm.sty
+MANUALSTYLIST =  phfparen.sty phfthm.sty
 
 
 .PHONY: help sty sty_from_ins cleanall install tdszip cleantdszip dist cleandist pdf clean cleanaux cleansty cleanpdf

@@ -1,8 +1,113 @@
-
-\NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{phfsvnwatermark}[2016/01/28 phfsvnwatermark package]
-
-
+% \iffalse meta-comment
+%
+% Copyright (C) 2016 by Philippe Faist <philippe.faist@bluewin.ch>
+% -------------------------------------------------------
+% 
+% This file may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in:
+%
+%    http://www.latex-project.org/lppl.txt
+%
+% and version 1.3 or later is part of all distributions of LaTeX 
+% version 2005/12/01 or later.
+%
+% \fi
+%
+% \iffalse
+%<*driver>
+\ProvidesFile{phfsvnwatermark.dtx}
+%</driver>
+%<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
+%<package>\ProvidesPackage{phfsvnwatermark}
+%<*package>
+    [2016/05/03 v1.0 phfsvnwatermark package]
+%</package>
+%
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{xcolor}
+\usepackage{phfsvnwatermark}
+\usepackage[preset=pkgdoc]{phfnote}
+\phfnoteSaveDefs{verbatimstuff}{verbatim,@verbatim,endverbatim}
+\usepackage[normalem]{ulem}
+\usepackage{verbdef}
+\usepackage{tcolorbox}
+\newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
+\newtcolorbox{pkgwarning}{colback=red!5!white,colframe=red!5!white,coltitle=red!50!black,fonttitle=\bfseries,title={WARNING}}
+\EnableCrossrefs         
+\CodelineIndex
+\RecordChanges
+\phfnoteRestoreDefs{verbatimstuff}
+\begin{document}
+  \DocInput{phfsvnwatermark.dtx}
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+%
+% \changes{v1.0}{2016/05/03}{Initial version}
+%
+% \GetFileInfo{phfsvnwatermark.dtx}
+%
+% \DoNotIndex{\newcommand,\newenvironment,\def,\gdef,\edef,\xdef,\if,\else,\fi,\ifx}
+% 
+% \title{The \textsf{phfsvnwatermark} package\thanks{\itshape
+% This document corresponds to
+% \textsf{phfsvnwatermark}~\fileversion, dated \filedate. It is part of
+% the Part of the
+% \href{https://github.com/phfaist/phfqitltx/}{\textsf{phfqitltx}}
+% package suite, see \url{https://github.com/phfaist/phfqitltx}.}}
+% \author{Philippe Faist\quad\email{philippe.faist@bluewin.ch}}
+%
+% \maketitle
+%
+% \begin{abstract}
+%   \textsf{phfsvnwatermark}---Add a watermark on each page with version control
+%   information from SVN.
+% \end{abstract}
+%
+% \inlinetoc
+%
+% \section{Introduction}
+%
+% - add SVN info (Id, Date, Author) on each page in gray watermark
+%
+% - optionally in header/footer instead (via manual placement)
+%
+% - via \textsf{svn} package or \textsf{svn-multi} package
+%
+% - works well with multiple source files with \textsf{svn-multi} with \textsf{currfile} ...
+%
+%
+%
+%
+%
+% \StopEventually{\vskip 2cm plus 2cm minus 2cm\relax\PrintChanges
+%     \vskip 2cm plus 2cm minus 2cm\relax\PrintIndex}
+%
+% \section{Implementation}
+%
+%    \begin{macrocode}
 \RequirePackage{kvoptions}
 \RequirePackage{calc}
 
@@ -248,3 +353,7 @@
 \fi
 
 
+%    \end{macrocode}
+%
+%\Finale
+\endinput
