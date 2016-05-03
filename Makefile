@@ -72,12 +72,13 @@ cleanall:  cleanaux cleansty cleanpdf cleandist cleantdszip
 # ------------------------------------------------
 
 install: $(ALLSTY) $(ALLPDF)
-	mkdir -p $(DESTDIR)$(PREFIX)/tex/phfqitltx
-	mkdir -p $(DESTDIR)$(PREFIX)/doc/phfqitltx
+	mkdir -p $(DESTDIR)$(PREFIX)/tex/latex/phfqitltx
+	mkdir -p $(DESTDIR)$(PREFIX)/doc/latex/phfqitltx
 	mkdir -p $(DESTDIR)$(PREFIX)/bibtex/bst/phfqitltx
-	cp $(ALLSTY) $(MANUALSTYLIST) $(DESTDIR)$(PREFIX)/tex/phfqitltx
-	cp $(ALLPDF) $(DESTDIR)$(PREFIX)/doc/phfqitltx
+	cp $(ALLSTY) $(MANUALSTYLIST) $(DESTDIR)$(PREFIX)/tex/latex/phfqitltx
+	cp $(ALLPDF) $(DESTDIR)$(PREFIX)/doc/latex/phfqitltx
 	cp naturemagdoi.bst $(DESTDIR)$(PREFIX)/bibtex/bst/phfqitltx
+
 
 # ------------------------------------------------
 # make tdszip
