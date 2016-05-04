@@ -48,4 +48,5 @@ IN PROGRESS -- the packages are currently migrating to fully documented DTX file
   - `phfnote` --- ready
   - `phfqit` --- ready
   - `phffullpagefigure` --- ready
+  - `phfsvnwatermark` --- ready
   - others hopefully coming soon!
