@@ -13,16 +13,12 @@ MAKEINDEX = makeindex
 DEFAULT_PREFIX := $(shell kpsewhich -var-value TEXMFHOME)
 PREFIX ?= $(DEFAULT_PREFIX)
 
-ALLDTX = phfnote.dtx phfquotetext.dtx phfqit.dtx phffullpagefigure.dtx phfsvnwatermark.dtx
-# ALLSTY should only list the *generated* .sty files
-ALLSTY = phfnote.sty phfquotetext.sty phfqit.sty phffullpagefigure.sty phfsvnwatermark.sty
-ALLPDF = phfnote.pdf phfquotetext.pdf phfqit.pdf phffullpagefigure.pdf phfsvnwatermark.pdf
-
-# for installation -- other style files to install, which aren't generated from DTX files
-MANUALSTYLIST =  phfparen.sty phfthm.sty
+ALLDTX = phfnote.dtx phfquotetext.dtx phfqit.dtx phffullpagefigure.dtx phfsvnwatermark.dtx phfparen.dtx phfthm.dtx
+ALLSTY = phfnote.sty phfquotetext.sty phfqit.sty phffullpagefigure.sty phfsvnwatermark.sty phfparen.sty phfthm.sty
+ALLPDF = phfnote.pdf phfquotetext.pdf phfqit.pdf phffullpagefigure.pdf phfsvnwatermark.pdf phfparen.pdf phfthm.pdf
 
 
-.PHONY: help sty sty_from_ins cleanall install tdszip cleantdszip dist cleandist pdf clean cleanaux cleansty cleanpdf
+.PHONY: help sty cleanall install tdszip cleantdszip dist cleandist pdf clean cleanaux cleansty cleanpdf
 
 # Don't remove intermediate files
 .SECONDARY:
@@ -55,13 +51,17 @@ help:
 # make sty
 # ------------------------------------------------
 
-sty: $(ALLSTY)
+sty:  _stamp_sty_from_ins.mkstamp
 
-%.sty: %.dtx
-	$(MAKE) sty_from_ins
+%.sty: _stamp_sty_from_ins.mkstamp
 
-sty_from_ins: $(ALLDTX)
-	$(LATEX) phfqitltx.ins
+_stamp_sty_from_ins.mkstamp: phfqitltx.ins $(ALLDTX)
+	$(LATEX) $<
+	touch $@
+
+cleansty:
+	@rm -f $(ALLSTY)
+	@rm -f _stamp_sty_from_ins.mkstamp
 
 # ------------------------------------------------
 # make cleanall
@@ -78,7 +78,7 @@ install: $(ALLSTY) $(ALLPDF)
 	mkdir -p $(DESTDIR)$(PREFIX)/tex/latex/phfqitltx
 	mkdir -p $(DESTDIR)$(PREFIX)/doc/latex/phfqitltx
 	mkdir -p $(DESTDIR)$(PREFIX)/bibtex/bst/phfqitltx
-	cp $(ALLSTY) $(MANUALSTYLIST) $(DESTDIR)$(PREFIX)/tex/latex/phfqitltx
+	cp $(ALLSTY) $(DESTDIR)$(PREFIX)/tex/latex/phfqitltx
 	cp $(ALLPDF) $(DESTDIR)$(PREFIX)/doc/latex/phfqitltx
 	cp naturemagdoi.bst $(DESTDIR)$(PREFIX)/bibtex/bst/phfqitltx
 
@@ -110,7 +110,7 @@ dist: tdszip
 	rm -rf $(DISTTMPDIR)
 	mkdir -p $(DISTTMPDIR)/phfqitltx
 	cp phfqitltx.tds.zip $(DISTTMPDIR)
-	cp $(ALLDTX) $(ALLPDF) phfqitltx.ins README.md naturemagdoi.bst Makefile $(MANUALSTYLIST)  $(DISTTMPDIR)/phfqitltx
+	cp $(ALLDTX) $(ALLPDF) phfqitltx.ins README.md naturemagdoi.bst Makefile $(DISTTMPDIR)/phfqitltx
 	cd $(DISTTMPDIR) && zip -r $(CURDIR)/phfqitltx.zip phfqitltx.tds.zip phfqitltx
 	rm -rf $(DISTTMPDIR)
 
@@ -127,9 +127,6 @@ clean: cleanaux
 
 cleanaux:
 	@rm -f *.aux *.log *.toc *.glo *.gls *.ind *.idx *.ilg *.out *.bbl *.blg *.synctex.gz
-
-cleansty:
-	@rm -f $(ALLSTY)
 
 cleanpdf:
 	@rm -f $(ALLPDF)
