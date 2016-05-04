@@ -21,6 +21,9 @@ phfsvnwatermark.sty
 phfparen.sty
 phfthm.sty
 
+# stamp for sty-files generation
+_stamp_sty_from_ins.mkstamp
+
 # distribution files
 phfqitltx.tds.zip
 phfqitltx.zip

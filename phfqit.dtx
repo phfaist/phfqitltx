@@ -205,6 +205,7 @@
 % \subsection{Math Operators}
 % \label{sec:math-operators}
 %
+% \needspace{6\baselineskip}
 % \DescribeMacro{\tr} \DescribeMacro{\supp} \DescribeMacro{\rank}
 % \DescribeMacro{\linspan} \DescribeMacro{\spec} \DescribeMacro{\diag} Provide
 % some common math operators.  The trace $\tr$, the support $\supp$, the rank
@@ -500,8 +501,8 @@
 %
 %
 %
-% \StopEventually{\vskip 3cm plus 2cm minus 2cm\relax\PrintChanges
-%     \vskip 3cm plus 2cm minus 2cm\relax\PrintIndex}
+% \StopEventually{\clearpage\PrintChanges
+%     \vskip 2cm plus 2cm minus 2cm\relax\PrintIndex}
 %
 % \section{Implementation}
 %
@@ -587,6 +588,7 @@
 %
 % See user documentation in \autoref{sec:math-operators}.
 %
+% \needspace{6\baselineskip}
 % \begin{macro}{\tr}
 % \begin{macro}{\supp}
 % \begin{macro}{\rank}
@@ -689,6 +691,7 @@
 %    \end{macrocode}
 % \end{macro}
 % 
+% \needspace{5\baselineskip}
 % \begin{macro}{\AND}
 % \begin{macro}{\XOR}
 % \begin{macro}{\CNOT}
@@ -711,6 +714,7 @@
 %
 % \subsubsection{Lie Groups \& Algebras}
 %
+% \needspace{7\baselineskip}
 % \begin{macro}{\uu(N)}
 % \begin{macro}{\UU(N)}
 % \begin{macro}{\su(N)}
@@ -754,6 +758,7 @@
 % \subsection{Bra-Ket Notation}
 %
 % 
+% \needspace{8\baselineskip}
 % \begin{macro}{\ket}
 % \begin{macro}{\bra}
 % \begin{macro}{\braket}
@@ -823,6 +828,7 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \needspace{4\baselineskip}
 % \begin{macro}{\intervalc}
 % \begin{macro}{\intervalo}
 % \begin{macro}{\intervalco}
@@ -924,15 +930,15 @@
 %   This command is robust.
 % 
 %   Examples: 
-%   \par |\@HHbase{HSYMBOL}{\mathrm{max}}[\rho][\epsilon]{E}[X']|
+%   \par |\@HHbase{\hat{H}}{\mathrm{max}}[\rho][\epsilon]{E}[X']|
 %   \quad$\to$\quad
-%   \fbox{$\@HHbase{HSYMBOL}{\mathrm{max}}[\rho][\epsilon]{E}[X']$}
-%   \par |\@HHbase{HSYMBOL}{\mathrm{max}}`*[\rho][\epsilon]{\bigotimes_i E}[X']|
+%   \fbox{$\@HHbase{\hat{H}}{\mathrm{max}}[\rho][\epsilon]{E}[X']$}
+%   \par |\@HHbase{\hat{H}}{\mathrm{max}}`*[\rho][\epsilon]{\bigotimes_i E}[X']|
 %   \quad$\to$\quad
-%   \fbox{$\@HHbase{HSYMBOL}{\mathrm{max}}`*[\rho][\epsilon]{\displaystyle\bigotimes_i E}[X']$}
-%   \par |\@HHbase{HSYMBOL}{\mathrm{max}}`\big[\rho][\epsilon]{E}[X']|
+%   \fbox{$\@HHbase{\hat{H}}{\mathrm{max}}`*[\rho][\epsilon]{\displaystyle\bigotimes_i E}[X']$}
+%   \par |\@HHbase{\hat{H}}{\mathrm{max}}`\big[\rho][\epsilon]{E}[X']|
 %   \quad$\to$\quad
-%   \fbox{$\@HHbase{HSYMBOL}{\mathrm{max}}`\big[\rho][\epsilon]{E}[X']$}
+%   \fbox{$\@HHbase{\hat{H}}{\mathrm{max}}`\big[\rho][\epsilon]{E}[X']$}
 %   
 %    \begin{macrocode}
 \def\@HHbase#1#2{%
@@ -1034,6 +1040,7 @@
 %
 % Now, we have the proper entropy commands.
 %
+% \needspace{4\baselineskip}
 % \begin{macro}{\HH}
 % \begin{macro}{\Hzero}
 % \begin{macro}{\Hmin}
