@@ -31,9 +31,15 @@
 \usepackage[id=svn-multi,watermark=false]{phfsvnwatermark}
 \svnid{$Id$}
 \usepackage[preset=pkgdoc]{phfnote}
-\phfnoteSaveDefs{verbatimstuff}{verbatim,@verbatim,endverbatim}
+\phfnoteSaveDefs{verbatimstuff}{verbatim,@verbatim,@xverbatim,@sxverbatim,endverbatim}
 \usepackage[normalem]{ulem}
 \usepackage{verbdef}
+\usepackage{listings}
+\lstset{
+  basicstyle=\small\ttfamily,
+  columns=flexible,
+  breaklines=true
+}
 \usepackage{tcolorbox}
 \newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
 \newtcolorbox{pkgwarning}{colback=red!5!white,colframe=red!5!white,coltitle=red!50!black,fonttitle=\bfseries,title={WARNING}}
@@ -91,28 +97,184 @@
 %
 % \section{Introduction}
 %
-% - add SVN info (Id, Date, Author) on each page in gray watermark
+% This package allows you to add version control information as a gray watermark on each
+% page of your document.
 %
-% - optionally in header/footer instead (via manual placement)
+% The watermark may be placed automatically on each page, or its placement may be
+% controlled manually by the user.
 %
-% - via \textsf{svn} package or \textsf{svn-multi} package
+% It is based on reading SVN keywords from your source file (e.g.\@ |$Id$|, which SVN
+% expands upon the following commit to |$Id: file.tex ... $|).  The tags are read with
+% either the \textsf{svn} or \textsf{svn-multi} packages (at your option).
 %
-% - works well with multiple source files with \textsf{svn-multi} with \textsf{currfile} ...
-%
-%
-% \section{Modes of Operation}
-%
-% SVN Version ID watermark -- code recycled from my old docnote package
-%
-% Different possibilities:
-%
-% - with the {svn} package
-%
-% - by faking SVN tags with GIT tags 
-%
-% - with the {svn-multi} package
+% There is also decent support for multiple files, with \textsf{svn-multi} and
+% \textsf{currfile}.  This allows to both display overall document version information as
+% well as information for the current file.
 %
 %
+% \section{SVN Identification Methods}
+%
+% The SVN version of the input file(s) is read with the help of SVN keyword |$Id$|.  (The
+% |svn| package may also read |$Date$| and |$Author$|, I'm not sure any more [TODO: CHECK].)
+%
+% Don't forget to enable source keyword expansion for your \LaTeX{} source(s).  This is
+% done with the help of the command:
+% \begin{verbatim}
+%   svn propset svn:keywords "Id Date Author"  my-file.tex
+% \end{verbatim}
+% 
+% You must specify an identification method with the package option |id=|\meta{method}.
+%
+% \begin{pkgoptions}
+% \item[id=svn] Read the keywords with the \textsf{svn} package.  Keywords are set in the
+%   file with the command |\SVN $Id$|.  (The |$Id$| keyword contains all the relevant
+%   information and only this one needs to be set.)  See below.
+% \item[id=gitnotsvn] Read the keywords with the \textsf{svn} pacakge.  However, a script
+%   is used to fake these tags from what are in fact GIT meta-information.  This causes
+%   |$Id$| not to contain all the information, and the |$Date$| and |$Author$| tags must
+%   be read and included in the watermark, as well.  See below.
+% \item[id=svn-multi] Read the keywords with the \textsf{svn-multi} package.  The ID
+%   information is set with the command |\svnid{$Id$}|.  (The |$Id$| keyword contains all
+%   the relevant information.)  See below.
+% \item[id=svn-multi-currfile] Read the keywords with the \textsf{svn-multi} package, with
+%   \textsf{currfile} support.  Ideal for a document with multiple source files which are
+%   |\input| into each other.  The ID information is set in each file with the command
+%   |\svnid{$Id$}|.  (The |$Id$| keyword contains all the relevant information.)  See
+%   below.
+% \end{pkgoptions}
+%
+% In each case, the relevant SVN package is automatically loaded \textsf{svn},
+% \textsf{svn-multi} and/or \textsf{currfile}.
+%
+%
+% \subsection{SVN Keywords read with the \textsf{svn} package}
+%
+%
+% Probably the most straightforward solution.  Just introduce in your \LaTeX{} source
+% file, somewhere near the top, the line:
+% \begin{verbatim}
+% \SVN $Id$
+% \end{verbatim}
+%
+% Don't forget to enable source keyword expansion for this \LaTeX{} file, and next time
+% you commit your file to SVN, the |$Id$| tag will be replaced by something like:
+% \begin{verbatim}
+% \SVN $Id: thesis.tex 1488 2016-05-03 16:19:34Z pfaist $
+% \end{verbatim}
+% which identifies the file version.
+%
+%
+%
+% \subsection{GIT information faked as SVN keywords and read with the \textsf{svn} package}
+%
+% \begin{pkgwarning}
+%   This method is buggy, and keywords won't always get updated.  I'm currently seeking a
+%   better method.  Unfortunately all methods for obtaining GIT meta-data require running
+%   GIT hooks or auxiliary scripts.
+%
+%   To force update the GIT keywords, make sure you file has no local modifications,
+%   delete the file and run |git checkout |\meta{file}.
+% \end{pkgwarning}
+%
+% The idea is to use the same keyword parsing engine, with the \textsf{svn} package, but
+% to plug in the GIT meta-information instead inside faked svn keyword tags.
+%
+% In your source file, add the lines
+% \begin{verbatim}
+% \SVN $Id$
+% \SVN $Date$
+% \SVN $Author$
+% \end{verbatim}
+%
+% And then, with the additional GIT configuration described below, these keywords will be
+% expanded to the hash of the file contents (and not the commit, this may be misleading!),
+% the date of the commit and the author.
+%
+% In order to set up GIT for this, add to the |.gitattribtes| file (create it in the
+% repository directory if necessary):
+% \begin{verbatim}
+%   *.tex ident filter=rcs-keyword
+% \end{verbatim}
+%
+% Then copy the following code, and paste it at the end of your |REPO/.git/config| or
+% |HOME/.gitconfig|:
+% \begin{samepage}
+% \begin{verbatim}
+% [filter "rcs-keyword"]
+%   clean = perl -pwe \"s/\\\\\\$(Date|Author)[^\\\\\\$]*\\\\\\$/\\\\\\$\\$1\\\\\\$/\"
+%   smudge = "echo >&2 'Applying RCS filter rules on '%f'.' && perl -we \
+%         \"\\$f=%f; use Date::Parse; use POSIX;\
+%         chomp(\\$author=\\`git log -1 --format=format:%ae -- \\$f\\`);\
+%         chomp(\\$gitdate=\\`git log -1 --format=format:%aD -- \\$f\\`);\
+%         \\$date=POSIX::strftime('%Y-%m-%d %H:%M:%S %z (%a, %e %b %Y)',\
+%         localtime(str2time(\\$gitdate)));\
+%         print STDERR \\\"formatted date: \\$date\\\\n\\\";\
+%         while (<>) {\
+%           s/\\\\\\$Date[^\\\\\\$]*\\\\\\$/'\\$Date: '.\\$date.' \\$'/e;\
+%           s/\\\\\\$Author[^\\\\\\$]*\\\\\\$/'\\$Author: '.\\$author.' \\$'/e;\
+%           print \\$_; }\""
+% \end{verbatim}
+% \end{samepage}
+%
+% \subsection{SVN Keywords read with the \textsf{svn-multi} package}
+%
+% The \textsf{svn-multi} package is an alternative, more powerful, package for parsing SVN
+% keywords.
+%
+% Add near the top of your files the command
+% \begin{verbatim}
+% \svnid{$Id$}
+% \end{verbatim}
+% and make sure keyword expansion is enabled in your source files.
+%
+%
+% \subsection{SVN Keywords read with the \textsf{svn-multi} package, with \textsf{currfile} support}
+%
+% This method is the same as for the |id=svn-multi| method with the \textsf{svn-multi}
+% package, but with added support for multiple files.
+%
+% Now, the watermark displays \emph{two} lines, with the overall document version
+% information, and the version information of the current file.
+%
+%
+%
+% \section{Placement of the Watermark}
+%
+% First, there is a master switch for enabling or disabling the watermark.  In either
+% case, the relevant SVN-related package is loaded anyway, to allow files to provide their
+% meta-information regardless of whether the watermark is displayed or not.
+% \begin{pkgoptions}
+% \item[watermark=true] Show the watermark with the ID information.
+% \item[watermark=false] Do not show the watermark with the ID information.  (Note that
+%   manually placed watermarks are not affected by this option.)
+% \end{pkgoptions}
+%
+%
+% \begin{pkgoptions}
+% \item[placement=shipout] Place the watermark at the bottom of each page;
+% \item[placement=manual] Don't place the watermark anywhere automatically; the user is
+%   responsible for placing it with a call to |\phfsvnVersionIdTag| wherever they want.
+% \end{pkgoptions}
+%
+% \subsection{Watermark on each page}
+%
+% With the |placement=shipout| option, the watermark is automatically added on each page.
+%
+% \DescribeMacro{\phfsvnShipoutWatermarkXposRight}
+% \DescribeMacro{\phfsvnShipoutWatermarkYposBaseline} \null\par\vspace*{\baselineskip} The
+% macros |\phfsvnShipoutWatermarkXposRight| and |\phfsvnShipoutWatermarkYposBaseline|
+% determine the position of the watermark.  They are macros which expand to a length, not
+% lengths themselves.  You may redefine them to adjust the placement of the watermark.
+%
+% \subsection{Manual placement}
+%
+% You may also opt to place the watermark manually on the page with the |placement=manual|
+% option.  Do this if you want the information to appear for example in a header or
+% footer.
+%
+% \DescribeMacro{\phfsvnVersionIdTag}\DescribeMacro{\phfsvnVersionIdTag*} Places the ID
+% tag immediately, at the given location.  The starred version produces a box of zero
+% width.
 %
 %
 %
@@ -177,6 +339,8 @@
 %
 % \subsection{Definitions for the different SVN info engines}
 %
+% \begin{macro}{\phfsvn@versionidtag@contents@svn}
+% \begin{macro}{\phfsvn@doincludesvn@svn}
 % Definitions for method \phfverb{id=svn}:
 %    \begin{macrocode}
 \def\phfsvn@versionidtag@contents@svn{%
@@ -186,10 +350,15 @@
   \RequirePackage{svn}
 }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % 
 % 
-% Definitions for method \phfverb{id=gitnotsvn}.  Use the \textsf{svn} package because the
-% files have fake SVN tags with in fact the GIT meta-info
+% \begin{macro}{\phfsvn@versionidtag@contents@gitnotsvn}
+% \begin{macro}{\phfsvn@versionidtag@contents@gitnotsvn}
+%   Definitions for method \phfverb{id=gitnotsvn}.  Use the \textsf{svn}
+%   package because the files have fake SVN tags with in fact the GIT
+%   meta-info
 %    \begin{macrocode}
 \def\phfsvn@versionidtag@contents@gitnotsvn{%
   \SVNId\hspace*{1.5em}\SVNDate~\SVNTime\hspace*{1.5em}\SVNAuthor%
@@ -198,10 +367,14 @@
   \RequirePackage{svn}%
 }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % 
 %
 %
-% Definitions for method \phfverb{id=svn-multi}:
+% \begin{macro}{\phfsvn@versionidtag@contents@svnmulti}
+% \begin{macro}{\phfsvn@doinludesvn@svnmulti}
+%   Definitions for method \phfverb{id=svn-multi}:
 %    \begin{macrocode}
 \def\phfsvn@versionidtag@contents@svnmulti{%
   SVN Document Version:\hspace*{1ex}%
@@ -212,9 +385,13 @@
   \RequirePackage{svn-multi}
 }
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % 
 %
-% Definitions for method \phfverb{id=svn-multi-currfile}:
+% \begin{macro}{\phfsvn@versionidtag@for@svnmulticurrfile}
+% \begin{macro}{\phfsvn@doincludesvn@svnmulticurrfile}
+%   Definitions for method \phfverb{id=svn-multi-currfile}:
 %    \begin{macrocode}
 \def\phfsvn@svnmulticurrfile@maxwidth{0.8\paperwidth}
 \newsavebox\phfsvn@box@upperline
@@ -247,17 +424,15 @@
   \RequirePackage[filehooks]{svn-multi}%
 }%
 %    \end{macrocode}
+% \end{macro} 
+% \end{macro}
 % 
-%
-%
 %
 % \subsection{Placement Methods}
 %
-% The |shipout| placement method:
+% \begin{macro}{\phfsvn@doplace@shipout}
+%   The |shipout| placement method.
 %    \begin{macrocode}
-\def\phfsvnShipoutWatermarkXposRight{0.9\paperwidth}
-\def\phfsvnShipoutWatermarkYposBaseline{0.05\paperheight}
-\def\phfsvn@doplace@manual{}
 \def\phfsvn@doplace@shipout{%
   \RequirePackage{eso-pic}
   \AddToShipoutPicture{%
@@ -270,11 +445,28 @@
   }%
 }
 %    \end{macrocode}
+% \end{macro}
 % 
-%
-% NOTE: there is nothing to do for the |manual| placement, since the info is placed
-% manually anyway.
-%
+% \begin{macro}{\phfsvnShipoutWatermarkXposRight}
+% \begin{macro}{\phfsvnShipoutWatermarkYposBaseline}
+%   Control the position of the watermark.  These are proper macros which expand to a
+%   length; they are not declared as lengths directly.  (This allows to calculate the
+%   lengths on the spot.)
+%    \begin{macrocode}
+\def\phfsvnShipoutWatermarkXposRight{0.9\paperwidth}
+\def\phfsvnShipoutWatermarkYposBaseline{0.05\paperheight}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}{\phfsvn@doplace@manual}
+% There is nothing to do for the |manual| placement, since the info is placed manually
+% anyway.  This macro is called by the package option treatment.
+%    \begin{macrocode}
+\def\phfsvn@doplace@manual{}
+%    \end{macrocode}
+% \end{macro}
+% 
 %
 %
 % \subsection{Package Options \& Setup}
