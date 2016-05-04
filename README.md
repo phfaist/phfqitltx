@@ -39,14 +39,9 @@ to install into your local TEXMF tree.  For a list of available actions, type
 
 # Package Documentation
 
-[Doc incomplete. Sorry. Check out the source code, there should be helpful
-comments.]
+Package documentation is provided via LaTeX' standard dtx scheme.  To build the
+package documentation, run
 
-IN PROGRESS -- the packages are currently migrating to fully documented DTX files.  Currently ready are:
+    > make pdf
 
-  - `phfquotetext` --- ready
-  - `phfnote` --- ready
-  - `phfqit` --- ready
-  - `phffullpagefigure` --- ready
-  - `phfsvnwatermark` --- ready
-  - others hopefully coming soon!
+[TODO: the documentation for packages `phfthm` and `phfparen` is incomplete.]

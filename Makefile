@@ -53,7 +53,8 @@ help:
 
 sty:  _stamp_sty_from_ins.mkstamp
 
-%.sty: _stamp_sty_from_ins.mkstamp
+%.sty: %.dtx
+	$(MAKE) _stamp_sty_from_ins.mkstamp
 
 _stamp_sty_from_ins.mkstamp: phfqitltx.ins $(ALLDTX)
 	$(LATEX) $<
