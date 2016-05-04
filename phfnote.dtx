@@ -598,6 +598,12 @@
 % \item[secfmt=\pkgoptattrib{secsquares}] Display black squares on the left side
 %   of |\section|-level commands, making them stand out better.  This is useful
 %   for documents (such as the present one) with several layers of sub-sections.
+% \item[secfmt=\pkgoptattrib{rmfamily}] Typeset headings in the regular
+%   roman font of the document, instead of trying to apply the
+%   {\fontfamily{ppl}\fontseries{bx}\selectfont Palatino font}.  This
+%   applies to section-level and/or paragraph-level headings, depending on
+%   which of the attributes |section| and/or |paragraph| have been
+%   specified.
 % \item[secfmt=\pkgoptattrib{sffamily}] Typeset headings in a sans-serif font.
 %   The default document sans serif font is used.  This applies to section-level
 %   and/or paragraph-level headings, depending on which of the attributes
@@ -1738,6 +1744,9 @@
   \csname the#1\endcsname\quad%
 }
 
+\def\phfnote@do@secfmt@rmfamily{
+  \renewcommand\notesectionallfontfamily{\rmdefault}
+}
 \def\phfnote@do@secfmt@sffamily{
   \renewcommand\notesectionallfontfamily{\sfdefault}
 }
