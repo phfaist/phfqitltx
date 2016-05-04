@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfqit}
 %<*package>
-    [2016/05/02 v1.0 phfqit package]
+    [2016/05/04 v1.0 phfqit package]
 %</package>
 %
 %<*driver>
@@ -37,19 +37,12 @@
   \renewcommand{\notetitlefont}{\bfseries}
   \renewcommand{\sfdefault}{phv}
 }\makeatother
-\usepackage[preset=pkgdoc]{phfnote}
+\usepackage[preset=xpkgdoc]{phfnote}
 \usepackage{phfqit}
-\phfnoteSaveDefs{verbatimstuff}{verbatim,@verbatim,endverbatim}
-\usepackage[normalem]{ulem}
-\usepackage{verbdef}
-\usepackage{tcolorbox}
-\newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
-\newtcolorbox{pkgwarning}{colback=red!5!white,colframe=red!5!white,coltitle=red!50!black,fonttitle=\bfseries,title={WARNING}}
 \usepackage{needspace}
 \EnableCrossrefs         
 \CodelineIndex
 \RecordChanges
-\phfnoteRestoreDefs{verbatimstuff}
 \begin{document}
   \DocInput{phfqit.dtx}
 \end{document}
@@ -81,18 +74,18 @@
 %
 % \DoNotIndex{\newcommand,\newenvironment,\def,\gdef,\edef,\xdef,\if,\else,\fi,\ifx}
 % 
-% \title{The \textsf{phfqit} package\thanks{\itshape
+% \title{The \pkgname{phfqit} package\thanks{\itshape
 % This document corresponds to
-% \textsf{phfqit}~\fileversion, dated \filedate. It is part of
+% \pkgname{phfqit}~\fileversion, dated \filedate. It is part of
 % the Part of the
-% \href{https://github.com/phfaist/phfqitltx/}{\textsf{phfqitltx}}
+% \href{https://github.com/phfaist/phfqitltx/}{\pkgname{phfqitltx}}
 % package suite, see \url{https://github.com/phfaist/phfqitltx}.}}
 % \author{Philippe Faist\quad\email{philippe.faist@bluewin.ch}}
 %
 % \maketitle
 %
 % \begin{abstract}
-%   \textsf{phfqit}---Utilities to typeset stuff in Quantum Information Theory
+%   \pkgname{phfqit}---Utilities to typeset stuff in Quantum Information Theory
 %   (quite biased towards theory), in particular general mathematical symbols,
 %   operators, and shorthands for entropy measures.
 % \end{abstract}
@@ -507,8 +500,8 @@
 %
 %
 %
-% \StopEventually{\vskip 2cm plus 2cm minus 2cm\relax\PrintChanges
-%     \vskip 2cm plus 2cm minus 2cm\relax\PrintIndex}
+% \StopEventually{\vskip 3cm plus 2cm minus 2cm\relax\PrintChanges
+%     \vskip 3cm plus 2cm minus 2cm\relax\PrintIndex}
 %
 % \section{Implementation}
 %
@@ -859,7 +852,7 @@
 %
 %   Parses a size argument, if any, and stores it into |\phfqit@val@sizearg|.
 %   The value stored can directly be expanded as an optional argument to a
-%   |\DeclarePairedDelimiter|-compatible command (see |mathtools| package).
+%   |\DeclarePairedDelimiter|-compatible command (see \pkgname{mathtools} package).
 %
 %   |#1| should be a command token.  It is the next action to take, after
 %   argument has been parsed.
@@ -999,7 +992,7 @@
   ^{\HH@tmpstore@epsilon}%
 %    \end{macrocode}
 % If system is blank, we just want the symbol itself with no
-% argument. (|\notblank| is from the |etoolbox| package.)  Otherwise, add the
+% argument. (|\notblank| is from the \pkgname{etoolbox} package.)  Otherwise, add the
 % rest:
 %    \begin{macrocode}
   \expandafter\notblank\expandafter{\HH@tmpstore@system}{%

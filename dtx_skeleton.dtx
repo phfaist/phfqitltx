@@ -29,17 +29,10 @@
 \documentclass{ltxdoc}
 \usepackage{xcolor}
 \usepackage{PACKAGENAME}
-\usepackage[preset=pkgdoc]{phfnote}
-\phfnoteSaveDefs{verbatimstuff}{verbatim,@verbatim,endverbatim}
-\usepackage[normalem]{ulem}
-\usepackage{verbdef}
-\usepackage{tcolorbox}
-\newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
-\newtcolorbox{pkgwarning}{colback=red!5!white,colframe=red!5!white,coltitle=red!50!black,fonttitle=\bfseries,title={WARNING}}
+\usepackage[preset=xpkgdoc]{phfnote}
 \EnableCrossrefs         
 \CodelineIndex
 \RecordChanges
-\phfnoteRestoreDefs{verbatimstuff}
 \begin{document}
   \DocInput{PACKAGENAME.dtx}
 \end{document}
@@ -71,18 +64,18 @@
 %
 % \DoNotIndex{\newcommand,\newenvironment,\def,\gdef,\edef,\xdef,\if,\else,\fi,\ifx}
 % 
-% \title{The \textsf{PACKAGENAME} package\thanks{\itshape
+% \title{The \pkgname{PACKAGENAME} package\thanks{\itshape
 % This document corresponds to
-% \textsf{PACKAGENAME}~\fileversion, dated \filedate. It is part of
+% \pkgname{PACKAGENAME}~\fileversion, dated \filedate. It is part of
 % the Part of the
-% \href{https://github.com/phfaist/phfqitltx/}{\textsf{phfqitltx}}
+% \href{https://github.com/phfaist/phfqitltx/}{\pkgname{phfqitltx}}
 % package suite, see \url{https://github.com/phfaist/phfqitltx}.}}
 % \author{Philippe Faist\quad\email{philippe.faist@bluewin.ch}}
 %
 % \maketitle
 %
 % \begin{abstract}
-%   \textsf{PACKAGENAME}---Short description.
+%   \pkgname{PACKAGENAME}---Short description.
 % \end{abstract}
 %
 % \inlinetoc
@@ -92,8 +85,8 @@
 % User documentation goes here.
 %
 %
-% \StopEventually{\vskip 2cm plus 2cm minus 2cm\relax\PrintChanges
-%     \vskip 2cm plus 2cm minus 2cm\relax\PrintIndex}
+% \StopEventually{\vskip 3cm plus 2cm minus 2cm\relax\PrintChanges
+%     \vskip 3cm plus 2cm minus 2cm\relax\PrintIndex}
 %
 % \section{Implementation}
 %

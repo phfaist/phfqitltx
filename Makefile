@@ -24,6 +24,9 @@ MANUALSTYLIST =  phfparen.sty phfthm.sty
 
 .PHONY: help sty sty_from_ins cleanall install tdszip cleantdszip dist cleandist pdf clean cleanaux cleansty cleanpdf
 
+# Don't remove intermediate files
+.SECONDARY:
+
 
 # ------------------------------------------------
 # make, make help

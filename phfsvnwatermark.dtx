@@ -30,23 +30,10 @@
 \usepackage{xcolor}
 \usepackage[id=svn-multi,watermark=false]{phfsvnwatermark}
 \svnid{$Id$}
-\usepackage[preset=pkgdoc]{phfnote}
-\phfnoteSaveDefs{verbatimstuff}{verbatim,@verbatim,@xverbatim,@sxverbatim,endverbatim}
-\usepackage[normalem]{ulem}
-\usepackage{verbdef}
-\usepackage{listings}
-\lstset{
-  basicstyle=\small\ttfamily,
-  columns=flexible,
-  breaklines=true
-}
-\usepackage{tcolorbox}
-\newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
-\newtcolorbox{pkgwarning}{colback=red!5!white,colframe=red!5!white,coltitle=red!50!black,fonttitle=\bfseries,title={WARNING}}
+\usepackage[preset=xpkgdoc]{phfnote}
 \EnableCrossrefs         
 \CodelineIndex
 \RecordChanges
-\phfnoteRestoreDefs{verbatimstuff}
 \begin{document}
   \DocInput{phfsvnwatermark.dtx}
 \end{document}
@@ -78,18 +65,18 @@
 %
 % \DoNotIndex{\newcommand,\newenvironment,\def,\gdef,\edef,\xdef,\if,\else,\fi,\ifx}
 % 
-% \title{The \textsf{phfsvnwatermark} package\thanks{\itshape
+% \title{The \pkgname{phfsvnwatermark} package\thanks{\itshape
 % This document corresponds to
-% \textsf{phfsvnwatermark}~\fileversion, dated \filedate. It is part of
+% \pkgname{phfsvnwatermark}~\fileversion, dated \filedate. It is part of
 % the Part of the
-% \href{https://github.com/phfaist/phfqitltx/}{\textsf{phfqitltx}}
+% \href{https://github.com/phfaist/phfqitltx/}{\pkgname{phfqitltx}}
 % package suite, see \url{https://github.com/phfaist/phfqitltx}.}}
 % \author{Philippe Faist\quad\email{philippe.faist@bluewin.ch}}
 %
 % \maketitle
 %
 % \begin{abstract}
-%   \textsf{phfsvnwatermark}---Add a watermark on each page with version control
+%   \pkgname{phfsvnwatermark}---Add a watermark on each page with version control
 %   information from SVN.
 % \end{abstract}
 %
@@ -105,17 +92,17 @@
 %
 % It is based on reading SVN keywords from your source file (e.g.\@ |$Id$|, which SVN
 % expands upon the following commit to |$Id: file.tex ... $|).  The tags are read with
-% either the \textsf{svn} or \textsf{svn-multi} packages (at your option).
+% either the \pkgname{svn} or \pkgname{svn-multi} packages (at your option).
 %
-% There is also decent support for multiple files, with \textsf{svn-multi} and
-% \textsf{currfile}.  This allows to both display overall document version information as
+% There is also decent support for multiple files, with \pkgname{svn-multi} and
+% \pkgname{currfile}.  This allows to both display overall document version information as
 % well as information for the current file.
 %
 %
 % \section{SVN Identification Methods}
 %
 % The SVN version of the input file(s) is read with the help of SVN keyword |$Id$|.  (The
-% |svn| package may also read |$Date$| and |$Author$|, I'm not sure any more [TODO: CHECK].)
+% \pkgname{svn} package may also read |$Date$| and |$Author$|, I'm not sure any more [TODO: CHECK].)
 %
 % Don't forget to enable source keyword expansion for your \LaTeX{} source(s).  This is
 % done with the help of the command:
@@ -126,28 +113,28 @@
 % You must specify an identification method with the package option |id=|\meta{method}.
 %
 % \begin{pkgoptions}
-% \item[id=svn] Read the keywords with the \textsf{svn} package.  Keywords are set in the
+% \item[id=svn] Read the keywords with the \pkgname{svn} package.  Keywords are set in the
 %   file with the command |\SVN $Id$|.  (The |$Id$| keyword contains all the relevant
 %   information and only this one needs to be set.)  See below.
-% \item[id=gitnotsvn] Read the keywords with the \textsf{svn} pacakge.  However, a script
+% \item[id=gitnotsvn] Read the keywords with the \pkgname{svn} pacakge.  However, a script
 %   is used to fake these tags from what are in fact GIT meta-information.  This causes
 %   |$Id$| not to contain all the information, and the |$Date$| and |$Author$| tags must
 %   be read and included in the watermark, as well.  See below.
-% \item[id=svn-multi] Read the keywords with the \textsf{svn-multi} package.  The ID
+% \item[id=svn-multi] Read the keywords with the \pkgname{svn-multi} package.  The ID
 %   information is set with the command |\svnid{$Id$}|.  (The |$Id$| keyword contains all
 %   the relevant information.)  See below.
-% \item[id=svn-multi-currfile] Read the keywords with the \textsf{svn-multi} package, with
-%   \textsf{currfile} support.  Ideal for a document with multiple source files which are
+% \item[id=svn-multi-currfile] Read the keywords with the \pkgname{svn-multi} package, with
+%   \pkgname{currfile} support.  Ideal for a document with multiple source files which are
 %   |\input| into each other.  The ID information is set in each file with the command
 %   |\svnid{$Id$}|.  (The |$Id$| keyword contains all the relevant information.)  See
 %   below.
 % \end{pkgoptions}
 %
-% In each case, the relevant SVN package is automatically loaded \textsf{svn},
-% \textsf{svn-multi} and/or \textsf{currfile}.
+% In each case, the relevant SVN package is automatically loaded \pkgname{svn},
+% \pkgname{svn-multi} and/or \pkgname{currfile}.
 %
 %
-% \subsection{SVN Keywords read with the \textsf{svn} package}
+% \subsection{SVN Keywords read with the \pkgname{svn} package}
 %
 %
 % Probably the most straightforward solution.  Just introduce in your \LaTeX{} source
@@ -165,7 +152,7 @@
 %
 %
 %
-% \subsection{GIT information faked as SVN keywords and read with the \textsf{svn} package}
+% \subsection{GIT information faked as SVN keywords and read with the \pkgname{svn} package}
 %
 % \begin{pkgwarning}
 %   This method is buggy, and keywords won't always get updated.  I'm currently seeking a
@@ -176,7 +163,7 @@
 %   delete the file and run |git checkout |\meta{file}.
 % \end{pkgwarning}
 %
-% The idea is to use the same keyword parsing engine, with the \textsf{svn} package, but
+% The idea is to use the same keyword parsing engine, with the \pkgname{svn} package, but
 % to plug in the GIT meta-information instead inside faked svn keyword tags.
 %
 % In your source file, add the lines
@@ -216,9 +203,9 @@
 % \end{verbatim}
 % \end{samepage}
 %
-% \subsection{SVN Keywords read with the \textsf{svn-multi} package}
+% \subsection{SVN Keywords read with the \pkgname{svn-multi} package}
 %
-% The \textsf{svn-multi} package is an alternative, more powerful, package for parsing SVN
+% The \pkgname{svn-multi} package is an alternative, more powerful, package for parsing SVN
 % keywords.
 %
 % Add near the top of your files the command
@@ -228,9 +215,9 @@
 % and make sure keyword expansion is enabled in your source files.
 %
 %
-% \subsection{SVN Keywords read with the \textsf{svn-multi} package, with \textsf{currfile} support}
+% \subsection{SVN Keywords read with the \pkgname{svn-multi} package, with \pkgname{currfile} support}
 %
-% This method is the same as for the |id=svn-multi| method with the \textsf{svn-multi}
+% This method is the same as for the |id=svn-multi| method with the \pkgname{svn-multi}
 % package, but with added support for multiple files.
 %
 % Now, the watermark displays \emph{two} lines, with the overall document version
@@ -356,7 +343,7 @@
 % 
 % \begin{macro}{\phfsvn@versionidtag@contents@gitnotsvn}
 % \begin{macro}{\phfsvn@versionidtag@contents@gitnotsvn}
-%   Definitions for method \phfverb{id=gitnotsvn}.  Use the \textsf{svn}
+%   Definitions for method \phfverb{id=gitnotsvn}.  Use the \pkgname{svn}
 %   package because the files have fake SVN tags with in fact the GIT
 %   meta-info
 %    \begin{macrocode}

@@ -22,21 +22,14 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfnote}
 %<*package>
-    [2016/04/21 v1.0 phfnote package]
+    [2016/05/04 v1.0 phfnote package]
 %</package>
 %
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{xcolor}
 \usepackage{lipsum}
-\usepackage[preset=pkgdoc]{phfnote}
-
-\phfnoteSaveDefs{verbatimstuff}{verbatim,@verbatim,endverbatim}
-
-\usepackage{tcolorbox}% includes {verbatim} package, so hack around that...
-\newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,toptitle=1.5ex,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
-\newtcolorbox{pkgwarning}{colback=red!5!white,colframe=red!5!white,toptitle=1.5ex,coltitle=red!50!black,fonttitle=\bfseries,title={WARNING}}
-\newtcolorbox{pkgtip}{colback=green!5!white,colframe=green!5!white,toptitle=1.5ex,coltitle=green!50!black,fonttitle=\bfseries,title={TIP}}
+\usepackage[preset=xpkgdoc]{phfnote}
 
 \makeatletter
 \newsavebox\phfnoteDocVirtualPage@contents
@@ -80,7 +73,7 @@
 \EnableCrossrefs
 \CodelineIndex
 \RecordChanges
-\phfnoteRestoreDefs{verbatimstuff}
+
 \begin{document}
   \DocInput{phfnote.dtx}
 \end{document}
@@ -113,18 +106,18 @@
 % \iffalse Bypass indexing for following commands: \fi
 % \DoNotIndex{\newcommand,\newenvironment,\renewcommand,\long,\def,\edef,\gdef,\xdef,\if,\else,\fi,\par,\relax,\vspace,\vskip,\hspace,\hskip,\vbox,\hbox}
 % 
-% \title{The \textsf{phfnote} package\thanks{\itshape
+% \title{The \pkgname{phfnote} package\thanks{\itshape
 % This document corresponds to
-% \textsf{phfnote}~\fileversion, dated \filedate. It is part of
+% \pkgname{phfnote}~\fileversion, dated \filedate. It is part of
 % the Part of the
-% \href{https://github.com/phfaist/phfqitltx/}{\textsf{phfqitltx}}
+% \href{https://github.com/phfaist/phfqitltx/}{\pkgname{phfqitltx}}
 % package suite, see \url{https://github.com/phfaist/phfqitltx}.}}
 % \author{Philippe Faist\quad\email{philippe.faist@bluewin.ch}}
 %
 % \maketitle
 %
 % \begin{abstract}
-%   \textsf{phfnote}---A handy \LaTeX{} class for typesetting short notes and
+%   \pkgname{phfnote}---A handy \LaTeX{} class for typesetting short notes and
 %   medium-length reports, full of goodies to make it look just right.
 % \end{abstract}
 %
@@ -138,14 +131,14 @@
 % yourself why half the page should be taken up by the title?  Yes?  Then
 % welcome to |phfnote|.
 %
-% The package |phfnote| provides basic formatting for short documents, such as
-% notes on a specific topic, short documentation, or quick memos.  It aims to
-% cover all basic needs for such purposes: include a standard set of relevant
-% packages, a nice title which doesn't take up too much space, better page
-% margin sizes, and some basic styling to make the note look nicer.  At the same
-% time, it is highly configurable so that nothing is really unchangeable.  And
-% all overridden features can be restored individually to their class-provided
-% defaults.
+% The package \pkgname{phfnote} provides basic formatting for short
+% documents, such as notes on a specific topic, short documentation, or
+% quick memos.  It aims to cover all basic needs for such purposes: include
+% a standard set of relevant packages, a nice title which doesn't take up
+% too much space, better page margin sizes, and some basic styling to make
+% the note look nicer.  At the same time, it is highly configurable so that
+% nothing is really unchangeable.  And all overridden features can be
+% restored individually to their class-provided defaults.
 %
 % This package has been designed to work optimally along with the |article|
 % document class, but in principle any relatively standard \LaTeX{} class should
@@ -183,9 +176,9 @@
 % \end{document}
 % \end{verbatim}
 %
-% The package |phfnote| introduces its default note formatting style, with a
-% more compact title, and some formatting adjustments in the text and section
-% headings.
+% The package \pkgname{phfnote} introduces its default note formatting
+% style, with a more compact title, and some formatting adjustments in the
+% text and section headings.
 %
 % \subsection{Presets}
 % \label{sec:presets}
@@ -220,23 +213,32 @@
 %   \LaTeX' default sans-serif font.  A very nice sans serif font.  It might
 %   look heavy though, depending on your taste.}
 % \item[preset=utopianote] {\fontfamily{futs}\selectfont Format the note in
-%   Utopia font (by using the |fourier| package).  Perfectly to my taste for
-%   documenting code for example, but a bit heavy for scientific documents I
-%   find.}
-% \item[preset=mnmynote] Format the note in Minion Pro font, with sans serif
-%   text formatted with |MyriadPro| (professional fonts by Adobe which can be
-%   used in \LaTeX{} with the |MinionPro| and |MyriadPro| packages\footnote{See
-%   \url{https://github.com/sebschub/FontPro}; the fonts themselves ship with
-%   some Adobe products}).  These beautiful fonts can be used for any purpose.
+%   Utopia font (by using the \pkgname{fourier} package).  Perfectly to my
+%   taste for documenting code for example, but a bit heavy for scientific
+%   documents I find.}
+% \item[preset=mnmynote] Format the note in Minion Pro font, with sans
+%   serif text formatted with the Myriad Pro font (professional fonts by
+%   Adobe which can be used in \LaTeX{} with the \pkgname{MinionPro} and
+%   \pkgname{MyriadPro} packages\footnote{See
+%   \url{https://github.com/sebschub/FontPro}; the fonts themselves ship
+%   with some Adobe products}).  These beautiful fonts can be used for any
+%   purpose.
 % \end{pkgoptions}
 % 
-% Based on |utopianote|, the preset |pkgdoc| combines additional definitions to
-% aid in documenting \LaTeX{} packages.
+% Based essentially on |utopianote|, the preset |pkgdoc| combines additional
+% definitions to aid in documenting \LaTeX{} packages.
 % \begin{pkgoptions}
 % \item[preset=pkgdoc] Basic formatting and settings for documenting \LaTeX{}
 %   packages. This preset was used for the current document.  This preset also
 %   defines some additional handy commands.
+% \item[preset=xpkgdoc] Same as |preset=pkgdoc|, but in addition a set of
+%   useful commands are also provided, the \pkgname{tcolorbox} package is
+%   loaded along with some default boxes.  Also some commands are patched
+%   to achieve some fixes.  This preset is used for the documentation of
+%   packages in the \pkgname{phfqitltx} package suite.  (For details see the
+%   implementation of |\phfnote@preset@xpkgdoc| below.)
 % \end{pkgoptions}
+%
 %
 % The following preset makes the document look more like an article.  There are
 % some slight minor differences with respect to the default |article| class'
@@ -287,9 +289,9 @@
 % \label{sec:title-styles}
 % \label{sec:main-default-title-style}
 %
-% The |phfnote| package allows a set of alternative title styles.  By default,
-% the |default| title style is used.  You may change this setting with the
-% |title=...| package option.
+% The \pkgname{phfnote} package allows a set of alternative title styles.
+% By default, the |default| title style is used.  You may change this
+% setting with the |title=...| package option.
 %
 % \begin{pkgoptions}
 % \item[title=default] The default title style displays the title in large bold
@@ -370,7 +372,7 @@
 % Unfortunately, you still have to provide the numbering manually.  On the other
 % hand, this package is not meant to replace \RevTeX, so if you're writing a
 % complicated article with many authors and affiliations, you probably shouldn't
-% be using |phfnote| in the first place.
+% be using \pkgname{phfnote} in the first place.
 %
 % \begin{pkgwarning}
 %   The optional argument to |\thanks|, as well as the command |\thanksmark|,
@@ -460,11 +462,10 @@
 % \subsection{Table of Contents}
 % \label{sec:inline-toc}
 %
-% \DescribeMacro{\inlinetoc}
-% The package |phfnote| also provides a table of contents typeset with
-% reduced spacing to be more compact, and with horizontal rules before
-% and after.  You can insert the table of contents with the command
-% |\inlinetoc|.  It looks like this:
+% \DescribeMacro{\inlinetoc} The package \pkgname{phfnote} also provides a
+% table of contents typeset with reduced spacing to be more compact, and
+% with horizontal rules before and after.  You can insert the table of
+% contents with the command |\inlinetoc|.  It looks like this:
 %
 % \begin{phfnoteDocVirtualPage}
 %   \title{Notes about Stuff}\relax
@@ -491,7 +492,7 @@
 % \subsection{Predefined Package Sets}
 % \label{sec:package-sets}
 %
-% The |phfnote| package also provides sets of standard \LaTeX{}
+% The \pkgname{phfnote} package also provides sets of standard \LaTeX{}
 % packages to load.  You may choose between a varying degree of
 % ``richness'' of packages included.
 %
@@ -499,19 +500,21 @@
 % \item[pkgset=none] Do not include any package set.
 %
 % \item[pkgset=minimal] Include some basic minimal set useful for
-%   scientific notes: the \AmS{} packages |amsmath|, |amssymb|,
-%   |amsfonts|, and |amsthm|.  The |xcolor| package is also loaded.
+%   scientific notes: the \AmS{} packages \pkgname{amsmath},
+%   \pkgname{amssymb}, \pkgname{amsfonts}, and \pkgname{amsthm}.  The
+%   \pkgname{xcolor} package is also loaded.
 %
-% \item[pkgset=rich] Include a fair amount of packages which may be
-%   useful.  On top of the |minimal| package set, this set includes
-%   the packages |enumitem|, |graphicx|, |microtype|, |caption|,
-%   |setspace|, as well as |inputenc| with the |utf8| option and
-%   |fontenc| with the |T1| option.
+% \item[pkgset=rich] Include a fair amount of packages which may be useful.
+%   On top of the |minimal| package set, this set includes the packages
+%   \pkgname{enumitem}, \pkgname{graphicx}, \pkgname{microtype},
+%   \pkgname{caption}, \pkgname{setspace}, as well as \pkgname{inputenc}
+%   with the |utf8| option and \pkgname{fontenc} with the |T1| option.
 %
 %   This package set is loaded by default.
 %
-% \item[pkgset=extended] Additionally, include packages |float|,
-%   |verbdef|, |csquotes|, |dsfont|, |bbm| and |mathtools|.
+% \item[pkgset=extended] Additionally, include packages \pkgname{float},
+%   \pkgname{verbdef}, \pkgname{csquotes}, \pkgname{dsfont}, \pkgname{bbm}
+%   and \pkgname{mathtools}.
 %
 % \end{pkgoptions}
 %
@@ -519,25 +522,26 @@
 % \subsection{Page Geometry}
 % \label{sec:pagegeomdefs}
 %
-% Another important aspect of |phfnote| is the handling of page margins.  Often
-% the default page margins of the |article| class are quite narrow.  While it is
-% a good typographical practice to avoid long lines, on occasion we prefer to
-% have notes typeset with wider text.  The general answer is the |geometry|
-% package, which allows to set all margins in full detail.
+% Another important aspect of \pkgname{phfnote} is the handling of page
+% margins.  Often the default page margins of the \pkgname{article} class
+% are quite narrow.  While it is a good typographical practice to avoid
+% long lines, on occasion we prefer to have notes typeset with wider text.
+% The general answer is the \pkgname{geometry} package, which allows to set all
+% margins in full detail.
 %
-% The |phfnote| package provides some standard choices of options for the
-% |geometry| package, which are adjusted according to the document font size,
+% The \pkgname{phfnote} package provides some standard choices of options for the
+% \pkgname{geometry} package, which are adjusted according to the document font size,
 % and whether the document is typeset in two columns.
 %
 % If you want anything more complicated than what is provided by a default
-% setting here, just use |pagegeomdefs=false| and invoke the |geometry| package
+% setting here, just use |pagegeomdefs=false| and invoke the \pkgname{geometry} package
 % directly with your preferred set of options.
 %
 % \begin{pkgoptions}
-% \item[pagegeomdefs=true] Include the |geometry| package, using the default
+% \item[pagegeomdefs=true] Include the \pkgname{geometry} package, using the default
 %   settings or whatever is specified with the |pagegeom| option.
 % \item[pagegeomdefs=false] Do not attempt to change the document margins, and
-%   don't load the |geometry| package.
+%   don't load the \pkgname{geometry} package.
 % \item[nopagegeomdefs] Same as |pagegeomdefs=false|.
 % \end{pkgoptions}
 %
@@ -561,12 +565,12 @@
 % \subsection{Section Headers Styling}
 % \label{sec:secfmt}
 %
-% The |phfnote| package provides some limited styling of section headers.  The
+% The \pkgname{phfnote} package provides some limited styling of section headers.  The
 % font, size and ``compactness'' of the headers can be adjusted with title options.
-% But really, these options are quite basic.  You should use |titlesec| or
-% |sectsty| directly if you want anything serious.
+% But really, these options are quite basic.  You should use \pkgname{titlesec} or
+% \pkgname{sectsty} directly if you want anything serious.
 %
-% The section headings are customized using the |sectsty| package.  If this
+% The section headings are customized using the \pkgname{sectsty} package.  If this
 % conflicts in your document, then use the |[secfmt={}]| package option to
 % indicate that section headings should be styled by this package.  Then take
 % care of section styling manually.
@@ -603,7 +607,7 @@
 %   to be in ``run-in'' style, but to be typeset on their own line like section
 %   headings.
 % \item[secfmt=\{\}] Leave the argument empty to keep the original class styling;
-%   nothing will be overridden and the |sectsty| package is not loaded.
+%   nothing will be overridden and the \pkgname{sectsty} package is not loaded.
 % \end{pkgoptions}
 %
 % You can also directly modify the section heading style by redefining some
@@ -659,7 +663,7 @@
 %
 % \begin{pkgoptions}
 % \item[par=indent] Paragraphs are indented, bearing some
-%   similarity to the |article| class' default paragraph style.
+%   similarity to the \pkgname{article} class' default paragraph style.
 % \item[par=skip] Paragraphs are separated by additional spacing,
 %   and not indented.
 % \item[par=indentminiskip] Paragraphs are indented, but there is also a small
@@ -671,7 +675,7 @@
 % \subsection{Adjusting Spacing of Lines and Words}
 % \label{sec:spacingdefs}
 %
-% The |phfnote| package also provides definitions to adjust spacing of lines and
+% The \pkgname{phfnote} package also provides definitions to adjust spacing of lines and
 % words.
 %
 % This includes definitions to avoid overflowing words in the margin in case of
@@ -688,7 +692,7 @@
 % \subsection{Adjustments for Fonts}
 % \label{sec:fontdefs}
 %
-% The |phfnote| package provides as well some adjustments for fonts to make some
+% The \pkgname{phfnote} package provides as well some adjustments for fonts to make some
 % fonts look nicer.
 %
 % Concretely, the {\fontfamily{cmbr}\selectfont Computer Modern Bright} font is
@@ -718,21 +722,21 @@
 % \subsection{Hyperref Loading}
 % \label{sec:hyperrefdefs}
 %
-% There are many options for setting up the |hyperref| package, and often, the
+% There are many options for setting up the \pkgname{hyperref} package, and often, the
 % defaults (with boxed links) are pretty ugly in my opinion.  Enable the
-% |hyperrefdefs| feature of |phfnote| to alter the defaults to something I
+% |hyperrefdefs| feature of \pkgname{phfnote} to alter the defaults to something I
 % personally like better (dark blue links as in this document).
 %
 % \begin{pkgoptions}
-% \item[hyperrefdefs=true] Load the |hyperref| package, and set some sensible
+% \item[hyperrefdefs=true] Load the \pkgname{hyperref} package, and set some sensible
 %   settings.  Also ensures the |\email| and |\url| commands are made available.
-% \item[hyperrefdefs=false] Do not load the |hyperref| package, do not set
+% \item[hyperrefdefs=false] Do not load the \pkgname{hyperref} package, do not set
 %   sensible settings.
 % \item[nohyperrefdefs] Same as |hyperrefdefs=false|.
 % \end{pkgoptions}
 %
 % \DescribeMacro{\url} In order to typeset URLs, the |\url| command is made
-% available from the package |url| (which is then linkified by |hyperref|).  For
+% available from the package \pkgname{url} (which is then linkified by \pkgname{hyperref}).  For
 % example, you can type |\url{https://github.com/phfaist/}|.
 %
 % \DescribeMacro{\email} A similar command allows to typeset e-mail addresses.
@@ -742,16 +746,16 @@
 %
 % \DescribeMacro{\phfnotePdfLinkColor} The command |\phfnotePdfLinkColor| may by
 % used to set the color of the links.  It takes one argument, a color
-% specification understood by the |xcolor| package.  For example:
+% specification understood by the \pkgname{xcolor} package.  For example:
 % \begin{verbatim}
 %   \phfnotePdfLinkColor{green!50!black}
 % \end{verbatim}
 %
 % \begin{pkgnote}
-%   The pacakge |xcolor| must be loaded for |\phfnotePdfLinkColor| to work.
-%   (The |xcolor| package is automatically loaded as part of a package set as
-%   long as you're not using the option |pkgset=none|; see
-%   \autoref{sec:package-sets}.)
+%   The package \pkgname{xcolor} must be loaded for |\phfnotePdfLinkColor|
+%   to work.  (The \pkgname{xcolor} package is automatically loaded as part
+%   of a package set as long as you're not using the option |pkgset=none|;
+%   see \autoref{sec:package-sets}.)
 % \end{pkgnote}
 %
 %
@@ -769,9 +773,9 @@
 % Finally, an entry in the table of contents is generated.
 %
 % \begin{pkgoptions}
-% \item[bibliographydefs=true] Load the |hyperref| package, and set some sensible
+% \item[bibliographydefs=true] Load the \pkgname{hyperref} package, and set some sensible
 %   settings.  Also ensures the |\email| and |\url| commands are made available.
-% \item[bibliographydefs=false] Do not load the |hyperref| package, do not set
+% \item[bibliographydefs=false] Do not load the \pkgname{hyperref} package, do not set
 %   sensible settings.
 % \item[nobibliographydefs] Same as |bibliographydefs=false|.
 % \end{pkgoptions}
@@ -790,7 +794,7 @@
 % \subsection{URL Styles}
 % \label{sec:url-styles}
 %
-% As a bonus, the |phfnote| package provides an alternative set of URL styles to
+% As a bonus, the \pkgname{phfnote} package provides an alternative set of URL styles to
 % use with the |\url| and |\email| commands (see \autoref{sec:hyperrefdefs}).
 %
 % All the styles described below typeset the URL in a slightly smaller size, so
@@ -816,7 +820,7 @@
 % This general-purpose command is handy to typeset text smaller than its
 % surrounding text, for when you don't know what size the surrounding text is
 % typeset at.  In some sense, this is a very very lightweight analogue of what
-% the |relsize| package does.  (This is used, for example, in our implementation
+% the \pkgname{relsize} package does.  (This is used, for example, in our implementation
 % of URL styles introduced in \autoref{sec:url-styles}.)
 %
 % \DescribeMacro{\notesmaller}\DescribeMacro{\notesmaller[0.8]} Set the font
@@ -832,7 +836,7 @@
 %
 % \subsection{Tools Mostly for Hackers}
 %
-% The |phfnote| package also provides some small hacks.  They are documented
+% The \pkgname{phfnote} package also provides some small hacks.  They are documented
 % further in \autoref{sec:impl-other-stand-alone-defs}.  These are:
 % \DescribeMacro{\phfnoteHackSectionStarWithTOC} a macro
 % |\phfnoteHackSectionStarWithTOC| to hack into a command which generates a
@@ -875,7 +879,7 @@
 %   (\autoref{sec:fontdefs}).
 % \item[footnotedefs=\meta{true or false}] Adjust slighly the appearance of
 %   footnotes.  See \autoref{sec:footnotedefs}.
-% \item[hyperrefdefs=\meta{true or false}] Load the |hyperref| package, and set
+% \item[hyperrefdefs=\meta{true or false}] Load the \pkgname{hyperref} package, and set
 %   some defaults settings.  See \autoref{sec:hyperrefdefs}.
 % \item[bibliographydefs=\meta{true or false}] Adjust the appearance and style
 %   of the bibliography.  See \autoref{sec:bibliographydefs}.
@@ -894,14 +898,14 @@
 %
 % Here comes the gory code.
 %
-% Let's start by loading the |kvoptions| package, which we need to
+% Let's start by loading the \pkgname{kvoptions} package, which we need to
 % parse the package options.
 %
 %    \begin{macrocode}
 \RequirePackage{kvoptions}
 %    \end{macrocode}
 %
-% Also load |etoolbox|, for various utilities.
+% Also load \pkgname{etoolbox}, for various utilities.
 %    \begin{macrocode}
 \RequirePackage{etoolbox}
 %    \end{macrocode}
@@ -988,7 +992,7 @@
 % \end{macro}
 % 
 % \begin{macro}{\phfnote@title@checksetspace}
-%   Some of our title styles require the |setspace| package.  This utility checks that
+%   Some of our title styles require the \pkgname{setspace} package.  This utility checks that
 %   this package is loaded, and generates an error otherwise.
 %
 %   |#1| = the current title style name; this is required only for the error message.
@@ -1425,8 +1429,8 @@
 % \subsection{Page Geometry Settings}
 %
 % For the page geometry settings, we just have a bunch of styles which we define as
-% macros.  The macros just set up |\PassOptionsToPackage| for the |geometry| package.
-% Then the correct macro will be selected according to the current |phfnote| package
+% macros.  The macros just set up |\PassOptionsToPackage| for the \pkgname{geometry} package.
+% Then the correct macro will be selected according to the current \pkgname{phfnote} package
 % options.
 %
 % The description of these settings are given in \autoref{sec:pagegeomdefs}.
@@ -1555,8 +1559,8 @@
 % \begin{macro}{\phfnote@do@spacing}
 %   Some cosmetic definitions to adjust line spacing.  The line spacing is slightly
 %   adjusted according to font size to make the document more readable.  Depending on
-%   whether the |setspace| package is loaded, we use it or go low-level with a
-%   redefinition of \LaTeX{}' |\baselinestretch|.  If the |captions| package is loaded,
+%   whether the \pkgname{setspace} package is loaded, we use it or go low-level with a
+%   redefinition of \LaTeX{}' |\baselinestretch|.  If the \pkgname{captions} package is loaded,
 %   the figure captions' line spacing is also adjusted.
 %   
 %   Also set an |\emergencystretch| so that lines get spaced out for underfull boxes,
@@ -1640,8 +1644,8 @@
 % \subsection{Section Styling}
 %
 % Very limited support for styling section and paragraph headers
-% (\autoref{sec:secfmt}).  If you want anything serious, use |sectsty| or
-% |titlesec| directly.
+% (\autoref{sec:secfmt}).  If you want anything serious, use \pkgname{sectsty} or
+% \pkgname{titlesec} directly.
 %
 % \begin{macro}{\notesectionallfont}
 % \begin{macro}{\notesectionallfontfamily}
@@ -1850,14 +1854,14 @@
 % \subsection{Hyperref Support and Hyperlinks}
 %
 % \begin{pkgnote}
-%   The name `docnotelinkcolor' is historical and hard-coded in many
+%   The name `|docnotelinkcolor|' is historical and hard-coded in many
 %   other files I've used, so I'm DEFINITELY NOT changing it.
 % \end{pkgnote}
 % 
 % \begin{macro}{\phfnote@do@pdfhyperrefdefs}
 % \begin{macro}{\email}
 % \begin{macro}{\url}
-%   Load the |hyperref| package and provide sensible defaults.
+%   Load the \pkgname{hyperref} package and provide sensible defaults.
 %    \begin{macrocode}
 \newcommand{\phfnote@do@pdfhyperrefdefs}{%
 %    \end{macrocode}
@@ -1868,13 +1872,13 @@
 %    \end{macrocode}
 % 
 % Load URL package, and save a version of |\url| which is not patched
-% by |hyperref|:
+% by \pkgname{hyperref}:
 %    \begin{macrocode}
   \RequirePackage{url}%
   \DeclareUrlCommand\phfnote@format@url{}%
 %    \end{macrocode}
 % 
-% Set up |hyperref| options:
+% Set up \pkgname{hyperref} options:
 %    \begin{macrocode}
   \PassOptionsToPackage{bookmarks=true,backref=false}{hyperref}%
   \RequirePackage{hyperref}%
@@ -1890,7 +1894,7 @@
 %    \end{macrocode}
 % 
 % Provide an |\email| command for specifying e-mails.  Note that the |\url| command is
-% already provided by the packages |url| and |hyperref|.
+% already provided by the packages \pkgname{url} and \pkgname{hyperref}.
 %    \begin{macrocode}
   \let\email\phfnote@email%
 %    \end{macrocode}
@@ -1907,7 +1911,7 @@
 % \begin{macro}{\phfnotePdfLinkColor}
 %   Set links color.  Use as |\phfnotePdfLinkColor|\marg{color}.
 %   Color may be any color name or specification recognized by the
-%   |xcolor| package.
+%   \pkgname{xcolor} package.
 %
 %    \begin{macrocode}
 \newcommand{\phfnotePdfLinkColor}[1]{%
@@ -1930,7 +1934,7 @@
 %   URL-like commands which should sanitize their arguments.
 %
 %   Also prepare the command |\phfnote@email| which will be renamed |\email| in our
-%   |hyperref| package setup (see above).
+%   \pkgname{hyperref} package setup (see above).
 % 
 %    \begin{macrocode}
 \def\phfnote@sanitize@url{%
@@ -1956,7 +1960,7 @@
 % 
 % \begin{macro}{\phfnote@requirecolorpackage}
 %   And finally define an internal utility to make sure that a color package (either
-%   |color| or |xcolor|) is loaded.  If none are loaded, the |xcolor| package is loaded.
+%   \pkgname{color} or \pkgname{xcolor}) is loaded.  If none are loaded, the \pkgname{xcolor} package is loaded.
 %    \begin{macrocode}
 \def\phfnote@requirecolorpackage{%
   \@ifpackageloaded{color}{%
@@ -2224,11 +2228,18 @@
 % Here we provide an ugly hack which introduces an entry in the table
 % of contents for |\section*| commands.
 %
+% [Note: An existing way of adding the toc entry in these cases is to issue
+% a |\addcontentsline| command before the relevant command
+% (say |\bibliography|).  However this is unreliable, because on page
+% boundaries the |\addcontentsline| will pick up the previous page.  This
+% is why |\addcontentsline| should be issued right \emph{after} the
+% |\section*| command.]
+%
 % \begin{pkgwarning}
-%   This is truly a hack, don't apply it globally!  It forces
+%   This command is truly a hack, don't apply it globally!  It forces
 %   (locally) the |\section| command to be followed by a `|*|' !  Do this
 %   within a group, just before a command which you are sure is
-%   invoking |\section*| (such as |\bibliography| in the |article|
+%   invoking |\section*| (such as |\bibliography| in the \pkgname{article}
 %   class).
 % \end{pkgwarning}
 %
@@ -2349,7 +2360,7 @@
 %
 % \subsubsection{Define and Parse Package Options}
 %
-% Initialization code for |kvoptions| for our package options.  See \autoref{sec:package-options}.
+% Initialization code for \pkgname{kvoptions} for our package options.  See \autoref{sec:package-options}.
 %
 %    \begin{macrocode}
 \SetupKeyvalOptions{
@@ -2566,11 +2577,11 @@
 %
 %
 % \begin{macro}{\phfnote@preset@pkgdoc}
-%   Preset for my package documentation.  Also provide some handy commands.
+%   Preset for a package documentation.
 %
 %   Start by setting the same settings as for other |Xnote| presets.
 %    \begin{macrocode}
-\def\phfnote@preset@pkgdoc{%
+\def\phfnote@preset@pkgdoc{
   \phfnote@presetcommon@xnote[noteit]
   \phfnote@opt@fontdefsfalse
 %    \end{macrocode}
@@ -2583,15 +2594,54 @@
   \phfnote@pkgdoc@setupfont
 %    \end{macrocode}
 % 
-% Set up general appearance.
+% Finally, set up general appearance.
 %    \begin{macrocode}
   \def\phfnote@opt@secfmt{section,paragraph,itpar,blockpar,larger,secsquares}
   \def\phfnote@opt@pagegeom{bigmargin}
   \def\phfnote@opt@abstract{noname}
+}
 %    \end{macrocode}
 %
+% Also provide a helper macro which is to load the font packages we want.  By
+% default, we use Utopia fonts via the \pkgname{fourier} package, but some package
+% documentations may want a different math font.
+%    \begin{macrocode}
+\providecommand\phfnote@pkgdoc@setupfont{
+  \PassOptionsToPackage{T1}{fontenc}
+  \RequirePackage{fontenc}
+  \RequirePackage{fourier}
+  \renewcommand{\notesectionallfontfamily}{put}
+  \renewcommand{\notetitlefont}{\bfseries}
+  \renewcommand{\sfdefault}{phv}
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\phfnote@preset@xpkgdoc}
+%   Same as |preset=pkgdoc|, but also provide some handy hacks and
+%   commands.
+%    \begin{macrocode}
+\def\phfnote@preset@xpkgdoc{
+  \phfnote@preset@pkgdoc
+%    \end{macrocode}
+%
+% Include the \pkgname{verbdef} package, because it's always useful.
+%    \begin{macrocode}
+  \RequirePackage{verbdef}
+%    \end{macrocode}
+%
+% A macro to format a package name.
+%    \begin{macrocode}
+  \def\pkgname##1{%
+    \textsf{##1}%
+    \index{##1={\ttfamily ##1} (package)}%
+    \index{packages:>##1={\ttfamily ##1}}%
+  }
+  \robustify\pkgname
+%    \end{macrocode}
+% 
 % Patch up |\PrintChanges| and |\PrintIndex|, if they are defined (for if we are
-% using the |ltxdoc| package for latex package documentation).  We want these to
+% using the \pkgname{ltxdoc} package for latex package documentation).  We want these to
 % generate an entry in the table of contents. 
 %    \begin{macrocode}
   \ifdefined\PrintChanges
@@ -2647,25 +2697,48 @@
   }
 %    \end{macrocode}
 % 
-% Finally, also provide the |\pkgoptattrib| command, which typesets its argument
-% as |\{arg, ...\}|---useful to typeset attributes such as in
+% Provide the |\pkgoptattrib| command, which typesets its argument as
+% |\{arg, ...\}|---useful to typeset attributes such as in
 % \autoref{sec:abstract-attributes}.
 %    \begin{macrocode}
   \def\pkgoptattrib##1{\{##1,...\}}
-}
 %    \end{macrocode}
-%
-% Also provide a helper macro which is to load the font packages we want.  By
-% default, we use Utopia fonts via the |fourier| package, but some package
-% documentations may want a different math font.
+% 
+% Now, load the \pkgname{tcolorbox} package to provide visual ``Note,''
+% ``Warning,'' and ``Tip'' boxes.  Because \pkgname{tcolorbox} includes the
+% \pkgname{verbatim} package which messes up the |verbatim| environment in
+% latex dtx files (for which source lines all start with a |%| which needs
+% to be stripped), we save the |verbatim|-related commands, and restore
+% them after the interfering packages have been loaded.
 %    \begin{macrocode}
-\providecommand\phfnote@pkgdoc@setupfont{
-  \PassOptionsToPackage{T1}{fontenc}
-  \RequirePackage{fontenc}
-  \RequirePackage{fourier}
-  \renewcommand{\notesectionallfontfamily}{put}
-  \renewcommand{\notetitlefont}{\bfseries}
-  \renewcommand{\sfdefault}{phv}
+  \phfnoteSaveDefs{verbatimstuff}{%
+    verbatim,@verbatim,@xverbatim,@sxverbatim,endverbatim}
+  \usepackage{tcolorbox}
+  \newtcolorbox{pkgnote}{
+    colback=blue!5!white,
+    colframe=blue!5!white,
+    coltitle=blue!50!black,
+    toptitle=1.5ex,
+    fonttitle=\bfseries,
+    title={NOTE}
+  }
+  \newtcolorbox{pkgwarning}{
+    colback=red!5!white,
+    colframe=red!5!white,
+    coltitle=red!50!black,
+    toptitle=1.5ex,
+    fonttitle=\bfseries,
+    title={WARNING}
+  }
+  \newtcolorbox{pkgtip}{
+    colback=green!5!white,
+    colframe=green!5!white,
+    coltitle=green!50!black,
+    toptitle=1.5ex,
+    fonttitle=\bfseries,
+    title={TIP}
+  }
+  \phfnoteRestoreDefs{verbatimstuff}
 }
 %    \end{macrocode}
 % \end{macro}

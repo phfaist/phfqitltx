@@ -22,24 +22,17 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phffullpagefigure}
 %<*package>
-    [2016/05/02 v1.0 phffullpagefigure package]
+    [2016/05/04 v1.0 phffullpagefigure package]
 %</package>
 %
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{xcolor}
 \usepackage{phffullpagefigure}
-\usepackage[preset=pkgdoc]{phfnote}
-\phfnoteSaveDefs{verbatimstuff}{verbatim,@verbatim,endverbatim}
-\usepackage[normalem]{ulem}
-\usepackage{verbdef}
-\usepackage{tcolorbox}
-\newtcolorbox{pkgnote}{colback=blue!5!white,colframe=blue!5!white,coltitle=blue!50!black,fonttitle=\bfseries,title={NOTE}}
-\newtcolorbox{pkgwarning}{colback=red!5!white,colframe=red!5!white,coltitle=red!50!black,fonttitle=\bfseries,title={WARNING}}
+\usepackage[preset=xpkgdoc]{phfnote}
 \EnableCrossrefs         
 \CodelineIndex
 \RecordChanges
-\phfnoteRestoreDefs{verbatimstuff}
 \begin{document}
   \DocInput{phffullpagefigure.dtx}
 \end{document}
@@ -71,25 +64,25 @@
 %
 % \DoNotIndex{\newcommand,\newenvironment,\def,\gdef,\edef,\xdef,\if,\else,\fi,\ifx}
 % 
-% \title{The \textsf{phffullpagefigure} package\thanks{\itshape
+% \title{The \pkgname{phffullpagefigure} package\thanks{\itshape
 % This document corresponds to
-% \textsf{phffullpagefigure}~\fileversion, dated \filedate. It is part of
+% \pkgname{phffullpagefigure}~\fileversion, dated \filedate. It is part of
 % the Part of the
-% \href{https://github.com/phfaist/phfqitltx/}{\textsf{phfqitltx}}
+% \href{https://github.com/phfaist/phfqitltx/}{\pkgname{phfqitltx}}
 % package suite, see \url{https://github.com/phfaist/phfqitltx}.}}
 % \author{Philippe Faist\quad\email{philippe.faist@bluewin.ch}}
 %
 % \maketitle
 %
 % \begin{abstract}
-%   \textsf{phffullpagefigure}---Figures which fill up a full page of a document.
+%   \pkgname{phffullpagefigure}---Figures which fill up a full page of a document.
 % \end{abstract}
 %
 % \inlinetoc
 %
 % \section{Introduction}
 %
-% The package \textsf{phffullpagefigure} provides an implementation for figures which are
+% The package \pkgname{phffullpagefigure} provides an implementation for figures which are
 % to be displayed to occupy a full page.
 %
 % A typical use case: suppose you have a figure in PDF format of the size of the document
@@ -127,8 +120,8 @@
 % \begin{verbatim}
 % \begin{fullpagefigure}
 %   \figpdf{fig/my-figure} % my PDF file
-%   \caption{A colorful figure with letters and words.  The table design
-%   may remind you of going to the optician.}
+%   \caption{A colorful figure with letters and words.  The table
+%     design may remind you of going to the optician.}
 %   \label{fig:test}
 % \end{fullpagefigure}
 % \end{verbatim}
@@ -161,7 +154,7 @@
 %         \vfil\vfil\vfil}}}%
 %       \clearpage\aftergroup\restoregeometry}%
 %   \caption{A colorful figure with letters and words.  The table design
-%   may remind you of going to the optician.}%
+%       may remind you of going to the optician.}%
 %   \label{fig:test}%
 % \end{fullpagefigure}
 %
@@ -188,12 +181,26 @@
 % |\figcontents{\includepdf{pdf-1}\includepdf{pdf-2}}|, and request that
 % the figure start on an even-side page with |\figpageside{even}|.
 %
+% If the \meta{\LaTeX{} commands} are not |\includepdf| instructions
+% and want to change the page geometry for the figure and you're using
+% the \pkgname{geometry} package, have a look at these \texttt{TeX.SX}
+% answers\footnote{\url{http://tex.stackexchange.com/a/278101/32188}
+% and \url{http://tex.stackexchange.com/a/40503/32188}} for getting
+% the |\newgeometry| and
+% |\restoregeometry| commands right.  You might use, for example:\\[1ex]
+% \noindent|\figcontents{\newpage\thispagestyle{empty}%|\\
+% \hspace*{2em}|\newgeometry{margin=0.25in}% or 0in for no margins|\\
+% \hspace*{2em}\meta{\ldots{} \LaTeX{} commands to draw figure contents ...}\\
+% \hspace*{2em}|\clearpage\aftergroup\restoregeometry}|.
+%
+%
+% 
 % \DescribeMacro{\figpdf} As a shorthand, you may use
 % |\figpdf|\oarg{options}\marg{pdf-file} as a shorthand for
 % |\figcontents{\includepdf|\oarg{options}\marg{pdf-file}|}|.
 % 
 % You should explore the options provided by |\includepdf| (from the
-% \textsf{pdfpages} package\footnote{See documentation at
+% \pkgname{pdfpages} package\footnote{See documentation at
 % \url{https://www.ctan.org/pkg/pdfpages}}).  For example, the figure can
 % be resized to fill the page, pages may be selected individually from a
 % mult-page PDF, the image may be rotated, etc.
@@ -253,9 +260,10 @@
 %
 % \begin{verbatim} \usepackage[nopdfpages]{phffullpagefigure} \end{verbatim}
 %
-% If this package option is given, then the |pdfpages| package is not
-% loaded, and the command |\figpdf| is not made available.  You may use
-% this package option if the |pdfpages| package conflicts with your setup.
+% If this package option is given, then the \pkgname{pdfpages} package
+% is not loaded, and the command |\figpdf| is not made available.  You
+% may use this package option if the \pkgname{pdfpages} package
+% conflicts with your setup.
 %
 %
 %
@@ -277,8 +285,8 @@
 \RequirePackage{afterpage}
 %    \end{macrocode}
 % 
-% The |placeins| package provies the |\FloatBarrier| command, which we use
-% to ensure that no other float gets in the way.
+% The \pkgname{placeins} package provies the |\FloatBarrier| command,
+% which we use to ensure that no other float gets in the way.
 %    \begin{macrocode}
 \RequirePackage{placeins}
 %    \end{macrocode}
@@ -371,8 +379,8 @@
 %    \end{macrocode}
 % 
 % Provide |\figpdf| as a shorthand, but only if applicable (i.e., the
-% |nopdfpages| package option was not specified and the |pdfpages| package
-% was loaded):
+% |nopdfpages| package option was not specified and the
+% \pkgname{pdfpages} package was loaded):
 %    \begin{macrocode}
   \phffpf@provide@figpdf%
 %    \end{macrocode}
