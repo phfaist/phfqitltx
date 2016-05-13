@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfthm}
 %<*package>
-    [2016/05/04 v1.0 phfthm package]
+    [2016/05/13 v1.0 phfthm package]
 %</package>
 %
 %<*driver>
@@ -134,7 +134,7 @@
 \newcommand\phfMakeTheorem[3][]{%
   % 
   %  #1 = [options]
-  %  #2 = {theorem-codename}
+  %  #2 = {theorem-environment-name}
   %  #3 = {Theorem Name}
   %
   %  e.g. \phfMakeTheorem[counter=thmcounter]{prop}{Proposition}
@@ -303,48 +303,242 @@
 
 % ------------------------------------------------------------------------------
 %
-% Improved, smarter {proof} environment
+% Improved, smarter {proof} environments
 %
+
+
+
+%
+% Save old {proof} environment provided by amsthm
+%
+\let\phfthm@old@proof\proof
+\let\endphfthm@old@proof\endproof
+
+
+
+\define@cmdkey{phfmkprf}{displayenv}{}
+\define@boolkey{phfmkprf}{override}[true]{}% override existing environment
+\define@cmdkey{phfmkprf}{defaultproofname}{}
+\define@cmdkey{phfmkprf}{internalcounter}{}
+\define@cmdkey{phfmkprf}{proofofname}{}
+\define@boolkey{phfmkprf}{parselabel}[true]{}
+\define@cmdkey{phfmkprf}{parselabelcmd}{}
+
+\providecommand\proofname{Proof}
+
+
+\newcommand\phfMakeProofEnv[2][]{% #1 = options, #2 = proof env name
+  % 
+  % Handle options: set defaults, then set the given options
+  %
+  \KV@phfmkprf@overridefalse%
+  \def\cmdKV@phfmkprf@displayenv{*}% "*" = a sensible default proof appearance
+  \def\cmdKV@phfmkprf@defaultproofname{\proofname}%
+  \def\cmdKV@phfmkprf@internalcounter{phfthmproofcnt}%
+  \def\cmdKV@phfmkprf@proofofname{\proofofname}%
+  \KV@phfmkprf@parselabeltrue
+  \def\cmdKV@phfmkprf@parselabelcmd{\phfthm@proof@parselabel}%
+  \setkeys{phfmkprf}{#1}%
+  %
+  %
+  %
+  % 
+  %
+  \def\phfmkprf@tmp@star{*}%
+  \ifx\cmdKV@phfmkprf@displayenv\phfmkprf@tmp@star\relax% use a sensible default proof appearance
+    \def\cmdKV@phfmkprf@displayenv{phfthm@proof@defaultdisplayenv}%
+  \fi
+  %
+  %
+  %
+  \cslet{phfthm@prfenv@#2@val@displayenv}\cmdKV@phfmkprf@displayenv%
+  \if\relax\detokenize\expandafter{\cmdKV@phfmkprf@defaultproofname}\relax%
+    \csdef{phfthm@prfenv@#2@val@defaultproofnameargs}{}%
+    \csdef{phfthm@prfenv@#2@val@setdefaultprooftitle}{%
+      \def\phfthm@val@prooftitle{\proofname}}%
+  \else
+    \csedef{phfthm@prfenv@#2@val@defaultproofnameargs}{%
+      [\expandonce{\cmdKV@phfmkprf@defaultproofname}]}%
+    \csedef{phfthm@prfenv@#2@val@setdefaultprooftitle}{%
+      \noexpand\def\noexpand\phfthm@val@prooftitle{%
+        \expandonce{\cmdKV@phfmkprf@defaultproofname}}}%
+  \fi
+  \csedef{phfthm@prfenv@#2@val@parselabel}##1{%
+    \ifKV@phfmkprf@parselabel
+      \expandonce\cmdKV@phfmkprf@parselabelcmd{##1}%
+    \else
+      \noexpand\phfthm@proof@noparselabel{##1}%
+    \fi
+  }
+  \csedef{phfthm@prfenv@#2@val@refstepinternalcounter}{%
+    \noexpand\refstepcounter{\cmdKV@phfmkprf@internalcounter}}%
+  \cslet{phfthm@prfenv@#2@val@proofofname}\cmdKV@phfmkprf@proofofname%
+  \csedef{phfthm@prfenv@#2@val@mkdisplayargs}{%
+    \noexpand\def\noexpand\phfthm@tmp@displayargs{[{%
+        \expandafter\noexpand\csname phfthm@prfenv@#2@val@proofofname\endcsname{\noexpand\phfthm@val@prooftitle}%
+      }]}%
+  }%
+  \csdef{phfthm@prfenv@#2@val@pinproofanchor}{%
+    % refstep the internal counter; and then pin down label, if appropriate
+    \csname phfthm@prfenv@#2@val@refstepinternalcounter\endcsname%
+    \if\relax\detokenize\expandafter{\phfthm@val@proofoflabel}\relax\else% not empty
+      \edef\phfthm@tmp@larg{{proof:\phfthm@val@proofoflabel}}%
+      \expandafter\label\phfthm@tmp@larg%
+    \fi
+  }%
+  %
+  % 
+  \if\relax\detokenize\expandafter{\cmdKV@phfmkprf@displayenv}\relax%
+    \csdef{phfthm@prfenv@#2@val@displayenvbegincmd}##1{}%
+    \csdef{phfthm@prfenv@#2@val@displayenvendcmd}##1{}%
+  \else
+    \csedef{phfthm@prfenv@#2@val@displayenvbegincmd}##1{%
+      \noexpand\begin{\csname phfthm@prfenv@#2@val@displayenv\endcsname}##1}%
+    \csedef{phfthm@prfenv@#2@val@displayenvendcmd}##1{%
+      \noexpand\end{\csname phfthm@prfenv@#2@val@displayenv\endcsname}##1}%
+  \fi
+  %
+  \def\phfthm@tmp@defcmd{\newenvironment}%
+  \ifKV@phfmkprf@override\def\phfthm@tmp@defcmd{\renewenvironment}\fi%
+  \phfthm@tmp@defcmd{#2}[1][\phfthm@NOPROOFARG]{%
+    %
+    \csname phfthm@hookproof@#2@start\endcsname%
+    %
+    % Parse optional argument into proof label (maybe) and proof title.
+    %
+    \def\phfthm@val@proofarg{##1}%
+    \ifx\phfthm@val@proofarg\phfthm@test@NOPROOFARG\relax%
+      % no opt arg given: don't give opt arg to display env
+      \def\phfthm@val@proofoflabel{}%
+      \csname phfthm@prfenv@#2@val@setdefaultprooftitle\endcsname%
+      \letcs\phfthm@tmp@displayargs{phfthm@prfenv@#2@val@defaultproofnameargs}%
+    \else%
+      \if\relax\detokenize{##1}\relax% empty arg given
+        \def\phfthm@val@proofoflabel{}%
+        \csname phfthm@prfenv@#2@val@setdefaultprooftitle\endcsname%
+      \else
+        \csname phfthm@prfenv@#2@val@parselabel\endcsname{##1}%
+        \csname phfthm@prfenv@#2@val@mkdisplayargs\endcsname%
+      \fi
+    \fi%
+    %
+    % Define the "\phfthmPinProofAnchor" command (locally) in case the
+    % display formatting environment takes care of where to place the anchor already.
+    \def\phfthmPinProofAnchor{%
+      \csname phfthm@prfenv@#2@val@pinproofanchor\endcsname%
+      \global\let\phfthmPinProofAnchor\relax}%
+    %
+    % Start the proof-display-environment
+    %
+    \def\x{\csname phfthm@prfenv@#2@val@displayenvbegincmd\endcsname}%
+    \expandafter\x\expandafter{\phfthm@tmp@displayargs}%
+    % 
+    \csname phfthm@hookproof@#2@startafterdisplay\endcsname%
+    % 
+    % If required, pin anchor after the proof-display-environment. (\phfthmPinProofAnchor
+    % auto-destructs after first use, so it's safe to potentially call it a second time
+    % here)
+    \phfthmPinProofAnchor%
+    %
+    \expandafter\noexpand\csname phfthm@hookproof@#2@startlast\endcsname%
+  }%
+  {%
+    \expandafter\noexpand\csname phfthm@hookproof@#2@end\endcsname%
+    \csname phfthm@prfenv@#2@val@displayenvendcmd\endcsname
+    \expandafter\noexpand\csname phfthm@hookproof@#2@final\endcsname%
+  }%
+  \csdef{phfthm@hookproof@#2@start}{\phfthm@hookproof@startcommon{#2}}%
+  \csdef{phfthm@hookproof@#2@startafterdisplay}{\phfthm@hookproof@startafterdisplaycommon{#2}}%
+  \csdef{phfthm@hookproof@#2@startlast}{\phfthm@hookproof@startlastcommon{#2}}%
+  \csdef{phfthm@hookproof@#2@end}{\phfthm@hookproof@endcommon{#2}}%
+  \csdef{phfthm@hookproof@#2@final}{\phfthm@hookproof@finalcommon{#2}}%
+}
+
+
+\def\phfthm@hookproof@startcommon#1{}
+\def\phfthm@hookproof@startafterdisplaycommon#1{}
+\def\phfthm@hookproof@startlastcommon#1{}
+\def\phfthm@hookproof@endcommon#1{}
+\def\phfthm@hookproof@finalcommon#1{}
 
 
 \newcounter{phfthmproofcnt}
 
-\newenvironment{phfthm@proof@inner}[1]{%
-  \refstepcounter{phfthmproofcnt}%
-  \phfthm@hook@start@proof{#1}%
-  \phfthm@do@proofofwhat{#1}%
-  \phfthm@hook@startpost@proof{#1}%
+\def\phfthm@NOPROOFARG{}
+\def\phfthm@test@NOPROOFARG{\phfthm@NOPROOFARG}
+
+
+\def\proofofname#1{\proofname\space of #1}
+
+
+\newenvironment{phfthm@proof@defaultdisplayenv}[1][\proofname]{\par
+  \pushQED{\qed}%
+  \normalfont \topsep6\p@\@plus6\p@\relax
+  \trivlist\item\relax
+  \phfthmPinProofAnchor
+  \phfthm@ProofTitleFmt{#1}%
+  \phfthm@ProofTitleHspace
+  \ignorespaces
 }{%
+  \popQED\endtrivlist\@endpefalse
+}
+
+\def\phfthm@ProofTitleFmt#1{%
+  {\itshape #1.}%
+}
+\def\phfthm@ProofTitleHspace{%
+  \hspace{1.5ex plus 0.5ex minus 0.2ex}%
 }
 
 
-\def\phfthm@hook@start@proof#1{}%\def\baselinestretch{1.2}\footnotesize}
-\def\phfthm@hook@startpost@proof#1{\hspace{1.5ex plus 0.5ex minus 0.2ex}}
+% \newenvironment{phfthm@proof@inner}[2]{% #1 = display environment, #2 = proof title
+%   \begin{#1}%
+%     \def\phfthm@proof@inner@closeenv{#1}%
+%   \refstepcounter{phfthmproofcnt}%
+%   \phfthm@hook@start@proof{#2}%
+%   \phfthm@do@proofofwhat{#2}%
+%   \phfthm@hook@startpost@proof{#2}%
+% }{%
+%   \expandafter\end\expandafter{\phfthm@proof@inner@closeenv}%
+% }
 
 
-\def\phfthm@do@proofofwhat#1{%
+% \def\phfthm@hook@start@proof#1{}%\def\baselinestretch{1.2}\footnotesize}
+% \def\phfthm@hook@startpost@proof#1{\hspace{1.5ex plus 0.5ex minus 0.2ex}}
+
+
+% \def\phfthm@do@proofofwhat#1{%
+%   \def\phfthm@val@proofoflabel{}%
+%   \def\phfthm@val@prooftitle{}%
+%   \if\relax\detokenize\expandafter{#1}\relax% #1 = empty ? 
+%     \phfthm@fmt@prooftitle{\proofname}%
+%   \else%
+%     \phfthm@do@proofofwhat@maybelabel#1\phfthm@do@proofofwhat@END%
+%     \phfthm@fmt@prooftitle{\proofofname{\phfthm@val@prooftitle}}%
+%   \fi%
+%   \if\relax\detokenize\expandafter{\phfthm@val@proofoflabel}\relax% proof of label = empty ?
+%   \else%
+%     \label{proof:\phfthm@val@proofoflabel}%  pin label of our own for this proof.
+%   \fi%
+% }
+
+
+\def\phfthm@proof@parselabel#1{%
+  \phfthm@proof@parselabel@maybelabel#1\phfthm@proof@parselabel@END%
+}
+\def\phfthm@proof@noparselabel#1{%
   \def\phfthm@val@proofoflabel{}%
-  \def\phfthm@val@prooftitle{}%
-  \if\relax\detokenize\expandafter{#1}\relax% #1 = empty ? 
-    \phfthm@fmt@prooftitle{\proofname}%
-  \else%
-    \phfthm@do@proofofwhat@maybelabel#1\phfthm@do@proofofwhat@END%
-    \phfthm@fmt@prooftitle{\proofofname{\phfthm@val@prooftitle}}%
-  \fi%
-  \if\relax\detokenize\expandafter{\phfthm@val@proofoflabel}\relax% proof of label = empty ?
-  \else%
-    \label{proof:\phfthm@val@proofoflabel}%  pin label of our own for this proof.
-  \fi%
+  \def\phfthm@val@prooftitle{#1}%
 }
 
-\def\phfthm@do@proofofwhat@maybelabel{%
-  \@ifnextchar*\phfthm@do@proofofwhat@label\phfthm@do@proofofwhat@title%
+\def\phfthm@proof@parselabel@maybelabel{%
+  \@ifnextchar*\phfthm@proof@parselabel@label\phfthm@proof@parselabel@title%
 }
-\def\phfthm@do@proofofwhat@label*#1\phfthm@do@proofofwhat@END{%
+\def\phfthm@proof@parselabel@label*#1\phfthm@proof@parselabel@END{%
   \edef\phfthm@val@proofoflabel{#1}%
   \def\phfthm@val@prooftitle{\phfthm@autoref{#1}}%
 }
-\def\phfthm@do@proofofwhat@title#1\phfthm@do@proofofwhat@END{%
+\def\phfthm@proof@parselabel@title#1\phfthm@proof@parselabel@END{%
   \def\phfthm@val@proofoflabel{}%
   \def\phfthm@val@prooftitle{#1}%
 }
@@ -355,21 +549,11 @@
   \@ifpackageloaded{hyperref}{\def\phfthm@autoref{\autoref}}{}
 }
 
-\def\phfthm@fmt@prooftitle#1{{\itshape#1.}}%
-\def\proofofname#1{\proofname{} of #1}
 
 
-\newenvironment{phfthm@proof}[1][]{%
-  \par%
-  \pushQED{\qed}%
-  \normalfont\topsep6\p@\@plus6\p@\relax%
-  \trivlist\item\relax%
-  \begin{phfthm@proof@inner}{#1}%
-  \ignorespaces%
-}{%
-  \popQED\endtrivlist\@endpefalse%
-  \end{phfthm@proof@inner}%
-}
+
+
+
 
 
 
@@ -677,6 +861,10 @@
 \define@boolkey{phfthmpkg}{qedsymbolblacksquare}[true]{}
 \KV@phfthmpkg@qedsymbolblacksquaretrue% true by default
 
+
+\define@boolkey{phfthmpkg}{proofenv}[true]{}
+\KV@phfthmpkg@proofenvtrue% true by default
+
 \define@boolkey{phfthmpkg}{prooftitleitbf}[true]{}
 \KV@phfthmpkg@prooftitleitbffalse% false by default
 
@@ -763,10 +951,15 @@
 %
 
 
+\def\phfthm@pkgopterr@require@proofenv#1{%
+  \ifKV@phfthmpkg@proofenv\else%
+    \PackageError{phfthm}{Option `#1' depends on `proofenv=true'}%
+  \fi
+} 
 
 
 \ifKV@phfthmpkg@smallproofs
-  \apptocmd\phfthm@hook@start@proof{\def\baselinestretch{1.2}\footnotesize}{}{%
+  \apptocmd\phfthm@hookproof@startcommon{\def\baselinestretch{1.2}\footnotesize}{}{%
     Failed to change command \string\phfthm@hook@start@proof}
 \fi
 
@@ -777,7 +970,7 @@
 \fi
 
 \ifKV@phfthmpkg@prooftitleitbf
-  \def\phfthm@fmt@prooftitle#1{{\itshape\bfseries#1.}}
+  \def\phfthm@ProofTitleFmt#1{{\itshape\bfseries#1.}}
 \fi
 
 \ifKV@phfthmpkg@sepcounters
@@ -818,7 +1011,8 @@
     }
   }
 
-  \def\phfthm@exec@proofrefstyles#1\phfthm@END{\phfthm@internal@execattribs{phfthm@proofref@style@}{ProofRef Style}{#1}}
+  \def\phfthm@exec@proofrefstyles#1\phfthm@END{%
+    \phfthm@internal@execattribs{phfthm@proofref@style@}{ProofRef Style}{#1}}
   \expandafter\phfthm@exec@proofrefstyles\cmdKV@phfthmpkg@proofref@style\phfthm@END
 
 
@@ -868,15 +1062,17 @@
 
 
 %
-% Save old {proof} environment provided by amsthm,
+% override it by our own:
 %
-\let\phfthm@old@proof\proof
-\let\endphfthm@old@proof\endproof
-%
-% and override it by our own:
-%
-\let\proof\phfthm@proof
-\let\endproof\endphfthm@proof
+
+\ifKV@phfthmpkg@proofenv
+
+  \phfMakeProofEnv[override=true]{proof}
+
+\fi
+
+%\let\proof\phfthm@proof
+%\let\endproof\endphfthm@proof
 
 
 

@@ -1,12 +1,40 @@
 \documentclass[12pt,a5paper]{article}
 
-\usepackage[thmset=default,sepcounters,proofref={margin,always},prooftitleitbf]{../phfthm}
+\usepackage[thmset=default,sepcounters,proofref={margin,always},proofenv=false]{../phfthm}
 %\usepackage[theoremstyle=definition,definitionstyle=remark,thmset=rich,proofref={longref,margin}]{../phfthm}
 %\usepackage[sepcounters,proofref]{../phfthm}
+
+\def\demof#1{D\'emonstration [#1]}
+\makeatletter\def\myparse#1{\phfthm@proof@parselabel{#1}\def\phfthm@val@prooftitle{$\langle$#1$\rangle$}}\makeatother
+
+\phfMakeProofEnv[proofofname=\demof,defaultproofname={D\'emonstration},parselabelcmd=\myparse]{myproof}
+\phfMakeProofEnv[proofofname=\demof,displayenv=miniproofdisplayblock]{myotherproofstyle}
+
+% can override default proof env's title formatting:
+\makeatletter
+\def\phfthm@ProofTitleFmt#1{%
+  {\textsc{#1}:}%
+}
+\makeatother
+
+\usepackage{tcolorbox}
+\newenvironment{miniproofdisplayblock}[1][\proofname]{%
+  \begin{tcolorbox}[colframe=blue,phantom={\phfthmPinProofAnchor},title={\tiny\scshape #1:}]%
+}{%
+  \end{tcolorbox}%
+}
 
 \def\proofrefsize{\tiny}
 
 \usepackage{hyperref}  % for \autoref{}
+  \hypersetup{unicode=true,%
+    bookmarksnumbered=false,bookmarksopen=false,bookmarksopenlevel=1,%
+    breaklinks=true,pdfborder={0 0 0},colorlinks=true}%
+  \hypersetup{%
+    anchorcolor=red,citecolor=red,%
+    filecolor=red,linkcolor=red,%
+    menucolor=red,runcolor=red,%
+    urlcolor=red}%
 
 
 \begin{document}
@@ -16,20 +44,20 @@
 \label{lem:1}
 Another lemma here.
 \end{lemma}
-\begin{proof}[a different Lemma]
+\begin{myproof}[a different Lemma]
   this is another proof.
-\end{proof}
+\end{myproof}
 
 
 \begin{proposition}
   \label{prop:1}
   Proposition here.
 \end{proposition}
-\begin{proof}[*prop:1]
+\begin{myotherproofstyle}[*prop:1]
   This is a proof.
 
   And more stuff.
-\end{proof}
+\end{myotherproofstyle}
 
 
 You might also like the defintion of the \ref{thmheading:trace-dist} on \autopageref{thmheading:trace-dist}.
@@ -38,15 +66,18 @@ You might also like the defintion of the \ref{thmheading:trace-dist} on \autopag
 \noproofref
 Another proposition here.
 \end{proposition}
-\begin{proof}
+\begin{myproof}
   this is yet another proof.
-\end{proof}
+\end{myproof}
 
 
 \begin{theorem}
 \label{thm:1}
 And a theorem
 \end{theorem}
+\begin{myotherproofstyle}
+  this is yet yet yet yet yet another another another proof.
+\end{myotherproofstyle}
 
 
 \begin{theorem}
@@ -64,9 +95,9 @@ This is a definition.
 \begin{proposition*}
 Another proposition here, with no numbering.
 \end{proposition*}
-\begin{proof}
+\begin{myproof}
   this is yet another proof.
-\end{proof}
+\end{myproof}
 
 \begin{theorem}
   \label{thm:another}
@@ -78,10 +109,10 @@ See also \autoref{prop:1}, \autoref{thm:1} and \autoref{lem:1}
 
 \cleardoublepage
 x
-\begin{proof}[*thm:1]
+\begin{myproof}[*thm:1]
   ....... and this is yet yet another proof.  This proof is only on the next page of the
   theorem, so it should not necessary display the reference there.
-\end{proof}
+\end{myproof}
 
 \begin{thmheading}{Trace Distance}
   \label{thmheading:trace-dist}
@@ -93,15 +124,15 @@ x
 
 \cleardoublepage
 
-\begin{proof}[*lem:1]
+\begin{myproof}[*lem:1]
   this is another proof.
-\end{proof}
+\end{myproof}
 
 \cleardoublepage
 
-\begin{proof}[*thm:another]
+\begin{myproof}[*thm:another]
   Proof proof proof proof. You're convinced?
-\end{proof}
+\end{myproof}
 
 
 
