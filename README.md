@@ -25,6 +25,7 @@ LaTeX packages for QIT stuff which I use often
   The caption e.g. reads "Figure 1 (on next page): blah blah" and the figure
   may occupy the full next page.
 
+- `phfthm` - goodies for theorems and proofs.
 
 # Installation
 
