@@ -202,7 +202,7 @@
 % if needed for inline math.
 %
 %
-% \subsection{Math Operators}
+% \subsection{Math/Linear Algebra Operators}
 % \label{sec:math-operators}
 %
 % \needspace{6\baselineskip}
@@ -217,6 +217,12 @@
 % and imaginary parts of a complex number), to the more readable $\Re(z)$ and
 % $\Im(z)$.  (The original symbols were {\makeatletter $\phfqit@Re(z)$ and
 % $\phfqit@Im(z)$}.)
+%
+% \subsection{Poly symbol}
+%
+% \DescribeMacro{\poly} Can be typeset in $\poly(n)$ time.
+% \iffalse meta-comment \changedreftext{v1.0-added-poly-command} \fi
+% 
 %
 % \subsection{Bits and Bit Strings}
 % \label{sec:bits}
@@ -624,6 +630,18 @@
 \renewcommand{\Im}{\phfqit@Imagpart}
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
+%
+% \subsubsection{Poly}
+%
+% \begin{macro}{\poly}
+%   Poly symbol.
+%   \iffalse meta-comment
+%         \changed[v1.0-added-poly-command]{v1.0}{2015/05/22}{Added \phfverb\poly\space command}
+%   \fi
+%    \begin{macrocode}
+\DeclareMathOperator{\poly}{poly}
+%    \end{macrocode}
 % \end{macro}
 %
 % \subsubsection{Bits and Bit Strings}

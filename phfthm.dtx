@@ -63,6 +63,7 @@
 % \GetFileInfo{phfthm.dtx}
 %
 % \DoNotIndex{\newcommand,\newenvironment,\def,\gdef,\edef,\xdef,\if,\else,\fi,\ifx}
+% \DoNotIndex{\expandafter,\csname,\endcsname,\let}
 % 
 % \title{The \pkgname{phfthm} package\thanks{\itshape
 % This document corresponds to
@@ -93,27 +94,39 @@
 %
 % \section{Implementation}
 %
+% First, load some packages.  General toolboxes:
 %    \begin{macrocode}
 \RequirePackage{xkeyval}
 \RequirePackage{etoolbox}
-
+%    \end{macrocode}
+% 
+% To define alias counters for theorems, load \pkgname{aliascnt}:
+%    \begin{macrocode}
 \RequirePackage{aliascnt}
-
+%    \end{macrocode}
+% 
+% And finally, load the {AMS} math and theorem packages:
+%    \begin{macrocode}
 \RequirePackage{amsmath}
 \RequirePackage{amsthm}
-
-
+%    \end{macrocode}
+% 
 %
-% internal -- execute all definitions given in list of attributes
+% \subsection{Generic Internal Stuff}
 %
+% \begin{macro}{\phfthm@internal@execattribs}
+%
+%   Internal command: execute all definitions given in list of attributes.  This was
+%   copy-pasted from a similar definition in the \pkgname{phfnote} package.
+%
+%   |#1| = prefix to look for attributes
+%   
+%   |#2| = name of what |#1| represents, to use in message in case attribute is not found
+%   
+%   |#3| = list of attributes
+%
+%    \begin{macrocode}
 \def\phfthm@internal@execattribs#1#2#3{%
-  %
-  % #1 = prefix to look for attributes
-  % 
-  % #2 = name of what #1 represents, to use in message in case attribute is not found
-  %
-  % #3 = list of attributes
-  %
   \@for\next:=#3\do{%
     \ifcsname #1\next\endcsname%
       \csname #1\next\endcsname%
@@ -122,6 +135,15 @@
     \fi
   }
 }
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% ......................................... TODO: DOC FROM HERE ON .........................
+%
+%
+%
+%    \begin{macrocode}
 
 
 \define@cmdkey{phfmkthm}{counter}{}

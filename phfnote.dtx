@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfnote}
 %<*package>
-    [2016/05/04 v1.0 phfnote package]
+    [2016/05/22 v1.0 phfnote package]
 %</package>
 %
 %<*driver>
@@ -2667,7 +2667,59 @@
     \setcounter{IndexColumns}{2}
   \fi
 %    \end{macrocode}
+% 
+% And set the glossary, that is, the list of changes history to single-column.  For this,
+% renew the environment completely to remove the |multicols| environment.
+%    \begin{macrocode}
+  \let\phfnote@xpkgdoc@old@theglossary\theglossary
+  \let\phfnote@xpkgdoc@old@endtheglossary\endtheglossary
+  \renewenvironment{theglossary}{%
+    \glossary@prologue%
+    \GlossaryParms \let\item\@idxitem \ignorespaces}
+  {}
+%    \end{macrocode}
 %
+% Provide |\changed| and |\changedreftext|, with more advanced support for displaying
+% changes in package functionality or API.  Syntax is
+% |\changed|\oarg{label}\marg{v1.0}\marg{2016/05/22}\marg{description}.
+%    \begin{macrocode}
+  \newcounter{phfnotechanged}
+  \def\phfnote@changed@set##1{%
+    \expandafter\gdef\csname phfnote@changed@lbl@##1\endcsname%
+  }
+  \newcommand*\changed[4][]{%
+    \if\relax\detokenize{##1}\relax%
+      \changedtextfmt{##2}{##3}{##4}%
+      \changes{##2}{##3}{##4}%
+    \else%
+      \protected@edef\phfnotechanged@tmpa{{##2}{##3}{##4}}%
+      \immediate\write\@auxout{\string\phfnote@changed@set{##1}{\expandonce\phfnotechanged@tmpa}}%
+      \par\hspace*{0pt}\refstepcounter{phfnotechanged}\label{phfnotechanged:##1}%
+      \begingroup\let\phfnote@changedreftext@par\relax
+        \changedreftext{##1}%
+      \endgroup
+      \changes{##2}{##3}{\hyperref[phfnotechanged:##1]{##4}}%
+    \fi
+  }
+  \def\phfnote@changedreftext@par{\par}
+  \newcommand*\changedreftext[1]{%
+    \phfnote@changedreftext@par%
+    \ifcsname phfnote@changed@lbl@##1\endcsname
+      \hyperref[phfnotechanged:##1]{%
+        \expandafter\expandafter\expandafter\changedtextfmt\csname phfnote@changed@lbl@##1\endcsname
+      }
+    \else
+      \hyperref[phfnotechanged:##1]{%
+        \changedtextfmt{???}{???}{[\textbf{missing ref}]} 
+      }%
+    \fi
+    \par
+  }
+  \newcommand*\changedtextfmt[3]{%
+    \textit{Changed in {##1\kern 0.3ex\relax[##2]}:} ##3.
+  }
+%    \end{macrocode}
+% 
 % Set up an elaborate environment (based on a |description| environment) to
 % describe package options.
 %    \begin{macrocode}
