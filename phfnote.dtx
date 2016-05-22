@@ -235,8 +235,8 @@
 %   useful commands are also provided, the \pkgname{tcolorbox} package is
 %   loaded along with some default boxes.  Also some commands are patched
 %   to achieve some fixes.  This preset is used for the documentation of
-%   packages in the \pkgname{phfqitltx} package suite.  (For details see the
-%   implementation of |\phfnote@preset@xpkgdoc| below.)
+%   packages in the \pkgname{phfqitltx} package suite.  (For details see
+%   the implementation of |\phfnote@preset@xpkgdoc| below.)
 % \end{pkgoptions}
 %
 %
@@ -2629,6 +2629,7 @@
 % \begin{macro}{\phfnote@preset@xpkgdoc}
 %   Same as |preset=pkgdoc|, but also provide some handy hacks and
 %   commands.
+%
 %    \begin{macrocode}
 \def\phfnote@preset@xpkgdoc{
   \phfnote@preset@pkgdoc
@@ -2639,16 +2640,7 @@
   \RequirePackage{verbdef}
 %    \end{macrocode}
 %
-% A macro to format a package name.
-%    \begin{macrocode}
-  \def\pkgname##1{%
-    \textsf{##1}%
-    \index{##1={\ttfamily ##1} (package)}%
-    \index{packages:>##1={\ttfamily ##1}}%
-  }
-  \robustify\pkgname
-%    \end{macrocode}
-% 
+% \textbf{Some patching first:}
 % Patch up |\PrintChanges| and |\PrintIndex|, if they are defined (for if we are
 % using the \pkgname{ltxdoc} package for latex package documentation).  We want these to
 % generate an entry in the table of contents. 
@@ -2679,21 +2671,53 @@
   {}
 %    \end{macrocode}
 %
-% Provide |\changed| and |\changedreftext|, with more advanced support for displaying
-% changes in package functionality or API.  Syntax is
-% |\changed|\oarg{label}\marg{v1.0}\marg{2016/05/22}\marg{description}.
+% \textbf{Provide Macro:} |\pkgname|\marg{package name} to format a package
+% name.  Also place it in the general index.  This command is robust and
+% can be used in section titles etc.
+%    \begin{macrocode}
+  \def\pkgname##1{%
+    \textsf{##1}%
+    \index{##1={\ttfamily ##1} (package)}%
+    \index{packages:>##1={\ttfamily ##1}}%
+  }
+  \robustify\pkgname
+%    \end{macrocode}
+% 
+%
+% \textbf{Provide Macros:} |\changed| and |\changedreftext|, with more
+% advanced support for displaying changes in package functionality or API.
+% 
+% First, we need a counter for the x-ref system.
 %    \begin{macrocode}
   \newcounter{phfnotechanged}
-  \def\phfnote@changed@set##1{%
-    \expandafter\gdef\csname phfnote@changed@lbl@##1\endcsname%
-  }
+%    \end{macrocode}
+% 
+% Mark changes in the implementation section of the package documentation
+% with the command |\changed|\oarg{label
+% name}\marg{v1.0}\marg{2016/05/22}\marg{description}.  This command
+% automatically adds the change to the package's change history list, and
+% allows you to refer to this change anywhere else in the package doc with
+% |\changedreftext|.
+%    \begin{macrocode}
   \newcommand*\changed[4][]{%
+%    \end{macrocode}
+% 
+% First, if no label is given as optional argument, then just display the
+% change and add it to the package changes list.
+%    \begin{macrocode}
     \if\relax\detokenize{##1}\relax%
       \changedtextfmt{##2}{##3}{##4}%
       \changes{##2}{##3}{##4}%
     \else%
+%    \end{macrocode}
+% 
+% If a label name is provided as optional argument, then we need to write
+% some stuff to the \texttt{.aux} file to make the change visible in the
+% whole document.
+%    \begin{macrocode}
       \protected@edef\phfnotechanged@tmpa{{##2}{##3}{##4}}%
-      \immediate\write\@auxout{\string\phfnote@changed@set{##1}{\expandonce\phfnotechanged@tmpa}}%
+      \immediate\write\@auxout{\string\phfnote@changed@set%
+        {##1}{\expandonce\phfnotechanged@tmpa}}%
       \par\hspace*{0pt}\refstepcounter{phfnotechanged}\label{phfnotechanged:##1}%
       \begingroup\let\phfnote@changedreftext@par\relax
         \changedreftext{##1}%
@@ -2701,27 +2725,43 @@
       \changes{##2}{##3}{\hyperref[phfnotechanged:##1]{##4}}%
     \fi
   }
+  \def\phfnote@changed@set##1{%
+    \expandafter\gdef\csname phfnote@changed@lbl@##1\endcsname%
+  }
+%    \end{macrocode}
+% 
+% When you document changes with the help of |\changed|, you may refer to
+% any specific change from anywhere else in the package doc with the help
+% of |\changedreftext|\marg{label name}.
+%    \begin{macrocode}
   \def\phfnote@changedreftext@par{\par}
   \newcommand*\changedreftext[1]{%
     \phfnote@changedreftext@par%
     \ifcsname phfnote@changed@lbl@##1\endcsname
       \hyperref[phfnotechanged:##1]{%
-        \expandafter\expandafter\expandafter\changedtextfmt\csname phfnote@changed@lbl@##1\endcsname
+        \expandafter\expandafter\expandafter\changedtextfmt%
+            \csname phfnote@changed@lbl@##1\endcsname
       }
     \else
       \hyperref[phfnotechanged:##1]{%
-        \changedtextfmt{???}{???}{[\textbf{missing ref}]} 
+        \changedtextfmt{???}{???}{[\textbf{missing ref}]}%
       }%
     \fi
     \par
   }
+%    \end{macrocode}
+% 
+% The macro |\changedtextfmt|\marg{v1.0}\marg{2016/05/22}\marg{description}
+% takes care of formatting the change on the spot.
+%    \begin{macrocode}
   \newcommand*\changedtextfmt[3]{%
     \textit{Changed in {##1\kern 0.3ex\relax[##2]}:} ##3.
   }
 %    \end{macrocode}
 % 
-% Set up an elaborate environment (based on a |description| environment) to
-% describe package options.
+% \textbf{Provide environment \phfverb{pkgoptions}:} Set up an elaborate
+% environment (based on a |description| environment) to describe package
+% options.
 %    \begin{macrocode}
   \RequirePackage{enumitem}
   \newlist{pkgoptions}{description}{1}
@@ -2765,8 +2805,10 @@
   \def\pkgoptattrib##1{\{##1,...\}}
 %    \end{macrocode}
 % 
-% Now, load the \pkgname{tcolorbox} package to provide visual ``Note,''
-% ``Warning,'' and ``Tip'' boxes.  Because \pkgname{tcolorbox} includes the
+% \textbf{Colorful boxes: environments \phfverb{pkgnote},
+%   \phfverb{pkgwarning}, and \phfverb{pkgtip}.}  Now, load the
+% \pkgname{tcolorbox} package to provide visual ``Note,'' ``Warning,'' and
+% ``Tip'' boxes.  Because \pkgname{tcolorbox} includes the
 % \pkgname{verbatim} package which messes up the |verbatim| environment in
 % latex dtx files (for which source lines all start with a |%| which needs
 % to be stripped), we save the |verbatim|-related commands, and restore
@@ -2806,7 +2848,7 @@
 % 
 %
 % \begin{macro}{\phfnote@preset@reset}
-%   |reset| preset:
+%   Finally, the |reset| preset:
 %    \begin{macrocode}
 \def\phfnote@preset@reset{
   \def\phfnote@opt@pkgset{none}
