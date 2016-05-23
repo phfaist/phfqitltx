@@ -164,20 +164,26 @@
 % add space, a horizontal rule, or add other formatting goodies.  By default, it is empty.
 %
 %
+% The macros |\quotetextfont|, as well as |\quotetextstart| and
+% |\quotetextend| are called within a \TeX{} group, so you don't need
+% to worry that font overrides leak outside of the |quotetext|
+% environment.
+%
+%
 % You may try, for instance, the following to get started with customization:
 % \begin{verbatim}
 % \renewcommand\quotetextstart{%
-%   \par\noindent\color{blue}\hrule height 0.8pt\vspace{2pt}\vspace{-\parskip}}
+%   \par\noindent{\color{blue}\hrule height 0.8pt}\vspace{2pt}\vspace{-\parskip}}
 % \renewcommand\quotetextend{%
-%   \begingroup\color{blue}\vspace{2pt}\hrule height 0.8pt\vspace{2pt}\endgroup}
+%   {\color{blue}\vspace{2pt}\hrule height 0.8pt\vspace{2pt}}}
 % % \sout{} requires \usepackage[normalem]{ulem}:
 % \renewcommand\quotetextfont[1]{\color{orange}\itshape\sout{\ignorespaces #1}}
 % \end{verbatim}
 % which gives:
 % \renewcommand\quotetextstart{%
-%   \par\noindent\color{blue}\hrule height 0.8pt\vspace{2pt}\vspace{-\parskip}}
+%   \par\noindent{\color{blue}\hrule height 0.8pt}\vspace{2pt}\vspace{-\parskip}}
 % \renewcommand\quotetextend{%
-%   \begingroup\color{blue}\vspace{2pt}\hrule height 0.8pt\vspace{2pt}\endgroup}
+%   {\color{blue}\vspace{2pt}\hrule height 0.8pt\vspace{2pt}}}
 % \renewcommand\quotetextfont[1]{\color{orange}\itshape\sout{\ignorespaces #1}}
 % \begin{quotetext} Stuff which you want to display verbatim, but with automatic white   space formatting and text re-flow.  \commands will not be expanded, and   will be displayed verbatim.  Percent signs also work 100%. \end{quotetext}
 % 
@@ -201,8 +207,6 @@
 % \item By default, the |{quotetext}| environment does not start a new paragraph nor end
 %   the paragraph, unless you enforce this explicitly in |\quotetextstart| and
 %   |\quotetextend|.  This is purposely left as a feature to be aware of.
-% \item The contents of |\quotetextstart| is protected within a \TeX{} group, but NOT that
-%   of |\quotetextend|.
 % \end{itemize}
 %
 %
@@ -223,23 +227,19 @@
 %   By default, all char catcodes are set as "other" characters, but you may
 %   redefine this macro to define you own catcodes.
 %   
+%   This macro is empty by default.
 %    \begin{macrocode}
-\newcommand\quotetextcatcodedefs{%
-  % no defs by default
-}
+\newcommand\quotetextcatcodedefs{}
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\quotetextstart}
 % \begin{macro}{\quotetextend}
-%   Definitions which are called at the beginning or end of every quote environment.
+%   Definitions which are called at the beginning or end of every
+%   quote environment.  They are empty by default.
 %    \begin{macrocode}
-\newcommand\quotetextstart{%
-  % nothing by default
-}
-\newcommand\quotetextend{%
-  % nothing by default
-}
+\newcommand\quotetextstart{}
+\newcommand\quotetextend{}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -263,18 +263,33 @@
 %    \begin{macrocode}
 \newenvironment{quotetext}{%
 %    \end{macrocode}
+% \iffalse meta-comment %} -- for emacs' paren matching
+% \fi
+%
+% Do anything we should do before the |quotetext| environment.
+%    \begin{macrocode}
+  \quotetextstart%
+%    \end{macrocode}
 %
 % Make sure to enclose the full quote text stuff into its own group to make definitions
 % such as catcode overrides local.
 %    \begin{macrocode}
   \begingroup%
 %    \end{macrocode}
-%
+% 
 % Finally, relay the call to |\phfquotetext@warg| to read the whole contents of the
 % environment, and finish the environment definition.
 %    \begin{macrocode}
   \phfquotetext@warg%
-}{}
+}
+%    \end{macrocode}
+% 
+% Finally, in the closing part of the environment, do anything which
+% needs to be done at the end.
+%    \begin{macrocode}
+{%
+  \quotetextend%
+}
 %    \end{macrocode}
 % \end{environment}
 %
@@ -296,7 +311,7 @@
   \catcode`\}=12
   \catcode`\\=12
   |long|gdef|phfquotetext@warg@#1\end{quotetext}<|endgroup
-    |quotetextstart|phfquotetext@show<#1>|quotetextend>
+    |phfquotetext@show<#1>>
 |endgroup
 %    \end{macrocode}
 % \end{macro}
@@ -305,7 +320,7 @@
 % \begin{macro}{\phfquotetext@show}
 %   Shows the content given as argument with the proper formatting.  Includes an actual
 %   call to |\end{quotetext}| to make \LaTeX's bookcounting mechanism for |\begin|/|\end|
-%   happy.
+%   happy, and which finally also calls |\quotetextend|.
 %   \begin{macrocode}
 \newtoks\qtt@mytoks
 \long\def\phfquotetext@show#1{%
@@ -316,8 +331,7 @@
 % expansion.  This way, we may pass the argument directly to
 % |\quotetextfont|, with tokens expanded exactly as they were given:
 %    \begin{macrocode}
-  \edef\qtt@cmdarg{{\the\qtt@mytoks}}%
-  \expandafter\quotetextfont\qtt@cmdarg%
+  \expandafter\quotetextfont\expandafter{\the\qtt@mytoks}%
   \endgroup%
   \end{quotetext}%
 }
