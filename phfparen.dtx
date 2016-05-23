@@ -22,17 +22,32 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfparen}
 %<*package>
-    [2016/05/04 v1.0 phfparen package]
+    [2016/05/23 v1.0 phfparen package]
 %</package>
 %
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{xcolor}
-\usepackage{phfparen}
+\usepackage{phfqit}
+\usepackage{amsmath}
+\usepackage[backtickon]{phfparen}
+\makeatletter
+\providecommand\phfnote@pkgdoc@setupfont{
+  \PassOptionsToPackage{T1}{fontenc}
+  \RequirePackage{fontenc}
+  \renewcommand{\rmdefault}{futs}% only rm font, not math
+  \renewcommand{\notesectionallfontfamily}{put}
+  \renewcommand{\notetitlefont}{\bfseries}
+  \renewcommand{\sfdefault}{phv}
+}\makeatother
 \usepackage[preset=xpkgdoc]{phfnote}
 \EnableCrossrefs         
 \CodelineIndex
 \RecordChanges
+
+\verbdef\phfverbpren+\paren+
+\robustify\phfverbpren
+
 \begin{document}
   \DocInput{phfparen.dtx}
 \end{document}
@@ -75,16 +90,226 @@
 % \maketitle
 %
 % \begin{abstract}
-%   \pkgname{phfparen}---Short description.
+%   \pkgname{phfparen}---Parenthetic math expressions made simpler and less
+%   redundant.
 % \end{abstract}
 %
 % \inlinetoc
 %
 % \section{Introduction}
 %
-% User documentation goes here.
+% The \pkgname{phfparen} package provides an easier way to handle
+% parenthetic expressions in math formulae, by reducing the amount of
+% redundancy in the \LaTeX{} code.
 %
-% WRITE ME ........................
+% The basic command is |\paren|\hspace{0.25ex}\meta{optional size
+% arg}\hspace{0.25ex}\meta{opening delimiter} \ldots{} \meta{closing
+% delimiter}.  It puts the given contents (``\ldots'') within the given
+% delimiters (such as ``[...]'', ``(...)'' or ``\{...\}''), and where the
+% delimiters are sized according to the default size (no argument), the
+% explicitly given size argument (``|\big|''), or the automatic sizing
+% (``|*|'').  As a shorthand, you may use a backtick character (``|`|'')
+% instead of |\paren|.
+%
+% For example, you can use |`\Big(1+\hat{f}`\big(x))| or
+% |\paren\Big(1+\hat{f}\paren\big(x))| instead of
+% |\Bigl(1+\hat{f}\bigl(x\bigr)\Bigr)|, to display
+% $`\Big(1+\hat{f}`\big(x))$.  In this way, the writing is more condensed.
+% Moreover, you don't have to repeat the size for the second delimiter,
+% making it easier to change the delimiter sizes if you later change your
+% mind.
+%
+% \iffalse META-COMMENT  :: TOO LONG
+% \begin{verbatim}
+% \begin{align}
+%   P\,`\bigg[\Phi_{XA\to X'A}`*(\sigma_{XR}\otimes
+%       \frac{P_A\Gamma_A P_A}{\tr P_A\Gamma_A})
+%     \,,\; \rho_{X'R}\otimes
+%     \frac{P'_{A'}\Gamma_{A'}P'_{A'}}{\tr P'_{A'}\Gamma_{A'}}
+%   ] \leqslant \epsilon\ .
+% \end{align}
+% \end{verbatim}
+% for:
+% \begin{align}
+%   P\,`\bigg[\Phi_{XA\to X'A}`*(\sigma_{XR}\otimes
+%       \frac{P_A\Gamma_A P_A}{\tr P_A\Gamma_A})
+%     \,,\; \rho_{X'R}\otimes
+%     \frac{P'_{A'}\Gamma_{A'}P'_{A'}}{\tr P'_{A'}\Gamma_{A'}}
+%   ] \leqslant \epsilon\ .
+% \end{align}
+% \fi
+% 
+%
+% \section{The \phfverbpren{} command and \phfverb` backtick shorthand}
+%
+% \DescribeMacro{\paren} The basic macro of this package is |\paren|.  It
+% handles a parenthetic expression including parsing matching delimiters
+% and adjusting their sizing.
+%
+% \leavevmode\marginpar{\raggedleft\phfverb`\texttt\ldots} The backtick
+% char provides a shorthand for specifying |\paren|.  It is useful to
+% de-clutter long formulas.
+%
+% The syntax for |\paren| and |`| is:
+% \begin{center}
+%   |\paren|\meta{optional size argument}\meta{open-delimiter} \ldots \meta{close-delimiter}
+%   \par or\par
+%   |`|\meta{optional size argument}\meta{open-delimiter} \ldots \meta{close-delimiter}
+% \end{center}
+% 
+% By default, the following pairs of delimiters are recognized:
+% |\paren(expression in parenthesis)|,\\
+% |\paren[expression in brackets]|,\\
+% |\paren<expression in angle brackets>|,\\
+% |\paren\{expression in curly braces\}|, and\\
+% |\paren{expression in curly braces}| (alternative syntax for curly
+% braces).  Of course, the same are available with the backtick shorthand:
+% |`(expression)|, |`[expression]|, |`<expression>|, and so on.
+%
+% Delimiters are balanced, meaning that %
+% |\paren[g[x] + f[x]]| is parsed as you would expect (the expression is %
+% ``|g[x] + f[x]|'') and not as \TeX/\LaTeX{} usually parses default
+% arguments (in which case the argument would be ``|g[x|''). \iffalse]\fi
+%
+% 
+% The optional size argument must be a single token.  It may be one of |*|,
+% |\big|, |\Big|, |\bigg|, |\Bigg|, or another standard sizing command.  If
+% the optional size argument is |*|, then the delimiters are sized with
+% |\left(| \ldots{} |\right)|, that is, they are sized
+% automatically.
+%
+% \subsection{Examples}
+%
+% \makeatletter
+% \def\showcaseexample{\begingroup\catcode`\\=12\catcode`\_=12\catcode`\^=12\catcode`\{=12\catcode`\}=12\relax\showcaseexample@}
+% \def\showcaseexample@!!#1!!{\endgroup\showcaseexample@@{#1}{\scantokens{#1}}}
+% \def\showcaseexample@@#1#2{\par\noindent\begin{minipage}{0.5\textwidth}\centering\ttfamily #1\end{minipage}\hspace{0.05\textwidth}\begin{minipage}{0.45\textwidth}\centering $\displaystyle #2$\end{minipage}\par\vskip 0.5em\relax}
+% \makeatother
+%
+% \showcaseexample!!    \log\paren\big( a + \sin(x) - y) !!
+% \showcaseexample!!    \log`\Big( a + \sin(x) - y) !!
+% \showcaseexample!!    \log`*( \sum_k`\big[ a_k^\dagger - a_k ] ) !!
+% \showcaseexample!!    F = `\big< f(x) >_x = `*< \sum g(`<p>) > !!
+% \showcaseexample!!    `\Big[\sum_j `[x]^2 - \sum [y]^2 + \sum f`*(x_3^\dagger)^2] !!
+% \showcaseexample!!    `(z + \backtick x) !!
+% \showcaseexample!!    `\{\vec z\} !!
+% \showcaseexample!!    `{\vec z} !!
+% \showcaseexample!!    `*{ \vec z : \sum_i z_i = 1 } !!
+% \showcaseexample!!    `\big{ \vec z : \sum_i z_i = 1 } !!
+%
+%
+%
+% \subsection{Controlling the behavior of the \phfverb` backtick shorthand}
+%
+% The behavior of the backtick character is only altered in math mode.  The
+% character works as normal in text mode.  (Its catcode is in fact not
+% changed, only its mathcode.)
+%
+% \DescribeMacro{\backtick} If you need a literal backtick, you may in any
+% case use the macro |\backtick|.
+%
+% You may use the |backtick| package option to enable or disable the |`|
+% backtick shorthand.
+%
+% \begin{pkgoptions}
+% \item[backtick=true] Enable the |`| backtick shorthand.  This is the
+%   default.
+% \item[backtick=false] Disable the |`| backtick shorthand.  A backtick
+%   character in math mode will now simply display a backtick character.
+% \end{pkgoptions}
+%
+% \DescribeMacro{\parenMakeBacktickActiveParen} You may use the command
+% |\parenMakeBacktickActiveParen| to enable the backtick shorthand at any
+% time in the document.  Similarly, the command
+% \DescribeMacro{\parenMakeNormalBacktick} |\parenMakeNormalBacktick|
+% disables the backtick shorthand.  These changes are local to \LaTeX{}
+% groups, which means that you can temporarily disable the backtick
+% shorthand with
+% \begin{verbatim}
+%  {\parenMakeNormalBacktick Normal backtick in math mode: $`$.}
+% \end{verbatim}
+% 
+%
+% \section{Declaring matching delimiters and corresponding representations}
+%
+% \DescribeMacro{\parenRegister} Register a new delimiter type with
+% |\parenRegister|.  This macro should only be called in the preamble.
+%
+% Syntax is: |\parenRegister|\marg{internal name}\marg{open parse
+% delimiter}\marg{close parse delimiter}\marg{open display
+% delimiter}\marg{close display delimiter}.
+%
+% The \meta{internal name} is just an internal identifier: use plain ascii
+% chars please (e.g. ``|angbrackets|'').
+%
+% The \meta{open parse delimiter} and \meta{close parse delimiter} are
+% those characters which will be used to parse the delimited expression.
+% They may differ from the actual delimiters used to display the
+% expression, given by \marg{open display delimiter} and \marg{close
+% display delimiter}.
+%
+% For example, you may use
+% \begin{verbatim}
+%   \parenRegister{angbrackets}{<}{>}{\langle}{\rangle}
+% \end{verbatim}
+% to instruct |\paren| (and |`|) to do the following: whenever the ``|<|''
+% open delimiter is encountered, then the expression is to be parsed within
+% the delimiters %
+% ``|< ... >|,'' and the final expression is to be delimited as %
+% ``|\langle ... \rangle|,'' where the |\langle| and |\rangle| are possibly
+% sized according to an optional size argument.
+% 
+% You may repeat calls to |\parenRegister|, with different internal
+% identifiers, to register different kinds of delimiters.  It is always the
+% opening delimiter which determines which registered info to use.
+%
+% \begin{pkgnote}
+%   With older versions of \pkgname{xparse} (older than
+%   \texttt{2015/11/04}), only single-character tokens or single-character
+%   escape sequences (such as |\{|) could be used as delimiters for parsing
+%   (second and third arguments to |\parenRegister|).
+%
+%   Otherwise, with versions of \pkgname{xparse} newer than
+%   \texttt{2015/11/04}, you may use full macros to delimit content, for
+%   example |\parenRegister{testang}{\start}{\stop}{\langle}{\rangle}|
+%   allows you to write e.g.\@ \fbox{\phfverb{`\start content...\stop}},
+%   and the content will be displayed in angle brackets.
+% \end{pkgnote}
+%
+% \DescribeMacro{\parenRegsiterSimpleBraces} The case where the delimiters
+% are a normal \LaTeX{} group, that is ``|`{...}|,'' is treated specially.
+% In this case, you need to specify which internal identifier to fall back
+% to.  For example, if you defined
+% |\parenRegister{braces}{\{}{\}}{\{}{\}}|, then you may use
+% |\parenRegisterSimpleBraces{braces}| to instruct |\paren| (and |`|) to
+% use curly braces whenever both the forms |`\{...\}| and |`{...}| are
+% used.
+%
+% \DescribeMacro{\parenRegisterDefaults} Register the default set of
+% delimiters: |`(...)|, |`[...]|, |`<...>|, |`\{...\}|, and with |`{...}|
+% the same as |`\{...\}|.
+%
+% There is a package option |registerdefaults| to instruct to load or not
+% to load the default set of delimiters:
+% \begin{pkgoptions}
+% \item[registerdefaults=true] Set up the default set of delimiters
+%   provided by |\parenRegisterDefaults| when loading the package.  This is
+%   the default.
+% \item[registerdefaults=false] Do not set up any delimiters.  It is your
+%   job to call |\parenRegister| as necessary to register all your
+%   delimiters.
+% \end{pkgoptions}
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
 %
 %
 %
@@ -94,280 +319,472 @@
 %
 % \section{Implementation}
 %
+% Load some utility packages.
+%
 %    \begin{macrocode}
 \RequirePackage{etoolbox}
+\RequirePackage{kvoptions}
 \RequirePackage{xparse}
-
 \RequirePackage{amsmath}
-
 \RequirePackage{mathtools}
-
-
-% ------------------------------------------------
-% Advanced Parenthetic Expressions.
-% ------------------------------------------------
-
+%    \end{macrocode}
 %
-% \paren(expression in parenthesis)
-% \paren[expression in brackets]
-% \paren\{expression in curly braces\}
-% \paren*[expression in \left[...\right]]
-% \paren\big[expression in \lbig[..\rbig]]
-% \paren{ expression in curly braces }  % alternative syntax for curly braces
 %
-% Examples (` is interchangeable with \paren if [backtickon] package option is given):
+% \subsection{Internal \phfverbpren{} API for different delimiters}
+% \label{sec:internal-API-for-delimiters}
 %
-%     \log\paren( a + \sin(x) - y)
-%     \log`( a + \sin(x) - y)
-%     \log`*( \sum_k`\big[ a_k^\dagger - a_k ] )
-%     F = `\big< f(x) >_x = `*< \sum g(`<p>) >
-%     `\Big[\sum_j `[x]^2 - \sum [y]^2 + \sum f`*(x_3^\dagger)^2]
-%     `(z + \backtick x)  % verbatim backtick
-%     `{\vec z}
-%     `*{ \vec z : \sum_i z_i = 1 }
-%     `\big{ \vec z : \sum_i z_i = 1 }
+% The idea is to combine the power of the delimiter-parsing mechanism of
+% \pkgname{xparse} with the display power of paired delimiters provided by
+% \pkgname{mathtools}.  With \pkgname{xparse}, you can define commands
+% which parse an argument given by arbitrary (but fixed) delimiters.  The
+% \pkgname{mathtools} package allows you to define commands such as |\abs|
+% with |\DeclarePairedDelimiter|, such that you can use them as |\abs{x}|
+% for default delimiter sizes, |\abs*{x}| for automatic delimiter sizing,
+% and |\abs[\big]{x}| to use an explicitly given size.
 %
-
-% syntax is: \paren<modifier-token><delimited-argument>  where modifier-token is optional and can be *
+% The idea for |\paren| is the following: detect what the open delimiter
+% is, and relay the call to a macro which knows how to parse a balanced
+% argument with those delimiters.  That macro then relays the call to the
+% paired-delimiter-display macro with appropriate star, optional argument
+% and mandatory argument.
+%
+% When parsing, a delimiter set is recognized by its opening delimiter
+% token.  Furthermore, to each delimiter set corresponds an internal
+% identifier name.
+%
+% A delimiter set is declared by |\parenRegister| via three macros.  First,
+% the macro |\paren@registered@delims@|\meta{open delimiter token (as
+% \phfverb\string)} is defined to expand to the internal identifier name
+% for this delimiter pair.
+%
+% Then, the macro |\paren@impl@|\meta{internal identifier name} is defined
+% to accept one argument, the possible modifiers passed to |\paren| before
+% the opening delimiter.
+%
+% Finally, the macro |\paren@impl@|\meta{internal identifier name}|@go| is
+% a |\DeclarePairedDelimiter|-declared macro which can display the
+% delimited expression.
+%
+%
+% \subsection{Implementation of \phfverbpren}
+%
+% \begin{macro}{\paren}
+%   Define the main |\paren| macro.  The syntax is:
+%   |\paren|\meta{modifier-token}\meta{delimited-argument}, where
+%   modifier-token is optional and can be |*| or a sizing command such as
+%   |\big|.
+%
+%   Because of the way \LaTeX{} parses arguments, we need to treat the case
+%   |\paren{...}| separately form, say, |\paren\{...\}|.  Recall that
+%   |\@ifnextchar\bgroup| checks for an opening brace.  Then, delegate call
+%   to appropriate macro for further processing.
+%    \begin{macrocode}
 \def\paren{%
   \@ifnextchar\bgroup\paren@impl@bgroup\paren@impl@nobgroup%
 }
+%    \end{macrocode}
+%   
+% Treat the special case in which we have a single \LaTeX{} group as
+% argument, no modifiers.  In this case, directly call the display macro
+% corresponding to the delimiter set we should use in this case.  (We know
+% that the main argument follows in the input token chain.)
+%    \begin{macrocode}
 \def\paren@impl@bgroup{%
-  %
-  % Special treatment for curly braces (or whatever we have by default)
-  %
-  % Go directly. (We know the argument follows in the input token chain.)
-  % 
   \csname paren@impl@\paren@registered@default @go\endcsname%
 }
+%    \end{macrocode}
+% 
+% 
+% Parse the following token.  See if |#1| is an opening delimiter.  Do that
+% by seeing if |#1| is a known and registered delimiter by checking if
+% |\paren@registered@delims@|\meta{open delimiter token as \phfverb\string}
+% is defined.  If it is not a recognized open delimiter, assume that it is
+% a modifier token.
+%    \begin{macrocode}
 \def\paren@impl@nobgroup#1{%
-  %
-  % See if #1 is <delimited-argument>. Do that by seeing if #1 is a known and
-  % registered delimiter, see if \paren@registered@delims@<delimiter-token-as-string>
-  % is defined.
-  % 
   \ifcsdef{paren@registered@delims@\string#1}{%
-    % this is a known delimiter
     \paren@impl@nomod{#1}%
   }{%
-    % this is not a known delimiter, assume it's a modifier-token
     \paren@impl@mod{#1}%
   }%
 }
-\def\paren@impl@nomod#1{% argument is the recognized <delimiter-token>.
-  %
-  % \paren@registered@delims@<delimiter-token-as-string> should be defined to be the
-  % internal name of the registered delimiter.
-  %
+%    \end{macrocode}
+% 
+% We have just parsed and recognized an open delimiter token, repeated here
+% as argument |#1|.  So get the internal delimiter identifier via
+% |\paren@registered@delims@\string|\meta{open delim}, and relay the call
+% to |\paren@impl@|\meta{internal delim identifier}.  Don't forget an empty
+% argument as we saw no modifier tokens.
+%    \begin{macrocode}
+\def\paren@impl@nomod#1{%
   \letcs\paren@tmp@delimname{paren@registered@delims@\string#1}%
-  % 
-  % call the implementation for that delimiter with the modifier-token as argument.
-  % 
-  \def\paren@impl@tmp@delimtoken{#1}%
   \csname paren@impl@\paren@tmp@delimname\endcsname{}#1%
   % 
 }
-\def\paren@impl@mod#1{% argument is {modifier-token}
+%    \end{macrocode}
+% 
+% We have just seen a token which is not recognized as an open delimiter,
+% so we've assumed it's a modifier token (repeated here as |#1|).  Store it
+% in |\paren@tmp@modtoken|, and parse further, keeping in mind that again
+% we may have a \LaTeX{} braced group instead of a single token.
+%    \begin{macrocode}
+\def\paren@impl@mod#1{%
   \def\paren@tmp@modtoken{#1}%
-%\show\paren@tmp@modtoken
   \@ifnextchar\bgroup\paren@impl@modBgroup\paren@impl@modNobgroup%
 }
-
+%    \end{macrocode}
+% 
+% We have seen a modifier token, then a \LaTeX{} braced group.  First, use
+% |\paren@util@parseModifs| to parse the modifier token and to get the
+% actual argument to the |\DeclarePairedDelimiter|-defined macro.  Then,
+% see which delimiter set to fall back to, and relay the call to that
+% including the modifier flags.
+%    \begin{macrocode}
 \def\paren@impl@modBgroup{%
-  %
-  % Special treatment for curly braces (or whatever we have by default)
-  %
-  % Parse the given modifiers:
   \paren@util@parseModifs\paren@tmp@modifsForMathtools\paren@tmp@modtoken%
-  % 
   \letcs\paren@tmp@gocmd{paren@impl@\paren@registered@default @go}%
-  %
-  % and Go! (we know the argument follows in the input token chain)
-  %
   \expandafter\paren@tmp@gocmd\paren@tmp@modifsForMathtools%
 }
-
-\def\paren@impl@modNobgroup#1{% argument is {delimiter?}
-%\message{(((((((((([\noexpand#1]))))))))))}%
-  %
-  % Check that the given delimiter is known and
-  % registered. \paren@registered@delims@<delimiter-token-as-string>
-  % should be defined to be the internal name of the registered delimiter.
-  %
+%    \end{macrocode}
+% 
+% We have seen a modifier token, stored in |\paren@tmp@modtoken|, and now
+% there is a next token coming in (|#1|) which has to be the open delimiter
+% (there cannot be several modifier tokens).  First, check that the given
+% delimiter is known and registered.
+% |\paren@registered@delims@|\meta{delimiter token as \phfverb\string}
+% should be defined to be the internal name of the registered delimiter.
+% Then, call the implementation for that delimiter with the modifier-token
+% as argument, and let that do the actual parsing.
+%    \begin{macrocode}
+\def\paren@impl@modNobgroup#1{%
   \ifcsdef{paren@registered@delims@\string#1}{%
     \letcs\paren@tmp@delimname{paren@registered@delims@\string#1}%
-    %
-    % call the implementation for that delimiter with the modifier-token as argument, and
-    % the delimiter to start parsing.
-    % 
-    \def\paren@impl@tmp@delimtoken{#1}%
     \letcs\paren@tmp@delimcmd{paren@impl@\paren@tmp@delimname}%
-    \edef\paren@tmp@modtokenarg{{\expandonce{\paren@tmp@modtoken}}}%
+    \edef\paren@tmp@modtokenarg{{\expandonce\paren@tmp@modtoken}}%
     \expandafter\paren@tmp@delimcmd\paren@tmp@modtokenarg#1%
-    %
   }{%
+%    \end{macrocode}
+% 
+% In the event the open delimiter is not recognized, display an error
+% message, and attempt to recover by keeping all arguments as text tokens.
+%    \begin{macrocode}
     \PackageError{phfqit}{Unknown delimiter: (or can't parse args?)
-      {\expandafter\string\paren@tmp@modtoken}{\string#1}}{Your call to \string\paren
-      couldn't be parsed, presumably because I didn't recognize your delimiter, or because
-      there's a bug in this package.}%
-    % 
-    \paren@tmp@modtoken#1% attempt to recover by keeping all args as text tokens ...
+      {\expandafter\string\paren@tmp@modtoken}{\string#1}}{Your call
+      to \string\paren couldn't be parsed, presumably because I didn't
+      recognize your delimiter, or because there's a bug in this
+      package.}%
+    \paren@tmp@modtoken#1%
   }%
 }
-
+%    \end{macrocode}
+% \end{macro}
 % 
-% defines macro-name to contain mathtools-compatible modifs args.  <modifs> is expanded
-% once, so it is expected to be a macro which contains the relevant modifiers.
+%
+% \subsection{Some Utilities}
+%
+% \begin{macro}{\paren@util@parseModifs}
+%   Parse a modifier token, and generates the appropriate size argument
+%   tokens (star or optional argument) for a
+%   |\DeclarePairedDelimiter|-declared command.
+%
+%   \par |#1| = new macro name to be defined.
+%   \par |#2| = macro containing the modifier token. (Will be expanded
+%   once.)
+%
+%   A call to |\paren@util@parseModifs| defines |#1| to contain
+%   mathtools-compatible size args.  |#2| is expanded once, so it is
+%   expected to be a macro which contains the relevant modifiers.
 % 
-\def\paren@util@parseModifs#1#2{%  {macro-name}{modifs}
-  % 
+%    \begin{macrocode}
+\def\paren@util@parseModifs#1#2{%
+%    \end{macrocode}
+% 
+% If the modifier token is a star |*|, then the argument should be a simple star.
+%    \begin{macrocode}
   \expandafter\ifstrequal\expandafter{#2}{*}{%
-    \def\paren@tmp@star{*}%
-    \def\paren@tmp@sqmodifs{}%
-  }{%
-    \def\paren@tmp@star{}%
+    \def#1{*}%
+  }%
+%    \end{macrocode}
+% Otherwise, if there is something and |#2| is not blank, put it in an
+% optional argument (square braces).
+%    \begin{macrocode}
+  {% (else:)
     \expandafter\ifblank\expandafter{#2}{%
-      \def\paren@tmp@sqmodifs{}%
+      \def#1{}%
     }{%
-      \edef\paren@tmp@sqmodifs{[\expandonce{#2}]}%
+      \edef#1{[\expandonce{#2}]}%
     }%
   }%
-  \edef#1{\expandonce\paren@tmp@star\expandonce\paren@tmp@sqmodifs}%
-%\show#1%%%%%
 }
-
-
-\def\paren@xparsefix@storeparenarg#1{% #1 = paren argument;
-  % use \paren@impl@tmp@delimtoken is the delimiter token;
-  % store final value in \paren@tmp@contents
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\paren@xparsefix@storeparenarg}
+%   The second utility is a fix for a bug (or feature?) in
+%   \pkgname{xparse}.  It seems that when specifying a delimited argument
+%   with |r|\meta{open}\meta{close}, if the \meta{open} delimiter is not a
+%   single character, then the argument is not properly prepared: for
+%   example, with some versions of \pkgname{xparse}, for delimiters
+%   |r\{\}|, we get for the macro call |\mymacro\{hi there\}| as parsed
+%   argument |{hi there|.  This bug was not present in older versions of
+%   \pkgname{xparse}, where it was impossible to use full macros as
+%   delimiters, but it seemed to have been introduced in more recent
+%   versions (tracked to starting from version \texttt{2015/11/04}).
+%
+%   So we wrap the fix into a macro
+%   |\paren@xparsefix@storeparenarg|\marg{main argument which may need
+%   fix}.  This defines the macro |\paren@tmp@contents| which is the actual
+%   argument, possibly fixed.
+%
+%   The caller must ensure that the macro |\paren@impl@tmp@delimtoken| is
+%   defined to expand to the opening delimiter token.
+%
+%   The default implementation assumes that \pkgname{xparse} doesn't have
+%   the bug.
+%    \begin{macrocode}
+\def\paren@xparsefix@storeparenarg#1{%
   \def\paren@tmp@contents{#1}%
 }
-
-\@ifpackagelater{xparse}{2015/11/04}{% "too recent" version of package: has bug when using
-                                     % macros as delimiter tokens
-  % 
-  % BUG in recent xparse version: when using macros as delimiters: need to strip macro
-  % length from beginning of argument
-  % 
+%    \end{macrocode}
+% 
+% Now, redefine this macro to the correct fix depending on the
+% \pkgname{xparse} package version.  If the version is more recent than
+% \texttt{2015/11/04}, then we need to strip macro name length (excluding
+% backslash char) from beginning of argument.
+%    \begin{macrocode}
+\@ifpackagelater{xparse}{2015/11/04}{
   \RequirePackage{xstring}%
-  %
   \def\paren@xparsefix@storeparenarg#1{%
-    \fullexpandarg\StrLen{\expandafter\string\paren@impl@tmp@delimtoken}[\paren@tmp@delimstrlen]%
+    \fullexpandarg\StrLen{\expandafter\string\paren@impl@tmp@delimtoken}%
+        [\paren@tmp@delimstrlen]%
     \ifnum\paren@tmp@delimstrlen=1\relax%
       \def\paren@tmp@contents{#1}%
     \else%
       \def\paren@tmp@delimstrlen@{\numexpr\paren@tmp@delimstrlen-1\relax}%
-      \noexpandarg\StrGobbleLeft{#1}{\the\paren@tmp@delimstrlen@}[\paren@tmp@contents]%
+      \noexpandarg\StrGobbleLeft{#1}{\the\paren@tmp@delimstrlen@}%
+          [\paren@tmp@contents]%
     \fi%
   }%
 }{%
-  % old xparse: macro delimiters won't work.
 }
-
-
+%    \end{macrocode}
+% \end{macro}
 %
-% Helper to register a delimiter set for use with \paren.
 %
-% This function defines \paren@registered@delims@<open-delimiter-token-as-string> to be
-% the internal registered <name> for this delimiter. Then, defines \paren@impl@<name>
-% which is a parser for this delimiter and calls the mathtools goodies
-% etc. \paren@impl@<name> takes one mandatory argument, which is all the stuff to insert
-% before the open delimiter and to pass on to mathtools (just a * or a delimiter size),
-% and then reads the delimited (balanced) content.
+% \subsection{Registering Delimiters} 
 %
-% This macro should only be called in the preamble.
+% Helper to register a delimiter set for use with |\paren|.
 %
-\def\paren@register#1#2#3#4#5{% {name}{open-delim-macro}{close-delim-macro}{open-delim-output}{close-delim-output}
-  %
-  % Use mathtools util
-  %
+% \begin{macro}{\parenRegister}
+%   The macro |\parenRegister| defines the necessary macros documented in
+%   \autoref{sec:internal-API-for-delimiters}.  Namely,
+%   |\paren@registered@delims@|\meta{open delimiter token, \phfverb\string
+%   ified} expands to the internal registered \meta{identifier} for this
+%   delimiter. Then, defines |\paren@impl@<name>| which is a parser for
+%   this delimiter and calls the mathtools goodies
+%   etc. |\paren@impl@<name>| takes one mandatory argument, which is all
+%   the stuff to insert before the open delimiter and to pass on to
+%   mathtools (just a |*| or a delimiter size), and then reads the
+%   delimited (balanced) content.
+%
+%   The syntax is |\parenRegister|\marg{identifier}\marg{open delimiter
+%   token}\marg{close delimiter token}\marg{display open
+%   delimiter}\marg{display close delimiter}.
+%
+%   This macro should only be called in the preamble.
+%    \begin{macrocode}
+\newcommand\parenRegister[5]{%
+%    \end{macrocode}
+% \iffalse meta-comment %}{ -- for matching braces in my editor
+% \fi
+% 
+% First, define the actual |\DeclarePairedDelimiter|-type command
+% |\paren@impl@#1@go| which displays the final delimited expression.
+% Recall that |#1| = the internal identifier, while |#4| and |#5| are the
+% delimiters we should use to display the expression.
+%
+% Use |\DeclarePairedDelimiterX| so that we put the main argument inside a
+% \LaTeX{} group, just to be sure.  (For example, we want to make sure that
+% in arguments such as |-1|, the minus sign is a unary minus and not seen
+% as a binary operator.)
+%    \begin{macrocode}
   \expandafter\DeclarePairedDelimiterX\csname paren@impl@#1@go\endcsname[1]{#4}{#5}{{##1}}
-
-%  \csdef{paren@impl@#1@goDEBUG}##1##2##3##4{%
-%\show\paren@impl@tmp@modifs
-%\toks0={##1}
-%\message{==========\the\toks0==========}
-%\message{========#2==\noexpand{\detokenize{##2}}==#3========}
-%    **##1**/**##2**/**##3**/**##4**%
-%  }
-
-  \expandafter\DeclareDocumentCommand\csname paren@impl@#1@parsedelim\endcsname{r#2#3}{%
-    \letcs\paren@impl@tmp@gocmd{paren@impl@#1@go}%
-%\message{********MESSAGE*********}%
-%\message{**********\detokenize\expandafter{\paren@impl@tmp@modifs}**********}%
-%\message{**********\detokenize{##1}***********}%
-    \paren@util@parseModifs\paren@impl@tmp@modifsForMathtools\paren@impl@tmp@modifs%
-%\show\paren@impl@tmp@modifsForMathtools%
-    \paren@xparsefix@storeparenarg{##1}%
+%    \end{macrocode}
 %
-%\show\paren@impl@tmp@modifsForMathtools
-%\show\paren@tmp@contents
-    \expandafter\paren@impl@tmp@gocmd\paren@impl@tmp@modifsForMathtools{\paren@tmp@contents}%##1}%
-  }
-
-  \csdef{paren@impl@#1}##1{%  ##1=modifiers
+% The second macro is the one which is capable of parsing the balanced,
+% delimited expression, while first taking a mandatory argument containing
+% the possible modifier token.
+%
+% Here, we just read the modifier token and store them in a temporary
+% macro, while relaying the delimiter parsing to a helper macro (not sure
+% why this is necessary).
+%    \begin{macrocode}
+  \csdef{paren@impl@#1}##1{%
     \gdef\paren@impl@tmp@modifs{##1}%
     \csname paren@impl@#1@parsedelim\endcsname%
   }
-
-  % register this open delimiter to be detected by the parent \paren macro
+  \expandafter\DeclareDocumentCommand\csname paren@impl@#1@parsedelim\endcsname{r#2#3}{%
+    \letcs\paren@impl@tmp@gocmd{paren@impl@#1@go}%
+%%\message{********MESSAGE*********}%
+%%\message{**********\detokenize\expandafter{\paren@impl@tmp@modifs}**********}%
+%%\message{**********\detokenize{##1}***********}%
+    \paren@util@parseModifs\paren@impl@tmp@modifsForMathtools\paren@impl@tmp@modifs%
+%%\show\paren@impl@tmp@modifsForMathtools%
+    \def\paren@impl@tmp@delimtoken{#2}%
+    \paren@xparsefix@storeparenarg{##1}%
+%%\show\paren@impl@tmp@modifsForMathtools
+%%\show\paren@tmp@contents
+  \expandafter\paren@impl@tmp@gocmd\paren@impl@tmp@modifsForMathtools{\paren@tmp@contents}%
+}
+%    \end{macrocode}
+% 
+% Finally, register this open delimiter to be detected by the |\paren|
+% macro.  With this, |\paren| also knows the internal identifier associated
+% to this open delimiter token.
+%    \begin{macrocode}
   \csdef{paren@registered@delims@\string#2}{#1}
 }
-
+%    \end{macrocode}
+% \end{macro}
 %
-% Specify the internal name for the delimiter which should be used in the syntax `{...} or \paren{...}.
+% \begin{macro}{\parenRegisterSimpleBraces}
+%   Specify the internal name for the delimiter which should be used in the
+%   syntax |`{...}| or |\paren{...}| (with or without modifier token).
 %
-% This macro may be called multiple times, the last specified name is used.
-%
-\def\parenRegisterDefault#1{%
+%   If this macro is called multiple times, the last specified name is
+%   used.
+%    \begin{macrocode}
+\newcommand\parenRegisterSimpleBraces[1]{%
   \def\paren@registered@default{#1}%
 }
-
+%    \end{macrocode}
+% \end{macro}
 %
-% Register parens.
 %
-
-\def\paren@setup@registerDefaults{
-  \paren@register{parens}{(}{)}{(}{)}
-  \paren@register{brackets}{[}{]}{[}{]}
-  \paren@register{angbrackets}{<}{>}{\langle}{\rangle}
-  \paren@register{braces}{\{}{\}}{\{}{\}}
-  % the registered paren type to use when given the syntax \paren{...}: use curly braces.
-  \parenRegisterDefault{braces}
+% \begin{macro}{\parenRegisterDefaults}
+%   A macro which registers the default set of delimiters.
+%    \begin{macrocode}
+\newcommand\parenRegisterDefaults{
+%    \end{macrocode}
+% \iffalse meta-comment %}{ -- for matching braces in my editor
+% \fi
+%
+% The default set of delimiters:
+%    \begin{macrocode}
+  \parenRegister{parens}{(}{)}{(}{)}
+  \parenRegister{brackets}{[}{]}{[}{]}
+  \parenRegister{angbrackets}{<}{>}{\langle}{\rangle}
+  \parenRegister{braces}{\{}{\}}{\{}{\}}
+%    \end{macrocode}
+%
+% And the registered paren type to use when given the syntax |`{...}|:
+% curly braces.
+%    \begin{macrocode}
+  \parenRegisterSimpleBraces{braces}
 }
-
-\def\normalbacktick{\mathcode`\`="0060\relax}
-
+%    \end{macrocode}
+% \end{macro}
+%
+% 
+% \subsection{Handle backtick shorthand}
+% 
+% \begin{macro}{\parenMakeBacktickActiveParen}
+%   Change the behavior of the backtick character in math mode to
+%   (|\parenMakeBacktickActiveParen|) be an alias for |\paren|.
+%    \begin{macrocode}
 \def\parenMakeBacktickActiveParen{%
-  \def\backtick{\begingroup\normalbacktick`\endgroup}%
-%  \catcode`\`=\active%  don't change catcode, only mathcode so this works in inline formulae, too.
-  % lccode-trick to do "\def`{...}" but for active "`" char
+%    \end{macrocode}
+%
+% Set the backtick character to be active, but only in math mode.  It still
+% has its normal |\catcode|, only its |\mathcode| is altered.
+%    \begin{macrocode}
+\mathcode`\`="8000\relax%
+%    \end{macrocode}
+%
+% Use the usual |\lccode|-trick to do ``|\def`{...}|'' but for an active |`| char
+%    \begin{macrocode}
   \begingroup%
   \lccode`\~=`\`%
   \lowercase{\endgroup\def~}{\paren}%
-  \mathcode`\`="8000\relax%  active mathcode
 }
-\def\parenMakeBacktickActiveParenInMathMode{%
-  \parenMakeBacktickActiveParen%
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\parenMakeNormalBacktick}
+%   The command |\parenMakeNormalBacktick| changes the behavior of the
+%   backtick character in math mode to be a normal backtick char
+%   (``$\backtick$'').
+%    \begin{macrocode}
+\def\parenMakeNormalBacktick{\mathcode`\`="0060\relax}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\backtick}
+%   A literal backtick.  Simply done by temporarily disabling our backtick
+%   shorthand within a \LaTeX{} group.
+%    \begin{macrocode}
+\def\backtick{\begingroup\parenMakeNormalBacktick`\endgroup}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+%
+%
+% \subsection{Parse package options}
+%
+%
+% Set up \pkgname{kvoptions} option parsing.
+%    \begin{macrocode}
+\SetupKeyvalOptions{
+  family=phfparen,
+  prefix=phfparen@opt@
 }
-
-
-\DeclareOption{backtickon}{
-  \parenMakeBacktickActiveParenInMathMode
+%    \end{macrocode}
+% 
+%
+% Option \pkgoptionfmt{backtick}, and complementary option \pkgoptionfmt{nobacktick}.
+%    \begin{macrocode}
+\DeclareBoolOption[true]{backtick}
+\DeclareComplementaryOption{nobacktick}{backtick}
+%    \end{macrocode}
+% 
+% For backwards compatibility with my previous versions of
+% \pkgname{phfparen}: provide the |backtickon| package option.
+%    \begin{macrocode}
+\DeclareVoidOption{backtickon}{%
+  \phfparen@opt@backticktrue
+  \PackageWarning{phfparen}{Option 'backtickon' is deprecated.  It still works,
+      but please consider using 'backtick=true|false' instead.}%
 }
-\DeclareOption{noregisterdefaults}{
-  \def\paren@setup@registerDefaults{}
+%    \end{macrocode}
+% 
+%
+%
+% Option \pkgoptionfmt{registerdefaults} to specify whether to register the
+% default set of delimiters or not.
+%    \begin{macrocode}
+\DeclareBoolOption[true]{registerdefaults}
+\DeclareComplementaryOption{noregisterdefaults}{registerdefaults}
+%    \end{macrocode}
+% 
+%
+% Finally, process the options.
+%    \begin{macrocode}
+\DeclareDefaultOption{%
+  \@unknownoptionerror
 }
-\DeclareOption*{
-  \PackageError{phfparen}{Unknown option `\CurrentOption'. 
-    Available options are backtickon and noregisterdefaults.}
-}
-\ProcessOptions\relax
-
-
-\paren@setup@registerDefaults
-
-
+\ProcessKeyvalOptions*
+%    \end{macrocode}
+% 
+%
+% Now, execute the settings dictated by the user options.
+%    \begin{macrocode}
+\ifphfparen@opt@backtick
+  \parenMakeBacktickActiveParen
+\fi
+\ifphfparen@opt@registerdefaults
+  \parenRegisterDefaults
+\fi
 %    \end{macrocode}
 %
 %\Finale

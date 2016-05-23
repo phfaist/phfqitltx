@@ -2,14 +2,16 @@
 
 \usepackage[backtickon]{../phfparen}
 
-\makeatletter
-\paren@register{extra}{\start}{\stop}{(}{)}
-\makeatother
+% no longer working---we need to make sure that delimiters are a single
+% char token or a single char-escape sequence such as "\{".."\}"
+%\makeatletter
+%\parenRegister{extra}{\start}{\stop}{(}{)}
+%\makeatother
 
 \begin{document}
 
 %\begin{gather*}
-%%  \paren\big\start x \stop
+%%  \paren\big\start \vec x \stop % no longer working
 %  \paren\Big[ x \paren(y) ]
 %\end{gather*}
 %\end{document}
@@ -27,8 +29,8 @@
   `\big\{h^\dagger vhjvj\}
   \\
   `\big{h^\dagger vhjvj}
-  \\
-  \paren\big\start x \stop
+%  \\
+%  \paren\big\start x \stop % does not work
   \\
   \paren\Big[ x \paren(y) ]
 \end{gather*}
@@ -44,18 +46,17 @@
 \\
      `\Big[\sum_j `[x]^2 - \sum [y]^2 + \sum f`*(x_3^\dagger)^2]
 \\
-     `(z + \backtick x)  % verbatim backtick
+     `(z + \backtick x) \mathrlap{\quad\text{$\leftarrow$ with verbatim backtick}}
 \\
      `{z}
 \\
-     `{\vec z}\mathrlap{\text{ $\leftarrow$ should show $\vec z$ inside braces !}}
+     `{\vec z}\mathrlap{\quad\text{$\leftarrow$ should show $\vec z$ inside braces !}}
 \\
      `*{ \vec z : \sum_i z_i = 1 }
 \\
      `\Big{ \vec z : \sum_i z_i = 1 }
 \end{gather*}
 
-%\texttt{\detokenize\expandafter{\the\everymath}}
 
 in text mode: $`{z} \sum_j$ and \( `{z} \sum_k \).
 

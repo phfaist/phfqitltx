@@ -2765,9 +2765,9 @@
 %    \begin{macrocode}
   \RequirePackage{enumitem}
   \newlist{pkgoptions}{description}{1}
-  \setlist[pkgoptions]{font=\phfnotePkgOptionsLabelFmt,style=nextline}
-  \def\phfnotePkgOptionsLabelFmt##1{%
-    \fbox{\ttfamily ##1}\vspace*{5pt}\phfnote@pkgdoc@index{##1}}
+  \setlist[pkgoptions]{font=\pkgoptionfmt[\vspace*{5pt}],style=nextline}
+  \newcommand\pkgoptionfmt[2][]{%
+    \fbox{\ttfamily ##2}\phfnote@pkgdoc@index{##2}##1}
 %    \end{macrocode}
 % 
 % within this environment, we want to keep package options in the index.
