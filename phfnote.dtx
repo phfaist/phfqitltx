@@ -31,6 +31,8 @@
 \usepackage{lipsum}
 \usepackage[preset=xpkgdoc]{phfnote}
 
+\usepackage{needspace}
+
 \makeatletter
 \newsavebox\phfnoteDocVirtualPage@contents
 \newenvironment{phfnoteDocVirtualPage}{%
@@ -212,10 +214,13 @@
 % \item[preset=sfssnote] {\fontfamily{cmss}\selectfont Format the note in
 %   \LaTeX' default sans-serif font.  A very nice sans serif font.  It might
 %   look heavy though, depending on your taste.}
+% \item[preset=opensansnote] {\fontfamily{fosj}\selectfont Format the note
+%   in Open Sans font (using the `\pkgname{opensans}' package with some
+%   default options).  A very beautiful and readable sans serif font.}
 % \item[preset=utopianote] {\fontfamily{futs}\selectfont Format the note in
-%   Utopia font (by using the \pkgname{fourier} package).  Perfectly to my
-%   taste for documenting code for example, but a bit heavy for scientific
-%   documents I find.}
+%   Utopia font (by using the \pkgname{fourier} package).  Perfect to my
+%   taste for documenting code for example, but I find it a bit heavy for
+%   scientific documents.}
 % \item[preset=mnmynote] Format the note in Minion Pro font, with sans
 %   serif text formatted with the Myriad Pro font (professional fonts by
 %   Adobe which can be used in \LaTeX{} with the \pkgname{MinionPro} and
@@ -225,12 +230,13 @@
 %   purpose.
 % \end{pkgoptions}
 % 
-% Based essentially on |utopianote|, the preset |pkgdoc| combines additional
-% definitions to aid in documenting \LaTeX{} packages.
+% Based essentially on |utopianote|, the preset |pkgdoc| sets up the
+% document to look nice for a \LaTeX{} package documentation.  The preset
+% |xpkgdoc| adds additional definitions to aid in documenting \LaTeX{}
+% packages on top of |pkgdoc|.
 % \begin{pkgoptions}
 % \item[preset=pkgdoc] Basic formatting and settings for documenting \LaTeX{}
-%   packages. This preset was used for the current document.  This preset also
-%   defines some additional handy commands.
+%   packages. This preset was used for the current document.
 % \item[preset=xpkgdoc] Same as |preset=pkgdoc|, but in addition a set of
 %   useful commands are also provided, the \pkgname{tcolorbox} package is
 %   loaded along with some default boxes.  Also some commands are patched
@@ -905,9 +911,13 @@
 % Here comes the gory code.
 %
 % Let's start by loading the \pkgname{kvoptions} package, which we need to
-% parse the package options.
+% parse the package options.  It's better to use \pkgname{xkeyval} as
+% backend, because the |\setkeys| by \pkgname{keyval} is a little fragile:
+% for example, it gets confused if, within a preset, we include a package
+% or run a command which itself parses key-vals.
 %
 %    \begin{macrocode}
+\RequirePackage{xkeyval}
 \RequirePackage{kvoptions}
 %    \end{macrocode}
 %
@@ -960,6 +970,7 @@
 %
 % \subsubsection{First, some common simple definitions for our different styles}
 %
+% \needspace{3\baselineskip}
 % \begin{macro}{\notetitlefont}
 % \begin{macro}{\notetitleauthorfont}
 % \begin{macro}{\notetitledatefont}
@@ -985,6 +996,15 @@
 % \end{macro}
 % \end{macro}
 %
+% \begin{macro}{\notetitlehrule}
+%   Allow customization of the horizontal rule below the title.  The macro
+%   |\notetitlehrule| expands to commands which generate the rule, such as
+%   ``|\hrule height 1pt|''.
+%    \begin{macrocode}
+\newcommand{\notetitlehrule}{\hrule}
+%    \end{macrocode}
+% \end{macro}
+% 
 % \begin{macro}{\notetitle@title}
 %   Provide a ``long'' definition for |\title|, so that the title can have several
 %   paragraphs.  Our style handles this by putting the title on several lines, and it can
@@ -1088,6 +1108,7 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \needspace{3\baselineskip}
 % \begin{macro}{\phfnote@fmt@titlefootnotes}
 % \begin{macro}{\phfnote@mympfootnotemark}
 % \begin{macro}{\phfnote@mpfootnoteglue}
@@ -1198,9 +1219,9 @@
         \global\let\@thanks\@empty%
         \phfnote@finalizempfootnotes%
       \end{singlespace}%
-    \end{minipage}%
+    \end{minipage}\par%
     \vspace*{2mm}%
-    \hrule%
+    \notetitlehrule\relax%
     \par%
   \endgroup%
   \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
@@ -1223,7 +1244,7 @@
     {\notetitlefont \@title}%
     \hfill\makebox{\fontsize{9pt}{10pt}\selectfont {\notetitleauthorfont \@author}%
       \hspace*{2mm}--\hspace*{2mm}{\emph{\notetitledatefont \@date}}}%
-    \vspace*{1mm}\hrule\vspace*{1mm}%
+    \vspace*{1mm}\notetitlehrule\relax\vspace*{1mm}%
     \par%
   \endgroup%
   \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
@@ -1867,6 +1888,7 @@
 %   other files I've used, so I'm DEFINITELY NOT changing it.
 % \end{pkgnote}
 % 
+% \needspace{3\baselineskip}
 % \begin{macro}{\phfnote@do@pdfhyperrefdefs}
 % \begin{macro}{\email}
 % \begin{macro}{\url}
@@ -1935,7 +1957,7 @@
 % \end{macro}
 % 
 %
-% 
+% \needspace{3\baselineskip}
 % \begin{macro}{\phfnote@sanitize@url}
 % \begin{macro}{\phfnote@format@url}
 % \begin{macro}{\phfnote@email}
@@ -2167,6 +2189,7 @@
 %
 % \subsubsection{URL Styles}
 %
+% \needspace{7\baselineskip}
 % \begin{macro}{\url@notettstyle}
 % \begin{macro}{\url@notesfstyle}
 % \begin{macro}{\url@notesfssstyle}
@@ -2521,8 +2544,10 @@
 %    \end{macrocode}
 % \end{macro}
 % 
+% \needspace{5\baselineskip}
 % \begin{macro}{\phfnote@preset@sfnote}
 % \begin{macro}{\phfnote@preset@sfssnote}
+% \begin{macro}{\phfnote@preset@opensansnote}
 % \begin{macro}{\phfnote@preset@utopianote}
 % \begin{macro}{\phfnote@preset@mnmynote}
 %   Define the different |*note| styles.
@@ -2546,6 +2571,20 @@
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
   \renewcommand\sfdefault{cmss}
+}
+\def\phfnote@preset@opensansnote{
+%    \end{macrocode}
+% set up all the settings as for |sfnote| \ldots
+%    \begin{macrocode}
+  \phfnote@preset@sfnote
+%    \end{macrocode}
+% \ldots but override:
+%    \begin{macrocode}
+  \phfnote@opt@fontdefsfalse
+  \PassOptionsToPackage{T1}{fontenc}
+  \RequirePackage{fontenc}
+  \PassOptionsToPackage{default,osfigures,scale=0.9}{opensans}
+  \RequirePackage{opensans}
 }
 \def\phfnote@preset@utopianote{
   \phfnote@presetcommon@xnote[noteit]
@@ -2579,6 +2618,7 @@
   }
 }
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -2621,7 +2661,8 @@
   \RequirePackage{fourier}
   \renewcommand{\notesectionallfontfamily}{put}
   \renewcommand{\notetitlefont}{\bfseries}
-  \renewcommand{\sfdefault}{phv}
+  \def\opensans@scale{s*[0.85]}
+  \renewcommand{\sfdefault}{fosj}
 }
 %    \end{macrocode}
 % \end{macro}
