@@ -2,16 +2,24 @@
 
 LaTeX packages for QIT stuff which I use often
 
+
 # List of Packages
 
 - `phfnote` - format documents for short notes.  Nicer title, saves more space
-  on paper, and provides some handy definitions
+  on paper, and provides some handy definitions.  Choose between several presets
+  to get your preferred document appearance.
 
 - `phfqit` - some useful definitions for LaTeXing stuff in quantum information
   theory, which I use often
 
 - `phfparen` - cool definitions for mathematical parenthetic expressions.  Easy
   to resize, short code which is still readable.
+
+- `phffullpagefigure` - as the package name suggests, place figures on full pages.
+  The caption e.g. reads "Figure 1 (on next page): blah blah" and the figure
+  may occupy the full next page.
+
+- `phfthm` - goodies for theorems and proofs.
 
 - `phfquotetext` - quote verbatim text, from e.g. an email, without worrying
   about LaTeX special characters.  Differs from
@@ -21,11 +29,6 @@ LaTeX packages for QIT stuff which I use often
 - `phfsvnwatermark` - add a watermark to your documents with the SVN ID, so that
   you know which document is which version
 
-- `phffullpagefigure` - as the package name suggests, place figures on full pages.
-  The caption e.g. reads "Figure 1 (on next page): blah blah" and the figure
-  may occupy the full next page.
-
-- `phfthm` - goodies for theorems and proofs.
 
 # Installation
 
@@ -45,4 +48,4 @@ package documentation, run
 
     > make pdf
 
-[TODO: the documentation for packages `phfthm` and `phfparen` is incomplete.]
+[TODO: the documentation for package `phfthm` is incomplete.]
