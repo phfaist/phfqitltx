@@ -133,7 +133,13 @@ cleanpdf:
 	@rm -f $(ALLPDF)
 
 
+#
+# fake index & glossary so they get a TOC entry from the beginning, and so the page
+# numbers in the index are correct.
+#
 %.aux %.idx %.glo: %.dtx %.sty
+	DTX=$< ; echo '\\begin{theindex}\\item index here \\end{theindex}' >$${DTX%.dtx}.ind
+	DTX=$< ; echo '\\begin{theglossary}\\item changes here\\end{theglossary}' >$${DTX%.dtx}.gls
 	$(PDFLATEX) $(PDFLATEXOPTS) $<
 	$(PDFLATEX) $(PDFLATEXOPTS) $<
 	$(PDFLATEX) $(PDFLATEXOPTS) $<

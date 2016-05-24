@@ -318,7 +318,7 @@
 %   \end{phfnoteDocVirtualPage}
 %
 % \item[title=article] Mimics the default title style from the |article| class,
-%   but saves more space.  It looks like this:
+%   but saves a little more space.  It looks like this:
 %   \begin{phfnoteDocVirtualPage}
 %     \vspace*{3em}\notetitle@style@article\null \shortlipsum \morepagecontents
 %   \end{phfnoteDocVirtualPage}
@@ -2651,19 +2651,26 @@
 }
 %    \end{macrocode}
 %
-% Also provide a helper macro which is to load the font packages we want.  By
-% default, we use Utopia fonts via the \pkgname{fourier} package, but some package
-% documentations may want a different math font.
+% Also provide a helper macro which is to load the font packages we
+% want.  By default, we use Utopia fonts via the \pkgname{fourier}
+% package, but some package documentations may want a different math
+% font.  Override |\phfnote@pkgdoc@setupfont| to adjust the whole font
+% set-up, or |\phfnote@pkgdoc@setupmainfont| to adjust only the main
+% document font.
 %    \begin{macrocode}
 \providecommand\phfnote@pkgdoc@setupfont{
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
-  \RequirePackage{fourier}
+  \phfnote@pkgdoc@setupmainfont
   \renewcommand{\notesectionallfontfamily}{put}
   \renewcommand{\notetitlefont}{\bfseries}
+  \IfFileExists{opensans.sty}{}{\PackageError{phfnote}{Font OpenSans is not
+      available (need `opensans' package)}{Please install the opensans
+      package, which provides the OpenSans font.}}
   \def\opensans@scale{s*[0.85]}
   \renewcommand{\sfdefault}{fosj}
 }
+\providecommand\phfnote@pkgdoc@setupmainfont{\RequirePackage{fourier}}
 %    \end{macrocode}
 % \end{macro}
 % 
@@ -2806,7 +2813,13 @@
 %    \begin{macrocode}
   \RequirePackage{enumitem}
   \newlist{pkgoptions}{description}{1}
-  \setlist[pkgoptions]{font=\pkgoptionfmt[\vspace*{5pt}],style=nextline}
+  \setlist[pkgoptions]{font=\pkgoptionfmt[{\vspace*{5pt}}],style=nextline}
+  \apptocmd\pkgoptions{\let\pkgoptions@old@item\item%
+    \def\item{\@ifnextchar[\pkgoptions@item@\pkgoptions@item@@}%]
+    \def\pkgoptions@item@[##1]{\pkgoptions@old@item[{{##1}}]}%
+    \def\pkgoptions@item@@{\PackageWarning{phfnote}{{pkgoptions}: you must
+        specify label to \string\item as \string\item[label].}\pkgoptions@old@item}%
+  }{}{\PackageWarning{phfnote}{preset xpkgdoc: Failed to patch command \string\pkgoptions}}
   \newcommand\pkgoptionfmt[2][]{%
     \fbox{\ttfamily ##2}\phfnote@pkgdoc@index{##2}##1}
 %    \end{macrocode}

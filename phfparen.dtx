@@ -32,13 +32,8 @@
 \usepackage{amsmath}
 \usepackage[backtickon]{phfparen}
 \makeatletter
-\providecommand\phfnote@pkgdoc@setupfont{
-  \PassOptionsToPackage{T1}{fontenc}
-  \RequirePackage{fontenc}
+\providecommand\phfnote@pkgdoc@setupmainfont{
   \renewcommand{\rmdefault}{futs}% only rm font, not math
-  \renewcommand{\notesectionallfontfamily}{put}
-  \renewcommand{\notetitlefont}{\bfseries}
-  \renewcommand{\sfdefault}{phv}
 }\makeatother
 \usepackage[preset=xpkgdoc]{phfnote}
 \EnableCrossrefs         
@@ -117,7 +112,7 @@
 % $`\Big(1+\hat{f}`\big(x))$.  In this way, the writing is more condensed.
 % Moreover, you don't have to repeat the size for the second delimiter,
 % making it easier to change the delimiter sizes if you later change your
-% mind.
+% mind.  See further examples  in \autoref{sec:examples}.
 %
 % \iffalse META-COMMENT  :: TOO LONG
 % \begin{verbatim}
@@ -179,6 +174,7 @@
 % automatically.
 %
 % \subsection{Examples}
+% \label{sec:examples}
 %
 % \makeatletter
 % \def\showcaseexample{\begingroup\catcode`\\=12\catcode`\_=12\catcode`\^=12\catcode`\{=12\catcode`\}=12\relax\showcaseexample@}

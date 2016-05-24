@@ -29,13 +29,8 @@
 \documentclass{ltxdoc}
 \usepackage{xcolor}
 \makeatletter
-\providecommand\phfnote@pkgdoc@setupfont{
-  \PassOptionsToPackage{T1}{fontenc}
-  \RequirePackage{fontenc}
+\providecommand\phfnote@pkgdoc@setupmainfont{
   \renewcommand{\rmdefault}{futs}% only rm font, not math
-  \renewcommand{\notesectionallfontfamily}{put}
-  \renewcommand{\notetitlefont}{\bfseries}
-  \renewcommand{\sfdefault}{phv}
 }\makeatother
 \usepackage[preset=xpkgdoc]{phfnote}
 \usepackage{phfqit}
