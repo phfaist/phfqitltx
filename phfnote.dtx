@@ -131,7 +131,7 @@
 % Have you ever thought, ``let me write up these short notes using \LaTeX,'' but
 % then disliked the default style of the |article| class?  Have you ever asked
 % yourself why half the page should be taken up by the title?  Yes?  Then
-% welcome to |phfnote|.
+% welcome to \pkgname{phfnote}.
 %
 % The package \pkgname{phfnote} provides basic formatting for short
 % documents, such as notes on a specific topic, short documentation, or
@@ -323,12 +323,46 @@
 %     \vspace*{3em}\notetitle@style@article\null \shortlipsum \morepagecontents
 %   \end{phfnoteDocVirtualPage}
 %
-% \item[title=] An empty argument to |title| instructs |phfnote| not to override
-%   any title definition, thus preserving the default class title style.
+% \item[title=] An empty argument to |title| instructs \pkgname{phfnote} not to
+%   override any title definition, thus preserving the default class title
+%   style.
 %
 %   Beware that some other title goodies, such as our more advanced |\thanks|
 %   notes, or spacing adjustments for the abstract, will probably not work.
 % \end{pkgoptions}
+%
+%
+% \subsubsection{Customizing the style of the \phfverb{default} and \phfverb{small} title styles}
+% 
+% You may customize the appearance of the |default| and |small| title styles by
+% overriding some macros.
+%
+% \needspace{3\baselineskip}
+% \DescribeMacro{\notetitlefont}\DescribeMacro{\notetitleauthorfont}
+% \DescribeMacro{\notetitledatefont} The macros
+% |\notetitlefont|, |\notetitleauthorfont|, and |\notetitledatefont| set the
+% default main font title, author text and date text.  You may override these
+% settings with, for instance:
+% \begin{verbatim}
+% \renewcommand{\notetitlefont}{\sffamily\bfseries}
+% \renewcommand{\notetitleauthorfont}{\itshape}
+% \renewcommand{\notetitledatefont}{\footnotesize}
+% \end{verbatim}
+% The spacing of the title may be adjusted with the macros
+% \DescribeMacro{\notetitlebelowspace} |\notetitlebelowspace| and
+% \DescribeMacro{\notetitletopspace} |\notetitletopspace|.  Override these with
+% e.g.:
+% \begin{verbatim}
+% \renewcommand{\notetitlebelowspace}{4mm}
+% \renewcommand{\notetitletopspace}{-1.2cm}
+% \end{verbatim}
+% Finally, you may override the command \DescribeMacro{\notetitlehrule}
+% |\notetitlehrule| which draws the rule below the title:
+% \begin{verbatim}
+% \renewcommand{\notetitlehrule}{\hrule height 0.8pt}
+% \end{verbatim}
+% 
+%
 %
 % \subsubsection{Title notes: \phfverb\thanks{} and \phfverb\thanksmark}
 %
@@ -392,9 +426,9 @@
 % \subsection{Abstract}
 % \label{sec:abstract-attributes}
 %
-% \DescribeEnv{abstract} The |abstract| environment renders a paragraph of
-% indented text aimed to provide a short summary of the document.  We might use,
-% for example, the following code:
+% \DescribeEnv{abstract} The |abstract| environment renders indented text aimed
+% to provide a short summary of the document.  We might use, for example, the
+% following code:
 % \begin{verbatim}
 % \begin{abstract}
 % Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Ut purus
@@ -2170,18 +2204,21 @@
 %   table of contents looks just like at the \hyperref[sec:toc]{top of
 %   this document}.  The command is described in
 %   \autoref{sec:inline-toc}.
+%
+%   We call |\@starttoc| directly, bypassing the |\section*| included by
+%   |\tableofcontents| (see definition |\tableofcontents| in latex sources).
 %    \begin{macrocode}
 \newcommand{\inlinetoc}{%
-  {%
+  \begingroup%
     \vspace*{2mm}%
     \hrule%
     \vspace*{2mm}%
     \parskip=1pt\relax%
-    \@starttoc{toc}% see definition of \tableofcontents
+    \@starttoc{toc}%
     \vspace*{4mm}%
     \hrule%
     \vspace*{6mm}%
-  }%
+  \endgroup%
 }
 %    \end{macrocode}
 % 
@@ -2814,22 +2851,39 @@
   \RequirePackage{enumitem}
   \newlist{pkgoptions}{description}{1}
   \setlist[pkgoptions]{font=\pkgoptionfmt[{\vspace*{5pt}}],style=nextline}
+%    \end{macrocode}
+% 
+% But patch the |pkgoptions|' |\item| command, so that it puts an additional
+% pair of braces around its argument.  In this way, the |font=| attribute for
+% the list sees the full label as its next token, and can be used as a macro
+% argument.  (This is not needed for newer versions of \pkgname{enumitem}.)
+%    \begin{macrocode}
   \apptocmd\pkgoptions{\let\pkgoptions@old@item\item%
     \def\item{\@ifnextchar[\pkgoptions@item@\pkgoptions@item@@}%]
     \def\pkgoptions@item@[##1]{\pkgoptions@old@item[{{##1}}]}%
     \def\pkgoptions@item@@{\PackageWarning{phfnote}{{pkgoptions}: you must
-        specify label to \string\item as \string\item[label].}\pkgoptions@old@item}%
-  }{}{\PackageWarning{phfnote}{preset xpkgdoc: Failed to patch command \string\pkgoptions}}
+        specify label to \string\item as \string\item[label].}%
+      \pkgoptions@old@item}%
+  }{}{\PackageWarning{phfnote}{preset xpkgdoc: Failed to patch command
+      \string\pkgoptions}}
+%    \end{macrocode}
+% 
+% Include also a command to format a package option.  Puts the option in a box
+% in typewriter text style, and indexes it.  The optional argument is meant to
+% be internal---it adds commands after the displayed text (use it to add, e.g.\@
+% spacing).
+%    \begin{macrocode}
   \newcommand\pkgoptionfmt[2][]{%
     \fbox{\ttfamily ##2}\phfnote@pkgdoc@index{##2}##1}
 %    \end{macrocode}
 % 
-% within this environment, we want to keep package options in the index.
-% Because package options may be of the form |key=val|, we want to split keys
-% from values and put them independently in the index.  This is done by entering
-% a \TeX{} group, and using an |\lccode| trick: the code is prepared to iterate
-% over a list of comma-separated stuff, but then the ``lowercase'' version of
-% that code is executed instead, where the |=|'s have been replaced by |,|'s.
+% Whenever a package option is formatted with |\pkgoptionfmt|, it is placed in
+% the index.  Because package options may be of the form |key=val|, we want to
+% split keys from values and put them independently in the index.  This is done
+% by entering a \TeX{} group, and using an |\lccode| trick: the code is prepared
+% to iterate over a list of comma-separated stuff, but then the ``lowercase''
+% version of that code is executed instead, where the |=|'s have been replaced
+% by |,|'s.
 %    \begin{macrocode}
   \def\phfnote@pkgdoc@index##1{%
     \begingroup\lccode`\= = `\,%
