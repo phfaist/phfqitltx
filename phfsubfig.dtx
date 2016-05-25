@@ -1,0 +1,171 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2016 by Philippe Faist <philippe.faist@bluewin.ch>
+% -------------------------------------------------------
+% 
+% This file may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in:
+%
+%    http://www.latex-project.org/lppl.txt
+%
+% and version 1.3 or later is part of all distributions of LaTeX 
+% version 2005/12/01 or later.
+%
+% \fi
+%
+% \iffalse
+%<*driver>
+\ProvidesFile{phfsubfig.dtx}
+%</driver>
+%<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
+%<package>\ProvidesPackage{phfsubfig}
+%<*package>
+    [2016/05/25 v1.0 phfsubfig package]
+%</package>
+%
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{xcolor}
+\usepackage{phfsubfig}
+\usepackage[preset=xpkgdoc]{phfnote}
+\EnableCrossrefs         
+\CodelineIndex
+\RecordChanges
+\begin{document}
+  \DocInput{phfsubfig.dtx}
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+%
+% \changes{v1.0}{2016/04/20}{Initial version}
+%
+% \GetFileInfo{phfsubfig.dtx}
+%
+% \DoNotIndex{\newcommand,\newenvironment,\def,\gdef,\edef,\xdef,\if,\else,\fi,\ifx}
+% 
+% \title{The \pkgname{phfsubfig} package\thanks{\itshape
+% This document corresponds to
+% \pkgname{phfsubfig}~\fileversion, dated \filedate. It is part of
+% the Part of the
+% \href{https://github.com/phfaist/phfqitltx/}{\pkgname{phfqitltx}}
+% package suite, see \url{https://github.com/phfaist/phfqitltx}.}}
+% \author{Philippe Faist\quad\email{philippe.faist@bluewin.ch}}
+%
+% \maketitle
+%
+% \begin{abstract}
+%   \pkgname{phfsubfig}---Simple subfigures made a bit easier (mostly for our scientific papers).
+% \end{abstract}
+%
+% \inlinetoc
+%
+% \section{Introduction}
+%
+% User documentation goes here.
+%
+%
+% \StopEventually{\vskip 3cm plus 2cm minus 2cm\relax\PrintChanges
+%     \vskip 3cm plus 2cm minus 2cm\relax\PrintIndex}
+%
+% \section{Implementation}
+%
+%    \begin{macrocode}
+
+\RequirePackage{etoolbox}
+
+
+\newcommand\phfDeclareFloatSubFigures[1]{%
+  \newcounter{phfsubfig@#1}[#1]%
+  \expandafter\renewcommand\csname thephfsubfig@#1\endcsname{\textbf{\alph{phfsubfig@#1}}.}%
+  \expandafter \apptocmd\csname #1\endcsname{%
+    \phfWithSubFigs%
+  }{}{\PackageError{phfsubfig}{Can't patch \string#1.}{Couldn't patch command
+      \string#1 to include \string\phfWithSubFigs.}}%
+}
+
+\phfDeclareFloatSubFigures{figure}
+
+
+\newcommand\phfWithSubFigs{%
+  \if\relax\detokenize\expandafter{\@captype}\relax
+    \PackageError{phfsubfig}{You must use \string\phfWithSubFigs
+      within a float environment.}{}%
+  \fi
+  \ifcsname c@phfsubfig@\@captype\endcsname \else
+    \PackageError{phfsubfig}{Float type \@captype\space not set up to be
+      used with phfsubfig.  Please run \string\phfDeclareFloatSubFigures.}{}
+  \fi
+  \ifdefined\phantomsection
+    \phantomsection
+    % 
+    \phfsubfig@save@labeldata\phfsubfig@usesubfig%
+  \fi
+}
+
+
+
+%
+% Use this in the caption. e.g.
+% \begin{verbatim}
+% \caption{Main caption of the figure. \phfsubfig[a.] Specific caption for a. figure
+% part. \phfsubfig[b.]\label{this-subfigure} Specific caption for b. figure part.}
+% \end{verbatim}
+% 
+% If you don't specify the optional argument in square brackets, then it is automatically
+% detected as a., b., c., etc.
+%
+\newcommand\phfsubfig[1][]{%
+}
+
+
+
+
+
+%
+% Utility: save label metadata and reload it later for use of \label{...} later
+%
+\def\phfsubfig@save@labeldata#1{% #1: a command to define with the relevant label data
+  \protected@xdef#1{{\@currentlabel}{\@currentlabelname}{\@currentHref}}
+}
+\def\phfsubfig@restore@labeldata@args#1#2#3{%
+  \global\def\@currentlabel{#1}%
+  \global\def\@currentlabelname{#2}%
+  \global\def\@currentHref{#3}%
+}
+\def\phfsubfig@restore@labeldata#1{% #1: the command used in argument to \phfsubfig@save@labeldata
+  \expandafter\phfsubfig@restore@labeldata@args#1%
+}
+
+
+
+
+
+
+
+
+
+%    \end{macrocode}
+%
+%\Finale
+\endinput

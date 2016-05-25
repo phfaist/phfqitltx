@@ -20,6 +20,7 @@ phffullpagefigure.sty
 phfsvnwatermark.sty
 phfparen.sty
 phfthm.sty
+phfsubfig.sty
 
 # stamp for sty-files generation
 _stamp_sty_from_ins.mkstamp

@@ -13,9 +13,9 @@ MAKEINDEX = makeindex
 DEFAULT_PREFIX := $(shell kpsewhich -var-value TEXMFHOME)
 PREFIX ?= $(DEFAULT_PREFIX)
 
-ALLDTX = phfnote.dtx phfquotetext.dtx phfqit.dtx phffullpagefigure.dtx phfsvnwatermark.dtx phfparen.dtx phfthm.dtx
-ALLSTY = phfnote.sty phfquotetext.sty phfqit.sty phffullpagefigure.sty phfsvnwatermark.sty phfparen.sty phfthm.sty
-ALLPDF = phfnote.pdf phfquotetext.pdf phfqit.pdf phffullpagefigure.pdf phfsvnwatermark.pdf phfparen.pdf phfthm.pdf
+ALLDTX = phfnote.dtx phfquotetext.dtx phfqit.dtx phffullpagefigure.dtx phfsvnwatermark.dtx phfparen.dtx phfthm.dtx phfsubfig.dtx
+ALLSTY = phfnote.sty phfquotetext.sty phfqit.sty phffullpagefigure.sty phfsvnwatermark.sty phfparen.sty phfthm.sty phfsubfig.sty
+ALLPDF = phfnote.pdf phfquotetext.pdf phfqit.pdf phffullpagefigure.pdf phfsvnwatermark.pdf phfparen.pdf phfthm.pdf phfsubfig.pdf
 
 
 .PHONY: help sty cleanall install tdszip cleantdszip dist cleandist pdf clean cleanaux cleansty cleanpdf
