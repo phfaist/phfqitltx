@@ -652,7 +652,7 @@
 % \item[secfmt=\pkgoptattrib{blockpar}] Change the paragraph-level headings not
 %   to be in ``run-in'' style, but to be typeset on their own line like section
 %   headings.
-% \item[secfmt=\{\}] Leave the argument empty to keep the original class styling;
+% \item[secfmt=\pkgoptattribempty] Leave the argument empty to keep the original class styling;
 %   nothing will be overridden and the \pkgname{sectsty} package is not loaded.
 % \end{pkgoptions}
 %
@@ -932,8 +932,9 @@
 % \end{pkgoptions}
 %
 % \begin{pkgtip}
-%   To activate only a small set of features, use \fbox{\phfverb{preset=reset}}
-%   and then enable only the features required.
+%   To activate only a subset of features, use \pkgoptionfmt{preset=reset} and then
+%   enable only the features required.  In this way, you can ensure that only those
+%   features which are explicitly specified are enabled.
 % \end{pkgtip}
 %
 %
@@ -2719,7 +2720,7 @@
 \def\phfnote@preset@xpkgdoc{
   \phfnote@preset@pkgdoc
 %    \end{macrocode}
-%
+% 
 % Include the \pkgname{verbdef} package, because it's always useful.
 %    \begin{macrocode}
   \RequirePackage{verbdef}
@@ -2756,14 +2757,38 @@
   {}
 %    \end{macrocode}
 %
+%
+% \textbf{Hyperref:} No ``default'' \pkgname{hyperref} definitions, we'll use
+% \pkgname{hyperdoc} instead.
+%    \begin{macrocode}
+  \phfnote@opt@hyperrefdefsfalse
+  \g@addto@macro\phfnote@hook@atendload{
+    \definecolor{docnotelinkcolor}{rgb}{0,0,0.4}%
+    \RequirePackage{url}%
+    \DeclareUrlCommand\phfnote@format@url{}%
+    \RequirePackage{hypdoc}
+    % 
+    \hypersetup{bookmarks=true,backref=false,unicode=true,%
+      bookmarksnumbered=false,bookmarksopen=false,bookmarksopenlevel=1,%
+      breaklinks=true,pdfborder={0 0 0},colorlinks=true}%
+    \hypersetup{%
+      anchorcolor=docnotelinkcolor,citecolor=docnotelinkcolor,%
+      filecolor=docnotelinkcolor,linkcolor=docnotelinkcolor,%
+      menucolor=docnotelinkcolor,runcolor=docnotelinkcolor,%
+      urlcolor=docnotelinkcolor}%
+    \let\email\phfnote@email%
+    \urlstyle{noteit}
+  }
+%    \end{macrocode}
+%
 % \textbf{Provide Macro:} |\pkgname|\marg{package name} to format a package
 % name.  Also place it in the general index.  This command is robust and
 % can be used in section titles etc.
 %    \begin{macrocode}
   \def\pkgname##1{%
     \textsf{##1}%
-    \index{##1={\ttfamily ##1} (package)}%
-    \index{packages:>##1={\ttfamily ##1}}%
+    \index{##1={\ttfamily ##1} (package)|hyperpage}%
+    \index{packages:>##1={\ttfamily ##1}|hyperpage}%
   }
   \robustify\pkgname
 %    \end{macrocode}
@@ -2872,9 +2897,13 @@
 % in typewriter text style, and indexes it.  The optional argument is meant to
 % be internal---it adds commands after the displayed text (use it to add, e.g.\@
 % spacing).
+%
+% When indexing the packages, make sure to remove the protective braces if any.
 %    \begin{macrocode}
   \newcommand\pkgoptionfmt[2][]{%
-    \fbox{\ttfamily ##2}\phfnote@pkgdoc@index{##2}##1}
+    \fbox{\ttfamily ##2}%
+    \expandafter\phfnote@pkgdoc@index\expandafter{\@firstofone ##2}%
+    ##1}
 %    \end{macrocode}
 % 
 % Whenever a package option is formatted with |\pkgoptionfmt|, it is placed in
@@ -2886,7 +2915,7 @@
 % by |,|'s.
 %    \begin{macrocode}
   \def\phfnote@pkgdoc@index##1{%
-    \begingroup\lccode`\= = `\,%
+    \begingroup\lccode`\= = `\,\relax%
       \def\x{\lowercase{\def\@tmpa{##1}}}%
       \x%
       \let\meta\@gobble%
@@ -2894,9 +2923,13 @@
       \let\oarg\@gobble%
       \let\parg\@gobble%
       \let\pkgoptattrib\@firstofone%
+      \let\pkgoptattribempty\@empty%
       \def\handleitemindex####1{%
-        \ifx\relax\detokenize{####1}\relax\else%
-          \edef\@tmpb{{####1=\string\verb!*+####1+ (pkg. opt.)}}%
+        \edef\@tmpc{####1}%
+        \if\relax\detokenize\expandafter{\@tmpc}\relax\else%
+          \edef\@tmpb{{\expandonce\@tmpc=\string\verb!*+\expandonce\@tmpc+ (pkg. opt.)|hyperpage}}%
+          \expandafter\index\@tmpb%
+          \edef\@tmpb{{package options:>\expandonce\@tmpc=\string\verb!*+\expandonce\@tmpc+|hyperpage}}%
           \expandafter\index\@tmpb%
         \fi%
       }%
@@ -2911,6 +2944,7 @@
 % \autoref{sec:abstract-attributes}.
 %    \begin{macrocode}
   \def\pkgoptattrib##1{\{##1,...\}}
+  \def\pkgoptattribempty{\{\}}
 %    \end{macrocode}
 % 
 % \textbf{Colorful boxes: environments \phfverb{pkgnote},
