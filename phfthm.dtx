@@ -600,7 +600,7 @@
   % #2 = full reference (e.g. "page XYZ")
   % 
   {\parfillskip=0pt\relax% Thanks http://tex.stackexchange.com/a/43239/32188 !
-    \hfil\hbox{\proofrefsize{(\proofonname{#1}{#2})}}\par}%
+    \hfil\null\hfil\hbox{\proofrefsize{(\proofonname{#1}{#2})}}\par}%
 }
 
 \def\phfthm@fmt@proofref@farback#1#2{\phfthm@fmt@proofref{#1}{#2}}
