@@ -89,8 +89,23 @@
 %
 %
 %
-% \StopEventually{\vskip 3cm plus 2cm minus 2cm\relax\PrintChanges
-%     \vskip 3cm plus 2cm minus 2cm\relax\PrintIndex}
+% \section{Theorems}
+%
+% \subsection{Presets: predefined theorem sets}
+%
+% .........
+%
+% \subsection{Define theorems manually}
+%
+% ......... Using |\phfMakeTheorem|....
+%
+% \subsection{Hooks}
+% \label{sec:theorem-hooks}
+% ...........
+%
+%
+% \StopEventually{\vspace{3cm plus 2cm minus 2cm}\PrintChanges
+%     \vspace{3cm plus 2cm minus 2cm}\PrintIndex}
 %
 % \section{Implementation}
 %
@@ -105,7 +120,8 @@
 \RequirePackage{aliascnt}
 %    \end{macrocode}
 % 
-% And finally, load the {AMS} math and theorem packages:
+% And finally, load the \textit{AMS} math and theorem (\pkgname{amsmath},
+% \pkgname{amsthm}) packages:
 %    \begin{macrocode}
 \RequirePackage{amsmath}
 \RequirePackage{amsthm}
@@ -139,93 +155,86 @@
 % \end{macro}
 % 
 %
-% ......................................... TODO: DOC FROM HERE ON .........................
+% \subsection{\phfverb{\phfMakeTheorem}: definition of a new theorem environment}
 %
-%
-%
+% First, define some key-value syntax accepted by the |\phfMakeTheorem| command.
 %    \begin{macrocode}
-
-
 \define@cmdkey{phfmkthm}{counter}{}
 \define@boolkey{phfmkthm}{aliascounter}[true]{}
 \define@cmdkey{phfmkthm}{thmstyle}{}
 \define@boolkey{phfmkthm}{defnostar}[true]{} % define {thm} variant
 \define@boolkey{phfmkthm}{defstar}[true]{} % define {thm*} variant
-
-
+%    \end{macrocode}
+% 
+% \begin{macro}{\phfMakeTheorem}
+%   Define a new theorem environment.  The syntax is
+%   |\phfMakeTheorem|\hspace{0pt}\oarg{options}\hspace{0pt}\marg{theorem
+%   environment name}\hspace{0pt}\marg{Theorem Display Name}.  For example:
+%   |\phfMakeTheorem[counter=thmcounter]{prop}{Proposition}|
+%    \begin{macrocode}
 \newcommand\phfMakeTheorem[3][]{%
-  % 
-  %  #1 = [options]
-  %  #2 = {theorem-environment-name}
-  %  #3 = {Theorem Name}
-  %
-  %  e.g. \phfMakeTheorem[counter=thmcounter]{prop}{Proposition}
-  %  
-  %
-  % Handle [options]
-  % ----------------
-  %
-  % ensure defaults are set
-  % 
+%    \end{macrocode}
+% \iffalse meta-comment %} -- for emacs' paren matching
+% \fi
+% Handle the [options].  First, ensure that the defaults are set, and then, parse the input.
+%    \begin{macrocode}
   \KV@phfmkthm@aliascountertrue%
   \def\cmdKV@phfmkthm@counter{}%
   \def\cmdKV@phfmkthm@thmstyle{}%
   \KV@phfmkthm@defnostartrue%
   \KV@phfmkthm@defstartrue%
-  %
-  \setkeys{phfmkthm}{#1}% options
-  %
-  %
-  % Now, implementation
-  % -------------------
-  % 
-  % set style if requested
-  %
-  \if\relax\detokenize\expandafter{\cmdKV@phfmkthm@thmstyle}\relax% test if empty:
-  %                                                              [http://tex.stackexchange.com/a/53091/32188]
+  \setkeys{phfmkthm}{#1}%
+%    \end{macrocode}
+% 
+% Now, react to whatever was given in the options.
+%
+% \verbdef\tmptheifconstruct|\if\relax\detokenize{...}\relax|
+% Set the theorem style, if requested.\footnote{The construct
+% \tmptheifconstruct\space tests whether \phfverb{...} is empty: see
+% \url{http://tex.stackexchange.com/a/53091/32188}}
+%    \begin{macrocode}
+  \if\relax\detokenize\expandafter{\cmdKV@phfmkthm@thmstyle}\relax%
   \else%
     \theoremstyle{\cmdKV@phfmkthm@thmstyle}%
   \fi%
-  %
-  % 
-  % Probably make the default, unstarred version ?
-  %
+%    \end{macrocode}
+% 
+% If requested, define the default, unstarred version of the theorem.  Use
+% |\newtheorem| for that, which we make sure to call appropriately depending on
+% whether a separate counter is requested or not.  Make sure also to define
+% |\...autorefname| for |\autoref|.  If an alias counter is requested, create it
+% and pass that one to |\newtheorem|.
+%
+% At this point, we create a theorem named |phfthm@....|, because we still want
+% to add calls to hooks.
+%    \begin{macrocode}
   \ifKV@phfmkthm@defnostar%
-    %
-    % separate counter?
-    % 
-    \if\relax\detokenize\expandafter{\cmdKV@phfmkthm@counter}\relax% tests if empty:
-      %                                                              [http://tex.stackexchange.com/a/53091/32188]
-      %
-      % Use our own separate counter.
-      %
+    \if\relax\detokenize\expandafter{\cmdKV@phfmkthm@counter}\relax%
+%    \end{macrocode}
+% ---in case we use our own separate counter:
+%    \begin{macrocode}
       \newtheorem{phfthm@#2}{#3}%
-      % 
-      \csdef{phfthm@#2autorefname}{#3}%  for \autoref{}
-      %
+      \csdef{phfthm@#2autorefname}{#3}%
     \else%
-      %
-      % Use another counter.
-      %
       \ifKV@phfmkthm@aliascounter%
-        %
-        % Make a distinct alias counter, e.g. for use with autoref.
-        %
+%    \end{macrocode}
+% ---in case we make a distinct alias counter, eg. for use with |\autoref|:
+%    \begin{macrocode}
         \newaliascnt{#2}{\cmdKV@phfmkthm@counter}%
         \newtheorem{phfthm@#2}[#2]{#3}%
         \aliascntresetthe{#2}%
-        % 
-        \csdef{#2autorefname}{#3}%  for \autoref{}
-        %
+        \csdef{#2autorefname}{#3}%
       \else%
-        %
-        % Directly instruct \newtheorem to use the other counter.  Does not work with \autoref.
-        %
+%    \end{macrocode}
+% ---in case we directly instruct |\newtheorem| to use the other counter (does not work with |\autoref|):
+%    \begin{macrocode}
         \newtheorem{phfthm@#2}[\cmdKV@phfmkthm@counter]{#3}%
       \fi%
     \fi%
-    %
-    %
+%    \end{macrocode}
+%
+% And also define the actual theorem environment, adding calls to hooks.
+%    \begin{macrocode}
     \newenvironment{#2}[1][]{%
       \begin{phfthm@#2}[##1]%
         \begingroup%
@@ -235,17 +244,23 @@
         \endgroup%
       \end{phfthm@#2}%
     }%
-    %
+%    \end{macrocode}
+% Define hooks specific to this theorem with sensible defaults: call common
+% hooks (see |\phfthm@hook@startcommonnostar|, |\phfthm@hook@afterlabelcommon|
+% and |\phfthm@hook@endcommonnostar|, detailed in \autoref{sec:theorem-hooks}).
+%    \begin{macrocode}
     \csdef{phfthm@hook@start@#2}##1{\phfthm@hook@startcommonnostar{#2}{##1}}%
     \csdef{phfthm@hook@afterlabel@#2}{\phfthm@hook@afterlabelcommon{#2}}%
     \csdef{phfthm@hook@end@#2}{\phfthm@hook@endcommonnostar{#2}}%
-    %
-    %
   \fi%
-  %
-  %
-  % Maybe make starred version ?
-  %
+%    \end{macrocode}
+% 
+%
+% If requested, define the starred version of the theorem.  We call
+% |\newtheorem*| to define the base theorem environment (which we call
+% |phfthm@....|), after which as above we define the actual environment which
+% also calls the relevant hooks.
+%    \begin{macrocode}
   \ifKV@phfmkthm@defstar%
     \newtheorem*{phfthm@#2*}{#3}%
     \newenvironment{#2*}[1][]{%
@@ -257,19 +272,22 @@
         \endgroup%
       \end{phfthm@#2*}%
     }%
-    % 
   \fi%
-  %
+%    \end{macrocode}
+% 
+% Finally, define the default hooks specific to the starred version of the
+% theorem (see \autoref{sec:theorem-hooks}).
+%    \begin{macrocode}
   \csdef{phfthm@hook@start@#2*}##1{\phfthm@hook@startcommonstar{#2}{##1}}%
   \csdef{phfthm@hook@end@#2*}{\phfthm@hook@endcommonstar{#2}}%
-  %
-  % 
 }
-
-
-
-% --------
-
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% \begin{macro}{\phfthm@hook@startcommonnostar}
+% .......................
+%    \begin{macrocode}
 \def\phfthm@hook@startcommonnostar#1#2{% #1 = "proposition", #2 = "Full Title of Proposition, if Given."
   %
   \phfthm@hook@startcommon{#1}{#2}%
@@ -277,7 +295,10 @@
   \phfthm@def@label@thmlabel{#1}%
 }
 \def\phfthm@hook@endcommonnostar#1{\phfthm@hook@endcommon{#1}}
-
+%    \end{macrocode}
+% \end{macro}
+% 
+%    \begin{macrocode}
 
 % --
 
@@ -318,7 +339,13 @@
 
 
 
-
+%    \end{macrocode}
+%
+% \subsection{Rest}
+% ......................................... TODO: DOC FROM HERE ON .........................
+%
+%
+%    \begin{macrocode}
 
 
 
