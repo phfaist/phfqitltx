@@ -938,8 +938,7 @@
 % \end{pkgtip}
 %
 %
-% \StopEventually{\vskip 2cm plus 2cm minus 2cm\relax\PrintChanges
-%     \vskip 2cm plus 2cm minus 2cm\relax\PrintIndex}
+% \StopEventually{\PrintChangesAndIndex}
 %
 % \section{Implementation}
 %
@@ -2728,8 +2727,10 @@
 %
 % \textbf{Some patching first:}
 % Patch up |\PrintChanges| and |\PrintIndex|, if they are defined (for if we are
-% using the \pkgname{ltxdoc} package for latex package documentation).  We want these to
-% generate an entry in the table of contents. 
+% using the \pkgname{ltxdoc} package for latex package documentation).  We want
+% these to generate an entry in the table of contents.  Also provide the utility
+% |\PrintChangesAndIndex|, which calls both |\PrintChanges| and |\PrintIndex| with
+% some additional spacing.
 %    \begin{macrocode}
   \ifdefined\PrintChanges
     \phfnoteHackSectionStarWithTOCInCommand\PrintChanges
@@ -2737,6 +2738,9 @@
   \ifdefined\PrintIndex
     \phfnoteHackSectionStarWithTOCInCommand\PrintIndex
   \fi
+  \def\PrintChangesAndIndexSpacing{\vspace{3cm plus 2cm minus 2cm}}
+  \def\PrintChangesAndIndex{\PrintChangesAndIndexSpacing\PrintChanges
+    \PrintChangesAndIndexSpacing\PrintIndex}
 %    \end{macrocode}
 %
 % Set the index to TWO columns only (three is too tight).

@@ -83,13 +83,17 @@
 %
 % \section{Introduction}
 %
-% User documentation goes here.
+% The \pkgname{phfthm} package provides enhanced theorem and proof environments,
+% based on the \pkgname{amsthm} original versions.  It allows for hooks to be
+% placed, adds some default goodies and is highly customizable.
 %
-% WRITE ME ...................................
+% There are three generic types of environments provided: theorem environments,
+% proof environments and ``thmheading'' environments.
 %
+% \section{Theorem environments}
 %
-%
-% \section{Theorems}
+% A theorem environment is based on the environment furnished by
+% \pkgname{amsthm}'s |\newtheorem| command, but with added goodies.
 %
 % \subsection{Presets: predefined theorem sets}
 %
@@ -99,13 +103,71 @@
 %
 % ......... Using |\phfMakeTheorem|....
 %
-% \subsection{Hooks}
+% \subsection{Theorem hooks}
 % \label{sec:theorem-hooks}
-% ...........
+%
+% Any theorem environment automatically calls some hooks.  There are hooks
+% available per theorem environment as well as generic for all theorem
+% environments.
+%
+% \DescribeMacro{\phfthm@hook@start@<thmname>} The hook
+% |\phfthm@hook@start@|\meta{theorem environment name}\marg{theorem title} is
+% called at the start of the environment.  More precisely, it is called inside
+% the original \pkgname{amsthm} base environment; that is, after the heading was
+% generated.  It takes one mandatory argument, the optional title provided to
+% the theorem environment which may be empty.  By default, the hook defers to
+% the global hook |\phfthm@hook@startcommonnostar|.
+%
+% \DescribeMacro{\phfthm@hook@start@<thmname>*} The hook
+% |\phfthm@hook@start@|\meta{starred theorem environment name} is completely
+% analogous, and is called for the starred environment.  The only difference is
+% that by default, it defers its call to |\phfthm@hook@startcommonstar|.
+%
+% \DescribeMacro{\phfthm@hook@startcommonnostar} The hook
+% |\phfthm@hook@startcommonnostar|\marg{theorem environment name}\marg{theorem
+% optional given title} collects the default definitions for non-starred
+% environments (such as overriding the |\label| command to generate appropriate
+% proof-refs), and continues to defer to
+% \DescribeMacro{\phfthm@hook@startcommon}
+% |\phfthm@hook@startcommon|\marg{theorem environment name}\marg{theorem
+% optional given title}.  \DescribeMacro{\phfthm@hook@startcommonstar}
+% Analogously, the macro |\phfthm@hook@startcommonstar|\marg{theorem environment
+% name}\marg{theorem optional given title} groups commands for starred
+% environments (typically doesn't take care of |\label| stuff) and also defers
+% to |\phfthm@hook@startcommon|.
+%
+% By default, the |\phfthm@hook@startcommonnostar| introduces definitions for
+% overriding the |\label| command (via a call to
+% |\phfthm@def@label@thmlabel|\marg{theorem environment name}).  If this
+% behavior is not overridden, then the |\label| command is redefined so that at
+% its fist occurrence, it provides the theorem environment label to use for the
+% proof reference (``see proof on page \ldots'').  There, an additional hook is
+% provided, \DescribeMacro{\phfthm@hook@afterlabel@<thmname>}
+% |\phfthm@hook@afterlabel@|\meta{theorem environment name}, which is called
+% after the theorem label is set (it can be recovered from the value of
+% |\phfthm@val@thmlabel|.  By default, that hook calls the common hook
+% |\phfthm@hook@afterlabelcommon|\marg{theorem environment name}. (After the
+% first occurrence of |\label|, its definition is restored.)
 %
 %
-% \StopEventually{\vspace{3cm plus 2cm minus 2cm}\PrintChanges
-%     \vspace{3cm plus 2cm minus 2cm}\PrintIndex}
+% The end hooks work very much
+% analogously. \DescribeMacro{\phfthm@hook@end@<thmname>}
+% |\phfthm@hook@end@|\meta{theorem environment name} and
+% \DescribeMacro{\phfthm@hook@end@<thmname>*} |\phfthm@hook@end@|\meta{starred
+% theorem environment name} are called respectively for the non-starred and
+% starred version of that theorem environment, and by default they defer to the
+% common \DescribeMacro{\phfthm@hook@endcommonnostar}
+% |\phfthm@hook@endcommonnostar|\marg{theorem environment name} or
+% \DescribeMacro{\phfthm@hook@endcommonstar}
+% |\phfthm@hook@endcommonstar|\marg{theorem environment name}.  Both these hooks
+% defer their calls to |\phfthm@hook@endcommon|\marg{theorem environment name}.
+%
+%
+%
+%
+%
+%
+% \StopEventually{\PrintChangesAndIndex}
 %
 % \section{Implementation}
 %
@@ -309,6 +371,7 @@
   %  don't touch \label{}, in case it's used in inner environments such as {itemize}
 }
 \def\phfthm@hook@endcommonstar#1{%
+  \phfthm@hook@endcommon{#1}%
 }
 
 % --
