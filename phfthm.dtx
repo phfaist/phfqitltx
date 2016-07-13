@@ -141,8 +141,9 @@
 % |\phfthm@def@label@thmlabel|\marg{theorem environment name}).  If this
 % behavior is not overridden, then the |\label| command is redefined so that at
 % its fist occurrence, it provides the theorem environment label to use for the
-% proof reference (``see proof on page \ldots'').  There, an additional hook is
-% provided, \DescribeMacro{\phfthm@hook@afterlabel@<thmname>}
+% proof reference (``see proof on page \ldots'', see \autoref{sec:proof-ref}).
+% There, an additional hook is provided,
+% \DescribeMacro{\phfthm@hook@afterlabel@<thmname>}
 % |\phfthm@hook@afterlabel@|\meta{theorem environment name}, which is called
 % after the theorem label is set (it can be recovered from the value of
 % |\phfthm@val@thmlabel|.  By default, that hook calls the common hook
@@ -163,11 +164,53 @@
 % defer their calls to |\phfthm@hook@endcommon|\marg{theorem environment name}.
 %
 %
+% \section{Pairing theorems to proofs and proof-ref mechanism}
+% \label{sec:proof-ref}
 %
+% One of the goodies provided by the \pkgname{phfthm} package is the proof-ref
+% mechanism, where in a theorem environment, the text ``see proof on page
+% \ldots'' is displayed to direct the reader to the location of the
+% corresponding proof.  The mechanism is deactivated by default, but can be
+% enabled with a simple package option.
+%
+% This only works if the proof is given the label of the corresponding theorem
+% or proposition.  For example:
+% \begin{verbatim}
+% \begin{theorem}[Gauss]
+%   \label{thm:Gauss}
+%   For a closed surface $S$ enclosing a volume $V$, we have
+%   \begin{equation}
+%     \oint_S\vec u\cdot d\vec S = \int_V(\vec\nabla\cdot\vec u)\,dV\ .
+%   \end{equation}
+% \end{theorem}
+%
+% ...
+%
+% \begin{proof}[*thm:Gauss]
+%   ...
+% \end{proof}
+% \end{verbatim}
+%
+% The above example might produce the following output:
+% \par\noindent\fbox{
+%   \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
+%     \textbf{Theorem 2} (Gauss). For a closed surface $S$ enclosing a
+%     volume $V$, we have
+%     \begin{equation}
+%       \oint_S\vec u\cdot d\vec S = \int_V(\vec\nabla\cdot\vec u)\,dV\ .
+%     \end{equation}
+%     \hfill{\small\itshape (Proof on page XXX.)}\hfilneg
+%     {\par\vspace{1ex}\relax
+%     \ldots\par\vspace{1ex}}\relax
+%     \par\textit{Proof of Theorem 2.} \ldots
+%   \end{minipage}
+% }
 %
 %
 %
 % \StopEventually{\PrintChangesAndIndex}
+%
+%
 %
 % \section{Implementation}
 %
@@ -217,7 +260,9 @@
 % \end{macro}
 % 
 %
-% \subsection{\phfverb{\phfMakeTheorem}: definition of a new theorem environment}
+% \subsection{Definitions for theorem environments}
+%
+% \subsubsection{\phfverb{\phfMakeTheorem}: definition of a new theorem environment}
 %
 % First, define some key-value syntax accepted by the |\phfMakeTheorem| command.
 %    \begin{macrocode}
@@ -347,62 +392,114 @@
 % \end{macro}
 % 
 %
+% \subsubsection{Default hooks for theorems}
+%
 % \begin{macro}{\phfthm@hook@startcommonnostar}
-% .......................
+% \begin{macro}{\phfthm@hook@startcommonstar}
+% \begin{macro}{\phfthm@hook@startcommon}
+% Common default hooks definitions for start of the theorems.
+%
+% For all three of these hooks, we have
+% |#1| = theorem name, e.g. |proposition| and 
+% |#2| = full (optional) title of proposition, if given, or empty.
+%
+% Make sure to invoke the |\label| re-definition hack only for non-starred
+% theorems/propositions; indeed, if no theorem label is set we don't want to
+% interfere with labels set to inner equations, itemizes etc.  Hence, call
+% |\phfhtm@def@label@thmlabel| only in the ``nostar'' hook.
 %    \begin{macrocode}
-\def\phfthm@hook@startcommonnostar#1#2{% #1 = "proposition", #2 = "Full Title of Proposition, if Given."
-  %
+\def\phfthm@hook@startcommonnostar#1#2{%
   \phfthm@hook@startcommon{#1}{#2}%
-  %
   \phfthm@def@label@thmlabel{#1}%
 }
-\def\phfthm@hook@endcommonnostar#1{\phfthm@hook@endcommon{#1}}
+\def\phfthm@hook@startcommonstar#1#2{%
+  \phfthm@hook@startcommon{#1}{#2}%
+}
+\def\phfthm@hook@startcommon#1#2{%
+%    \end{macrocode}
+% Furthermore, in any case, set the |\postdisplaypenalty| to avoid an orphan
+% line on a new page after display equation.
+%    \begin{macrocode}
+  \postdisplaypenalty=10000\relax%
+}
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
+% \end{macro}
 % 
+% \begin{macro}{\phfthm@hook@afterlabelcommon}
+% \begin{macro}{\phfthm@hook@endcommonnostar}
+% \begin{macro}{\phfthm@hook@endcommonstar}
+% \begin{macro}{\phfthm@hook@endcommon}
+%   Further hooks, for after the theorem main |\label| command
+%   (|\phfthm@hook@@afterlabelcommon|) and for the end of the theorem.
 %    \begin{macrocode}
-
-% --
-
-\def\phfthm@hook@startcommonstar#1#2{% #1 = "proposition", #2 = "Full Title of Proposition, if Given."
-  %
-  \phfthm@hook@startcommon{#1}{#2}%
-  %
-  %  don't touch \label{}, in case it's used in inner environments such as {itemize}
-}
-\def\phfthm@hook@endcommonstar#1{%
-  \phfthm@hook@endcommon{#1}%
-}
-
-% --
-
-\def\phfthm@hook@startcommon#1#2{% #1 = "proposition", #2 = "Full Title of Proposition, if Given."
-  %
-  \postdisplaypenalty=10000\relax% avoid orphan line on new page after display equation
-  %
-}
 \def\phfthm@hook@afterlabelcommon#1{}
+\def\phfthm@hook@endcommonnostar#1{\phfthm@hook@endcommon{#1}}
+\def\phfthm@hook@endcommonstar#1{\phfthm@hook@endcommon{#1}}
 \def\phfthm@hook@endcommon#1{}
-
-% --------
-
-
-\def\phfthm@def@label@thmlabel#1{% #1 = theorem type e.g. "proposition"
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \subsubsection{Proof-ref mechanism (on the theorem side)}
+%
+% These macros enable the proof-ref mechanism.  The theorem's label is stored
+% upon calling |\label|, because we (locally) hack into the definition of
+% |\label|.  (After the first usage of |\label| its meaning is restored.)
+% \begin{macro}{\phfthm@def@label@thmlabel}
+%   Main macro to invoke at the beginning of the theorem environment, so that
+%   the theorem label is stored in a local macro once |\label| is invoked.  This
+%   hacks the |\label| macro locally.  Here, |#1| = the theorem environment
+%   name, e.g.\@ |proposition|.
+%    \begin{macrocode}
+\def\phfthm@def@label@thmlabel#1{%
   \let\phfthm@old@label\label%
   \def\label{\phfthm@thmlabel{#1}}%
 }
-\def\phfthm@thmlabel#1#2{% theorem type, label name
-  \def\phfthm@val@thmlabel{#2}% save the label name
-  \phfthm@old@label{#2}% actually do the LaTeX \label{}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\phfthm@thmlabel}
+%   The macro which is invoked upon the first call to |\label| within the
+%   theorem (for which |\phfthm@def@label@thmlabel| was called, which is the
+%   default).
+%
+%   Here |#1| = theorem environment name, e.g.\@ |proposition|; and |#2| = the
+%   label value (argument to the |\label| macro).
+%    \begin{macrocode}
+\def\phfthm@thmlabel#1#2{%
+%    \end{macrocode}
+% First, store the label value into a macro called |\phfthm@val@thmlabel|.
+%    \begin{macrocode}
+  \def\phfthm@val@thmlabel{#2}%
+%    \end{macrocode}
+% Then, call the original |\label| macro to do what \LaTeX\space would normally
+% do for a |\label{|\ldots|}| call.
+%    \begin{macrocode}
+  \phfthm@old@label{#2}%
+%    \end{macrocode}
+% Invoke the |\phfthm@hook@afterlabel@<thmname>| hook for this theorem
+% environment.
+%    \begin{macrocode}
   \csname phfthm@hook@afterlabel@#1\endcsname%
-  % and restore old \label definition for other items in the environment:
+%    \end{macrocode}
+% Restore the old |\label| definition, in case there are other items in the
+% theorem environment such as equations, itemizes etc.\@ which may themselves
+% have |\label|'s.
+%    \begin{macrocode}
   \let\label\phfthm@old@label%
+%    \end{macrocode}
+% Finally, ignore any spaces following the |\label| command. (Maybe we should
+% have done something with |\@bsphack| and |\@esphack| but oh well\ldots
+%    \begin{macrocode}
   \ignorespaces%
 }
-
-
-
 %    \end{macrocode}
+% \end{macro}
+% 
 %
 % \subsection{Rest}
 % ......................................... TODO: DOC FROM HERE ON .........................
