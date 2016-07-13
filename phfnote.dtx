@@ -2422,7 +2422,7 @@
     \noexpand\phfverb{\unexpanded{#1}}%
   \fi%
 }
-\def\phfverbfmt#1{\texttt{#1}}
+\def\phfverbfmt#1{{\normalfont\texttt{#1}}}
 %    \end{macrocode}
 %
 % \subsection{Handle Package Options}
@@ -2905,9 +2905,11 @@
 % When indexing the packages, make sure to remove the protective braces if any.
 %    \begin{macrocode}
   \newcommand\pkgoptionfmt[2][]{%
-    \fbox{\ttfamily ##2}%
+    \begingroup\let\meta\pkgoptfmt@meta\fbox{\ttfamily ##2}\endgroup%
     \expandafter\phfnote@pkgdoc@index\expandafter{\@firstofone ##2}%
     ##1}
+  \let\pkgopt@save@meta\meta
+  \def\pkgoptfmt@meta##1{\begingroup\normalfont\itshape\pkgopt@save@meta{##1}\endgroup}
 %    \end{macrocode}
 % 
 % Whenever a package option is formatted with |\pkgoptionfmt|, it is placed in
@@ -2931,9 +2933,9 @@
       \def\handleitemindex####1{%
         \edef\@tmpc{####1}%
         \if\relax\detokenize\expandafter{\@tmpc}\relax\else%
-          \edef\@tmpb{{\expandonce\@tmpc=\string\verb!*+\expandonce\@tmpc+ (pkg. opt.)|hyperpage}}%
+          \edef\@tmpb{{\expandonce\@tmpc=\string\verb!*+\expandonce\@tmpc+ (\pkgoptname)|hyperpage}}%
           \expandafter\index\@tmpb%
-          \edef\@tmpb{{package options:>\expandonce\@tmpc=\string\verb!*+\expandonce\@tmpc+|hyperpage}}%
+          \edef\@tmpb{{\packageoptionsname:>\expandonce\@tmpc=\string\verb!*+\expandonce\@tmpc+|hyperpage}}%
           \expandafter\index\@tmpb%
         \fi%
       }%
@@ -2941,6 +2943,23 @@
       \expandafter\@tmpc\expandafter{\@tmpa}%
     \endgroup%
   }
+  \def\pkgoptname{pkg. opt.}
+  \def\packageoptionsname{package options}
+%    \end{macrocode}
+%
+% \textbf{Provide environment \phfverb{cmdoptions}:} hijack the |pkgoptions|
+% environment to do the same thing, except we place the items in the index under
+% ``command options'' instead of ``package options.''
+%    \begin{macrocode}
+  \def\cmdoptions{\begingroup\setcmdnotpkgoptions
+    \pkgoptions}
+  \def\endcmdoptions{\endpkgoptions\endgroup}
+  \newcommand\cmdoptionfmt[2][]{\begingroup\setcmdnotpkgoptions
+    \pkgoptionfmt[{##1}]{##2}\endgroup}
+  \def\cmdoptname{cmd. opt.}
+  \def\commandoptionsname{command options}
+  \def\setcmdnotpkgoptions{\let\pkgoptname\cmdoptname
+    \let\packageoptionsname\commandoptionsname}
 %    \end{macrocode}
 % 
 % Provide the |\pkgoptattrib| command, which typesets its argument as

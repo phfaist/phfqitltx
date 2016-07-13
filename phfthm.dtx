@@ -99,7 +99,7 @@
 %
 % .........
 %
-% \subsection{Define theorems manually}
+% \subsection{Define theorem environments manually}
 %
 % ......... Using |\phfMakeTheorem|....
 %
@@ -141,8 +141,8 @@
 % |\phfthm@def@label@thmlabel|\marg{theorem environment name}).  If this
 % behavior is not overridden, then the |\label| command is redefined so that at
 % its fist occurrence, it provides the theorem environment label to use for the
-% proof reference (``see proof on page \ldots'', see \autoref{sec:proof-ref}).
-% There, an additional hook is provided,
+% proof reference (``see proof on page \ldots'', see
+% \autoref{sec:proof-ref-mechanism}).  There, an additional hook is provided,
 % \DescribeMacro{\phfthm@hook@afterlabel@<thmname>}
 % |\phfthm@hook@afterlabel@|\meta{theorem environment name}, which is called
 % after the theorem label is set (it can be recovered from the value of
@@ -164,8 +164,79 @@
 % defer their calls to |\phfthm@hook@endcommon|\marg{theorem environment name}.
 %
 %
+% \section{Definitions for proof environments}
+%
+% \subsection{Manually define a proof environment}
+% \label{sec:mk-proof-env}
+%
+% ......... Using |\phfMakeProofEnv|....
+%
+% Options:
+% \begin{cmdoptions}
+% \item[displayenv=\meta{name of \LaTeX{} environment}] Set a
+%   \LaTeX{} environment to use to actually format and display the proof.  (The
+%   |\phfMakeProofEnv| command itself doesn't care about how the proof is
+%   displayed or formatted; rather it adds a goodies infrastructure in which
+%   stuff can be plugged in and provides options for such goodies.)
+%
+%   You may specify here the name of a \LaTeX{} environment, or give the special
+%   value \cmdoptionfmt{displayenv=*} to indicate the default appearance
+%   provided by \pkgname{phfthm}, or leave the value empty
+%   \cmdoptionfmt{displayenv=} to signify that no underlying display environment
+%   should be invoked.  (The latter may be useful if you are plugging a
+%   |\phfMakeProofEnv|-generated environment into a larger environment which
+%   already takes care of the display.)
+%
+% \item[defaultproofname=\meta{default proof title}] Specify here the title to
+%   use (e.g.\@ ``Proof'') if no argument was given to the proof environment.
+%   If you do not specify any |defaultproofname|, or pass an empty value, then
+%   the value of |\proofname| is used.
+%
+% \item[parselabel=\meta{\phfverb{true} $\mid$ \phfverb{false}}] Specify whether
+%   the environment should parse its argument for some special information.  If
+%   set to |true|, then the proof argument is passed on to a command (specified
+%   by the \cmdoptionfmt{parselabelcmd} option).
+%
+% \item[parselabelcmd=\meta{{\LaTeX} macro}] If
+%   \cmdoptionfmt{parselabel} is set to |true|, then specify here a \LaTeX{}
+%   command which parses whatever it wants from the proof environment's
+%   argument.  The macro should set the |\phfthm@val@displayargs| macro to
+%   tokens which will be expanded just after the invocation of the proof
+%   environment's display environment (\cmdoptionfmt{displayenv}).
+%
+%   By default, the command |\phfthm@proof@parselabel| is used, which parses the
+%   proof environment's argument for a reference to a theorem in the context of
+%   a proof-ref mechanism (see \autoref{sec:proof-ref-mechanism}).  The label is
+%   parsed to see if it is of the form |[*thm:reference]|, where |thm:reference|
+%   is the label pinned to a theorem.
+%
+% \item[override=\meta{\phfverb{true} $\mid$ \phfverb{false}}] Whether to
+%   override any existing environment with the same name as the new proof
+%   environment. If |true| is specified here, then |\renewenvironment| is used
+%   to define the proof environment, otherwise a simple |\newenvironment| is
+%   used.
+%
+% \item[internalcounter=\meta{name of \LaTeX{} counter}] The name of the
+%   internal counter the proof environment should use.  The count number is not
+%   displayed (by default at least), but it is only used to pin down anchors for
+%   PDF hyperlinks.
+%
+%   The counter should already be defined with |\newcounter|.
+%
+% \item[proofofname=\meta{macro for ``Proof of \ldots''}] Specify here a macro
+%   which will be called with a single argument. The macro produces the text to
+%   display when the proof environment is parsed as the proof of a specific
+%   theorem or proposition (or other theorem environment).  The argument which
+%   will be given to it is the title of what the proof is of (e.g.\@ ``Theorem
+%   3''). Typically, the macro should produce something like ``Proof of Theorem
+%   XYZ.''
+%
+%   By default, the macro |\proofofname| is used.
+% \end{cmdoptions}
+%
+%
 % \section{Pairing theorems to proofs and proof-ref mechanism}
-% \label{sec:proof-ref}
+% \label{sec:proof-ref-mechanism}
 %
 % One of the goodies provided by the \pkgname{phfthm} package is the proof-ref
 % mechanism, where in a theorem environment, the text ``see proof on page
@@ -192,19 +263,21 @@
 % \end{verbatim}
 %
 % The above example might produce the following output:
+% \begingroup\setlength{\fboxsep}{1em}
 % \par\noindent\fbox{
 %   \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
-%     \textbf{Theorem 2} (Gauss). For a closed surface $S$ enclosing a
+%     \textbf{Theorem 17} (Gauss). For a closed surface $S$ enclosing a
 %     volume $V$, we have
+%     \setcounter{equation}{41}
 %     \begin{equation}
 %       \oint_S\vec u\cdot d\vec S = \int_V(\vec\nabla\cdot\vec u)\,dV\ .
 %     \end{equation}
 %     \hfill{\small\itshape (Proof on page XXX.)}\hfilneg
 %     {\par\vspace{1ex}\relax
 %     \ldots\par\vspace{1ex}}\relax
-%     \par\textit{Proof of Theorem 2.} \ldots
+%     \par\textit{Proof of Theorem 17.}\hspace{2em}\ldots
 %   \end{minipage}
-% }
+% }\endgroup
 %
 %
 %
@@ -446,9 +519,10 @@
 %
 % \subsubsection{Proof-ref mechanism (on the theorem side)}
 %
-% These macros enable the proof-ref mechanism.  The theorem's label is stored
-% upon calling |\label|, because we (locally) hack into the definition of
-% |\label|.  (After the first usage of |\label| its meaning is restored.)
+% These macros enable the proof-ref mechanism
+% (\autoref{sec:proof-ref-mechanism}).  The theorem's label is stored upon
+% calling |\label|, because we (locally) hack into the definition of |\label|.
+% (After the first usage of |\label| its meaning is restored.)
 % \begin{macro}{\phfthm@def@label@thmlabel}
 %   Main macro to invoke at the beginning of the theorem environment, so that
 %   the theorem label is stored in a local macro once |\label| is invoked.  This
@@ -501,66 +575,96 @@
 % \end{macro}
 % 
 %
-% \subsection{Rest}
-% ......................................... TODO: DOC FROM HERE ON .........................
+% \subsection{Definitions for proof environments}
+%
+% Improved, smarter |proof| environments.
 %
 %
+% \begin{macro}{\phfthm@old@proof}
+% \begin{macro}{\endphfthm@old@proof}
+%   Save old |proof| environment provided by \pkgname{amsthm}.
 %    \begin{macrocode}
-
-
-
-
-% ------------------------------------------------------------------------------
-%
-% Improved, smarter {proof} environments
-%
-
-
-
-%
-% Save old {proof} environment provided by amsthm
-%
 \let\phfthm@old@proof\proof
 \let\endphfthm@old@proof\endproof
-
-
-
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\proofname}
+% And provide a default name for proofs (this should normally already be
+% provided by \pkgname{amsthm}).
+%    \begin{macrocode}
+\providecommand\proofname{Proof}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \subsubsection{Define a proof environment: \phfverb{\phfMakeProofEnv}}
+%
+% Declare some key-value options accepted by |\phfMakeProofEnv|.  See
+% \autoref{sec:mk-proof-env} for the documentation of these options.
+%    \begin{macrocode}
 \define@cmdkey{phfmkprf}{displayenv}{}
-\define@boolkey{phfmkprf}{override}[true]{}% override existing environment
 \define@cmdkey{phfmkprf}{defaultproofname}{}
+\define@boolkey{phfmkprf}{override}[true]{}
 \define@cmdkey{phfmkprf}{internalcounter}{}
 \define@cmdkey{phfmkprf}{proofofname}{}
 \define@boolkey{phfmkprf}{parselabel}[true]{}
 \define@cmdkey{phfmkprf}{parselabelcmd}{}
-
-\providecommand\proofname{Proof}
-
-
-\newcommand\phfMakeProofEnv[2][]{% #1 = options, #2 = proof env name
-  % 
-  % Handle options: set defaults, then set the given options
-  %
+%    \end{macrocode}
+%
+% \begin{macro}{\phfMakeProofEnv}
+%   Make a proof environment. Syntax:
+%   |\phfMakeProofEnv|\hspace{0pt}\oarg{options}\hspace{0pt}\marg{proof
+%   environment name}.
+%    \begin{macrocode}
+\newcommand\phfMakeProofEnv[2][]{%
+%    \end{macrocode}
+% \iffalse meta-comment %} -- for emacs' paren matching
+% \fi
+%
+% Parse the key-value options.  First, make sure that all the defaults are set,
+% then parse the options.
+%    \begin{macrocode}
   \KV@phfmkprf@overridefalse%
-  \def\cmdKV@phfmkprf@displayenv{*}% "*" = a sensible default proof appearance
+  \def\cmdKV@phfmkprf@displayenv{*}%
   \def\cmdKV@phfmkprf@defaultproofname{\proofname}%
   \def\cmdKV@phfmkprf@internalcounter{phfthmproofcnt}%
   \def\cmdKV@phfmkprf@proofofname{\proofofname}%
   \KV@phfmkprf@parselabeltrue
   \def\cmdKV@phfmkprf@parselabelcmd{\phfthm@proof@parselabel}%
   \setkeys{phfmkprf}{#1}%
-  %
-  %
-  %
-  % 
-  %
+%    \end{macrocode}
+% 
+% The meaning of the options are detailed in \autoref{sec:mk-proof-env}.
+% 
+% The general idea here is first to pre-process all the options, and save all
+% the useful information in macros named
+% |\phfthm@prfenv@<proof-environment-name>@val@<something>|.  Then, we can define
+% the begin/end environment macros which will recall the saved information.
+%
+% Take care of the display environment to use.  Recall that if |displayenv=*|,
+% we use our own default; if |displayenv=| (empty), there is no display
+% environment.  Here, we set
+% |\phfthm@prfenv@<proof-environment-name>@val@displayenv| to the name of the
+% environment to use (possibly empty), for later reference.
+%    \begin{macrocode}
   \def\phfmkprf@tmp@star{*}%
-  \ifx\cmdKV@phfmkprf@displayenv\phfmkprf@tmp@star\relax% use a sensible default proof appearance
+  \ifx\cmdKV@phfmkprf@displayenv\phfmkprf@tmp@star\relax%
     \def\cmdKV@phfmkprf@displayenv{phfthm@proof@defaultdisplayenv}%
   \fi
-  %
-  %
-  %
   \cslet{phfthm@prfenv@#2@val@displayenv}\cmdKV@phfmkprf@displayenv%
+%    \end{macrocode}
+% 
+% Process the default proof name.  If none is given, use |\proofname| and pass
+% no option to the underlying display environment whenever the proof environment
+% is called with no option.  Here, we set
+% |\phfthm@prfenv@<proof-environment-name>@val@defaultproofnameargs| and
+% |\phfthm@prfenv@<proof-environment-name>@val@setdefaultprooftitle|; the former
+% is the tokens to put in front of the proof environment invocation in case no
+% explicit proof title is given to the proof environment while the latter
+% contains the command to set |\phfthm@val@prooftitle| to the default proof
+% name.
+%    \begin{macrocode}
   \if\relax\detokenize\expandafter{\cmdKV@phfmkprf@defaultproofname}\relax%
     \csdef{phfthm@prfenv@#2@val@defaultproofnameargs}{}%
     \csdef{phfthm@prfenv@#2@val@setdefaultprooftitle}{%
@@ -572,21 +676,19 @@
       \noexpand\def\noexpand\phfthm@val@prooftitle{%
         \expandonce{\cmdKV@phfmkprf@defaultproofname}}}%
   \fi
-  \csedef{phfthm@prfenv@#2@val@parselabel}##1{%
+  \csedef{phfthm@prfenv@#2@val@parselabelandmkdisplayargs}##1{%
     \ifKV@phfmkprf@parselabel
       \expandonce\cmdKV@phfmkprf@parselabelcmd{##1}%
     \else
       \noexpand\phfthm@proof@noparselabel{##1}%
     \fi
+    \noexpand\def\noexpand\phfthm@val@displayargs{[{%
+        \expandafter\noexpand\csname phfthm@prfenv@#2@val@proofofname\endcsname{\noexpand\phfthm@val@prooftitle}%
+      }]}%
   }
   \csedef{phfthm@prfenv@#2@val@refstepinternalcounter}{%
     \noexpand\refstepcounter{\cmdKV@phfmkprf@internalcounter}}%
   \cslet{phfthm@prfenv@#2@val@proofofname}\cmdKV@phfmkprf@proofofname%
-  \csedef{phfthm@prfenv@#2@val@mkdisplayargs}{%
-    \noexpand\def\noexpand\phfthm@tmp@displayargs{[{%
-        \expandafter\noexpand\csname phfthm@prfenv@#2@val@proofofname\endcsname{\noexpand\phfthm@val@prooftitle}%
-      }]}%
-  }%
   \csdef{phfthm@prfenv@#2@val@pinproofanchor}{%
     % refstep the internal counter; and then pin down label, if appropriate
     \csname phfthm@prfenv@#2@val@refstepinternalcounter\endcsname%
@@ -620,14 +722,13 @@
       % no opt arg given: don't give opt arg to display env
       \def\phfthm@val@proofoflabel{}%
       \csname phfthm@prfenv@#2@val@setdefaultprooftitle\endcsname%
-      \letcs\phfthm@tmp@displayargs{phfthm@prfenv@#2@val@defaultproofnameargs}%
+      \letcs\phfthm@val@displayargs{phfthm@prfenv@#2@val@defaultproofnameargs}%
     \else%
       \if\relax\detokenize{##1}\relax% empty arg given
         \def\phfthm@val@proofoflabel{}%
         \csname phfthm@prfenv@#2@val@setdefaultprooftitle\endcsname%
       \else
-        \csname phfthm@prfenv@#2@val@parselabel\endcsname{##1}%
-        \csname phfthm@prfenv@#2@val@mkdisplayargs\endcsname%
+        \csname phfthm@prfenv@#2@val@parselabelandmkdisplayargs\endcsname{##1}%
       \fi
     \fi%
     %
@@ -640,7 +741,7 @@
     % Start the proof-display-environment
     %
     \def\x{\csname phfthm@prfenv@#2@val@displayenvbegincmd\endcsname}%
-    \expandafter\x\expandafter{\phfthm@tmp@displayargs}%
+    \expandafter\x\expandafter{\phfthm@val@displayargs}%
     % 
     \csname phfthm@hookproof@#2@startafterdisplay\endcsname%
     % 
@@ -662,6 +763,10 @@
   \csdef{phfthm@hookproof@#2@end}{\phfthm@hookproof@endcommon{#2}}%
   \csdef{phfthm@hookproof@#2@final}{\phfthm@hookproof@finalcommon{#2}}%
 }
+%    \end{macrocode}
+% \end{macro}
+% 
+%    \begin{macrocode}
 
 
 \def\phfthm@hookproof@startcommon#1{}
@@ -698,38 +803,6 @@
 \def\phfthm@ProofTitleHspace{%
   \hspace{1.5ex plus 0.5ex minus 0.2ex}%
 }
-
-
-% \newenvironment{phfthm@proof@inner}[2]{% #1 = display environment, #2 = proof title
-%   \begin{#1}%
-%     \def\phfthm@proof@inner@closeenv{#1}%
-%   \refstepcounter{phfthmproofcnt}%
-%   \phfthm@hook@start@proof{#2}%
-%   \phfthm@do@proofofwhat{#2}%
-%   \phfthm@hook@startpost@proof{#2}%
-% }{%
-%   \expandafter\end\expandafter{\phfthm@proof@inner@closeenv}%
-% }
-
-
-% \def\phfthm@hook@start@proof#1{}%\def\baselinestretch{1.2}\footnotesize}
-% \def\phfthm@hook@startpost@proof#1{\hspace{1.5ex plus 0.5ex minus 0.2ex}}
-
-
-% \def\phfthm@do@proofofwhat#1{%
-%   \def\phfthm@val@proofoflabel{}%
-%   \def\phfthm@val@prooftitle{}%
-%   \if\relax\detokenize\expandafter{#1}\relax% #1 = empty ? 
-%     \phfthm@fmt@prooftitle{\proofname}%
-%   \else%
-%     \phfthm@do@proofofwhat@maybelabel#1\phfthm@do@proofofwhat@END%
-%     \phfthm@fmt@prooftitle{\proofofname{\phfthm@val@prooftitle}}%
-%   \fi%
-%   \if\relax\detokenize\expandafter{\phfthm@val@proofoflabel}\relax% proof of label = empty ?
-%   \else%
-%     \label{proof:\phfthm@val@proofoflabel}%  pin label of our own for this proof.
-%   \fi%
-% }
 
 
 \def\phfthm@proof@parselabel#1{%
