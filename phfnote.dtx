@@ -638,6 +638,12 @@
 % \item[secfmt=\pkgoptattrib{secsquares}] Display black squares on the left side
 %   of |\section|-level commands, making them stand out better.  This is useful
 %   for documents (such as the present one) with several layers of sub-sections.
+% \item[secfmt=\pkgoptattrib{secnummargin}] Display the section, subsection, and
+%   subsubsection numbering in the left margin and have the title occupy the
+%   full width of the text (such as for this document).  If you want both
+%   \pkgoptionfmt{secsquares} and \pkgoptionfmt{secnummargin}, you must specify
+%   them in that order, or the black square may end up overlapping with the
+%   number.
 % \item[secfmt=\pkgoptattrib{rmfamily}] Typeset headings in the regular
 %   roman font of the document, instead of trying to apply the
 %   {\fontfamily{ppl}\fontseries{bx}\selectfont Palatino font}.  This
@@ -1788,15 +1794,19 @@
 
 \def\phfnote@do@secfmt@secsquares{
   \RequirePackage{amssymb}
-  \let\@seccntformat\phfnote@secfmt@secsquares@seccntformat
-}
-\def\phfnote@secfmt@secsquares@seccntformat#1{%
-  \expandafter\ifx\csname #1\endcsname\section\relax%
+  \let\phfnote@secsquares@old@seccntformat\@seccntformat
+  \def\@seccntformat##1{%
+    \expandafter\ifx\csname ##1\endcsname\section\relax%
     \unexpanded{\makebox[0pt][r]{\raisebox{0.15ex}{{%
             \notesmaller[0.6]\ensuremath{\blacksquare}}}%
         \hspace*{1.2ex}}}%
-  \fi%
-  \csname the#1\endcsname\quad%
+    \fi%
+    \phfnote@secsquares@old@seccntformat{##1}}
+}
+\def\phfnote@do@secfmt@secnummargin{
+  \let\phfnote@secnummargin@old@seccntformat\@seccntformat
+  \def\@seccntformat##1{%
+    \protect\makebox[0pt][r]{\phfnote@secnummargin@old@seccntformat{##1}}}
 }
 
 \def\phfnote@do@secfmt@rmfamily{
@@ -2682,7 +2692,7 @@
 % 
 % Finally, set up general appearance.
 %    \begin{macrocode}
-  \def\phfnote@opt@secfmt{section,paragraph,itpar,blockpar,larger,secsquares}
+  \def\phfnote@opt@secfmt{section,paragraph,itpar,blockpar,larger,secsquares,secnummargin}
   \def\phfnote@opt@pagegeom{bigmargin}
   \def\phfnote@opt@abstract{noname}
 }
