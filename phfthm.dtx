@@ -30,6 +30,7 @@
 \usepackage{xcolor}
 \usepackage{phfthm}
 \usepackage[preset=xpkgdoc]{phfnote}
+\usepackage{needspace}
 \EnableCrossrefs         
 \CodelineIndex
 \RecordChanges
@@ -90,18 +91,99 @@
 % There are three generic types of environments provided: theorem environments,
 % proof environments and ``thmheading'' environments.
 %
+% \section{Quick start and package options}
+%
+%
+% \subsection{Presets: predefined theorem sets}
+% \label{sec:theorem-sets}
+%
+% .........
+%
 % \section{Theorem environments}
 %
 % A theorem environment is based on the environment furnished by
 % \pkgname{amsthm}'s |\newtheorem| command, but with added goodies.
 %
-% \subsection{Presets: predefined theorem sets}
-%
-% .........
 %
 % \subsection{Define theorem environments manually}
 %
-% ......... Using |\phfMakeTheorem|....
+% \DescribeMacro{\phfMakeTheorem} If you don't want to load a full theorem set
+% (\autoref{sec:theorem-sets}), you can define theorem environments individually
+% with |\phfMakeTheorem|:
+%
+% \noindent |\phfMakeTheorem|\hspace{0pt}\oarg{key-value
+% options}\hspace{0pt}\marg{theorem environment name}\hspace{0pt}\marg{theorem
+% name}
+%
+% This command defines a new environment (given as the first mandatory argument)
+% which behaves as a theorem and is displayed as given by the second mandatory
+% argument.  For example, we might call |\phfMakeTheorem{theorem}{Theorem}| to
+% define the environment |\begin{theorem}...\end{theorem}| which displays
+% ``\textit{Theorem N.} \ldots''
+%
+% The possible options are:
+% \begin{cmdoptions}
+% \item[counter=\meta{\LaTeX{} counter $\mid$ (empty)}] The name of the \LaTeX{}
+%   counter to use for the theorem environment.  If this is empty, then a new
+%   counter will be created which is specific to this theorem environment (the
+%   default).  If not empty, then the theorem environment uses the given counter
+%   (or an alias thereof, see \cmdoptionfmt{aliascounter}).
+%
+%   If a counter is specified, the counter should already be defined with
+%   \LaTeX's |\newcounter|.
+%
+% \item[aliascounter=\meta{\phfverb{true} $\mid$ \phfverb{false}}] In some cases
+%   (e.g.\@ if you're using \pkgname{hyperref}'s |\autoref|), it is important to
+%   have counters specific to each theorem environment (so you get ``Theorem 5''
+%   or ``Proposition 5'' right).  However, you may want different theorem
+%   environments to share a same logical counter (Say ``Definition 1'',
+%   ``Definition 2'', ``Theorem 3'', ``Proposition 4'').  In this case, you
+%   should specify \cmdoptionfmt{aliascounter=true}.
+%
+%   When this option is on, then first we define an alias counter of the one
+%   given to the \cmdoptionfmt{counter} option, and then use the alias for the
+%   theorem environment.  The alias is declared using the \pkgname{aliascnt}
+%   package.  The alias counter is automatically set up correctly for using
+%   |\autoref|.
+%
+%   Note that the \cmdoptionfmt{aliascounter} option only has an effect if the
+%   \cmdoptionfmt{counter} option is set to some non-empty value.  If
+%   \cmdoptionfmt{counter} is set to a non-empty value, then
+%   \cmdoptionfmt{aliascounter} defaults to |true|.
+%
+% \item[thmstyle=\meta{theorem style $\mid$ (empty)}] The theorem style to use
+%   to define this theorem environment.  The value of this option should be a
+%   valid argument to \textit{AMS}'s |\theoremstyle|.  If you leave this empty
+%   (the default), then the theorem style is not set explicitly and whatever
+%   default style is used.
+%
+% \item[defnostar=\meta{\phfverb{true} $\mid$ \phfverb{false}}] Set this to
+%   |true| if you want the corresponding non-starred theorem environment to be
+%   defined, e.g.\@ |\begin{theorem}...\end{theorem}|.
+%
+%   Normal (non-starred) versions of the environments have an associated theorem
+%   number, as you expect by default.
+%
+% \item[defstar=\meta{\phfverb{true} $\mid$ \phfverb{false}}] Set this to
+%   |true| if you want the corresponding starred theorem environment to be
+%   defined, e.g.\@ |\begin{theorem*}...\end{theorem*}|.
+%
+%   Starred versions of the environments do not have an associated theorem
+%   number.
+%
+% \item[proofref=\meta{\phfverb{true} $\mid$ \phfverb{false}}] Enable or disable
+%   the proof-ref mechanism for this theorem environment (enabled by default).
+%
+% \item[proofrefstyle=\meta{proof-ref style}] The style to use for the proof
+%   references.  Here you may specify how the proof ref appears, for example (in
+%   the margin, long sentence, ...).  Possible styles are
+%   \cmdoptionfmt{proofrefstyle=default} (the default),
+%   \cmdoptionfmt{proofrefstyle=margin} (display the proof ref in the margin of
+%   the page) and \cmdoptionfmt{proofrefstyle=longref} (as by default but with a
+%   full sentence).  See \autoref{sec:proof-ref-customize-appearance} for how to
+%   further customize the appearance of the proof reference.
+%
+% \end{cmdoptions}
 %
 % \subsection{Theorem hooks}
 % \label{sec:theorem-hooks}
@@ -110,7 +192,7 @@
 % available per theorem environment as well as generic for all theorem
 % environments.
 %
-% \DescribeMacro{\phfthm@hook@start@<thmname>} The hook
+% \DescribeMacro{\phfthm@hook@start@thmname} The hook
 % |\phfthm@hook@start@|\meta{theorem environment name}\marg{theorem title} is
 % called at the start of the environment.  More precisely, it is called inside
 % the original \pkgname{amsthm} base environment; that is, after the heading was
@@ -118,7 +200,7 @@
 % the theorem environment which may be empty.  By default, the hook defers to
 % the global hook |\phfthm@hook@startcommonnostar|.
 %
-% \DescribeMacro{\phfthm@hook@start@<thmname>*} The hook
+% \DescribeMacro{\phfthm@hook@start@thmname*} The hook
 % |\phfthm@hook@start@|\meta{starred theorem environment name} is completely
 % analogous, and is called for the starred environment.  The only difference is
 % that by default, it defers its call to |\phfthm@hook@startcommonstar|.
@@ -143,7 +225,7 @@
 % its fist occurrence, it provides the theorem environment label to use for the
 % proof reference (``see proof on page \ldots'', see
 % \autoref{sec:proof-ref-mechanism}).  There, an additional hook is provided,
-% \DescribeMacro{\phfthm@hook@afterlabel@<thmname>}
+% \DescribeMacro{\phfthm@hook@afterlabel@thmname}
 % |\phfthm@hook@afterlabel@|\meta{theorem environment name}, which is called
 % after the theorem label is set (it can be recovered from the value of
 % |\phfthm@val@thmlabel|.  By default, that hook calls the common hook
@@ -152,9 +234,9 @@
 %
 %
 % The end hooks work very much
-% analogously. \DescribeMacro{\phfthm@hook@end@<thmname>}
+% analogously. \DescribeMacro{\phfthm@hook@end@thmname}
 % |\phfthm@hook@end@|\meta{theorem environment name} and
-% \DescribeMacro{\phfthm@hook@end@<thmname>*} |\phfthm@hook@end@|\meta{starred
+% \DescribeMacro{\phfthm@hook@end@thmname*} |\phfthm@hook@end@|\meta{starred
 % theorem environment name} are called respectively for the non-starred and
 % starred version of that theorem environment, and by default they defer to the
 % common \DescribeMacro{\phfthm@hook@endcommonnostar}
@@ -164,14 +246,18 @@
 % defer their calls to |\phfthm@hook@endcommon|\marg{theorem environment name}.
 %
 %
-% \section{Definitions for proof environments}
+% \section{Proof environments}
 %
 % \subsection{Manually define a proof environment}
 % \label{sec:mk-proof-env}
 %
-% ......... Using |\phfMakeProofEnv|....
+% \DescribeMacro{\phfMakeProofEnv} You may use the macro |\phfMakeProofEnv| to
+% declare a new proof environment. The syntax is:
 %
-% Options:
+% \noindent |\phfMakeProofEnv|\oarg{key-value options}\marg{proof environment name}
+%
+% This defines a new environment with the given name, which may be used to
+% display proofs to theorems.  The options may be:
 % \begin{cmdoptions}
 % \item[displayenv=\meta{name of \LaTeX{} environment}] Set a
 %   \LaTeX{} environment to use to actually format and display the proof.  (The
@@ -284,6 +370,76 @@
 %   \end{minipage}
 % }\endgroup
 %
+% \subsection{On the theorem side}
+%
+% On the theorem side, the proof-ref mechanism works by hacking into the
+% definition of \LaTeX's |\label|.  The |\label| command should be placed first
+% within the theorem (see example above).  It is important, in theorems which
+% use the proof-ref mechanism (on by default), to always have a corresponding
+% label: Indeed, you may experience weird results if you don't have a theorem
+% label, but then have labels for other objects in the theorem such as equations
+% or itemize items.
+%
+% Once the corresponding proof is detected (a proof environment with an optional
+% argument of the form |[*thm:the-label]| for the same label |thm:the-label| as
+% specified to the theorem, see \autoref{sec:proof-ref-mechanism-proof-side}),
+% then a text is generated (by default ``Proof on page \ldots'') and placed
+% after the theorem. The appearance of this text is customizable
+% (\autoref{sec:proof-ref-customize-appearance}).
+%
+%
+% \DescribeMacro{\noproofref} If, for any reason, you do not want to make sure
+% you don't have any text ``Proof on page \ldots'' appearing (for example there
+% is no corresponding proof because the theorem is obvious), then you should
+% call |\noproofref| immediately inside the theorem:
+% \begin{verbatim}
+% \begin{theorem}
+%   \noproofref
+%   Theorem text ...
+% \end{theorem}
+% \end{verbatim}
+%
+% The command |\noproofref| temporarily disables the proof-ref mechanism for the
+% current theorem and restores |\label| to \LaTeX's original meaning.
+%
+% \subsection{On the proof side}
+% \label{sec:proof-ref-mechanism-proof-side}
+%
+% On the proof side, you just need to specify for which theorem this is the
+% proof of.  For that (unless you override the defaults and plug in your own
+% magic parsing; see \autoref{sec:mk-proof-env}), you should specify an optional
+% argument to the proof which is of the following form:
+% |\begin{proof}[*|\meta{label}|]|,
+%   \iffalse meta-comment \end{proof} [-- emacs is confused] \fi
+% where \meta{label} is the label name you have associated with the theorem in
+% question (see example above).
+%
+% This has two effects: it sets the proof to display ``\textit{Proof of
+% \ldots},'' and also does some background dark magic to display, at the
+% location of the corresponding theorem, some text like ``\textit{Proof on page
+% \ldots},'' where the page number corresponds to the page on which this proof
+% is located.
+%
+%
+% \subsection{Customizing appearance of the proof reference text}
+% \label{sec:proof-ref-customize-appearance}
+% ..............
+%
+%
+% ....................
+% NOTE: the |\phfthm@proofrefstyle@<XYZ>@setup| command should at least define
+% the commands |\phfthm@proofref@impl@start|,
+% |\phfthm@proofref@impl@afterlabel|, and |\phfthm@proofref@impl@end|.
+%
+%
+%
+%
+%
+% \section{Theorem-heading definition-like environments}
+%
+%
+% .......................
+%
 %
 %
 % \StopEventually{\PrintChangesAndIndex}
@@ -347,8 +503,10 @@
 \define@cmdkey{phfmkthm}{counter}{}
 \define@boolkey{phfmkthm}{aliascounter}[true]{}
 \define@cmdkey{phfmkthm}{thmstyle}{}
-\define@boolkey{phfmkthm}{defnostar}[true]{} % define {thm} variant
-\define@boolkey{phfmkthm}{defstar}[true]{} % define {thm*} variant
+\define@boolkey{phfmkthm}{defnostar}[true]{}
+\define@boolkey{phfmkthm}{defstar}[true]{}
+\define@boolkey{phfmkthm}{proofref}[true]{}
+\define@cmdkey{phfmkthm}{proofrefstyle}{}
 %    \end{macrocode}
 % 
 % \begin{macro}{\phfMakeTheorem}
@@ -368,6 +526,8 @@
   \def\cmdKV@phfmkthm@thmstyle{}%
   \KV@phfmkthm@defnostartrue%
   \KV@phfmkthm@defstartrue%
+  \KV@phfmkthm@proofreftrue%
+  \def\cmdKV@phfmkthm@proofrefstyle{default}%
   \setkeys{phfmkthm}{#1}%
 %    \end{macrocode}
 % 
@@ -390,13 +550,13 @@
 % |\...autorefname| for |\autoref|.  If an alias counter is requested, create it
 % and pass that one to |\newtheorem|.
 %
-% At this point, we create a theorem named |phfthm@....|, because we still want
-% to add calls to hooks.
+% At this point, we create a theorem named |phfthm@....| using |\newtheorem|
+% (because we still want to add calls to hooks).
 %    \begin{macrocode}
   \ifKV@phfmkthm@defnostar%
     \if\relax\detokenize\expandafter{\cmdKV@phfmkthm@counter}\relax%
 %    \end{macrocode}
-% ---in case we use our own separate counter:
+% ---in case we use a separate counter (if \cmdoptionfmt{counter=}):
 %    \begin{macrocode}
       \newtheorem{phfthm@#2}{#3}%
       \csdef{phfthm@#2autorefname}{#3}%
@@ -430,13 +590,34 @@
       \end{phfthm@#2}%
     }%
 %    \end{macrocode}
-% Define hooks specific to this theorem with sensible defaults: call common
-% hooks (see |\phfthm@hook@startcommonnostar|, |\phfthm@hook@afterlabelcommon|
-% and |\phfthm@hook@endcommonnostar|, detailed in \autoref{sec:theorem-hooks}).
+% Define hooks specific to this theorem with sensible defaults.  If proof-ref is
+% on, call the appropriate callbacks. Then, call the common hooks (see
+% |\phfthm@hook@startcommonnostar|, |\phfthm@hook@afterlabelcommon| and
+% |\phfthm@hook@endcommonnostar|, detailed in \autoref{sec:theorem-hooks}).
 %    \begin{macrocode}
-    \csdef{phfthm@hook@start@#2}##1{\phfthm@hook@startcommonnostar{#2}{##1}}%
-    \csdef{phfthm@hook@afterlabel@#2}{\phfthm@hook@afterlabelcommon{#2}}%
-    \csdef{phfthm@hook@end@#2}{\phfthm@hook@endcommonnostar{#2}}%
+    \csedef{phfthm@hook@start@#2}##1{%
+      \ifKV@phfmkthm@proofref%
+        \expandafter\noexpand%
+          \csname phfthm@proofrefstyle@\cmdKV@phfmkthm@proofrefstyle @setup\endcsname%
+        \noexpand\phfthm@def@label@thmlabel{#2}%
+        \noexpand\phfthm@proofref@impl@start%
+      \fi%
+      \noexpand\phfthm@hook@startcommonnostar{#2}{##1}%
+    }%
+    \csedef{phfthm@hook@afterlabel@#2}{%
+      \ifKV@phfmkthm@proofref%
+        \noexpand\phfthm@proofref@expandthmlabeltoarg%
+          \noexpand\phfthm@proofref@impl@afterlabel%
+      \fi%
+      \noexpand\phfthm@hook@afterlabelcommon{#2}%
+    }%
+    \csedef{phfthm@hook@end@#2}{%
+      \ifKV@phfmkthm@proofref%
+        \noexpand\phfthm@proofref@expandthmlabeltoarg%
+          \noexpand\phfthm@proofref@impl@end%
+      \fi%
+      \noexpand\phfthm@hook@endcommonnostar{#2}%
+    }%
   \fi%
 %    \end{macrocode}
 % 
@@ -472,6 +653,7 @@
 %
 % \subsubsection{Default hooks for theorems}
 %
+% \needspace{3\baselineskip}
 % \begin{macro}{\phfthm@hook@startcommonnostar}
 % \begin{macro}{\phfthm@hook@startcommonstar}
 % \begin{macro}{\phfthm@hook@startcommon}
@@ -488,7 +670,6 @@
 %    \begin{macrocode}
 \def\phfthm@hook@startcommonnostar#1#2{%
   \phfthm@hook@startcommon{#1}{#2}%
-  \phfthm@def@label@thmlabel{#1}%
 }
 \def\phfthm@hook@startcommonstar#1#2{%
   \phfthm@hook@startcommon{#1}{#2}%
@@ -510,7 +691,7 @@
 % \begin{macro}{\phfthm@hook@endcommonstar}
 % \begin{macro}{\phfthm@hook@endcommon}
 %   Further hooks, for after the theorem main |\label| command
-%   (|\phfthm@hook@@afterlabelcommon|) and for the end of the theorem.
+%   (|\phfthm@hook@afterlabelcommon|) and for the end of the theorem.
 %    \begin{macrocode}
 \def\phfthm@hook@afterlabelcommon#1{}
 \def\phfthm@hook@endcommonnostar#1{\phfthm@hook@endcommon{#1}}
@@ -535,16 +716,21 @@
 %   name, e.g.\@ |proposition|.
 %    \begin{macrocode}
 \def\phfthm@def@label@thmlabel#1{%
-  \let\phfthm@old@label\label%
-  \def\label{\phfthm@thmlabel{#1}}%
+  \ifdefined\phfthm@old@label
+    \PackageWarning{phfthm}{Internal inconsistency: \string\phfthm@def@label@thmlabel
+      called twice for the same theorem environment!}
+  \else
+    \let\phfthm@old@label\label%
+    \edef\label{\noexpand\phfthm@thmlabel{#1}}%
+  \fi
 }
 %    \end{macrocode}
 % \end{macro}
 % 
 % \begin{macro}{\phfthm@thmlabel}
-%   The macro which is invoked upon the first call to |\label| within the
-%   theorem (for which |\phfthm@def@label@thmlabel| was called, which is the
-%   default).
+%   The first call to |\label| within the theorem redirects to the macro
+%   |\phfthm@thmlabel|.  (Applies to theorem environments for which
+%   |\phfthm@def@label@thmlabel| was called, which is the default).
 %
 %   Here |#1| = theorem environment name, e.g.\@ |proposition|; and |#2| = the
 %   label value (argument to the |\label| macro).
@@ -560,16 +746,16 @@
 %    \begin{macrocode}
   \phfthm@old@label{#2}%
 %    \end{macrocode}
-% Invoke the |\phfthm@hook@afterlabel@<thmname>| hook for this theorem
-% environment.
-%    \begin{macrocode}
-  \csname phfthm@hook@afterlabel@#1\endcsname%
-%    \end{macrocode}
 % Restore the old |\label| definition, in case there are other items in the
 % theorem environment such as equations, itemizes etc.\@ which may themselves
 % have |\label|'s.
 %    \begin{macrocode}
   \let\label\phfthm@old@label%
+%    \end{macrocode}
+% Invoke the |\phfthm@hook@afterlabel@thmname| hook for this theorem
+% environment.
+%    \begin{macrocode}
+  \csname phfthm@hook@afterlabel@#1\endcsname%
 %    \end{macrocode}
 % Finally, ignore any spaces following the |\label| command. (Maybe we should
 % have done something with |\@bsphack| and |\@esphack| but oh well\ldots
@@ -862,7 +1048,8 @@
 %   Provide an environment which displays a proof in a similar fashion as
 %   \emph{AMS}', but with some small additional features.
 %    \begin{macrocode}
-\newenvironment{phfthm@proof@defaultdisplayenv}[1][\proofname]{\par
+\newenvironment{phfthm@proof@defaultdisplayenv}[1][\proofname]{%
+  \par
   \pushQED{\qed}%
   \normalfont \topsep6\p@\@plus6\p@\relax
   \trivlist\item\relax
@@ -946,101 +1133,98 @@
 %
 % \subsection{Implementation of the proof-ref machinery}
 %
-% ...................................
+% \subsubsection{Small general stuff}
 %
+% \begin{macro}{\proofonname}
+%   The macro |\proofonname| displays ``Proof on \ldots.''  Here, |#2| is the
+%   full page reference and |#1| is the label name of the referenced theorem.
 %    \begin{macrocode}
-
 \providecommand\proofonname[2]{Proof on #2.}
-
-\def\noproofref{%
-  \def\phfthm@val@noproofref{1}% if this is defined, then no proof ref should be generated for the current thmlabel
-}
-
-%
-% This one may also be defined to take one argument, the proof ref text.
-%
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\proofrefsize}
+%   Format the proof reference ``Proof on page \ldots''.  This macro is meant to
+%   set the font size (or other font properties), but it may also be defined to
+%   take one argument, the proof reference text.
+%    \begin{macrocode}
 \def\proofrefsize{\footnotesize}
-
-\def\phfthm@fmt@proofref#1#2{%
-  %
-  % #1 = theorem's label (e.g. "prop:1")
-  % #2 = full reference (e.g. "page XYZ")
-  % 
-  {\parfillskip=0pt\relax% Thanks http://tex.stackexchange.com/a/43239/32188 !
-    \hfil\null\hfil\hbox{\proofrefsize{(\proofonname{#1}{#2})}}\par}%
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% \begin{macro}{\noproofref}
+%   Use |\noproofref| inside a theorem to signify that no proof reference should
+%   be attempted.
+%
+%   The implementation just defines |\phfthm@val@noproofref|.  If this macro is
+%   defined, then no proof ref should be generated for the current thmlabel.
+%   Also, restore |\label| to its original definition in case it was overridden.
+%    \begin{macrocode}
+\def\noproofref{%
+  \def\phfthm@val@noproofref{1}%
+  \ifdefined\phfthm@old@label \let\label\phfthm@old@label \fi%
 }
-
-\def\phfthm@fmt@proofref@farback#1#2{\phfthm@fmt@proofref{#1}{#2}}
-\def\phfthm@fmt@proofref@farahead#1#2{\phfthm@fmt@proofref{#1}{#2}}
-\def\phfthm@fmt@proofref@closeby#1#2{}
-
+%    \end{macrocode}
+% \end{macro}
+%
+% 
+% \begin{macro}{\phfthm@proofref@warnnolabel}
+%   Produce a warning that no label was provided in order to infer the proof
+%   reference.
+%    \begin{macrocode}
 \def\phfthm@proofref@warnnolabel{%
   \PackageWarning{phfthm}{No label provided for proof reference!}%
 }
-
-\def\phfthm@proofref@impl@thmlabel{%
+%    \end{macrocode}
+% \end{macro} 
+%
+% \begin{macro}{\phfthm@proofref@expandthmlabeltoarg}
+%   Utility to expand the value of |\phfthm@val@thmlabel| as an argument to a
+%   callback command.  |#1| = the macro to relay the call to.
+%    \begin{macrocode}
+\def\phfthm@proofref@expandthmlabeltoarg#1{%
+%    \end{macrocode}
+%
+% First, check if the proof-ref mechanism was explicitly temporarily disabled,
+% and do nothing if that is the case.
+%    \begin{macrocode}
   \ifdefined\phfthm@val@noproofref\relax%
-    % "no proof ref" was explicitly specified
   \else%
-    % make sure \phfthm@val@thmlabel is defined, maybe empty
+%    \end{macrocode}
+%
+% Then make sure |\phfthm@val@thmlabel| is defined (maybe empty), and then
+% either call the callback macro |#1| with the value of |\phfthm@val@thmlabel|
+% as argument, or generate a warning if that value is empty.
+%    \begin{macrocode}
     \providecommand\phfthm@val@thmlabel{}%
-    % generate the proof reference for current thmlabel
     \edef\phfthm@tmpa{{\phfthm@val@thmlabel}}%
     \expandafter\notblank\phfthm@tmpa{%
-      \expandafter\phfthm@proofref@impl\phfthm@tmpa%
+      \expandafter#1\phfthm@tmpa%
     }{%
       \phfthm@proofref@warnnolabel% no label provided
     }%
   \fi%
 }
-
+%    \end{macrocode}
+% \end{macro}
 %
-% allow the proof to be this many pages away. Use -1 to force display of reference.
 %
-\newcommand\phfthmProofrefPageBackTolerance{1}
-\newcommand\phfthmProofrefPageAheadTolerance{1}
-
-\newcounter{phfthmInternalProofrefCounter}
-
-\def\phfthm@proofref@impl#1{%
-  %
-  % #1 = referenced label
-  %
-  % Check to see if the proof is far away (further than on the next page).  Only if that's
-  % the case, display the reference.
-  %
-  % See http://tex.stackexchange.com/a/2526 to test whether ref is on same page. Note that
-  % was problematic, probably due to hyperref. I needed to use my own \phfthm@min@pageref
-  % without any hyper linking mechanism in place.
-  %
-  \refstepcounter{phfthmInternalProofrefCounter}\label{internalproofref\thephfthmInternalProofrefCounter}%
-  \edef\phfthm@proofref@tmp@proofpage{\phfthm@min@pageref{proof:#1}}%
-  \edef\phfthm@proofref@tmp@thispage{\phfthm@min@pageref{internalproofref\thephfthmInternalProofrefCounter}}%
-  \edef\phfthm@proofref@tmp@pagediff{\the\numexpr\phfthm@proofref@tmp@proofpage-\phfthm@proofref@tmp@thispage\relax}%
-  \ifnum\numexpr\phfthm@proofref@tmp@pagediff\relax<\numexpr-\phfthmProofrefPageBackTolerance\relax%
-    % far back
-    \phfthm@fmt@proofref@farback{#1}{\autopageref{proof:#1}}%
-  \else%
-    \ifnum\numexpr\phfthm@proofref@tmp@pagediff\relax>\numexpr\phfthmProofrefPageAheadTolerance\relax%
-      % far ahead
-      \phfthm@fmt@proofref@farahead{#1}{\autopageref{proof:#1}}%
-    \else%
-      % close
-      \phfthm@fmt@proofref@closeby{#1}{\autopageref{proof:#1}}%
-    \fi%
-  \fi%
-%  [\number\numexpr\phfthm@proofref@tmp@proofpage\relax{} vs % DEBUG
-%  \number\numexpr\phfthm@proofref@tmp@thispage\relax or % DEBUG
-%  \number\numexpr1+\phfthm@proofref@tmp@thispage\relax] % DEBUG
-}
-
+% \subsubsection{Utilities for interacting with \phfverb{\autoref} labels}
+%
+% In this context, we also need some generic utilities for interacting with
+% |\autoref| labels.
+%
+% \begin{macro}{\phfthm@autorefnameof}
+%   The macro |\phfthm@autorefnameof| extracts the name of the counter which
+%   generated this reference (e.g.\@ ``section'' or ``theorem'').
+%    \begin{macrocode}
 \def\phfthm@autorefnameof#1{%
-  % 
-  % Extract the counter part of the reference `section.NN', which is 4th element in the
-  % \r@label macro
-  %
-  % Code extracted from hyperref.sty
-  % 
+%    \end{macrocode}
+% 
+% Extract the counter part of the reference |section.NN|, which is 4th element in the
+% |\r@label| macro. (Code extracted from |hyperref.sty|.)
+%    \begin{macrocode}
   \expandafter\ifx\csname r@#1\endcsname\relax%
     \textbf{??}%
   \else%
@@ -1064,12 +1248,19 @@
     \csname#1autorefname\endcsname%
   }%
 }
-
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\phfthm@min@pageref}
+%   A minimal pageref macro, which just extracts the page number on which the
+%   given label is located.
+% 
+%   There's some dark magic going on here. The code was copied from |hyperref.sty|, in
+%   ``|\def\HyPsd@@@pageref...|''
+% 
+%    \begin{macrocode}
 \def\phfthm@min@pageref#1{%
   \ifcsname r@#1\endcsname%
-    %
-    % Dark magic going on here. Copied from hyperref.sty, in "\def\HyPsd@@@pageref..."
-    % 
     \expandafter\expandafter\expandafter\expandafter
     \expandafter\expandafter\expandafter\@car
     \expandafter\expandafter\expandafter\@gobble
@@ -1078,111 +1269,350 @@
     0%
   \fi%
 }
-
-
-
-
-% ==============================================================================
-%                    THEOREM HEADING MACHINERY
-% ==============================================================================
-
-
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% \subsubsection{Default style, with basic machinery}
+%
+% Now we define the relevant callbacks for the default style.  See doc in
+% \autoref{sec:proof-ref-customize-appearance}.  Recall a proof-ref style just
+% needs to define |\phfthm@proofrefstyle@<stylename>@setup|, which in turn
+% should just define the callbacks |\phfthm@proofref@impl@start|,
+% |\phfthm@proofref@impl@afterlabel| and |\phfthm@proofref@impl@end|.  For our
+% default style, these callbacks further call other callbacks of the form
+% |\phfthm@proofref@impl@...|, such that these definitions can be re-used to
+% create new styles.  The main proof-ref generation routine is
+% |\phfthm@proofrefstyle@default@main|, which can be used for either the
+% |...@afterlabel| or the |...@end| callback.
+%
+% \begin{macro}{\phfthm@proofrefstyle@default@fmt}
+%   Format and display the proof reference. |#1| = the theorem's label
+%   (e.g. |prop:1|); |#2| = the full reference (e.g. ``page XYZ'').
+%
+%   This macro is the default value of the callback |\phfthm@proofref@impl@fmt|,
+%   which is called by the default style itself.
+%
+%   Use correct spacing for right-aligning the reference.\footnote{Thanks
+%   \url{http://tex.stackexchange.com/a/43239/32188}!}  If there is room on the
+%   current line, just right-align the proof-ref text; if not, add it on a
+%   separate line.  [We can achieve this with the sequences |\hfil\null\hfil|:
+%   if there is space, it all fits on the same line, if not, the line breaks at
+%   the |\null| point.]
+%    \begin{macrocode}
+\def\phfthm@proofrefstyle@default@fmt#1#2{%
+  {\parfillskip=0pt\relax%
+    \hfil\null\hfil\null\hfil%
+    \hbox{\proofrefsize{(\proofonname{#1}{#2})}}\par}%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% 
+% \begin{macro}{\phfthm@proofrefstyle@default@fmtfarback}
+% \begin{macro}{\phfthm@proofrefstyle@default@fmtfarahead}
+% \begin{macro}{\phfthm@proofrefstyle@default@fmtcloseby}
+%   These macros are the default values of the callbacks
+%   |\phfthm@proofref@impl@fmtfarback|, |\phfthm@proofref@impl@fmtfarahead|, and
+%   |\phfthm@proofref@impl@fmtcloseby|, which are called by the default style
+%   itself.  These callbacks define how to format and (possibly not) display the
+%   proof reference depending on whether the proof is ``far behind'' (several
+%   pages back), ``far ahead'' (several pages ahead) or ``close by'' (neither
+%   far back nor far ahead), as defined by |\phfthmProofrefPageBackTolerance|
+%   and |\phfthmProofrefPageAheadTolerance|.
+%    \begin{macrocode}
+\def\phfthm@proofrefstyle@default@fmtfarback#1#2{%
+  \phfthm@proofref@impl@fmt{#1}{#2}}
+\def\phfthm@proofrefstyle@default@fmtfarahead#1#2{%
+  \phfthm@proofref@impl@fmt{#1}{#2}}
+\def\phfthm@proofrefstyle@default@fmtcloseby#1#2{}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\phfthmProofrefPageBackTolerance}
+% \begin{macro}{\phfthmProofrefPageAheadTolerance}
+%   The macros |\phfthmProofrefPageBackTolerance| and
+%   |\phfthmProofrefPageAheadTolerance| define how many pages back or ahead the
+%   proof should be in order to consider it ``far back'' or ``far ahead.''
+%
+%   Either value may be set to |-1| to force the proof to be considered ``far
+%   back'' or ``far ahead.''
+%    \begin{macrocode}
+\newcommand\phfthmProofrefPageBackTolerance{1}
+\newcommand\phfthmProofrefPageAheadTolerance{1}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% Define the internal counter which allows to check on which page we are at the
+% place of the proof reference.  This is used by
+% |\phfthm@proofrefstyle@default@main|.
+%    \begin{macrocode}
+\newcounter{phfthmInternalProofrefCounter}
+%    \end{macrocode}
+% 
+% \begin{macro}{\phfthm@proofrefstyle@default@main}
+%   The main proof-ref generation routine.  The argument |#1| is the current
+%   label of the theorem; the referenced label is |proof:#1|.
+%    \begin{macrocode}
+\def\phfthm@proofrefstyle@default@main#1{%
+%    \end{macrocode}
+% 
+% Check to see if the proof is far away ahead or back (as defined by the
+% tolerance macros above).  Depending on each case, call the corresponding
+% callbacks.{\makeatletter\footnote{See \url{http://tex.stackexchange.com/a/2526} to test
+% whether ref is on same page. Note that was problematic, probably due to
+% hyperref. I needed to use my own \phfverb{\phfthm@min@pageref}
+% without any hyper linking mechanism in place.}}
+%
+%    \begin{macrocode}
+  \refstepcounter{phfthmInternalProofrefCounter}%
+  \label{internalproofref\thephfthmInternalProofrefCounter}%
+  \edef\phfthm@proofref@tmp@proofpage{\phfthm@min@pageref{proof:#1}}%
+  \edef\phfthm@proofref@tmp@thispage{%
+    \phfthm@min@pageref{internalproofref\thephfthmInternalProofrefCounter}}%
+  \edef\phfthm@proofref@tmp@pagediff{%
+    \the\numexpr\phfthm@proofref@tmp@proofpage-\phfthm@proofref@tmp@thispage\relax}%
+%    \end{macrocode}
+% 
+% If the proof is ``far back,'' call the corresponding callback. 
+%    \begin{macrocode}
+  \ifnum\numexpr\phfthm@proofref@tmp@pagediff\relax%
+      <\numexpr-\phfthmProofrefPageBackTolerance\relax%
+    \phfthm@proofref@impl@fmtfarback{#1}{\autopageref{proof:#1}}%
+  \else%
+%    \end{macrocode}
+% 
+% If the proof is ``far ahead,'' call the corresponding callback. 
+%    \begin{macrocode}
+    \ifnum\numexpr\phfthm@proofref@tmp@pagediff\relax%
+        >\numexpr\phfthmProofrefPageAheadTolerance\relax%
+      \phfthm@proofref@impl@fmtfarahead{#1}{\autopageref{proof:#1}}%
+%    \end{macrocode}
+% 
+% Otherwise, it is close by.
+%    \begin{macrocode}
+    \else%
+      \phfthm@proofref@impl@fmtcloseby{#1}{\autopageref{proof:#1}}%
+    \fi%
+  \fi%
+%%  [\number\numexpr\phfthm@proofref@tmp@proofpage\relax{} vs % DEBUG
+%%  \number\numexpr\phfthm@proofref@tmp@thispage\relax or % DEBUG
+%%  \number\numexpr1+\phfthm@proofref@tmp@thispage\relax] % DEBUG
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+%
+% \begin{macro}{\phfthm@proofrefstyle@default@setup}
+%   The main set-up macro for the |default| proof-ref style.  It sets all the
+%   call-backs to the default ones.
+%    \begin{macrocode}
+\def\phfthm@proofrefstyle@default@setup{%
+  \let\phfthm@proofref@impl@start\relax
+  \let\phfthm@proofref@impl@afterlabel\@gobble
+  \let\phfthm@proofref@impl@end\phfthm@proofrefstyle@default@main
+  \let\phfthm@proofref@impl@fmtfarback\phfthm@proofrefstyle@default@fmtfarback
+  \let\phfthm@proofref@impl@fmtfarahead\phfthm@proofrefstyle@default@fmtfarahead
+  \let\phfthm@proofref@impl@fmtcloseby\phfthm@proofrefstyle@default@fmtcloseby
+  \let\phfthm@proofref@impl@fmt\phfthm@proofrefstyle@default@fmt
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% \subsubsection{Other proof-ref styles: only \phfverb{margin} for now}
+%
+% These styles simply use the same mechanism as the default style, but plug in
+% different sub-callbacks.
+%
+% \begin{macro}{\phfthm@proofrefstyle@margin@setup}
+%   Set-up macro for the ``|margin|'' proof-ref style (displays the proof
+%   reference in the margin of the page).
+%    \begin{macrocode}
+\def\phfthm@proofrefstyle@margin@setup{%
+  \phfthm@proofrefstyle@default@setup
+%    \end{macrocode}
+% 
+% The proof reference should be displayed directly at the top, not at the end of
+% the theorem, so plug in |\phfthm@proofref@default@main| onto |...@afterlabel|
+% and not onto |...@end|.  Don't forget that these macros accept one argument,
+% the theorem label.
+%    \begin{macrocode}
+  \let\phfthm@proofref@impl@afterlabel\phfthm@proofrefstyle@default@main
+  \let\phfthm@proofref@impl@end\@gobble
+%    \end{macrocode}
+% 
+% Define the formatting callback to put the note in the margin of the page using
+% a |\marginpar|.  We need |\leavevmode| to make sure it's aligned properly
+% vertically with the paragraph.\footnote{See
+% \url{http://tex.stackexchange.com/a/16161/32188}}
+%    \begin{macrocode}
+  \def\phfthm@proofref@impl@fmt##1##2{%
+    \leavevmode\marginpar{\proofrefsize{\proofonname{##1}{##2}}}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% \subsection{Thmheading definition-like environments}
+%
+%
+% \subsubsection{Manually define a thmheading environment}
+%
+% Define the key-value options accepted by |\phfthmMakeThmheadingEnvironment|.
+%    \begin{macrocode}
 \define@cmdkey{phfthmmkthmheading}{thmstyle}{}
 \define@cmdkey{phfthmmkthmheading}{internalcounter}{}
-
-
+%    \end{macrocode}
+% 
+%    \begin{macrocode}
 \newcounter{phfthmheadingcounter}%
-
+%    \end{macrocode}
+%
+% \begin{macro}{\phfthmMakeThmheadingEnvironment}
+%
+%   Creates a new environment |\begin{thmheading}{Title}...\end{thmheading}| for
+%   customizing the heading on-the-fly. Useful for an alternative formatting of
+%   definitions.  The syntax is:
+%
+%   \noindent|\phfthmMakeThmheadingEnvironment|\oarg{key-value options}\marg{environment name}
 % 
-% Creates a new environment \begin{thmheading}{Title} .... \end{thmheading} for
-% customizing the heading on-the-fly. Useful for my formatting of definitions.
+%   You can also use |\label| and |\ref| (the latter simply displays the given
+%   title).
+%
 % 
-% You can also use \label{...} and \ref{} which yields the title.
-% 
+%    \begin{macrocode}
 \newcommand\phfthmMakeThmheadingEnvironment[2][]{%
-  % 
-  % #1 = options (thmstyle=xyz)
-  % 
-  % #2 = environment name
-  %
-  %
-  % First, parse options:
-  % 
-  %   set defaults:
-  %
+%    \end{macrocode}
+% \iffalse meta-comment %} -- for emacs' paren matching
+% \fi
+% 
+% Parse the options. First set defaults, and then parse the input string.
+%    \begin{macrocode}
   \def\cmdKV@phfthmmkthmheading@thmstyle{plain}%
   \def\cmdKV@phfthmmkthmheading@internalcounter{phfthmheadingcounter}%
-  %
-  %   manually given options:
-  % 
   \setkeys{phfthmmkthmheading}{#1}%
-  % 
-  %
-  % And the definitions, per se:
-  %
+%    \end{macrocode}
+% 
+% And now, produce the relevant definitions:
+%    \begin{macrocode}
   \csdef{phfthm@thmheading@#2@val@title}{$\langle$No Title Given$\rangle$}%
   \theoremstyle{\cmdKV@phfthmmkthmheading@thmstyle}%
-  % 
+%    \end{macrocode}
+% 
+% We use |\newtheorem*| to create an unnumbered theorem. The fixed title is just
+% a single token, the macro which will be set to the relevant title at the last
+% moment.
+%    \begin{macrocode}
   \newtheorem*{phfthm@internal@thmheading@#2}{\csname phfthm@thmheading@#2@val@title\endcsname}%
-  %
-  % define the relevant environment
-  % 
-  \newenvironment{#2}[1]{%
+%    \end{macrocode}
+%
+% Define the actual environment.
+%    \begin{macrocode}
+  \newenvironment{#2}[1]{%}
     \csdef{phfthm@thmheading@#2@val@title}{##1}%
     \letcs\thephfthmheadingcounter{phfthm@thmheading@#2@val@title}%
+%    \end{macrocode}
+% Relay call to the internal \textit{AMS}-defined ``theorem:''
+%    \begin{macrocode}
     \csname phfthm@internal@thmheading@#2\endcsname%
-    % \hspace: see http://tex.stackexchange.com/a/88493/32188, especially the first comment
+%    \end{macrocode}
+% Pin down an anchor.  The use of |\hspace*{0pt}| is explained at
+% \url{http://tex.stackexchange.com/a/88493/32188} (especially the first comment).
+%    \begin{macrocode}
     \hspace*{0pt}\refstepcounter{\cmdKV@phfthmmkthmheading@internalcounter}%
     \csname phfthm@hook@thmheading@#2@start\endcsname{##1}%
-    % add some flexibility in the hspace
+%    \end{macrocode}
+% Also, let's add some flexibility in the hspace:
+%    \begin{macrocode}
     \hskip 0em plus 0.5em minus 0em%
     \ignorespaces%
-  }{%
+  }%
+%    \end{macrocode}
+% 
+% Now, the END part of the environment: just call the callback and close the
+% internal AMS-defined theorem.
+%    \begin{macrocode}
+  {%
     \csname phfthm@hook@thmheading@#2@end\endcsname%
     \csname endphfthm@internal@thmheading@#2\endcsname%
   }%
-  % 
+%    \end{macrocode}
+% 
+% Also define the relevant callbacks, which just relay their calls to the
+% default callbacks.
+%    \begin{macrocode}
   \csdef{phfthm@hook@thmheading@#2@start}##1{\phfthm@hook@thmheading@start{##1}}%
   \csdef{phfthm@hook@thmheading@#2@end}{\phfthm@hook@thmheading@end}%
-  %
 }
-
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\phfthm@hook@thmheading@start}
+% \begin{macro}{\phfthm@hook@thmheading@end}
+%   Global callbacks which are called for all thmheading-type environments
+%   defined with |\phfthmMakeThmheadingEnvironment| (unless their hooks have
+%   been changed in order for them not to call these global hooks).
+%    \begin{macrocode}
 \def\phfthm@hook@thmheading@start#1{}
 \def\phfthm@hook@thmheading@end{}
-
-
-
-
-
-
-% ==============================================================================
-%                    STYLES AND THEOREM SETS
-% ==============================================================================
-
-
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% 
 %
-% Define theorem sets
+% \subsection{Theorem sets}
 %
+% Here, we define the theorem sets proposed by the package for quick loading.
+%
+%
+% As we define the theorem sets, remember the names in a comma-separated list
+% which we can display in help text.  The |\phfthm@def@thmset| replaces the
+% |\def| command and expects the definitions to follow immediately.
+%    \begin{macrocode}
 \def\phfthm@def@thmset@optlist{}
 \def\phfthm@def@thmset#1{\appto\phfthm@def@thmset@optlist{#1,}\csdef{phfthm@thmset@#1}}
-
-
-% Note: should be defined by the package option processing mechanism: \phfthm@val@mkthmoptarg@{theorem|defn}
+%    \end{macrocode}
+% 
+%
+% \begin{macro}{\phfthm@def@thmset@mktheorem}
+% \begin{macro}{\phfthm@def@thmset@mkdefn}
+%   In definitions of theorem sets, use these macros to define a new
+%   theorem-like environment (theorem, proposition, corollary, etc.) or
+%   definition-like environment (definition, remark).  The macros
+%   |\phfthm@val@mkthmoptarg@theorem| and |\phfthm@val@mkthmoptarg@defn| are
+%   defined by |\phfthmLoadThmSet|.
+%    \begin{macrocode}
 \def\phfthm@def@thmset@mktheorem{\expandafter\phfMakeTheorem\phfthm@val@mkthmoptarg@theorem}
 \def\phfthm@def@thmset@mkdefn{\expandafter\phfMakeTheorem\phfthm@val@mkthmoptarg@defn}
-
-\def\phfthm@thmset@{% empty set, name ''
-}
-
-\phfthm@def@thmset{empty}{
-  % empty set, name 'empty'
-}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% 
+% The default set (empty name, or name ``|empty|'') provides no theorem.
+%    \begin{macrocode}
+\def\phfthm@thmset@{}
+\phfthm@def@thmset{empty}{}
+%    \end{macrocode}
+% 
+% Theorem set |simple|:
+%    \begin{macrocode}
 \phfthm@def@thmset{simple}{
   \phfthm@def@thmset@mktheorem{theorem}{Theorem}
   \phfthm@def@thmset@mktheorem{proposition}{Proposition}
   \phfthm@def@thmset@mktheorem{lemma}{Lemma}
   \phfthm@def@thmset@mktheorem{corollary}{Corollary}
 }
+%    \end{macrocode}
+% 
+% Theorem set |default|:
+%    \begin{macrocode}
 \phfthm@def@thmset{default}{
   \phfthm@def@thmset@mktheorem{theorem}{Theorem}
   \phfthm@def@thmset@mktheorem{proposition}{Proposition}
@@ -1192,6 +1622,10 @@
   \phfthm@def@thmset@mktheorem{remark}{Remark}
   \phfthm@def@thmset@mkdefn{definition}{Definition}
 }
+%    \end{macrocode}
+% 
+% Theorem set |shortnames|:
+%    \begin{macrocode}
 \phfthm@def@thmset{shortnames}{
   \phfthm@def@thmset@mktheorem{thm}{Theorem}
   \phfthm@def@thmset@mktheorem{prop}{Proposition}
@@ -1201,21 +1635,31 @@
   \phfthm@def@thmset@mktheorem{rem}{Remark}
   \phfthm@def@thmset@mkdefn{defn}{Definition}
 }
+%    \end{macrocode}
+% 
+% Theorem set |rich|. Add definitions to the |default| set:
+%    \begin{macrocode}
 \phfthm@def@thmset{rich}{
-
-  \phfthm@thmset@default % the default set, plus:
-
+  \phfthm@thmset@default
   \phfthm@def@thmset@mktheorem{idea}{Idea}
   \phfthm@def@thmset@mktheorem{question}{Question}
   \phfthm@def@thmset@mktheorem{problem}{Problem}
 }
-
+%    \end{macrocode}
+% 
+%
+% \begin{macro}{\phfthmLoadThmSet}
+%   The macro |\phfthmLoadThmSet| loads a theorem set.  See documentation at
+%   \autoref{sec:load-thm-set}.
+%
+%   |#1| = options to |\phfMakeTheorem| for theorem-like environments
+%
+%   |#2| = options to |\phfMakeTheorem| for definition-like environments
+%
+%   |#3| = name of the theorem set to load
+%
+%    \begin{macrocode}
 \newcommand\phfthmLoadThmSet[3]{%
-  % 
-  % #1 = options for theorem definitions
-  % #2 = options for definition definitions
-  % #3 = name of the thm set to load
-  %
   \ifcsname phfthm@thmset@#3\endcsname%
     \edef\phfthm@val@mkthmoptarg@theorem{#1}%
     \edef\phfthm@val@mkthmoptarg@defn{#2}%
@@ -1224,20 +1668,20 @@
     \PackageWarning{phfthm}{Unknown theorem set: `#3'!}%
   \fi%
 }
-
-
-% ==============================================================================
-
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% \subsection{Package option handling}
 %
 % The machinery is in place, now define and parse the package options.
 %
-
+%    \begin{macrocode}
 \define@boolkey{phfthmpkg}{smallproofs}[true]{}
 \KV@phfthmpkg@smallproofstrue% true by default
 
 \define@boolkey{phfthmpkg}{qedsymbolblacksquare}[true]{}
 \KV@phfthmpkg@qedsymbolblacksquaretrue% true by default
-
 
 \define@boolkey{phfthmpkg}{proofenv}[true]{}
 \KV@phfthmpkg@proofenvtrue% true by default
@@ -1252,10 +1696,11 @@
 \KV@phfthmpkg@thmheadingtrue% set to true by default because these are only stand-alone definitions
 \define@cmdkey{phfthmpkg}{thmheadingstyle}{}
 \def\cmdKV@phfthmpkg@thmheadingstyle{plain}
-
+%    \end{macrocode}
+% 
 %
-% proof ref options
-%
+% Proof-ref related options.
+%    \begin{macrocode}
 \newif\ifKV@phfthmpkg@proofref
 \KV@phfthmpkg@proofreffalse% false by default
 \def\cmdKV@phfthmpkg@proofref@style{}
@@ -1276,8 +1721,11 @@
     }%
   }%
 }
-
-
+%    \end{macrocode}
+% 
+% An option to reset all options so that the package provides only stand-alone
+% definitions and is not invasive.
+%    \begin{macrocode}
 \define@key{phfthmpkg}{resetstyle}[]{%
   \KV@phfthmpkg@smallproofsfalse%
   \KV@phfthmpkg@qedsymbolblacksquarefalse%
@@ -1290,43 +1738,48 @@
     \PackageWarning{phfthm}{'resetstyle' does not take any argument.}%
   \fi%
 }
-
-
-
-% \define@choicekey{phfthmpkg}{thmset}[\val]{\phfthm@def@thmset@optlist}{ ... but with expanded option list arg
+%    \end{macrocode}
+% 
+%
+% The |thmset| option.  We subtly construct the command
+% |\define@choicekey{phfthmpkg}{thmset}[\val]{\phfthm@def@thmset@optlist}|, but
+% with the last macro (option list) expanded.
+%    \begin{macrocode}
 \def\@tmpa{\define@choicekey{phfthmpkg}{thmset}[\val]}
 \edef\@tmpb{{\phfthm@def@thmset@optlist}}
 \expandafter\@tmpa\@tmpb{%
   \xdef\cmdKV@phfthmpkg@thmset{\val}%
 }
-\def\cmdKV@phfthmpkg@thmset{default}% by default, load the default set
-
-
+%    \end{macrocode}
+% By default we should load the default set.
+%    \begin{macrocode}
+\def\cmdKV@phfthmpkg@thmset{default}
+%    \end{macrocode}
+% 
 %
 % These set which theorem style to use for theorems and definitions, when loading the
 % given thmset.
 %
+%    \begin{macrocode}
 \define@cmdkey{phfthmpkg}{theoremstyle}{}
 \def\cmdKV@phfthmpkg@theoremstyle{plain}
-%
 \define@cmdkey{phfthmpkg}{definitionstyle}{}
 \def\cmdKV@phfthmpkg@definitionstyle{definition}
-
-
+%    \end{macrocode}
+% 
+%
+% Parse the package options.
+%    \begin{macrocode}
 \DeclareOptionX*{%
   \PackageWarning{phfthm}{Invalid option: `\CurrentOption'}%
 }
 \ProcessOptionsX<phfthmpkg>
-
-
-% ==============================================================================
-
-
-
+%    \end{macrocode}
+% 
 %
-% Now, execute options-controlled actions, such as defining theorem sets.
+% Execute options-controlled actions, such as defining theorem sets.
 %
-
+%    \begin{macrocode}
 
 \def\phfthm@pkgopterr@require@proofenv#1{%
   \ifKV@phfthmpkg@proofenv\else%
@@ -1354,17 +1807,10 @@
   \def\phfthm@val@mkthmopt@counteropts{}
 \fi
 
+\def\phfthm@val@mkthmopt@proofrefstyle{}
+
 \ifKV@phfthmpkg@proofref
 
-  \def\phfthm@proofref@style@margin{%
-    % 
-    \def\phfthm@fmt@proofref##1##2{%
-      % 
-      % ##1 = full reference (e.g. "page XYZ")
-      % 
-      \marginpar{\proofrefsize{\proofonname{##1}{##2}}}%
-    }%
-  }
   \def\phfthm@proofref@style@default{}
   \def\phfthm@proofref@style@{}
   % 
@@ -1376,10 +1822,14 @@
     \def\phfthmProofrefPageBackTolerance{2}
     \def\phfthmProofrefPageAheadTolerance{4}
   }
-  % 
+  \def\phfthm@proofref@style@margin{%
+    \def\phfthm@val@mkthmopt@proofrefstyle{proofrefstyle=margin}
+  }
   \def\phfthm@proofref@style@longref{
+    % make a full sentence, can be combined with other proof-ref styles
     \def\proofonname##1##2{The proof of this \phfthm@autorefnameof{##1} can be found on ##2.}
-    \def\phfthm@fmt@proofref##1##2{%
+    % but then alter the default formatting to avoid ugly line breaks
+    \def\phfthm@proofrefstyle@default@fmt##1##2{%
       % 
       % #1 = theorem's label (e.g. "prop:1")
       % #2 = full reference (e.g. "page XYZ")
@@ -1387,19 +1837,22 @@
       \par{\raggedleft\proofrefsize{(\proofonname{##1}{##2})}\par}%
     }
   }
+  \def\phfthm@proofref@style@off{
+    \def\phfthm@val@mkthmopt@proofrefstyle{proofref=false}
+  }
 
   \def\phfthm@exec@proofrefstyles#1\phfthm@END{%
     \phfthm@internal@execattribs{phfthm@proofref@style@}{ProofRef Style}{#1}}
   \expandafter\phfthm@exec@proofrefstyles\cmdKV@phfthmpkg@proofref@style\phfthm@END
 
 
-  \let\phfthm@def@thmset@mktheorem@OLD\phfthm@def@thmset@mktheorem%
-  \def\phfthm@def@thmset@mktheorem#1#2{% #1 = prop env name ("proposition"), #2 = prop title name ("Proposition")
-    \phfthm@def@thmset@mktheorem@OLD{#1}{#2}%
-    \expandafter\apptocmd\csname phfthm@hook@end@#1\endcsname{%
-      \phfthm@proofref@impl@thmlabel%
-    }{}{Failed to append to command `\expandafter\string\csname phfthm@hook@end@#1\endcsname!!}%
-  }
+%  \let\phfthm@def@thmset@mktheorem@OLD\phfthm@def@thmset@mktheorem%
+%  \def\phfthm@def@thmset@mktheorem#1#2{% #1 = prop env name ("proposition"), #2 = prop title name ("Proposition")
+%    \phfthm@def@thmset@mktheorem@OLD{#1}{#2}%
+%    \expandafter\apptocmd\csname phfthm@hook@end@#1\endcsname{%
+%      \phfthm@proofref@impl@thmlabel%
+%    }{}{Failed to append to command `\expandafter\string\csname phfthm@hook@end@#1\endcsname!!}%
+%  }
 
 \fi
 
@@ -1428,8 +1881,10 @@
 %
 
 \phfthmLoadThmSet%
-{[\phfthm@val@mkthmopt@counteropts,thmstyle=\cmdKV@phfthmpkg@theoremstyle]}% opts for theorems
-{[\phfthm@val@mkthmopt@counteropts,thmstyle=\cmdKV@phfthmpkg@definitionstyle]}% opts for definitions
+{[\phfthm@val@mkthmopt@counteropts,\phfthm@val@mkthmopt@proofrefstyle,
+  thmstyle=\cmdKV@phfthmpkg@theoremstyle]}% opts for theorems
+{[\phfthm@val@mkthmopt@counteropts,proofref=false,
+  thmstyle=\cmdKV@phfthmpkg@definitionstyle]}% opts for definitions -- no proof-ref
 {\cmdKV@phfthmpkg@thmset} % the theorem set
 
 

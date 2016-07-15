@@ -1,9 +1,12 @@
 \documentclass[12pt,a5paper]{article}
 
-\usepackage[thmset=default,sepcounters,proofref={margin,always},prooftitleitbf]{../phfthm}
-%\usepackage[theoremstyle=definition,definitionstyle=remark,thmset=rich,proofref={longref,margin}]{../phfthm}
+%\usepackage[thmset=default,sepcounters,proofref={margin,always},prooftitleitbf]{../phfthm}
+%\usepackage[theoremstyle=definition,definitionstyle=remark,thmset=rich,proofref={margin,longref}]{../phfthm}
 %\usepackage[sepcounters,proofref]{../phfthm}
-%\usepackage{../phfthm}
+%\usepackage[proofref=off]{../phfthm}
+\usepackage{../phfthm}
+
+\phfMakeTheorem[counter={},defstar=false,proofref=false]{algorithm}{Algorithm}
 
 \def\proofrefsize{\tiny}
 
@@ -36,8 +39,8 @@ Another lemma here.
 You might also like the defintion of the \ref{thmheading:trace-dist} on \autopageref{thmheading:trace-dist}.
 
 \begin{proposition}
-\noproofref
-Another proposition here.
+  \noproofref
+  Another proposition here.
 \end{proposition}
 \begin{proof}
   this is yet another proof.
@@ -57,7 +60,6 @@ I heard you like theorems?
 \end{theorem}
 
 \begin{definition*}
-\label{def:1}
 This is a definition.
 \end{definition*}
 
@@ -92,11 +94,34 @@ x
   \end{align}
 \end{thmheading}
 
+\begin{theorem}
+  \label{thm:long}
+  Some theorem which has a little longer statement.
+  Some theorem which has a little longer statement.
+  Some theorem which has a little longer statement.
+  Some theorem which has a little longer statement.
+
+  Some theorem which has a little longer statement.
+  Some theorem which has a little longer statement.
+  Some theorem which has a little longer statement.
+\end{theorem}
+
 \cleardoublepage
 
 \begin{proof}[*lem:1]
   this is another proof.
 \end{proof}
+
+\begin{algorithm}
+  \label{algo:1}
+  An algorithm here.
+  % note that no proof-ref is generated.
+\end{algorithm}
+
+\begin{algorithm}
+  \label{algo:2}
+  Another algorithm here.
+\end{algorithm}
 
 \cleardoublepage
 
@@ -104,6 +129,13 @@ x
   Proof proof proof proof. You're convinced?
 \end{proof}
 
+\begin{proof}[*algo:1]
+  Proof of an algorithm (WTF?).
+\end{proof}
+
+\begin{proof}[*thm:long]
+  Proof.
+\end{proof}
 
 
 \end{document}
