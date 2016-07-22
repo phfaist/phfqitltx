@@ -612,7 +612,7 @@
 %
 % The section headings are customized using the \pkgname{sectsty} package.  If this
 % conflicts in your document, then use the |[secfmt={}]| package option to
-% indicate that section headings should be styled by this package.  Then take
+% indicate that section headings should NOT be styled by this package.  Then take
 % care of section styling manually.
 %
 % Package options may be used to customize the appearance of the section
@@ -622,7 +622,17 @@
 % keyword in the package options; the last occurrence defines all set
 % attributes.  If the |secfmt| package option is not given, then by default only
 % the |section| attribute is set.
+%
+% \begin{pkgnote}
+%   Don't forget to include the attribute `|section|' and/or `|paragraph|'
+%   depending on which type of heading you want your settings to apply to.  For
+%   example, \pkgoptionfmt{secfmt=\pkgoptattribnodots{sffamily}} has no effect,
+%   you need to use e.g.\@
+%   \pkgoptionfmt{secfmt=\pkgoptattribnodots{section,sffamily}}.
+% \end{pkgnote}
 % 
+% Available attributes are the following:
+%
 % \begin{pkgoptions}
 % \item[secfmt=\pkgoptattrib{section}] Use the |section| attribute to activate
 %   the styling of section-level headings, that is, |\section|, |\subsection|
@@ -1352,8 +1362,9 @@
     \ifcsname notetitle@style@#1\endcsname
       \def\phfnote@tmp@titsty{#1}%
     \else
-      \PackageError{phfnote}{Unknown title style: '#1'.
-        Using default style instead}
+      \PackageError{phfnote}{Unknown title style: '#1'.}{Unknown title
+        style: '#1'. Please consult the package documentation for available
+        styles.}
       \def\phfnote@tmp@titsty{default}%
     \fi
 %    \end{macrocode}
@@ -2534,7 +2545,10 @@
   \ifcsname phfnote@preset@#1\endcsname%
     \csname phfnote@preset@#1\endcsname%
   \else%
-    \PackageWarning{phfnote}{Unknown preset: `#1'!}
+    \PackageError{phfnote}{Unknown preset: `#1'!}{You specified the
+      option 'preset=...' with an invalid value.  Please look up the
+      package documentation corresponding to your version of phfnote
+      for possible values.}
   \fi%
 }
 %    \end{macrocode}
@@ -2905,6 +2919,13 @@
       \pkgoptions@old@item}%
   }{}{\PackageWarning{phfnote}{preset xpkgdoc: Failed to patch command
       \string\pkgoptions}}
+  \def\pkgoptionscombineitem{\leavevmode\vspace{\dimexpr-\baselineskip-\parskip-\itemsep\relax}}
+%    \end{macrocode}
+% 
+% For convenience, also provide a |\meta|-like command for boolean arguments
+% (|true| or |false|). `|\metatruefalsearg|' typesets as `\metatruefalsearg'.
+%    \begin{macrocode}
+  \def\metatruefalsearg{\meta{\phfverb{true} $\mid$ \phfverb{false}}}
 %    \end{macrocode}
 % 
 % Include also a command to format a package option.  Puts the option in a box
@@ -2939,6 +2960,7 @@
       \let\oarg\@gobble%
       \let\parg\@gobble%
       \let\pkgoptattrib\@firstofone%
+      \let\pkgoptattribnodots\@firstofone%
       \let\pkgoptattribempty\@empty%
       \def\handleitemindex####1{%
         \edef\@tmpc{####1}%
@@ -2974,9 +2996,11 @@
 % 
 % Provide the |\pkgoptattrib| command, which typesets its argument as
 % |\{arg, ...\}|---useful to typeset attributes such as in
-% \autoref{sec:abstract-attributes}.
+% \autoref{sec:abstract-attributes}.  The variant |\pkgoptattribondots{arg}|
+% typesets |\{arg\}| while |\pkgoptattribempty| expands to |{}|.
 %    \begin{macrocode}
   \def\pkgoptattrib##1{\{##1,...\}}
+  \def\pkgoptattribnodots##1{\{##1\}}
   \def\pkgoptattribempty{\{\}}
 %    \end{macrocode}
 % 

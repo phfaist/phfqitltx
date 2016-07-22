@@ -93,12 +93,135 @@
 %
 % \section{Quick start and package options}
 %
+% \subsection{Features}
 %
-% \subsection{Presets: predefined theorem sets}
+% theorem environments: extends the functionality of the \pkgname{amsthm} package .............
+% may load theorem sets .......
+%
+% proof environments: various enhancements .............
+%
+% proof-ref mechanism..........
+%
+% thmheading environments: like a theorem environment, but a title acts as
+% heading ..............
+%
+% default styles tweaked a bit so that they appear nicely, use
+% \pkgoptionfmt{resetstyle} to undo these style customization to enable
+% individual things to be enabled ...........
+%
+% \subsection{Predefined theorem environments}
 % \label{sec:theorem-sets}
 %
-% .........
+% You may load predefined theorem sets via the package option
+% \pkgoptionfmt{thmset}.  Theorem sets group common environments used in
+% mathematical works such as Theorem, Proposition, Definition, etc.
 %
+% Some package options control the way these environments are defined.  If you
+% would like more refined control over the appearance of these environments, or
+% over which environments are defined, you may consider calling |\phfLoadThmSet|
+% manually or defining individual environments with |\phfMakeTheorem|.
+%
+% Possible theorem sets are:
+% \begin{pkgoptions}
+% \item[thmset=]\pkgoptionscombineitem
+% \item[thmset=empty] Do not define any environment at package loading.  You may
+%   of course invoke |\phfLoadThmSet| or |\phfMakeTheorem| manually at any
+%   later point.
+% \item[thmset=simple] Define the environments |theorem|, |proposition|,
+%   |lemma| and |corollary|.
+% \item[thmset=default] Define the environments |theorem|, |proposition|,
+%   |lemma|, |corollary|, |conjecture|, |remark| as theorem-like environments,
+%   and |definition| as a definition-like environment.
+% \item[thmset=shortnames] For if you like typing less: the same environments
+%   are defined as the default set, but with shorter names.  Define the
+%   environments |thm|, |prop|, |lem|, |cor|, |conj|, |rem| as theorem-like
+%   environments, and |defn| as a definition-like environment.
+% \item[thmset=rich] Provides the same environments as the |default| theorem
+%   set, as well as in addition: |idea|, |question| and |problem| as
+%   theorem-like environments.
+% \end{pkgoptions}
+%
+% You may also load a theorem set at a later
+% point after loading the \pkgname{phfthm} package by invoking the
+% |\phfLoadThmSet| macro, see \autoref{sec:load-thm-set-manually}.
+%
+% Further package options modify the style of the theorem-like and
+% definition-like environments defined via the \pkgoptionfmt{thmset} package
+% option:
+% 
+% \begin{pkgoptions}
+% \item[theoremstyle=\meta{theorem style name}] Use this package option to
+%   specify which style to use for theorem-like environments when loading the
+%   theorem set specified via the \pkgoptionfmt{thmset} package option.  The
+%   theorem style name should be one of |plain|, |definition|, |remark|, or any
+%   other |\newtheoremstyle|-defined theorem style (see documentation of
+%   \pkgname{amsthm}).
+% \item[definitionstyle=\meta{theorem style name}] Use this package option to
+%   specify which style to use for definition-like environments when loading the
+%   theorem set specified via the \pkgoptionfmt{thmset} package option.  The
+%   theorem style name should be one of |plain|, |definition|, |remark|, or any
+%   other |\newtheoremstyle|-defined theorem style (see documentation of
+%   \pkgname{amsthm}).
+% \end{pkgoptions}
+%
+% Further options control various aspects of the environments defined by
+% \pkgoptionfmt{thmset}.
+% \begin{pkgoptions}
+% \item[sepcounters=\metatruefalsearg] Each theorem environment defined with the
+%   \pkgoptionfmt{thmset} package option will use a separate counter if this
+%   option is set; otherwise (the default), there is a single counter which is
+%   shared by all those theorem environments.
+% \end{pkgoptions}
+%
+% The \pkgoptionfmt{proofref} package option allows to specify a comma-separated
+% list of attributes to apply to the proof reference (``proof on page XYZ'')
+% displayed along with the theorem.  The following attributes may be specified:
+% \begin{pkgoptions}
+% \item[proofref=\pkgoptionattribempty{}]\pkgoptionscombineitem
+% \item[proofref=\pkgoptionattribnodots{default}] Do not change the default
+%   proof reference appearance.
+%
+% \item[proofref=\pkgoptionattrib{margin}] The proof reference is displayed in
+%   the margin, instead of after the theorem.
+%
+% \item[proofref=\pkgoptionattrib{longref}] The proof reference is displayed as
+%   a full sentence (``The proof of this \meta{Theorem Name} can be found on
+%   page \meta{XYZ}.'').
+%
+% \item[proofref=\pkgoptionattrib{off}] Turn off the proof reference mechanism
+%   completely for theorems defined with the \pkgoptionsfmt{thmset} option.
+%
+% \item[proofref=\pkgoptionattrib{always}] Always display the proof reference,
+%   even if the proof is on the same page or on a nearby page.
+%
+%   Note: this option has a global effect.
+%
+% \item[proofref=\pkgoptionattrib{onyifveryfar}] The proof reference is only
+%   displayed if the proof is at least two pages back, or four pages ahead.
+%
+%   Note: this option has a global effect.
+%
+% \end{pkgoptions}
+%
+% \begin{pkgnote}
+%   The package options \pkgoptionfmt{proofref=\pkgoptionnodots{always}} and
+%   \pkgoptionfmt{proofref=\pkgoptionnodots{onlyifveryfar}} apply to \emph{all}
+%   theorem environments which use the proof-ref mechanism (see
+%   |\phfProofrefPageBackTolerance| and |\phfProofrefPageAheadTolerance|).
+%
+%   All the other above options apply only to the theorem environments defined
+%   via the \pkgoptionfmt{thmset} package option.
+% \end{pkgnote}
+% 
+% \subsection{The proof environment}
+%
+% \begin{pkgoptions}
+% \item[proofenv=\metatruefalsearg] Define a |proof| environment. ........
+% \item[smallproofs=\metatruefalsearg] 
+% \item[qedsymbolblacksquare=\metatruefalsearg]
+% \item[prooftitleitbf=\metatruefalsearg]
+% \end{pkgoptions}
+% 
 % \section{Theorem environments}
 %
 % A theorem environment is based on the environment furnished by
@@ -132,7 +255,7 @@
 %   If a counter is specified, the counter should already be defined with
 %   \LaTeX's |\newcounter|.
 %
-% \item[aliascounter=\meta{\phfverb{true} $\mid$ \phfverb{false}}] In some cases
+% \item[aliascounter=\metatruefalsearg] In some cases
 %   (e.g.\@ if you're using \pkgname{hyperref}'s |\autoref|), it is important to
 %   have counters specific to each theorem environment (so you get ``Theorem 5''
 %   or ``Proposition 5'' right).  However, you may want different theorem
@@ -157,21 +280,21 @@
 %   (the default), then the theorem style is not set explicitly and whatever
 %   default style is used.
 %
-% \item[defnostar=\meta{\phfverb{true} $\mid$ \phfverb{false}}] Set this to
+% \item[defnostar=\metatruefalsearg] Set this to
 %   |true| if you want the corresponding non-starred theorem environment to be
 %   defined, e.g.\@ |\begin{theorem}...\end{theorem}|.
 %
 %   Normal (non-starred) versions of the environments have an associated theorem
 %   number, as you expect by default.
 %
-% \item[defstar=\meta{\phfverb{true} $\mid$ \phfverb{false}}] Set this to
+% \item[defstar=\metatruefalsearg] Set this to
 %   |true| if you want the corresponding starred theorem environment to be
 %   defined, e.g.\@ |\begin{theorem*}...\end{theorem*}|.
 %
 %   Starred versions of the environments do not have an associated theorem
 %   number.
 %
-% \item[proofref=\meta{\phfverb{true} $\mid$ \phfverb{false}}] Enable or disable
+% \item[proofref=\metatruefalsearg] Enable or disable
 %   the proof-ref mechanism for this theorem environment (enabled by default).
 %
 % \item[proofrefstyle=\meta{proof-ref style}] The style to use for the proof
@@ -184,6 +307,36 @@
 %   further customize the appearance of the proof reference.
 %
 % \end{cmdoptions}
+%
+% \subsection{Loading theorem sets manually}
+% \label{sec:load-thm-set-manually}
+%
+% \DescribeMacro{\phfLoadThmSet} You may load theorem sets at any time via the
+% macro |\phfLoadThmSet|.  This may be useful, for example, to load theorem sets
+% only after you have defined a custom theorem style.  The syntax of
+% |\phfLoadThmSet| is:
+%
+% \noindent |\phfMakeTheorem|\hspace{0pt}\marg{options to
+% \phfverb{\phfMakeThoerem} for theorem-like
+% environments}\hspace{0pt}\marg{options to \phfverb{\phfMakeThorem} for
+% definition-like environments}\hspace{0pt}\marg{name of theorem set to load}
+%
+% The first and second argument to this macro are tokens to expand in front of
+% |\phfMakeTheorem| for theorem-like or definition-like environments.  For
+% example:
+% \begin{verbatim}
+% \newcounter{mythmcounter}
+% \newtheoremstyle{mythmstyle}{....}
+% \newtheoremstyle{mydefnstyle}{....}
+% \phfLoadThmSet{[thmstyle=mythmstyle,counter=mythmcounter]}
+%     {[thmstyle=mydefnstyle,counter=mythmcounter]}{rich}
+% \end{verbatim}
+% 
+% \begin{pkgwarning}
+%   The first and second arguments to |\phfLoadThmSet| must either be empty,
+%   or be enclosed in square braces.
+% \end{pkgwarning}
+% 
 %
 % \subsection{Theorem hooks}
 % \label{sec:theorem-hooks}
@@ -217,21 +370,6 @@
 % name}\marg{theorem optional given title} groups commands for starred
 % environments (typically doesn't take care of |\label| stuff) and also defers
 % to |\phfthm@hook@startcommon|.
-%
-% By default, the |\phfthm@hook@startcommonnostar| introduces definitions for
-% overriding the |\label| command (via a call to
-% |\phfthm@def@label@thmlabel|\marg{theorem environment name}).  If this
-% behavior is not overridden, then the |\label| command is redefined so that at
-% its fist occurrence, it provides the theorem environment label to use for the
-% proof reference (``see proof on page \ldots'', see
-% \autoref{sec:proof-ref-mechanism}).  There, an additional hook is provided,
-% \DescribeMacro{\phfthm@hook@afterlabel@thmname}
-% |\phfthm@hook@afterlabel@|\meta{theorem environment name}, which is called
-% after the theorem label is set (it can be recovered from the value of
-% |\phfthm@val@thmlabel|.  By default, that hook calls the common hook
-% |\phfthm@hook@afterlabelcommon|\marg{theorem environment name}. (After the
-% first occurrence of |\label|, its definition is restored.)
-%
 %
 % The end hooks work very much
 % analogously. \DescribeMacro{\phfthm@hook@end@thmname}
@@ -278,7 +416,7 @@
 %   If you do not specify any |defaultproofname|, or pass an empty value, then
 %   the value of |\proofname| is used.
 %
-% \item[parselabel=\meta{\phfverb{true} $\mid$ \phfverb{false}}] Specify whether
+% \item[parselabel=\metatruefalsearg] Specify whether
 %   the environment should parse its argument for some special information.  If
 %   set to |true|, then the proof argument is passed on to a command (specified
 %   by the \cmdoptionfmt{parselabelcmd} option).
@@ -298,7 +436,7 @@
 %   parsed to see if it is of the form |[*thm:reference]|, where |thm:reference|
 %   is the label pinned to a theorem.
 %
-% \item[override=\meta{\phfverb{true} $\mid$ \phfverb{false}}] Whether to
+% \item[override=\metatruefalsearg] Whether to
 %   override any existing environment with the same name as the new proof
 %   environment. If |true| is specified here, then |\renewenvironment| is used
 %   to define the proof environment, otherwise a simple |\newenvironment| is
@@ -402,6 +540,8 @@
 % The command |\noproofref| temporarily disables the proof-ref mechanism for the
 % current theorem and restores |\label| to \LaTeX's original meaning.
 %
+%
+%
 % \subsection{On the proof side}
 % \label{sec:proof-ref-mechanism-proof-side}
 %
@@ -425,6 +565,17 @@
 % \label{sec:proof-ref-customize-appearance}
 % ..............
 %
+%
+%
+% Then the |\label| command is redefined so that at its fist occurrence, it
+% provides the theorem environment label to use for the proof reference (``see
+% proof on page \ldots'', see \autoref{sec:proof-ref-mechanism}).  There, an
+% additional hook is provided, \DescribeMacro{\phfthm@hook@afterlabel@thmname}
+% |\phfthm@hook@afterlabel@|\meta{theorem environment name}, which is called
+% after the theorem label is set (it can be recovered from the value of
+% |\phfthm@val@thmlabel|.  By default, that hook calls the common hook
+% |\phfthm@hook@afterlabelcommon|\marg{theorem environment name}. (After the
+% first occurrence of |\label|, its definition is restored.)
 %
 % ....................
 % NOTE: the |\phfthm@proofrefstyle@<XYZ>@setup| command should at least define
@@ -515,10 +666,8 @@
 %   environment name}\hspace{0pt}\marg{Theorem Display Name}.  For example:
 %   |\phfMakeTheorem[counter=thmcounter]{prop}{Proposition}|
 %    \begin{macrocode}
-\newcommand\phfMakeTheorem[3][]{%
+\newcommand\phfMakeTheorem[3][]{%}
 %    \end{macrocode}
-% \iffalse meta-comment %} -- for emacs' paren matching
-% \fi
 % Handle the [options].  First, ensure that the defaults are set, and then, parse the input.
 %    \begin{macrocode}
   \KV@phfmkthm@aliascountertrue%
@@ -827,10 +976,8 @@
 %   |\phfMakeProofEnv|\hspace{0pt}\oarg{options}\hspace{0pt}\marg{proof
 %   environment name}.
 %    \begin{macrocode}
-\newcommand\phfMakeProofEnv[2][]{%
+\newcommand\phfMakeProofEnv[2][]{%}
 %    \end{macrocode}
-% \iffalse meta-comment %} -- for emacs' paren matching
-% \fi
 %
 % Parse the key-value options.  First, make sure that all the defaults are set,
 % then parse the options.
@@ -983,14 +1130,19 @@
     \fi%
 %    \end{macrocode}
 % 
-% Define the |\phfthmPinProofAnchor| command (locally) in case the
+% Define the |\phfPinProofAnchor| command (locally) in case the
 % display formatting environment takes care of where to place the anchor already.
 %    \begin{macrocode}
-    \def\phfthmPinProofAnchor{%
+    \def\phfPinProofAnchor{%
       \csname phfthm@prfenv@#2@val@pinproofanchor\endcsname%
-      \global\let\phfthmPinProofAnchor\relax}%
+      \global\let\phfPinProofAnchor\relax}%
 %    \end{macrocode}
-%
+% [Also provide the obsolete |\phfthmPinProofAnchor| which I previously had in
+% older versions of this package:]
+%    \begin{macrocode}
+    \def\phfthmPinProofAnchor{\phfPinProofAnchor}%
+%    \end{macrocode}
+% 
 % Start the proof's display environment, and call the corresponding hook.
 %    \begin{macrocode}
     \def\x{\csname phfthm@prfenv@#2@val@displayenvbegincmd\endcsname}%
@@ -998,10 +1150,10 @@
     \csname phfthm@hookproof@#2@startafterdisplay\endcsname%
 %    \end{macrocode}
 % If required, pin anchor after the proof-display-environment.
-% (|\phfthmPinProofAnchor| auto-destructs after first use, so it's safe to
+% (|\phfPinProofAnchor| auto-destructs after first use, so it's safe to
 % potentially call it a second time here). Then, call the corresponding hook.
 %    \begin{macrocode}
-    \phfthmPinProofAnchor%
+    \phfPinProofAnchor%
     \expandafter\noexpand\csname phfthm@hookproof@#2@startlast\endcsname%
   }%
 %    \end{macrocode}
@@ -1053,7 +1205,7 @@
   \pushQED{\qed}%
   \normalfont \topsep6\p@\@plus6\p@\relax
   \trivlist\item\relax
-  \phfthmPinProofAnchor
+  \phfPinProofAnchor
   \phfthm@ProofTitleFmt{#1}%
   \phfthm@ProofTitleHspace
   \ignorespaces
@@ -1318,8 +1470,8 @@
 %   itself.  These callbacks define how to format and (possibly not) display the
 %   proof reference depending on whether the proof is ``far behind'' (several
 %   pages back), ``far ahead'' (several pages ahead) or ``close by'' (neither
-%   far back nor far ahead), as defined by |\phfthmProofrefPageBackTolerance|
-%   and |\phfthmProofrefPageAheadTolerance|.
+%   far back nor far ahead), as defined by |\phfProofrefPageBackTolerance|
+%   and |\phfProofrefPageAheadTolerance|.
 %    \begin{macrocode}
 \def\phfthm@proofrefstyle@default@fmtfarback#1#2{%
   \phfthm@proofref@impl@fmt{#1}{#2}}
@@ -1331,17 +1483,17 @@
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{\phfthmProofrefPageBackTolerance}
-% \begin{macro}{\phfthmProofrefPageAheadTolerance}
-%   The macros |\phfthmProofrefPageBackTolerance| and
-%   |\phfthmProofrefPageAheadTolerance| define how many pages back or ahead the
+% \begin{macro}{\phfProofrefPageBackTolerance}
+% \begin{macro}{\phfProofrefPageAheadTolerance}
+%   The macros |\phfProofrefPageBackTolerance| and
+%   |\phfProofrefPageAheadTolerance| define how many pages back or ahead the
 %   proof should be in order to consider it ``far back'' or ``far ahead.''
 %
 %   Either value may be set to |-1| to force the proof to be considered ``far
 %   back'' or ``far ahead.''
 %    \begin{macrocode}
-\newcommand\phfthmProofrefPageBackTolerance{1}
-\newcommand\phfthmProofrefPageAheadTolerance{1}
+\newcommand\phfProofrefPageBackTolerance{1}
+\newcommand\phfProofrefPageAheadTolerance{1}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1380,7 +1532,7 @@
 % If the proof is ``far back,'' call the corresponding callback. 
 %    \begin{macrocode}
   \ifnum\numexpr\phfthm@proofref@tmp@pagediff\relax%
-      <\numexpr-\phfthmProofrefPageBackTolerance\relax%
+      <\numexpr-\phfProofrefPageBackTolerance\relax%
     \phfthm@proofref@impl@fmtfarback{#1}{\autopageref{proof:#1}}%
   \else%
 %    \end{macrocode}
@@ -1388,7 +1540,7 @@
 % If the proof is ``far ahead,'' call the corresponding callback. 
 %    \begin{macrocode}
     \ifnum\numexpr\phfthm@proofref@tmp@pagediff\relax%
-        >\numexpr\phfthmProofrefPageAheadTolerance\relax%
+        >\numexpr\phfProofrefPageAheadTolerance\relax%
       \phfthm@proofref@impl@fmtfarahead{#1}{\autopageref{proof:#1}}%
 %    \end{macrocode}
 % 
@@ -1464,7 +1616,7 @@
 %
 % \subsubsection{Manually define a thmheading environment}
 %
-% Define the key-value options accepted by |\phfthmMakeThmheadingEnvironment|.
+% Define the key-value options accepted by |\phfMakeThmheadingEnvironment|.
 %    \begin{macrocode}
 \define@cmdkey{phfthmmkthmheading}{thmstyle}{}
 \define@cmdkey{phfthmmkthmheading}{internalcounter}{}
@@ -1474,23 +1626,21 @@
 \newcounter{phfthmheadingcounter}%
 %    \end{macrocode}
 %
-% \begin{macro}{\phfthmMakeThmheadingEnvironment}
+% \begin{macro}{\phfMakeThmheadingEnvironment}
 %
 %   Creates a new environment |\begin{thmheading}{Title}...\end{thmheading}| for
 %   customizing the heading on-the-fly. Useful for an alternative formatting of
 %   definitions.  The syntax is:
 %
-%   \noindent|\phfthmMakeThmheadingEnvironment|\oarg{key-value options}\marg{environment name}
+%   \noindent|\phfMakeThmheadingEnvironment|\oarg{key-value options}\marg{environment name}
 % 
 %   You can also use |\label| and |\ref| (the latter simply displays the given
 %   title).
 %
 % 
 %    \begin{macrocode}
-\newcommand\phfthmMakeThmheadingEnvironment[2][]{%
+\newcommand\phfMakeThmheadingEnvironment[2][]{%}
 %    \end{macrocode}
-% \iffalse meta-comment %} -- for emacs' paren matching
-% \fi
 % 
 % Parse the options. First set defaults, and then parse the input string.
 %    \begin{macrocode}
@@ -1551,13 +1701,19 @@
   \csdef{phfthm@hook@thmheading@#2@end}{\phfthm@hook@thmheading@end}%
 }
 %    \end{macrocode}
+%
+% Provide as well the obsolete command |\phfthmMakeThmheadingEnvironment| which
+% was provided in earlier versions of this package:
+%    \begin{macrocode}
+\def\phfthmMakeThmheadingEnvironment{\phfMakeThmheadingEnvironment}
+%    \end{macrocode}
 % \end{macro}
 %
 %
 % \begin{macro}{\phfthm@hook@thmheading@start}
 % \begin{macro}{\phfthm@hook@thmheading@end}
 %   Global callbacks which are called for all thmheading-type environments
-%   defined with |\phfthmMakeThmheadingEnvironment| (unless their hooks have
+%   defined with |\phfMakeThmheadingEnvironment| (unless their hooks have
 %   been changed in order for them not to call these global hooks).
 %    \begin{macrocode}
 \def\phfthm@hook@thmheading@start#1{}
@@ -1587,7 +1743,7 @@
 %   theorem-like environment (theorem, proposition, corollary, etc.) or
 %   definition-like environment (definition, remark).  The macros
 %   |\phfthm@val@mkthmoptarg@theorem| and |\phfthm@val@mkthmoptarg@defn| are
-%   defined by |\phfthmLoadThmSet|.
+%   defined by |\phfLoadThmSet|.
 %    \begin{macrocode}
 \def\phfthm@def@thmset@mktheorem{\expandafter\phfMakeTheorem\phfthm@val@mkthmoptarg@theorem}
 \def\phfthm@def@thmset@mkdefn{\expandafter\phfMakeTheorem\phfthm@val@mkthmoptarg@defn}
@@ -1648,8 +1804,8 @@
 %    \end{macrocode}
 % 
 %
-% \begin{macro}{\phfthmLoadThmSet}
-%   The macro |\phfthmLoadThmSet| loads a theorem set.  See documentation at
+% \begin{macro}{\phfLoadThmSet}
+%   The macro |\phfLoadThmSet| loads a theorem set.  See documentation at
 %   \autoref{sec:load-thm-set}.
 %
 %   |#1| = options to |\phfMakeTheorem| for theorem-like environments
@@ -1659,7 +1815,7 @@
 %   |#3| = name of the theorem set to load
 %
 %    \begin{macrocode}
-\newcommand\phfthmLoadThmSet[3]{%
+\newcommand\phfLoadThmSet[3]{%
   \ifcsname phfthm@thmset@#3\endcsname%
     \edef\phfthm@val@mkthmoptarg@theorem{#1}%
     \edef\phfthm@val@mkthmoptarg@defn{#2}%
@@ -1668,6 +1824,12 @@
     \PackageWarning{phfthm}{Unknown theorem set: `#3'!}%
   \fi%
 }
+%    \end{macrocode}
+%
+% For compatibility with my earlier versions of \pkgname{phfthm}, also provide
+% the obsolete |\phfthmLoadThmSet|:
+%    \begin{macrocode}
+\def\phfthmLoadThmSet{\phfLoadThmSet}
 %    \end{macrocode}
 % \end{macro}
 % 
@@ -1735,7 +1897,9 @@
   % 
   \if\relax\detokenize{#1}\relax% expect empty arg.
   \else%
-    \PackageWarning{phfthm}{'resetstyle' does not take any argument.}%
+    \PackageError{phfthm}{'resetstyle' does not take any argument.}%
+      {You specified the 'resetstyle' argument and provided a value to it. However
+        the 'resetstyle' option does not accept any value argument.}
   \fi%
 }
 %    \end{macrocode}
@@ -1806,7 +1970,12 @@
 \ifKV@phfthmpkg@sepcounters
   \def\phfthm@val@mkthmopt@counteropts{}
 \fi
-
+%    \end{macrocode}
+% 
+%
+% Execute proof-ref related options.
+%
+%    \begin{macrocode}
 \def\phfthm@val@mkthmopt@proofrefstyle{}
 
 \ifKV@phfthmpkg@proofref
@@ -1815,47 +1984,39 @@
   \def\phfthm@proofref@style@{}
   % 
   \def\phfthm@proofref@style@always{
-    \def\phfthmProofrefPageBackTolerance{-1}
-    \def\phfthmProofrefPageAheadTolerance{-1}
+    \def\phfProofrefPageBackTolerance{-1}
+    \def\phfProofrefPageAheadTolerance{-1}
   }
   \def\phfthm@proofref@style@onlyifveryfar{
-    \def\phfthmProofrefPageBackTolerance{2}
-    \def\phfthmProofrefPageAheadTolerance{4}
+    \def\phfProofrefPageBackTolerance{2}
+    \def\phfProofrefPageAheadTolerance{4}
   }
   \def\phfthm@proofref@style@margin{%
     \def\phfthm@val@mkthmopt@proofrefstyle{proofrefstyle=margin}
   }
+%    \end{macrocode}
+% By setting |\proofonname| globally, this option can be combined with other
+% styles.  But then we also change the default style formatting to avoid ugly
+% line breaks.
+%    \begin{macrocode}
   \def\phfthm@proofref@style@longref{
-    % make a full sentence, can be combined with other proof-ref styles
     \def\proofonname##1##2{The proof of this \phfthm@autorefnameof{##1} can be found on ##2.}
-    % but then alter the default formatting to avoid ugly line breaks
     \def\phfthm@proofrefstyle@default@fmt##1##2{%
-      % 
-      % #1 = theorem's label (e.g. "prop:1")
-      % #2 = full reference (e.g. "page XYZ")
-      % 
       \par{\raggedleft\proofrefsize{(\proofonname{##1}{##2})}\par}%
     }
   }
   \def\phfthm@proofref@style@off{
     \def\phfthm@val@mkthmopt@proofrefstyle{proofref=false}
   }
-
   \def\phfthm@exec@proofrefstyles#1\phfthm@END{%
     \phfthm@internal@execattribs{phfthm@proofref@style@}{ProofRef Style}{#1}}
   \expandafter\phfthm@exec@proofrefstyles\cmdKV@phfthmpkg@proofref@style\phfthm@END
 
-
-%  \let\phfthm@def@thmset@mktheorem@OLD\phfthm@def@thmset@mktheorem%
-%  \def\phfthm@def@thmset@mktheorem#1#2{% #1 = prop env name ("proposition"), #2 = prop title name ("Proposition")
-%    \phfthm@def@thmset@mktheorem@OLD{#1}{#2}%
-%    \expandafter\apptocmd\csname phfthm@hook@end@#1\endcsname{%
-%      \phfthm@proofref@impl@thmlabel%
-%    }{}{Failed to append to command `\expandafter\string\csname phfthm@hook@end@#1\endcsname!!}%
-%  }
-
 \fi
-
+%    \end{macrocode}
+% 
+%
+%    \begin{macrocode}
 
 
 %
@@ -1880,7 +2041,7 @@
 % load the theorem set defined by the options
 %
 
-\phfthmLoadThmSet%
+\phfLoadThmSet%
 {[\phfthm@val@mkthmopt@counteropts,\phfthm@val@mkthmopt@proofrefstyle,
   thmstyle=\cmdKV@phfthmpkg@theoremstyle]}% opts for theorems
 {[\phfthm@val@mkthmopt@counteropts,proofref=false,
@@ -1903,17 +2064,11 @@
 
 \fi
 
-%\let\proof\phfthm@proof
-%\let\endproof\endphfthm@proof
-
-
-
 \ifKV@phfthmpkg@thmheading % also set \cmdKV@phfthmpkg@thmheadingstyle
 
-  \phfthmMakeThmheadingEnvironment[thmstyle=\cmdKV@phfthmpkg@thmheadingstyle]{thmheading}
+  \phfMakeThmheadingEnvironment[thmstyle=\cmdKV@phfthmpkg@thmheadingstyle]{thmheading}
 
 \fi
-
 
 
 %    \end{macrocode}
