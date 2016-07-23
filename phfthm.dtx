@@ -91,23 +91,63 @@
 % There are three generic types of environments provided: theorem environments,
 % proof environments and ``thmheading'' environments.
 %
+% \subsection{Theorem environments}
+%
+% Theorem environments look like this:
+% \begingroup\setlength{\fboxsep}{1ex}
+% \par\noindent\fbox{\begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
+%   \begin{theorem}[Gauss]\noproofref
+%     \label{thm:example-Gauss}
+%     For a closed surface $S$ enclosing a volume $V$, we have
+%     \begin{equation}
+%       \oint_S\vec u\cdot d\vec S = \int_V(\vec\nabla\cdot\vec u)\,dV\ .
+%     \end{equation}
+%   \end{theorem}
+% \end{minipage}}\endgroup
+%
+% \subsection{Proof environments}
+%
+% A proof environment might look like this:
+% \begingroup\setlength{\fboxsep}{1ex}
+% \par\noindent\fbox{\begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
+%   \begin{proof}[*thm:example-Gauss]
+%     The proof of the theorem goes here. \par\ldots
+%   \end{proof}
+% \end{minipage}}\endgroup
+%
+% The enhanced theorem and proof environments provided by this package allow to
+% pair theorems with proofs, automatically generating references from one to the
+% other (see \autoref{sec:proof-ref-mechanism}).
+%
+%
+% \subsection{Theorem-heading environments}
+%
+% Finally, theorem-heading environments are formatted like theorems, but the
+% heading title is set as an argument to the environment.  These environments
+% are a nice alternative for definitions, and look like this:
+% \begingroup\setlength{\fboxsep}{1ex}
+% \par\noindent\fbox{\begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
+%   \begin{thmheading}{Trace Distance}
+%     The `trace distance' between $\rho$ and $\sigma$ is defined as
+%     \begin{equation}
+%       \delta(\rho,\sigma)=\frac12\,\left\Vert \rho - \sigma \right\Vert_1\ ,
+%     \end{equation}
+%     where $\lVert\cdot\rVert_1$ is the Schatten-1 norm.
+%   \end{thmheading}
+% \end{minipage}}\endgroup
+% 
+%
+%
+% 
 % \section{Quick start and package options}
 %
-% \subsection{Features}
+% \subsection{Example invocation}
 %
-% theorem environments: extends the functionality of the \pkgname{amsthm} package .............
-% may load theorem sets .......
-%
-% proof environments: various enhancements .............
-%
-% proof-ref mechanism..........
-%
-% thmheading environments: like a theorem environment, but a title acts as
-% heading ..............
-%
-% default styles tweaked a bit so that they appear nicely, use
-% \pkgoptionfmt{resetstyle} to undo these style customization to enable
-% individual things to be enabled ...........
+% Example: Load the rich theorem set, with separate counters, and with proof-ref
+% mechanism on and always displaying the proof reference in the margin:
+% \begin{verbatim}
+% \usepackage[thmset=rich,sepcounters=true,proofref={always,margin}]{phfthm}
+% \end{verbatim}
 %
 % \subsection{Predefined theorem environments}
 % \label{sec:theorem-sets}
@@ -177,26 +217,26 @@
 % list of attributes to apply to the proof reference (``proof on page XYZ'')
 % displayed along with the theorem.  The following attributes may be specified:
 % \begin{pkgoptions}
-% \item[proofref=\pkgoptionattribempty{}]\pkgoptionscombineitem
-% \item[proofref=\pkgoptionattribnodots{default}] Do not change the default
+% \item[proofref=\pkgoptattribempty{}]\pkgoptionscombineitem
+% \item[proofref=\pkgoptattribnodots{default}] Do not change the default
 %   proof reference appearance.
 %
-% \item[proofref=\pkgoptionattrib{margin}] The proof reference is displayed in
+% \item[proofref=\pkgoptattrib{margin}] The proof reference is displayed in
 %   the margin, instead of after the theorem.
 %
-% \item[proofref=\pkgoptionattrib{longref}] The proof reference is displayed as
+% \item[proofref=\pkgoptattrib{longref}] The proof reference is displayed as
 %   a full sentence (``The proof of this \meta{Theorem Name} can be found on
 %   page \meta{XYZ}.'').
 %
-% \item[proofref=\pkgoptionattrib{off}] Turn off the proof reference mechanism
-%   completely for theorems defined with the \pkgoptionsfmt{thmset} option.
+% \item[proofref=\pkgoptattrib{off}] Turn off the proof reference mechanism
+%   completely for theorems defined with the \pkgoptionfmt{thmset} option.
 %
-% \item[proofref=\pkgoptionattrib{always}] Always display the proof reference,
+% \item[proofref=\pkgoptattrib{always}] Always display the proof reference,
 %   even if the proof is on the same page or on a nearby page.
 %
 %   Note: this option has a global effect.
 %
-% \item[proofref=\pkgoptionattrib{onyifveryfar}] The proof reference is only
+% \item[proofref=\pkgoptattrib{onyifveryfar}] The proof reference is only
 %   displayed if the proof is at least two pages back, or four pages ahead.
 %
 %   Note: this option has a global effect.
@@ -204,10 +244,11 @@
 % \end{pkgoptions}
 %
 % \begin{pkgnote}
-%   The package options \pkgoptionfmt{proofref=\pkgoptionnodots{always}} and
-%   \pkgoptionfmt{proofref=\pkgoptionnodots{onlyifveryfar}} apply to \emph{all}
-%   theorem environments which use the proof-ref mechanism (see
-%   |\phfProofrefPageBackTolerance| and |\phfProofrefPageAheadTolerance|).
+%   The two package options \pkgoptionfmt{proofref=\pkgoptattribnodots{always}}
+%   and \pkgoptionfmt{proofref=\pkgoptattribnodots{onlyifveryfar}} apply to
+%   \emph{all} theorem environments which use the proof-ref mechanism, whether
+%   they have already been defined or not (see |\phfProofrefPageBackTolerance|
+%   and |\phfProofrefPageAheadTolerance|).
 %
 %   All the other above options apply only to the theorem environments defined
 %   via the \pkgoptionfmt{thmset} package option.
@@ -215,12 +256,45 @@
 % 
 % \subsection{The proof environment}
 %
+% By default, the \pkgname{phfthm} package overrides the |proof| environment
+% with a the package's own enhanced version.  If you want to preserve the
+% original \emph{AMS} environment, you should use the
+% \pkgoptionfmt{proofenv=false} package option.
+%
 % \begin{pkgoptions}
-% \item[proofenv=\metatruefalsearg] Define a |proof| environment. ........
-% \item[smallproofs=\metatruefalsearg] 
-% \item[qedsymbolblacksquare=\metatruefalsearg]
-% \item[prooftitleitbf=\metatruefalsearg]
+% \item[proofenv=\metatruefalsearg] If set to |true|, then define an enhanced
+%   |proof| environment when loading this package.  This will override any
+%   previously existing |proof| environment such as \emph{AMS}'.
+%
+%   If set to |false|, no action is taken at package loading time.  You should
+%   then directly use the |\phfMakeProofEnv| macro to define proof environments.
 % \end{pkgoptions}
+%
+% If you want finer control over how the proof environment is defined, or if you
+% want to customize its appearance, you should use the |\phfMakeProofEnv| macro
+% directly (\autoref{sec:mk-proof-env}).
+%
+% If you set \pkgoptionfmt{proofenv=true}, there are a couple package options
+% which alter the way the proof displays:
+% \begin{pkgoptions}
+% \item[smallproofs=\metatruefalsearg] If set to |true|, then proofs display in
+%   a smaller font.
+%
+% \item[qedsymbolblacksquare=\metatruefalsearg] If set to |true| the QED
+%   end-of-proof symbol (usually ``$\square$'' with \pkgname{amsthm}) is
+%   replaced by a filled square (``$\blacksquare$'').
+%
+% \item[prooftitleitbf=\metatruefalsearg] If set to |true|, then the proof title
+%   (``Proof'' or ``Proof of Theorem 1'') is typeset in bold italic font.
+% \end{pkgoptions}
+%
+% \subsection{Global package options}
+%
+% .....................
+% default styles tweaked a bit so that they appear nicely, use
+% \pkgoptionfmt{resetstyle} to undo these style customization to enable
+% individual things to be enabled ...........
+%
 % 
 % \section{Theorem environments}
 %
@@ -307,6 +381,17 @@
 %   further customize the appearance of the proof reference.
 %
 % \end{cmdoptions}
+%
+% For example, you may use the following command invocation to define a theorem
+% environment named ``Remark'' implemented as |\begin{remark}...\end{remark}|,
+% also with a starred verison |\begin{remark*}...\end{remark*}|, using the
+% |plain| \emph{AMS} theorem style, and without the proof-ref mechanism:
+% \begin{verbatim}
+% \phfMakeTheorem[defstar=true,defnostar=true,thmstyle=plain,counter=,%
+%     proofref=false]{remark}{Remark}
+% \end{verbatim}
+%
+%
 %
 % \subsection{Loading theorem sets manually}
 % \label{sec:load-thm-set-manually}
@@ -464,7 +549,7 @@
 % \label{sec:proof-hooks}
 % xxxxxxx..............
 %
-% \section{Pairing theorems to proofs and proof-ref mechanism}
+% \section{Pairing theorems to proofs and proof-reference mechanism}
 % \label{sec:proof-ref-mechanism}
 %
 % One of the goodies provided by the \pkgname{phfthm} package is the proof-ref
@@ -493,7 +578,7 @@
 %
 % The above example might produce the following output:
 % \begingroup\setlength{\fboxsep}{1em}
-% \par\noindent\fbox{
+% \par\noindent\fbox{%
 %   \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
 %     \textbf{Theorem 17} (Gauss). For a closed surface $S$ enclosing a
 %     volume $V$, we have
@@ -1629,7 +1714,8 @@
 % \begin{macro}{\phfMakeThmheadingEnvironment}
 %
 %   Creates a new environment |\begin{thmheading}{Title}...\end{thmheading}| for
-%   customizing the heading on-the-fly. Useful for an alternative formatting of
+%   customizing the heading on-the-fly (see documentation in
+%   \autoref{sec:thmheading}).  Useful for an alternative formatting of
 %   definitions.  The syntax is:
 %
 %   \noindent|\phfMakeThmheadingEnvironment|\oarg{key-value options}\marg{environment name}
@@ -1659,7 +1745,8 @@
 % a single token, the macro which will be set to the relevant title at the last
 % moment.
 %    \begin{macrocode}
-  \newtheorem*{phfthm@internal@thmheading@#2}{\csname phfthm@thmheading@#2@val@title\endcsname}%
+  \newtheorem*{phfthm@internal@thmheading@#2}{%
+    \csname phfthm@thmheading@#2@val@title\endcsname}%
 %    \end{macrocode}
 %
 % Define the actual environment.
@@ -1673,7 +1760,8 @@
     \csname phfthm@internal@thmheading@#2\endcsname%
 %    \end{macrocode}
 % Pin down an anchor.  The use of |\hspace*{0pt}| is explained at
-% \url{http://tex.stackexchange.com/a/88493/32188} (especially the first comment).
+% \url{http://tex.stackexchange.com/a/88493/32188} (see especially the first
+% comment).
 %    \begin{macrocode}
     \hspace*{0pt}\refstepcounter{\cmdKV@phfthmmkthmheading@internalcounter}%
     \csname phfthm@hook@thmheading@#2@start\endcsname{##1}%
@@ -1944,29 +2032,24 @@
 % Execute options-controlled actions, such as defining theorem sets.
 %
 %    \begin{macrocode}
-
 \def\phfthm@pkgopterr@require@proofenv#1{%
   \ifKV@phfthmpkg@proofenv\else%
     \PackageError{phfthm}{Option `#1' depends on `proofenv=true'}%
   \fi
-} 
-
-
+}
 \ifKV@phfthmpkg@smallproofs
-  \apptocmd\phfthm@hookproof@startcommon{\def\baselinestretch{1.2}\footnotesize}{}{%
+  \apptocmd\phfthm@hookproof@startcommon{%
+    \def\baselinestretch{1.2}\footnotesize}{}{%
     Failed to change command \string\phfthm@hook@start@proof}
 \fi
-
 \ifKV@phfthmpkg@qedsymbolblacksquare
   \RequirePackage{amssymb}
   \providecommand\filledsquare{\ensuremath{\blacksquare}}
   \renewcommand\qedsymbol{\text{\tiny\ensuremath{\filledsquare}}}
 \fi
-
 \ifKV@phfthmpkg@prooftitleitbf
   \def\phfthm@ProofTitleFmt#1{{\itshape\bfseries#1.}}
 \fi
-
 \ifKV@phfthmpkg@sepcounters
   \def\phfthm@val@mkthmopt@counteropts{}
 \fi
