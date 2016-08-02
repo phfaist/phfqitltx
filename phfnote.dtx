@@ -108,12 +108,7 @@
 % \iffalse Bypass indexing for following commands: \fi
 % \DoNotIndex{\newcommand,\newenvironment,\renewcommand,\long,\def,\edef,\gdef,\xdef,\if,\else,\fi,\par,\relax,\vspace,\vskip,\hspace,\hskip,\vbox,\hbox}
 % 
-% \title{The \pkgname{phfnote} package\thanks{\itshape
-% This document corresponds to
-% \pkgname{phfnote}~\fileversion, dated \filedate. It is part of
-% the Part of the
-% \href{https://github.com/phfaist/phfqitltx/}{\pkgname{phfqitltx}}
-% package suite, see \url{https://github.com/phfaist/phfqitltx}.}}
+% \title{\phfqitltxPkgTitle{phfnote}}
 % \author{Philippe Faist\quad\email{philippe.faist@bluewin.ch}}
 %
 % \maketitle
@@ -2814,11 +2809,13 @@
 % can be used in section titles etc.
 %    \begin{macrocode}
   \def\pkgname##1{%
-    \textsf{##1}%
-    \index{##1={\ttfamily ##1} (package)|hyperpage}%
-    \index{packages:>##1={\ttfamily ##1}|hyperpage}%
+    \pkgnamefmt{##1}%
+    \index{##1=\pkgnamefmt{##1}|hyperpage}%
+    \index{packages:>##1=\pkgnamefmt{##1}|hyperpage}%
   }
   \robustify\pkgname
+  \def\pkgnamefmt##1{\textsf{##1}}
+  \robustify\pkgnamefmt
 %    \end{macrocode}
 % 
 %
@@ -2936,7 +2933,7 @@
 % When indexing the packages, make sure to remove the protective braces if any.
 %    \begin{macrocode}
   \newcommand\pkgoptionfmt[2][]{%
-    \begingroup\let\meta\pkgoptfmt@meta\fbox{\ttfamily ##2}\endgroup%
+    \begingroup\let\meta\pkgoptfmt@meta\fbox{\normalfont\ttfamily ##2}\endgroup%
     \expandafter\phfnote@pkgdoc@index\expandafter{\@firstofone ##2}%
     ##1}
   \let\pkgopt@save@meta\meta
@@ -3041,7 +3038,14 @@
     title={TIP}
   }
   \phfnoteRestoreDefs{verbatimstuff}
-}
+%    \end{macrocode}
+% 
+%    \begin{macrocode}
+  \def\phfqitltxPkgTitle##1{The \pkgname{##1} package\thanks{\itshape
+    This document corresponds to \pkgname{##1}~\fileversion, dated \filedate. It
+    is part of the
+    \href{https://github.com/phfaist/phfqitltx/}{\pkgname{phfqitltx}} package
+    suite, see \url{https://github.com/phfaist/phfqitltx}.}}  }
 %    \end{macrocode}
 % \end{macro}
 % 

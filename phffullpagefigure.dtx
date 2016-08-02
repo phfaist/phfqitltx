@@ -64,12 +64,7 @@
 %
 % \DoNotIndex{\newcommand,\newenvironment,\def,\gdef,\edef,\xdef,\if,\else,\fi,\ifx}
 % 
-% \title{The \pkgname{phffullpagefigure} package\thanks{\itshape
-% This document corresponds to
-% \pkgname{phffullpagefigure}~\fileversion, dated \filedate. It is part of
-% the Part of the
-% \href{https://github.com/phfaist/phfqitltx/}{\pkgname{phfqitltx}}
-% package suite, see \url{https://github.com/phfaist/phfqitltx}.}}
+% \title{\phfqitltxPkgTitle{phffullpagefigure}}
 % \author{Philippe Faist\quad\email{philippe.faist@bluewin.ch}}
 %
 % \maketitle
@@ -173,10 +168,11 @@
 % following commands, which must be issued within the |fullpagefigure|
 % environment.
 %
-% \DescribeMacro{\figcontents} Specify the contents of the figure by
-% calling |\figcontents|\marg{\LaTeX{} commands}.  The contents can be any
-% \LaTeX{} commands which will generate the figure content.  These commands
-% will be called within an |afterpage| block.
+% \DescribeMacro{\figcontents} Specify the contents of the figure by calling
+% |\figcontents|\marg{\LaTeX{} commands}.  The contents can be any \LaTeX{}
+% commands which will generate the figure content.  These commands will be
+% called within an |afterpage| block.\footnote{See documentation for the
+% \pkgname{afterpage} package}
 %
 % If you want a figure to occupy several pages, you may use for example
 % |\figcontents{\includepdf{pdf-1}\includepdf{pdf-2}}|, and request that
