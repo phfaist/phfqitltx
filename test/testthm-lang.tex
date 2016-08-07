@@ -1,13 +1,48 @@
 \documentclass[12pt,a5paper]{article}
 
+\usepackage[francais,english]{babel}
+\selectlanguage{francais}
+
 \usepackage[thmset=default,sepcounters,proofref={margin,always},prooftitleitbf]{../phfthm}
 %\usepackage[theoremstyle=definition,definitionstyle=remark,thmset=rich,proofref={margin,longref}]{../phfthm}
 %\usepackage[sepcounters,proofref]{../phfthm}
 %\usepackage[proofref=off]{../phfthm}
 %\usepackage{../phfthm}
-%\usepackage[resetstyle,prooftitleitbf=true]{../phfthm}
 
-\phfMakeTheorem[counter={},defstar=false,proofref=false]{algorithm}{Algorithm}
+\def\algorithmname{Algorithme}%
+\phfMakeTheorem[counter={},defstar=false,proofref=false]{algorithm}{\algorithmname}
+
+\let\proofofnameenglish\proofofname
+\addto\captionsenglish{%
+  \def\theoremname{Theorem}%
+  \def\propositionname{Proposition}%
+  \def\lemmaname{Lemma}%
+  \def\corollaryname{Corollary}%
+  \def\conjecturename{Conjecture}%
+  \def\remarkname{Remark}%
+  \def\definitionname{Definition}%
+  \def\ideaname{Idea}%
+  \def\questionname{Question}%
+  \def\problemname{Problem}%
+  \def\algorithmname{Algorithm}%
+  \let\proofofname\proofofnameenglish
+}
+\def\proofofnamefrancais#1{\proofname\space (#1)}
+\addto\captionsfrancais{%
+  \def\theoremname{Th\'eor\`eme}%
+  \def\propositionname{Proposition}%
+  \def\lemmaname{Lemme}%
+  \def\corollaryname{Corollaire}%
+  \def\conjecturename{Conjecture}%
+  \def\remarkname{Remarque}%
+  \def\definitionname{D\'efinition}%
+  \def\ideaname{Id\'ee}%
+  \def\questionname{Question}%
+  \def\problemname{Probl\`eme}%
+  \def\algorithmname{Algorithme}%
+  \let\proofofname\proofofnamefrancais
+}
+
 
 \def\proofrefsize{\tiny}
 
@@ -16,6 +51,7 @@
 
 \begin{document}
 
+\selectlanguage{english}
 
 \begin{lemma}
 \label{lem:1}
@@ -54,38 +90,44 @@ And a theorem
 \end{theorem}
 
 
+\selectlanguage{francais}
+
 \begin{theorem}
 \noproofref
 \label{thm:2}
-I heard you like theorems?
+Vous aimez les th\'eor\`emes?
 \end{theorem}
 
 \begin{definition*}
-This is a definition.
+Voil\`a une d\'efinition toute belle.
 \end{definition*}
 
 
 \begin{proposition*}
-Another proposition here, with no numbering.
+Voici une autre proposition, sans chiffre.
 \end{proposition*}
 \begin{proof}
-  this is yet another proof.
+  et voil\`a une preuve qui suit directement la proposition.
 \end{proof}
 
 \begin{theorem}
   \label{thm:another}
-  Yet another theorem here.
+  Encore un autre th\'eor\`eme.
 \end{theorem}
 
 
-See also \autoref{prop:1}, \autoref{thm:1} and \autoref{lem:1}
+Voir aussi \autoref{prop:1}, \autoref{thm:1} et \autoref{lem:1}.
 
 \cleardoublepage
+
 x
 \begin{proof}[*thm:1]
-  ....... and this is yet yet another proof.  This proof is only on the next page of the
-  theorem, so it should not necessary display the reference there.
+  ........ encore une preuve.  Cette preuve est sur la page suivant imm\'ediatement le
+  th\'eor\`eme.
 \end{proof}
+
+\selectlanguage{english}
+Back to English:
 
 \begin{thmheading}{Trace Distance}
   \label{thmheading:trace-dist}

@@ -127,7 +127,7 @@
 %     \begin{equation}
 %       \delta(\rho,\sigma)=\frac12\,\left\Vert \rho - \sigma \right\Vert_1\ ,
 %     \end{equation}
-%     where $\lVert\cdot\rVert_1$ is the Schatten-1 norm.
+%     where $\lVert\cdot\rVert_1$ is the Chasten-1 norm.
 %   \end{thmheading}
 % \end{minipage}}\endgroup
 % 
@@ -135,14 +135,25 @@
 %
 % 
 % \section{Quick start and package options}
-%
-% \subsection{Example invocation}
+% \label{sec:quick-start}
+% \label{sec:global-pkg-options}
 %
 % Example: Load the rich theorem set, with separate counters, and with proof-ref
 % mechanism on and always displaying the proof reference in the margin:
 % \begin{verbatim}
 % \usepackage[thmset=rich,sepcounters=true,proofref={always,margin}]{phfthm}
 % \end{verbatim}
+%
+% By default, some styles are tweaked a bit so that they appear nicely as
+% documented below (for example, by using a filled square instead of a simple
+% square for end-of-proof QED markers).  Use the package option
+% \pkgoptionfmt{resetstyle} to instruct \pkgname{phfthm} not to proceed to these
+% style adjustments; this allows you to enable features individually and
+% selectively:
+% \begin{verbatim}
+% \usepackage[resetstyle,prooftitleitbf=true]{../phfthm}
+% \end{verbatim}
+% 
 %
 % \subsection{Predefined theorem environments}
 % \label{sec:theorem-sets}
@@ -162,8 +173,9 @@
 % \item[thmset=empty] Do not define any environment at package loading.  You may
 %   of course invoke |\phfLoadThmSet| or |\phfMakeTheorem| manually at any
 %   later point.
-% \item[thmset=simple] Define the environments |theorem|, |proposition|,
-%   |lemma| and |corollary|.
+% \item[thmset=simple] Define the environments |theorem|, |proposition|, |lemma|
+%   and |corollary| as theorem-like environments, and |definition| as a
+%   definition-like environment.
 % \item[thmset=default] Define the environments |theorem|, |proposition|,
 %   |lemma|, |corollary|, |conjecture|, |remark| as theorem-like environments,
 %   and |definition| as a definition-like environment.
@@ -285,13 +297,6 @@
 % \item[prooftitleitbf=\metatruefalsearg] If set to |true|, then the proof title
 %   (``Proof'' or ``Proof of Theorem 1'') is typeset in bold italic font.
 % \end{pkgoptions}
-%
-% \subsection{Global package options}
-% \label{sec:global-pkg-options}
-% .....................
-% default styles tweaked a bit so that they appear nicely, use
-% \pkgoptionfmt{resetstyle} to undo these style customization to enable
-% individual things to be enabled ...........
 %
 % 
 % \section{Theorem environments}
@@ -419,8 +424,45 @@
 %   The first and second arguments to |\phfLoadThmSet| must either be empty,
 %   or be enclosed in square braces.
 % \end{pkgwarning}
-% 
 %
+% \needspace{10\baselineskip}
+% \DescribeMacro{\theoremname}
+% \DescribeMacro{\propositionname}
+% \DescribeMacro{\lemmaname}
+% \DescribeMacro{\corollaryname}
+% \DescribeMacro{\conjecturename}
+% The title of the theorem environments defined in theorem sets use the same
+% scheme as figures, tables, etc.\@ with regard to translations and
+% \pkgname{babel}: they use |\theoremname|, |\propositionname|, etc.
+% 
+% \DescribeMacro{\remarkname}
+% \DescribeMacro{\definitionname}
+% \DescribeMacro{\ideaname}
+% \DescribeMacro{\questionname}
+% \DescribeMacro{\problemname}
+% This package is language agnostic, and does not provide the titles for
+% different languages.  In order to support language switching with
+% \pkgname{babel} and |\selectlanguage|, you should add the relevant names to
+% the corresponding |\captions|\meta{language name} macro, for example:
+% \begin{verbatim}
+% \usepackage[francais,...]{babel}
+% ...
+% \addto\captionsfrancais{%
+%   \def\theoremname{Th\'eor\`eme}%
+%   \def\propositionname{Proposition}%
+%   \def\lemmaname{Lemme}%
+%   \def\corollaryname{Corollaire}%
+%   \def\conjecturename{Conjecture}%
+%   \def\remarkname{Remarque}%
+%   \def\definitionname{D\'efinition}%
+%   \def\ideaname{Id\'ee}%
+%   \def\questionname{Question}%
+%   \def\problemname{Probl\`eme}%
+% }
+% ... \selectlanguage{francais} ...
+% \end{verbatim}
+%
+% 
 % \subsection{Theorem hooks}
 % \label{sec:theorem-hooks}
 %
@@ -468,6 +510,19 @@
 %
 %
 % \section{Proof environments}
+%
+% \subsection{How proof environments work}
+%
+% ....... adds functionality to an existing ``proof-display'' environment, by
+% parse the argument for reference to a theorem environment
+%
+% ....... uses underlying ``display'' environment, an environment which is
+% supposed to display the proof nicely (that environment could be the original
+% |proof| environment by \pkgname{amsthm} or by \pkgname{IEEEtran}, for
+% example).
+%
+% ...... to customize: use |\phfPinProofAnchor| ........
+%
 %
 % \subsection{Manually define a proof environment}
 % \label{sec:mk-proof-env}
@@ -540,27 +595,84 @@
 %   3''). Typically, the macro should produce something like ``Proof of Theorem
 %   XYZ.''
 %
-%   By default, the macro |\proofofname| is used.
+%   By default, the global macro |\proofofname| is used.
 % \end{cmdoptions}
 %
+% \DescribeMacro{\proofname} Text to use to display ``Proof.''  This should be
+% already defined by the \LaTeX{} system, and \pkgname{babel} should already
+% provide translations in different languages.
+%
+% \DescribeMacro{\proofofname} The globally defined macro |\proofofname|
+% specifies the default way of displaying ``Proof of Theorem~5.''  It is
+% originally defined as something like
+% \begin{verbatim}
+% \newcommand\proofofname[1]{\proofname{} of #1}
+% \end{verbatim}
+% You may override this to obtain something fancier, of you wish to display the
+% document in a different language:
+% \begin{verbatim}
+% \def\proofofnamefrancais#1{\proofname{} (#1)}
+% \addto\captionsfrancais{\let\proofofname\proofofnamefrancais}
+% ...
+% \selectlanguage{francais} ...
+% \end{verbatim}
+% 
 % \subsection{Proof hooks}
 % \label{sec:proof-hooks}
 %
-% xxxxxxx........................ write documentation ..............
+% The proof hooks are relatively straightforward.  All hooks presented here take
+% no argument.
 %
-% Hooks:  all take no arg........  Arg of proof (later also parsed) accessible via macros .........
-%  |\phfthm@hookproof@|\meta{environment name}|@start|
-%  |\phfthm@hookproof@|\meta{environment name}|@startafterdisplay|
-%  |\phfthm@hookproof@|\meta{environment name}|@startlast|
-%  |\phfthm@hookproof@|\meta{environment name}|@end|
-%  |\phfthm@hookproof@|\meta{environment name}|@final|
+% Information about the argument of the proof, both the raw argument and the
+% possibly parsed reference, are available as macros to some of the hooks (but
+% don't change these values unless you know what you're doing).  The macro
+% |\phfthm@val@proofarg| contains the raw argument to the proof environment, and
+% is available to all hooks.  If you use the default proof environment argument
+% parsing (which you must have enabled when calling |\phfMakeProofEnv|), then
+% additionally the macros |\phfthm@val@prooftitle| and |\phfthm@val@proofofname|
+% are available containing, respectively, the label of the theorem which is
+% referenced, and the displayable reference to it (e.g. ``Theorem~5'').  The
+% last two macros are available to all hooks except the first one (|..@start|).
 %
-%  Common hooks all empty by default.........
-%  |\phfthm@hookproof@startcommon|\marg{environment name}
-%  |\phfthm@hookproof@startafterdisplaycommon|\marg{environment name}
-%  |\phfthm@hookproof@startlastcommon|\marg{environment name}
-%  |\phfthm@hookproof@endcommon|\marg{environment name}
-%  |\phfthm@hookproof@finalcommon|\marg{environment name}
+% The hooks named |..@start...| are called within the call to
+% |\beg||in{<proof environment>}|.
+%
+% \expandafter\DescribeMacro\expandafter{\csname phfthm@hookproof@...@start\endcsname}
+% The hook named |\phfthm@hookproof@|\meta{environment name}|@start| is called
+% at the very beginning of the proof environment.
+%
+% \expandafter\DescribeMacro\expandafter{\csname phfthm@hookproof@...@startafterdisplay\endcsname}
+% 
+% The hook named |\phfthm@hookproof@|\meta{environment name}|@startafterdisplay|
+% is invoked immediately after the beginning of the underlying ``display''
+% environment (the environment used to display the proof contents).
+%
+% \expandafter\DescribeMacro\expandafter{\csname phfthm@hookproof@...@startlast\endcsname}
+% 
+% The hook named |\phfthm@hookproof@|\meta{environment name}|@startlast| is
+% called after we are sure that an anchor has been pinned down for the proof.
+% This hook is called last within the commands in |\beg||in{<proof environment>}|.
+%
+% The two following hooks are called within the call to%
+% |\en||d{<proof environment>}|.
+%
+% \expandafter\DescribeMacro\expandafter{\csname phfthm@hookproof@...@end\endcsname}
+% The hook |\phfthm@hookproof@|\meta{environment name}|@end| is called before
+% the proof display environment is closed.
+%
+% \expandafter\DescribeMacro\expandafter{\csname phfthm@hookproof@...@final\endcsname}
+% The hook |\phfthm@hookproof@|\meta{environment name}|@final| is called after
+% the proof environment display is finished, as the very last.
+%
+% All proof hooks call are defined by default to defer their call to a common
+% hook.  The common hooks each take one argument (the proof environment name).
+% They are named |\phfthm@hookproof@startcommon|\marg{environment name},
+% |\phfthm@hookproof@startafterdisplaycommon|\marg{environment name},
+% |\phfthm@hookproof@startlastcommon|\marg{environment name},
+% |\phfthm@hookproof@endcommon|\marg{environment name}, and
+% |\phfthm@hookproof@finalcommon|\marg{environment name}.
+% They are all defined to be empty by default.
+%
 %
 % \section{Pairing theorems to proofs and proof-reference mechanism}
 % \label{sec:proof-ref-mechanism}
@@ -1181,8 +1293,9 @@
 % 
 % Make macros |\phfthm@prfenv@<proof-environment-name>@val@displayenvbegincmd|
 % and |\phfthm@prfenv@<proof-environment-name>@val@displayenvendcmd|, which
-% essentially expand to |\begin{<the-display-env>}| and |\end{<the-display-env}|
-% for the display environment given in the option \cmdoptionfmt{displayenv}.
+% essentially expand to |\begin{<the-display-env>}| and
+%   |\end{<the-display-env>}| for the display environment given in the option
+% \cmdoptionfmt{displayenv}.
 %    \begin{macrocode}
   \if\relax\detokenize\expandafter{\cmdKV@phfmkprf@displayenv}\relax%
     \csdef{phfthm@prfenv@#2@val@displayenvbegincmd}##1{}%
@@ -1207,7 +1320,7 @@
 % was provided.
 %
 % Start by storing the value of the argument into a macro, and then call the
-% ``start'' hook.
+% ``start'' hook (see proof hooks in \autoref{sec:proof-hooks}).
 %    \begin{macrocode}
   \phfthm@tmp@defcmd{#2}[1][\phfthm@NOPROOFARG]{%
     \def\phfthm@val@proofarg{##1}%
@@ -1251,10 +1364,17 @@
     \def\phfthmPinProofAnchor{\phfPinProofAnchor}%
 %    \end{macrocode}
 % 
-% Start the proof's display environment, and call the corresponding hook.
+% Start the proof's display environment.  Don't be fooled here by the curly
+% braces after |\x|, it only protects the argument to the
+% |\phfthm@prfenv@#2@val@displayenvbegincmd| command itself: the
+% |\phfthm@val@displayargs| are still just tokens which will be expanded in
+% front of the |\beg||in{<proof-display-env>}| command.
 %    \begin{macrocode}
     \def\x{\csname phfthm@prfenv@#2@val@displayenvbegincmd\endcsname}%
     \expandafter\x\expandafter{\phfthm@val@displayargs}%
+%    \end{macrocode}
+% And call the corresponding hook:
+%    \begin{macrocode}
     \csname phfthm@hookproof@#2@startafterdisplay\endcsname%
 %    \end{macrocode}
 % If required, pin anchor after the proof-display-environment.
@@ -1356,7 +1476,12 @@
   \@ifnextchar*\phfthm@proof@parselabel@label\phfthm@proof@parselabel@title%
 }
 \def\phfthm@proof@parselabel@label*#1\phfthm@proof@parselabel@END{%
-  \edef\phfthm@val@proofoflabel{#1}%
+%    \end{macrocode}
+% The use of |\detokenize| here is a trick to make sure that all chars in the
+% label text have a non-active category (e.g.\@ we would have problems, e.g., if
+% in the label ``|thm:gauss|'' the ``|:|'' is an active char---such as in French):
+%    \begin{macrocode}
+  \edef\phfthm@val@proofoflabel{\detokenize{#1}}%
   \def\phfthm@val@prooftitle{\phfthm@autoref{#1}}%
 }
 \def\phfthm@proof@parselabel@title#1\phfthm@proof@parselabel@END{%
@@ -1839,7 +1964,21 @@
 %
 % Here, we define the theorem sets proposed by the package for quick loading.
 %
-%
+% We first define the names.  These are defined in any case regardless of
+% whether we are loading a theorem set or of which theorem set we are loading.
+%    \begin{macrocode}
+\def\theoremname{Theorem}
+\def\propositionname{Proposition}
+\def\lemmaname{Lemma}
+\def\corollaryname{Corollary}
+\def\conjecturename{Conjecture}
+\def\remarkname{Remark}
+\def\definitionname{Definition}
+\def\ideaname{Idea}
+\def\questionname{Question}
+\def\problemname{Problem}
+%    \end{macrocode}
+% 
 % As we define the theorem sets, remember the names in a comma-separated list
 % which we can display in help text.  The |\phfthm@def@thmset| replaces the
 % |\def| command and expects the definitions to follow immediately.
@@ -1866,7 +2005,9 @@
 % \end{macro}
 % \end{macro}
 % 
-% The default set (empty name, or name ``|empty|'') provides no theorem.
+% The default set (empty name, or name ``|empty|'') provides no theorem.  (The
+% first line uses |\def| directly so that we don't include an empty item in the
+% list of available choices.)
 %    \begin{macrocode}
 \def\phfthm@thmset@{}
 \phfthm@def@thmset{empty}{}
@@ -1875,36 +2016,37 @@
 % Theorem set |simple|:
 %    \begin{macrocode}
 \phfthm@def@thmset{simple}{
-  \phfthm@def@thmset@mktheorem{theorem}{Theorem}
-  \phfthm@def@thmset@mktheorem{proposition}{Proposition}
-  \phfthm@def@thmset@mktheorem{lemma}{Lemma}
-  \phfthm@def@thmset@mktheorem{corollary}{Corollary}
+  \phfthm@def@thmset@mktheorem{theorem}{\theoremname}
+  \phfthm@def@thmset@mktheorem{proposition}{\propositionname}
+  \phfthm@def@thmset@mktheorem{lemma}{\lemmaname}
+  \phfthm@def@thmset@mktheorem{corollary}{\corollaryname}
+  \phfthm@def@thmset@mkdefn{definition}{\definitionname}
 }
 %    \end{macrocode}
 % 
 % Theorem set |default|:
 %    \begin{macrocode}
 \phfthm@def@thmset{default}{
-  \phfthm@def@thmset@mktheorem{theorem}{Theorem}
-  \phfthm@def@thmset@mktheorem{proposition}{Proposition}
-  \phfthm@def@thmset@mktheorem{lemma}{Lemma}
-  \phfthm@def@thmset@mktheorem{corollary}{Corollary}
-  \phfthm@def@thmset@mktheorem{conjecture}{Conjecture}
-  \phfthm@def@thmset@mktheorem{remark}{Remark}
-  \phfthm@def@thmset@mkdefn{definition}{Definition}
+  \phfthm@def@thmset@mktheorem{theorem}{\theoremname}
+  \phfthm@def@thmset@mktheorem{proposition}{\propositionname}
+  \phfthm@def@thmset@mktheorem{lemma}{\lemmaname}
+  \phfthm@def@thmset@mktheorem{corollary}{\corollaryname}
+  \phfthm@def@thmset@mktheorem{conjecture}{\conjecturename}
+  \phfthm@def@thmset@mktheorem{remark}{\remarkname}
+  \phfthm@def@thmset@mkdefn{definition}{\definitionname}
 }
 %    \end{macrocode}
 % 
 % Theorem set |shortnames|:
 %    \begin{macrocode}
 \phfthm@def@thmset{shortnames}{
-  \phfthm@def@thmset@mktheorem{thm}{Theorem}
-  \phfthm@def@thmset@mktheorem{prop}{Proposition}
-  \phfthm@def@thmset@mktheorem{lem}{Lemma}
-  \phfthm@def@thmset@mktheorem{cor}{Corollary}
-  \phfthm@def@thmset@mktheorem{conj}{Conjecture}
-  \phfthm@def@thmset@mktheorem{rem}{Remark}
-  \phfthm@def@thmset@mkdefn{defn}{Definition}
+  \phfthm@def@thmset@mktheorem{thm}{\theoremname}
+  \phfthm@def@thmset@mktheorem{prop}{\propositionname}
+  \phfthm@def@thmset@mktheorem{lem}{\lemmaname}
+  \phfthm@def@thmset@mktheorem{cor}{\corollaryname}
+  \phfthm@def@thmset@mktheorem{conj}{\conjecturename}
+  \phfthm@def@thmset@mktheorem{rem}{\remarkname}
+  \phfthm@def@thmset@mkdefn{defn}{\definitionname}
 }
 %    \end{macrocode}
 % 
@@ -1912,16 +2054,16 @@
 %    \begin{macrocode}
 \phfthm@def@thmset{rich}{
   \phfthm@thmset@default
-  \phfthm@def@thmset@mktheorem{idea}{Idea}
-  \phfthm@def@thmset@mktheorem{question}{Question}
-  \phfthm@def@thmset@mktheorem{problem}{Problem}
+  \phfthm@def@thmset@mktheorem{idea}{\ideaname}
+  \phfthm@def@thmset@mktheorem{question}{\questionname}
+  \phfthm@def@thmset@mktheorem{problem}{\problemname}
 }
 %    \end{macrocode}
 % 
 %
 % \begin{macro}{\phfLoadThmSet}
 %   The macro |\phfLoadThmSet| loads a theorem set.  See documentation at
-%   \autoref{sec:load-thm-set}.
+%   \autoref{sec:load-thm-set-manually}.
 %
 %   |#1| = options to |\phfMakeTheorem| for theorem-like environments
 %
