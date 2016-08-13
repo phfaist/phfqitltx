@@ -48,4 +48,3 @@ package documentation, run
 
     > make pdf
 
-[TODO: the documentation for package `phfthm` is incomplete.]
