@@ -172,18 +172,23 @@
 % \item[thmset=empty] Do not define any environment at package loading.  You may
 %   of course invoke |\phfLoadThmSet| or |\phfMakeTheorem| manually at any
 %   later point.
-% \item[thmset=simple] Define the environments |theorem|, |proposition|, |lemma|
+% \item[thmset=simple]
+%   \DescribeEnv{theorem} \DescribeEnv{proposition}
+%   \DescribeEnv{lemma} \DescribeEnv{corollary} \DescribeEnv{definition}
+%   Define the environments |theorem|, |proposition|, |lemma|
 %   and |corollary| as theorem-like environments, and |definition| as a
 %   definition-like environment.
-% \item[thmset=default] Define the environments |theorem|, |proposition|,
-%   |lemma|, |corollary|, |conjecture|, |remark| as theorem-like environments,
-%   and |definition| as a definition-like environment.
+% \item[thmset=default] \DescribeEnv{conjecture} \DescribeEnv{remark} Define the
+%   environments |theorem|, |proposition|, |lemma|, |corollary|, |conjecture|,
+%   |remark| as theorem-like environments, and |definition| as a definition-like
+%   environment.
 % \item[thmset=shortnames] For if you like typing less: the same environments
 %   are defined as the default set, but with shorter names.  Define the
 %   environments |thm|, |prop|, |lem|, |cor|, |conj|, |rem| as theorem-like
 %   environments, and |defn| as a definition-like environment.
-% \item[thmset=rich] Provides the same environments as the |default| theorem
-%   set, as well as in addition: |idea|, |question| and |problem| as
+% \item[thmset=rich] \DescribeEnv{idea} \DescribeEnv{question}
+%   \DescribeEnv{problem} Provides the same environments as the |default|
+%   theorem set, as well as in addition: |idea|, |question| and |problem| as
 %   theorem-like environments.
 % \end{pkgoptions}
 %
@@ -265,6 +270,7 @@
 % \subsection{The proof environment}
 % \label{sec:proof-env}
 %
+% \DescribeEnv{proof}
 % By default, the \pkgname{phfthm} package overrides the |proof| environment
 % with a the package's own enhanced version.  If you want to preserve the
 % original \emph{AMS} environment, you should use the
@@ -297,6 +303,52 @@
 %   (``Proof'' or ``Proof of Theorem 1'') is typeset in bold italic font.
 % \end{pkgoptions}
 %
+%
+% \subsection{The theorem-heading environment}
+% \label{sec:thmheading-default}
+% \DescribeEnv{thmheading} By default, the |thmheading| environment is provided
+% by the \pkgname{phfthm} package:
+% \begin{verbatim}
+% \begin{thmheading}{Trace Distance}
+%   The `trace distance' between $\rho$ and $\sigma$ is defined as
+%   \begin{equation}
+%     \delta(\rho,\sigma)=\frac12\,\left\Vert\rho-\sigma\right\Vert_1\ ,
+%   \end{equation}
+%   where $\lVert\cdot\rVert_1$ is the Schatten-1 norm.
+% \end{thmheading}
+% \end{verbatim}
+% \begingroup\setlength{\fboxsep}{1ex}
+% \par\noindent\fbox{\begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
+%   \begin{thmheading}{Trace Distance}
+%     The `trace distance' between $\rho$ and $\sigma$ is defined as
+%     \begin{equation}
+%       \delta(\rho,\sigma)=\frac12\,\left\Vert \rho - \sigma \right\Vert_1\ ,
+%     \end{equation}
+%     where $\lVert\cdot\rVert_1$ is the Schatten-1 norm.
+%   \end{thmheading}
+% \end{minipage}}\endgroup
+%
+% You may also use |\label| and |\ref| as usual (|\ref| simply displays the
+% given title).
+%
+% Some package options control the way this environment is defined.
+%
+% \begin{pkgoptions}
+% \item[thmheading=\metatruefalsearg] Define the environment
+%   |\begin{thmheading}...\end{thmheading}| when loading the \pkgname{phfthm}
+%   package, with reasonable default settings.
+% \item[thmheadingstyle=\meta{theorem style}] If \pkgoptionfmt{thmheading=true}
+%   was specified, you may use this option to specify the theorem style to use
+%   for the |thmheading| environment.  Possible values are \emph{AMS} theorem
+%   style names (e.g.\@ the base styles |plain|, |definition| or |remark|), or
+%   any other style defined with |\newtheoremstyle|.
+% \end{pkgoptions}
+%
+% If you want to define theorem-heading environments manually, see
+% \autoref{sec:thmheading-manually}.
+%
+%
+%
 % 
 % \section{Theorem environments}
 %
@@ -320,7 +372,7 @@
 % define the environment |\begin{theorem}...\end{theorem}| which displays
 % ``\textit{Theorem N.} \ldots''
 %
-% The possible options are:
+% The possible key-value options for the optional argument are:
 % \begin{cmdoptions}
 % \item[counter=\meta{\LaTeX{} counter $\mid$ (empty)}] The name of the \LaTeX{}
 %   counter to use for the theorem environment.  If this is empty, then a new
@@ -403,9 +455,9 @@
 % only after you have defined a custom theorem style.  The syntax of
 % |\phfLoadThmSet| is:
 %
-% \noindent |\phfMakeTheorem|\hspace{0pt}\marg{options to
-% \phfverb{\phfMakeThoerem} for theorem-like
-% environments}\hspace{0pt}\marg{options to \phfverb{\phfMakeThorem} for
+% \noindent |\phfLoadThmSet|\hspace{0pt}\marg{options to
+% \phfverb{\phfLoadThmSet} for theorem-like
+% environments}\hspace{0pt}\marg{options to \phfverb{\phfLoadThmSet} for
 % definition-like environments}\hspace{0pt}\marg{name of theorem set to load}
 %
 % The first and second argument to this macro are tokens to expand in front of
@@ -439,10 +491,12 @@
 % \DescribeMacro{\ideaname}
 % \DescribeMacro{\questionname}
 % \DescribeMacro{\problemname}
-% This package is language agnostic, and does not provide the titles for
-% different languages.  In order to support language switching with
-% \pkgname{babel} and |\selectlanguage|, you should add the relevant names to
-% the corresponding |\captions|\meta{language name} macro, for example:
+%
+% This package is language agnostic (with titles defined by default in English),
+% and does not provide the titles for other languages.  In order to support
+% language switching with \pkgname{babel} and |\selectlanguage|, you should add
+% the relevant names to the corresponding |\captions|\meta{language name} macro,
+% for example:
 % \begin{verbatim}
 % \usepackage[francais,...]{babel}
 % ...
@@ -485,8 +539,7 @@
 % \DescribeMacro{\phfthm@hook@startcommonnostar} The hook
 % |\phfthm@hook@startcommonnostar|\marg{theorem environment name}\marg{theorem
 % optional given title} collects the default definitions for non-starred
-% environments (such as overriding the |\label| command to generate appropriate
-% proof-refs), and continues to defer to
+% environments (none by default) and continues to defer to
 % \DescribeMacro{\phfthm@hook@startcommon}
 % |\phfthm@hook@startcommon|\marg{theorem environment name}\marg{theorem
 % optional given title}.  \DescribeMacro{\phfthm@hook@startcommonstar}
@@ -510,17 +563,28 @@
 %
 % \section{Proof environments}
 %
-% \subsection{How proof environments work}
+% Proof environments typeset mathematical proofs.  The proof environment(s)
+% provided by \pkgname{phfthm} give some added functionality with respect to the
+% \emph{AMS}-default |proof| environment, such as supporting the proof-reference
+% mechanism described in \autoref{sec:proof-ref-mechanism}.
 %
-% ....... adds functionality to an existing ``proof-display'' environment, by
-% parse the argument for reference to a theorem environment
+% A proof environment might look like the following:
+% \begin{proof}[Theorem 5]
+%   Let $\mathcal{T}_{X\to X'}$ be any trace nonincreasing completely positive
+%   map such that $\mathcal{T}_{X\to X'}\left(\Gamma_X\right)$ lies within the
+%   support of $\Gamma_{X'}$. Define the normalized state
+%   $\gamma_X = \Gamma_X / \operatorname{tr}\Gamma_X$.
 %
-% ....... uses underlying ``display'' environment, an environment which is
-% supposed to display the proof nicely (that environment could be the original
-% |proof| environment by \pkgname{amsthm} or by \pkgname{IEEEtran}, for
-% example).
+%   Now consider this and that \ldots
+% \end{proof}
 %
-% ...... to customize: use |\phfPinProofAnchor| ........
+%
+% The proof environments defined by this package wrap a given proof display
+% environment (such as \emph{AMS}' (\pkgname{amsthm}'s) or \pkgname{IEEEtran}'s
+% original |proof| environment) by adding functionality in the form of hooks.
+% In the following, we refer to the ``underlying proof display environment'' as
+% the original environment which is wrapped.  It may be any \LaTeX{} environment
+% whose task is to format the proof nicely.
 %
 %
 % \subsection{Manually define a proof environment}
@@ -615,6 +679,8 @@
 % ...
 % \selectlanguage{francais} ...
 % \end{verbatim}
+%
+%
 % 
 % \subsection{Proof hooks}
 % \label{sec:proof-hooks}
@@ -651,6 +717,15 @@
 % The hook named |\phfthm@hookproof@|\meta{environment name}|@startlast| is
 % called after we are sure that an anchor has been pinned down for the proof.
 % This hook is called last within the commands in |\beg||in{<proof environment>}|.
+%
+% \DescribeMacro{\phfPinProofAnchor} By the way, the macro |\phfPinProofAnchor|
+% may be used within the hooks to pin down an anchor for referring to the proof
+% (especially via the proof-ref mechanism).  Just call it anywhere appropriate
+% (a good idea is calling it after leaving v-mode before displaying the title,
+% in order to avoid placing it just before a page break).  If you do not call
+% this macro, it is automatically called for you just before the |...@startlast|
+% hook.
+%
 %
 % The two following hooks are called within the call to%
 % |\en||d{<proof environment>}|.
@@ -777,28 +852,59 @@
 % \subsection{Customizing appearance of the proof reference text}
 % \label{sec:proof-ref-customize-appearance}
 %
-% Here is a quick overview of the workings of the |\phfthm@proofrefstyle@...|
-% macros and how they are called.  It allows you to define new proof-ref styles,
-% for example.
+% Here we explain the workings of the |\phfthm@proofrefstyle@...| macros and how
+% they are called.  It allows you to define new proof-ref styles, for example.
 %
-% .............
+% When the option \cmdoptionfmt{proofref=true} is given to |\phfMakeTheorem| to
+% define an environment (say |mytheoremenv|), then the hook
+% |phfthm@hook@start@mytheoremenv| will automatically include the following
+% calls:
+% \begin{itemize}
+% \item The macro |\phfthm@proofrefstyle@|\meta{proof-ref style}|@setup| is called
+%   (for the proof-ref style given via the
+%   \cmdoptionfmt{proofenvstyle=\meta{style name}} key-value option to
+%   |\phfMakeTheorem|);
+% \item The macro |\phfthm@def@label@thmlabel| is invoked, implementing the hack
+%   on the |\label| macro;
+% \item The macro |\phfthm@proofref@impl@start| is called.  This macro is
+%   expected to be defined after calling |\phfthm@proofrefstyle@|\meta{proof-ref
+%   style}|@setup|.
+% \end{itemize}
+% 
+% Furthermore, the |\phfthm@hook@afterlabel@mytheoremenv| hook will include a
+% call to |\phfthm@proofref@impl@afterlabel|\marg{label of the theorem}.  Again,
+% the latter macro is expected to be defined after calling
+% |\phfthm@proofrefstyle@|\meta{proof-ref style}|@setup|.
+%
+% Finally, the hook |\phfthm@hook@end@mytheoremenv| includes a call to
+% |\phfthm@proofref@impl@end|\marg{label of the theorem}.  Again,
+% the latter macro is expected to be defined after calling
+% |\phfthm@proofrefstyle@|\meta{proof-ref style}|@setup|.
 %
 %
-% Then the |\label| command is redefined so that at its fist occurrence, it
-% provides the theorem environment label to use for the proof reference (``see
-% proof on page \ldots'', see \autoref{sec:proof-ref-mechanism}).  There, an
-% additional hook is provided, \DescribeMacro{\phfthm@hook@afterlabel@thmname}
+% ................... The hack with the |\label| command is the following: The
+% |\label| command is redefined so that at its fist occurrence, it provides the
+% theorem environment label to use for the proof reference (``see proof on page
+% \ldots'', see \autoref{sec:proof-ref-mechanism}).  There, an additional hook
+% is provided, \DescribeMacro{\phfthm@hook@afterlabel@thmname}
 % |\phfthm@hook@afterlabel@|\meta{theorem environment name}, which is called
 % after the theorem label is set (it can be recovered from the value of
 % |\phfthm@val@thmlabel|.  By default, that hook calls the common hook
 % |\phfthm@hook@afterlabelcommon|\marg{theorem environment name}. (After the
 % first occurrence of |\label|, its definition is restored.)
+% 
+% Hence, to define a new proof-ref style, you simply need to define a macro
+% called |\phfthm@proofrefstyle@<PROOF-REF-STYLE-NAME>@setup|.  This macro
+% should include commands to locally define the macros
+% |\phfthm@proofref@impl@start|, |\phfthm@proofref@impl@afterlabel|, and
+% |\phfthm@proofref@impl@end|.
 %
-% ....................
-% NOTE: the |\phfthm@proofrefstyle@<XYZ>@setup| command should at least define
-% the commands |\phfthm@proofref@impl@start|,
-% |\phfthm@proofref@impl@afterlabel|, and |\phfthm@proofref@impl@end|.
 %
+% ........good idea: use the |default| proof-ref style and hack into that
+% (e.g.\@ see |margin| proofrefstyle) 
+% ............
+%  see also the documentation of the implementation
+% (\autoref{sec:impl-default-proof-ref-style}).
 %
 %
 %
@@ -810,48 +916,8 @@
 % as a theorem environment, but where the title may be any text (say, ``Trace
 % Distance'' instead of, e.g., ``Theorem~5'').
 %
-% \subsection{Default \phfverb{thmheading} environment provided by the package}
-%
-% \DescribeEnv{thmheading} By default, the |thmheading| environment is provided
-% by the \pkgname{phfthm} package:
-% \begin{verbatim}
-% \begin{thmheading}{Trace Distance}
-%   The `trace distance' between $\rho$ and $\sigma$ is defined as
-%   \begin{equation}
-%     \delta(\rho,\sigma)=\frac12\,\left\Vert\rho-\sigma\right\Vert_1\ ,
-%   \end{equation}
-%   where $\lVert\cdot\rVert_1$ is the Schatten-1 norm.
-% \end{thmheading}
-% \end{verbatim}
-% \begingroup\setlength{\fboxsep}{1ex}
-% \par\noindent\fbox{\begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
-%   \begin{thmheading}{Trace Distance}
-%     The `trace distance' between $\rho$ and $\sigma$ is defined as
-%     \begin{equation}
-%       \delta(\rho,\sigma)=\frac12\,\left\Vert \rho - \sigma \right\Vert_1\ ,
-%     \end{equation}
-%     where $\lVert\cdot\rVert_1$ is the Schatten-1 norm.
-%   \end{thmheading}
-% \end{minipage}}\endgroup
-%
-% You may also use |\label| and |\ref| as usual (|\ref| simply displays the
-% given title).
-%
-% Some package options control the way this environment is defined.
-%
-% \begin{pkgoptions}
-% \item[thmheading=\metatruefalsearg] Define the environment
-%   |\begin{thmheading}...\end{thmheading}| when loading the \pkgname{phfthm}
-%   package, with reasonable default settings.
-% \item[thmheadingstyle=\meta{theorem style}] If \pkgoptionfmt{thmheading=true}
-%   was specified, you may use this option to specify the theorem style to use
-%   for the |thmheading| environment.  Possible values are \emph{AMS} theorem
-%   style names (e.g.\@ the base styles |plain|, |definition| or |remark|), or
-%   any other style defined with |\newtheoremstyle|.
-% \end{pkgoptions}
-%
-% If you want to define theorem-heading environments manually, see
-% \autoref{sec:thmheading-manually}.
+% By default, the \pkgname{phfthm} package provides the |thmheading| environment
+% (see \autoref{sec:thmheading-default}).
 %
 %
 % \subsection{Define theorem-heading environments manually}
@@ -880,8 +946,21 @@
 % You can also use |\label| and |\ref| (the latter simply displays the given
 % title).
 %
+% \subsection{Available hooks for theorem-heading environments}
+% 
+% The hook |\phfthm@hook@thmheading@...@start|\marg{title} is invoked at start,
+% within an internal environment created with |\newtheorem|.  This hook accepts
+% one argument, the title of the theorem-heading.
 %
+% The hook |\phfthm@hook@thmheading@...@end| is called at the end, but still
+% within the internal theorem environment.
 %
+% Replace the dots with the name of the theorem-heading environment (such as
+% |thmheading|).
+%
+% By default, these hooks simply call the common hooks
+% |\phfthm@hook@thmheading@start| and |\phfthm@hook@thmheading@end|.  These
+% common hooks are empty by default.
 %
 %
 %
@@ -892,6 +971,7 @@
 %
 %
 % \section{Implementation}
+% \label{sec:implementation}
 %
 % First, load some packages.  General toolboxes:
 %    \begin{macrocode}
@@ -993,7 +1073,7 @@
 % |\...autorefname| for |\autoref|.  If an alias counter is requested, create it
 % and pass that one to |\newtheorem|.
 %
-% At this point, we create a theorem named |phfthm@....| using |\newtheorem|
+% At this point, we create a theorem named |phfthm@...| using |\newtheorem|
 % (because we still want to add calls to hooks).
 %    \begin{macrocode}
   \ifKV@phfmkthm@defnostar%
@@ -1067,7 +1147,7 @@
 %
 % If requested, define the starred version of the theorem.  We call
 % |\newtheorem*| to define the base theorem environment (which we call
-% |phfthm@....|), after which as above we define the actual environment which
+% |phfthm@...|), after which as above we define the actual environment which
 % also calls the relevant hooks.
 %    \begin{macrocode}
   \ifKV@phfmkthm@defstar%
@@ -1734,11 +1814,12 @@
 % \end{macro}
 % 
 %
-% \subsubsection{Default style, with basic machinery}
+% \subsubsection{Default proof-ref style, with basic machinery}
+% \label{sec:impl-default-proof-ref-style}
 %
-% Now we define the relevant callbacks for the default style.  See doc in
-% \autoref{sec:proof-ref-customize-appearance}.  Recall a proof-ref style just
-% needs to define |\phfthm@proofrefstyle@<stylename>@setup|, which in turn
+% Now we define the relevant callbacks for the default style.  See documentation
+% in \autoref{sec:proof-ref-customize-appearance}.  Recall a proof-ref style
+% just needs to define |\phfthm@proofrefstyle@<stylename>@setup|, which in turn
 % should just define the callbacks |\phfthm@proofref@impl@start|,
 % |\phfthm@proofref@impl@afterlabel| and |\phfthm@proofref@impl@end|.  For our
 % default style, these callbacks further call other callbacks of the form

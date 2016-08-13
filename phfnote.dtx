@@ -2988,7 +2988,9 @@
   \def\cmdoptname{cmd. opt.}
   \def\commandoptionsname{command options}
   \def\setcmdnotpkgoptions{\let\pkgoptname\cmdoptname
-    \let\packageoptionsname\commandoptionsname}
+    \let\packageoptionsname\commandoptionsname
+    \let\fbox\cmdoptionsfbox}
+  \def\cmdoptionsfbox##1{\ensuremath{\underline{{\text{##1}}}}}
 %    \end{macrocode}
 % 
 % Provide the |\pkgoptattrib| command, which typesets its argument as
