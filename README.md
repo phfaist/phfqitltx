@@ -48,3 +48,6 @@ package documentation, run
 
     > make pdf
 
+# License
+
+This material is subject to the [LaTeX Project Public License](http://www.ctan.org/license/lppl1.3).
