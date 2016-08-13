@@ -127,11 +127,10 @@
 %     \begin{equation}
 %       \delta(\rho,\sigma)=\frac12\,\left\Vert \rho - \sigma \right\Vert_1\ ,
 %     \end{equation}
-%     where $\lVert\cdot\rVert_1$ is the Chasten-1 norm.
+%     where $\lVert\cdot\rVert_1$ is the Schatten-1 norm.
 %   \end{thmheading}
 % \end{minipage}}\endgroup
 % 
-%
 %
 % 
 % \section{Quick start and package options}
@@ -414,8 +413,8 @@
 % example:
 % \begin{verbatim}
 % \newcounter{mythmcounter}
-% \newtheoremstyle{mythmstyle}{....}
-% \newtheoremstyle{mydefnstyle}{....}
+% \newtheoremstyle{mythmstyle}{...}
+% \newtheoremstyle{mydefnstyle}{...}
 % \phfLoadThmSet{[thmstyle=mythmstyle,counter=mythmcounter]}
 %     {[thmstyle=mydefnstyle,counter=mythmcounter]}{rich}
 % \end{verbatim}
@@ -807,7 +806,84 @@
 % \section{Theorem-heading definition-like environments}
 % \label{sec:thmheading}
 %
-% .......................
+% A theorem-heading environment is an environment which displays in the same way
+% as a theorem environment, but where the title may be any text (say, ``Trace
+% Distance'' instead of, e.g., ``Theorem~5'').
+%
+% \subsection{Default \phfverb{thmheading} environment provided by the package}
+%
+% \DescribeEnv{thmheading} By default, the |thmheading| environment is provided
+% by the \pkgname{phfthm} package:
+% \begin{verbatim}
+% \begin{thmheading}{Trace Distance}
+%   The `trace distance' between $\rho$ and $\sigma$ is defined as
+%   \begin{equation}
+%     \delta(\rho,\sigma)=\frac12\,\left\Vert\rho-\sigma\right\Vert_1\ ,
+%   \end{equation}
+%   where $\lVert\cdot\rVert_1$ is the Schatten-1 norm.
+% \end{thmheading}
+% \end{verbatim}
+% \begingroup\setlength{\fboxsep}{1ex}
+% \par\noindent\fbox{\begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
+%   \begin{thmheading}{Trace Distance}
+%     The `trace distance' between $\rho$ and $\sigma$ is defined as
+%     \begin{equation}
+%       \delta(\rho,\sigma)=\frac12\,\left\Vert \rho - \sigma \right\Vert_1\ ,
+%     \end{equation}
+%     where $\lVert\cdot\rVert_1$ is the Schatten-1 norm.
+%   \end{thmheading}
+% \end{minipage}}\endgroup
+%
+% You may also use |\label| and |\ref| as usual (|\ref| simply displays the
+% given title).
+%
+% Some package options control the way this environment is defined.
+%
+% \begin{pkgoptions}
+% \item[thmheading=\metatruefalsearg] Define the environment
+%   |\begin{thmheading}...\end{thmheading}| when loading the \pkgname{phfthm}
+%   package, with reasonable default settings.
+% \item[thmheadingstyle=\meta{theorem style}] If \pkgoptionfmt{thmheading=true}
+%   was specified, you may use this option to specify the theorem style to use
+%   for the |thmheading| environment.  Possible values are \emph{AMS} theorem
+%   style names (e.g.\@ the base styles |plain|, |definition| or |remark|), or
+%   any other style defined with |\newtheoremstyle|.
+% \end{pkgoptions}
+%
+% If you want to define theorem-heading environments manually, see
+% \autoref{sec:thmheading-manually}.
+%
+%
+% \subsection{Define theorem-heading environments manually}
+% \label{sec:thmheading-manually}
+% 
+% \DescribeMacro{\phfMakeThmheadingEnvironment} A new theorem-heading
+% environment can be defined by calling |\phfMakeThmheadingEnvironment|.
+% The syntax is:
+%
+% \noindent |\phfMakeThmheadingEnvironment|\oarg{key-value options}\marg{environment name}
+%
+% The key-value options may be any combination of the following:
+% \begin{cmdoptions}
+% \item[thmstyle=\meta{theorem style name}] The theorem style to use to display
+%   the environment.  You may specify here any default \emph{AMS} style
+%   (|plain|, |remark| or |definition|), or any other |\newtheoremstyle|-defined
+%   style.
+% \item[internalcounter=\meta{name of counter}] The name of a counter which will
+%   internally track environment instances.  By default, a common internal
+%   counter is used for all theorem-heading environments (named
+%   |phfthmheadingcounter|).  The counter must be already defined (see \LaTeX's
+%   |\newcounter|).
+% \end{cmdoptions}
+%
+%
+% You can also use |\label| and |\ref| (the latter simply displays the given
+% title).
+%
+%
+%
+%
+%
 %
 %
 %
