@@ -560,6 +560,24 @@
 % |\phfthm@hook@endcommonstar|\marg{theorem environment name}.  Both these hooks
 % defer their calls to |\phfthm@hook@endcommon|\marg{theorem environment name}.
 %
+% For theorems using the proof-reference mechanism, i.e.\@ for which
+% \cmdoptionfmt{proofref=true} was specified to |\phfMakeTheorem| and which uses
+% the |\label| hack (\autoref{sec:proof-ref-mechanism}), there is an additional
+% hook.  \DescribeMacro{\phfthm@hook@afterlabel@thmname} The hook
+% |\phfthm@hook@afterlabel@|\meta{theorem environment name} is called just after
+% the |\label| command corresponding to the theorem is encountered (this should
+% always be at the \emph{beginning} of the theorem, see
+% \autoref{sec:proof-ref-mechanism}).  Depending on the proof-ref style, this
+% hook may be used to generate the proof reference text (for example, with the
+% |margin| proof-ref style).  The hook is called after the theorem label is set.
+% The label itself can be recovered from the value of the macro
+% |\phfthm@val@thmlabel|.  By default, that hook calls the common hook
+% \DescribeMacro{\phfthm@hook@afterlabelcommon}
+% |\phfthm@hook@afterlabelcommon|\marg{theorem environment name}. (After the
+% first occurrence of the command |\label|, the latter's definition is
+% restored.)
+% 
+%
 %
 % \section{Proof environments}
 %
@@ -809,6 +827,15 @@
 % after the theorem. The appearance of this text is customizable
 % (\autoref{sec:proof-ref-customize-appearance}).
 %
+% More precisely, the hack with the |\label| command works as follows: At the
+% beginning of the theorem, the |\label| command is redefined so that at its
+% fist occurrence, it stores its argument as the theorem's label to use for the
+% proof reference, it then pins down a \LaTeX{} label as the original |\label|
+% command would do, and finally it calls the |...@afterlabel| theorem hook (see
+% \ref{sec:theorem-hooks}).  After the first occurrence of |\label|, the
+% |\label| command is restored to its original \LaTeX{} meaning in case there
+% are other objects within the theorem which are to be referred to.
+%
 % \begin{pkgtip}
 %   The |\label| hack is only active within theorem environments where the
 %   proof-ref mechanism has been enabled.  Outside these environments, the
@@ -882,17 +909,6 @@
 % |\phfthm@proofrefstyle@|\meta{proof-ref style}|@setup|.
 %
 %
-% ................... The hack with the |\label| command is the following: The
-% |\label| command is redefined so that at its fist occurrence, it provides the
-% theorem environment label to use for the proof reference (``see proof on page
-% \ldots'', see \autoref{sec:proof-ref-mechanism}).  There, an additional hook
-% is provided, \DescribeMacro{\phfthm@hook@afterlabel@thmname}
-% |\phfthm@hook@afterlabel@|\meta{theorem environment name}, which is called
-% after the theorem label is set (it can be recovered from the value of
-% |\phfthm@val@thmlabel|.  By default, that hook calls the common hook
-% |\phfthm@hook@afterlabelcommon|\marg{theorem environment name}. (After the
-% first occurrence of |\label|, its definition is restored.)
-% 
 % Hence, to define a new proof-ref style, you simply need to define a macro
 % called |\phfthm@proofrefstyle@<PROOF-REF-STYLE-NAME>@setup|.  This macro
 % should include commands to locally define the macros
@@ -900,11 +916,12 @@
 % |\phfthm@proofref@impl@end|.
 %
 %
-% ........good idea: use the |default| proof-ref style and hack into that
-% (e.g.\@ see |margin| proofrefstyle) 
-% ............
-%  see also the documentation of the implementation
-% (\autoref{sec:impl-default-proof-ref-style}).
+% Different proof-ref styles may work similarly and want to share most of the
+% code.  A good idea is to build up on the |default| proof-ref style, which is
+% highly modular and can be instantiated in different flavors.  For an example,
+% check the |margin| proof-ref style which does precisely that.  For more
+% documentation, check out the implementation of the |default| proof-ref style
+% in \autoref{sec:impl-default-proof-ref-style}.
 %
 %
 %
