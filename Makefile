@@ -127,7 +127,7 @@ pdf: $(ALLPDF)
 clean: cleanaux
 
 cleanaux:
-	@rm -f *.aux *.log *.toc *.glo *.gls *.ind *.idx *.ilg *.out *.bbl *.blg *.synctex.gz
+	@rm -f *.aux *.log *.toc *.glo *.gls *.ind *.idx *.ilg *.out *.bbl *.blg *.synctex.gz *.hd
 
 cleanpdf:
 	@rm -f $(ALLPDF)
