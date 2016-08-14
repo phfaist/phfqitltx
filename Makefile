@@ -17,6 +17,8 @@ ALLDTX = phfnote.dtx phfquotetext.dtx phfqit.dtx phffullpagefigure.dtx phfsvnwat
 ALLSTY = phfnote.sty phfquotetext.sty phfqit.sty phffullpagefigure.sty phfsvnwatermark.sty phfparen.sty phfthm.sty
 ALLPDF = phfnote.pdf phfquotetext.pdf phfqit.pdf phffullpagefigure.pdf phfsvnwatermark.pdf phfparen.pdf phfthm.pdf
 
+README = README.md
+
 
 .PHONY: help sty cleanall install tdszip cleantdszip dist cleandist pdf clean cleanaux cleansty cleanpdf
 
@@ -79,9 +81,9 @@ install: $(ALLSTY) $(ALLPDF)
 	mkdir -p $(DESTDIR)$(PREFIX)/tex/latex/phfqitltx
 	mkdir -p $(DESTDIR)$(PREFIX)/doc/latex/phfqitltx
 	mkdir -p $(DESTDIR)$(PREFIX)/bibtex/bst/phfqitltx
-	cp $(ALLSTY) $(DESTDIR)$(PREFIX)/tex/latex/phfqitltx
-	cp $(ALLPDF) $(DESTDIR)$(PREFIX)/doc/latex/phfqitltx
-	cp naturemagdoi.bst $(DESTDIR)$(PREFIX)/bibtex/bst/phfqitltx
+	cp $(ALLSTY)  $(DESTDIR)$(PREFIX)/tex/latex/phfqitltx
+	cp $(ALLPDF) $(README)  $(DESTDIR)$(PREFIX)/doc/latex/phfqitltx
+	cp naturemagdoi.bst  $(DESTDIR)$(PREFIX)/bibtex/bst/phfqitltx
 
 
 # ------------------------------------------------
