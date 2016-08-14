@@ -4,6 +4,14 @@ LaTeX packages for QIT stuff which I use often
 
 Bundle Version: 2016/08/14 v1.0
 
+These packages provide useful definitions which I use often when writing
+scientific documents (and more specifically for quantum information theory).
+Some packages may be of more general use (formatting notes as a short document,
+full-page figures, quoting unformatted text, adding an SVN version watermark).
+Other packages are meant for scientific documents (more advanced theorems/proofs
+framework, handy parens in equations).  The phfqit package is specifically for
+quantum information theory.
+
 
 # List of Packages
 
@@ -11,17 +19,9 @@ Bundle Version: 2016/08/14 v1.0
   on paper, and provides some handy definitions.  Choose between several presets
   to get your preferred document appearance.
 
-- `phfqit` - some useful definitions for LaTeXing stuff in quantum information
-  theory, which I use often
-
-- `phfparen` - cool definitions for mathematical parenthetic expressions.  Easy
-  to resize, short code which is still readable.
-
 - `phffullpagefigure` - as the package name suggests, place figures on full pages.
   The caption e.g. reads "Figure 1 (on next page): blah blah" and the figure
   may occupy the full next page.
-
-- `phfthm` - goodies for theorems and proofs.
 
 - `phfquotetext` - quote verbatim text, from e.g. an email, without worrying
   about LaTeX special characters.  Differs from
@@ -30,6 +30,14 @@ Bundle Version: 2016/08/14 v1.0
 
 - `phfsvnwatermark` - add a watermark to your documents with the SVN ID, so that
   you know which document is which version
+
+- `phfthm` - goodies for theorems and proofs.
+
+- `phfparen` - cool definitions for mathematical parenthetic expressions.  Easy
+  to resize, short code which is still readable.
+
+- `phfqit` - some useful definitions for LaTeXing stuff in quantum information
+  theory, which I use often
 
 
 # Installation
