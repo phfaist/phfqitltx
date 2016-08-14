@@ -14,17 +14,16 @@
 *.synctex.gz
 
 # auto-generated sty files
-phfquotetext.sty
-phfnote.sty
-phfqit.sty
-phffullpagefigure.sty
-phfsvnwatermark.sty
-phfparen.sty
-phfthm.sty
+*/*.sty
 
-# stamp for sty-files generation
-_stamp_sty_from_ins.mkstamp
+# distribution files (TDS.ZIP)
+*/*.tds.zip
 
 # distribution files
-phfqitltx.tds.zip
-phfqitltx.zip
+phffullpagefigure/phffullpagefigure.zip
+phfnote/phfnote.zip
+phfparen/phfparen.zip
+phfqit/phfqit.zip
+phfquotetext/phfquotetext.zip
+phfsvnwatermark/phfsvnwatermark.zip
+phfthm/phfthm.zip

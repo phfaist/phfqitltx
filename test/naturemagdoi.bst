@@ -1,1 +1,1 @@
-../naturemagdoi.bst
+../phfnote/naturemagdoi.bst
