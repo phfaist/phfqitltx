@@ -20,7 +20,7 @@ ALLPDF = phfnote.pdf phfquotetext.pdf phfqit.pdf phffullpagefigure.pdf phfsvnwat
 README = README.md
 
 
-.PHONY: help sty cleanall install tdszip cleantdszip dist cleandist pdf clean cleanaux cleansty cleanpdf
+.PHONY: help sty cleanall install tdszip cleantdszip dist cleandist pdf clean cleanaux cleansty cleanpdf versioncheck
 
 # Don't remove intermediate files
 .SECONDARY:
@@ -109,7 +109,22 @@ phfqitltx.tds.zip: $(ALLSTY) $(ALLPDF)
 
 DISTTMPDIR = $(CURDIR)/_install_dist_zip.make.tmp
 
-dist: tdszip
+versioncheck:
+	@echo
+	@echo
+	@echo "================================================================================"
+	@echo
+	@echo "Please make sure that the version numbers are correct:"
+	@echo
+	@echo "In $(README): "
+	@grep -i 'Bundle Version:' $(README)
+	@echo "Individual package versions: "
+	@egrep -h '\[.* phf\w+ package\]' $(ALLDTX)
+	@echo
+	@echo "================================================================================"
+	@echo
+
+dist: versioncheck tdszip
 	rm -rf $(DISTTMPDIR)
 	mkdir -p $(DISTTMPDIR)/phfqitltx
 	cp phfqitltx.tds.zip $(DISTTMPDIR)
@@ -156,4 +171,3 @@ cleanpdf:
 	$(PDFLATEX) $(PDFLATEXOPTS) $<
 	$(PDFLATEX) $(PDFLATEXOPTS) $<
 	$(PDFLATEX) $(PDFLATEXOPTS) $<
-

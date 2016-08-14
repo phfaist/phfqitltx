@@ -2,6 +2,8 @@
 
 LaTeX packages for QIT stuff which I use often
 
+Bundle Version: 2016/08/14 v1.0
+
 
 # List of Packages
 
