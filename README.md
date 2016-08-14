@@ -1,6 +1,6 @@
 # phfqitltx
 
-LaTeX packages for QIT stuff which I use often
+Collection of LaTeX utility packages for scientific documents
 
 Bundle Version: 2016/08/14 v1.0
 
