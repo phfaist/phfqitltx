@@ -7,7 +7,6 @@ PREFIX ?= $(DEFAULT_PREFIX)
 
 ALLPKGS = phfnote phfquotetext phfqit phffullpagefigure phfsvnwatermark phfparen phfthm
 
-
 .PHONY: help sty pdf install versioncheck tdszip dist clean cleanall cleanaux cleansty cleanpdf cleantdszip cleandist
 
 # Don't remove intermediate files
@@ -37,62 +36,93 @@ help:
 	@echo "    - 'make dist' to generate a distribution ZIP file, ready to upload to CTAN;"
 	@echo "    - 'make versioncheck' to list the version information in the packages and the README file(s)."
 	@echo ""
+	@echo "You may also run make on individual packages.  Run 'make' or 'make help' within"
+	@echo "the corresponding subdirectory for more info."
+	@echo ""
 
 # ------------------------------------------------
 # make sty
 # ------------------------------------------------
 
-sty:  $(ALLSTY)
+ALLSTY = $(foreach x,$(ALLPKGS),$(x)/$(x).sty)
+ALLSTYCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) $(x).sty && ) true
 
-%/%.sty: %/%.ins %/%.dtx
-	$(LATEX) $<
+sty:
+	$(ALLSTYCMDS)
 
 cleansty:
 	@rm -f $(ALLSTY)
-	@rm -f _stamp_sty_from_ins.mkstamp
 
 # ------------------------------------------------
-# make cleanall
+# make clean, make cleanall
 # ------------------------------------------------
 
-cleanall:  cleanaux cleansty cleanpdf cleandist cleantdszip
+ALLCLEANCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C clean && ) true
+ALLCLEANALLCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C cleanall && ) true
 
+clean:
+	$(ALLCLEANCMDS)
+
+cleanall:
+	$(ALLCLEANALLCMDS)
+
+# ------------------------------------------------
+# make pdf
+# ------------------------------------------------
+
+ALLPDF = $(foreach x,$(ALLPKGS),$(x)/$(x).pdf)
+ALLPDFCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) $(x).pdf && ) true
+
+pdf:
+	$(ALLPDFCMDS)
+
+cleanpdf:
+	@rm -f $(ALLPDF)
+
+# ------------------------------------------------
+# make cleanaux
+# ------------------------------------------------
+
+ALLCLEANAUXCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C cleanaux && ) true
+
+cleanaux:
+	$(ALLCLEANAUXCMDS)
 
 # ------------------------------------------------
 # make install
 # ------------------------------------------------
 
-install: $(ALLSTY) $(ALLPDF)
-	mkdir -p $(DESTDIR)$(PREFIX)/tex/latex/phfqitltx
-	mkdir -p $(DESTDIR)$(PREFIX)/doc/latex/phfqitltx
-	mkdir -p $(DESTDIR)$(PREFIX)/bibtex/bst/phfqitltx
-	cp $(ALLSTY)  $(DESTDIR)$(PREFIX)/tex/latex/phfqitltx
-	cp $(ALLPDF) $(README)  $(DESTDIR)$(PREFIX)/doc/latex/phfqitltx
-	cp naturemagdoi.bst  $(DESTDIR)$(PREFIX)/bibtex/bst/phfqitltx
+ALLINSTALLCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) install && ) true
+
+install:
+	$(ALLINSTALLCMDS)
 
 
 # ------------------------------------------------
 # make tdszip
 # ------------------------------------------------
 
-tdszip: phfqitltx.tds.zip
+ALLTDSZIPCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) $(x).tds.zip && ) true
+
+tdszip:
+	$(ALLTDSZIPCMDS)
 
 cleantdszip:
-	@rm -f phfqitltx.tds.zip
-
-TDSTMPDIR = $(CURDIR)/_install_tds_zip.make.tmp
-
-phfqitltx.tds.zip: $(ALLSTY) $(ALLPDF)
-	mkdir $(TDSTMPDIR)
-	$(MAKE) install PREFIX=$(TDSTMPDIR)
-	cd $(TDSTMPDIR) && zip -r $(CURDIR)/phfqitltx.tds.zip *
-	rm -rf $(TDSTMPDIR)
+	..........
 
 # ------------------------------------------------
 # make dist
 # ------------------------------------------------
 
-DISTTMPDIR = $(CURDIR)/_install_dist_zip.make.tmp
+ALLDISTCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) dist && ) true
+
+dist:
+	$(ALLDISTCMDS)
+
+cleandist: ............
+	@rm -f phfqitltx.zip
+
+...........
 
 versioncheck:
 	@echo
@@ -109,50 +139,3 @@ versioncheck:
 	@echo "================================================================================"
 	@echo
 
-dist: versioncheck tdszip
-	rm -rf $(DISTTMPDIR)
-	mkdir -p $(DISTTMPDIR)/phfqitltx
-	cp phfqitltx.tds.zip $(DISTTMPDIR)
-	cp $(ALLDTX) $(ALLPDF) phfqitltx.ins README.md naturemagdoi.bst Makefile $(DISTTMPDIR)/phfqitltx
-	cd $(DISTTMPDIR) && zip -r $(CURDIR)/phfqitltx.zip phfqitltx.tds.zip phfqitltx
-	rm -rf $(DISTTMPDIR)
-
-cleandist:
-	@rm -f phfqitltx.zip
-
-# ------------------------------------------------
-# make pdf
-# ------------------------------------------------
-
-pdf: $(ALLPDF)
-
-clean: cleanaux
-
-cleanaux:
-	@rm -f *.aux *.log *.toc *.glo *.gls *.ind *.idx *.ilg *.out *.bbl *.blg *.synctex.gz *.hd
-
-cleanpdf:
-	@rm -f $(ALLPDF)
-
-
-#
-# fake index & glossary so they get a TOC entry from the beginning, and so the page
-# numbers in the index are correct.
-#
-%.aux %.idx %.glo: %.dtx %.sty
-	DTX=$< ; echo '\\begin{theindex}\\item index here \\end{theindex}' >$${DTX%.dtx}.ind
-	DTX=$< ; echo '\\begin{theglossary}\\item changes here\\end{theglossary}' >$${DTX%.dtx}.gls
-	$(PDFLATEX) $(PDFLATEXOPTS) $<
-	$(PDFLATEX) $(PDFLATEXOPTS) $<
-	$(PDFLATEX) $(PDFLATEXOPTS) $<
-
-%.ind: %.idx
-	$(MAKEINDEX) -s gind.ist -o $@ $<
-
-%.gls: %.glo
-	$(MAKEINDEX) -s gglo.ist -o $@ $<
-
-%.pdf: %.dtx %.aux %.ind %.gls
-	$(PDFLATEX) $(PDFLATEXOPTS) $<
-	$(PDFLATEX) $(PDFLATEXOPTS) $<
-	$(PDFLATEX) $(PDFLATEXOPTS) $<
