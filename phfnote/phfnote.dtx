@@ -114,7 +114,7 @@
 % \maketitle
 %
 % \begin{abstract}
-%   \pkgname{phfnote}---A handy \LaTeX{} class for typesetting short notes and
+%   \pkgname{phfnote}---A handy \LaTeX{} package for typesetting short notes and
 %   medium-length reports, full of goodies to make it look just right.
 % \end{abstract}
 %
@@ -135,7 +135,7 @@
 % too much space, better page margin sizes, and some basic styling to make
 % the note look nicer.  At the same time, it is highly configurable so that
 % nothing is really unchangeable.  And all overridden features can be
-% restored individually to their class-provided defaults.
+% restored individually to their defaults provided by the underlying class.
 %
 % This package has been designed to work optimally along with the |article|
 % document class, but in principle any relatively standard \LaTeX{} class should
@@ -148,8 +148,8 @@
 % complicated articles.  For that, you should use a specialized class such as
 % \RevTeX.\footnote{See \url{https://journals.aps.org/revtex}}
 %
-% In the following, we detail individual features of this class, and explain how
-% to activate, deactivate, and customize them.
+% In the following, we detail individual features of this package, and explain
+% how to activate, deactivate, and customize them.
 %
 %
 % \section{Basic Usage}
@@ -411,7 +411,8 @@
 %
 % \begin{pkgwarning}
 %   The optional argument to |\thanks|, as well as the command |\thanksmark|,
-%   are not made available if you don't use one of |\phfnote|'s title styles.
+%   are not made available if you don't use one of \pkgname{phfnote}'s title
+%   styles.
 %
 %   This behavior is such as to prevent interference with more advanced class
 %   mechanisms, such as \RevTeX's.
@@ -464,9 +465,10 @@
 %   then by default.
 % \item[abstract=\pkgoptattrib{noname}] The title ``Abstract.'' above the text
 %   will not be typeset.  The abstract text is typeset directly instead.
-% \item[abstract=\pkgoptattrib{original}] Revert to the class' default
-%   implementation of the |abstract| environment.  The class' implementation is
-%   restored and no longer tampered with.
+% \item[abstract=\pkgoptattrib{original}] Revert to the original class' default
+%   implementation of the |abstract| environment before \pkgname{phfnote} was
+%   loaded.  The original class' implementation is restored and no longer
+%   tampered with.
 % \item[abstract=\pkgoptattrib{small}] Use a smaller font for the abstract text
 %   (|\small| font).
 % \item[abstract=\pkgoptattrib{compact}] Reduce spacing before and after the
@@ -663,8 +665,9 @@
 % \item[secfmt=\pkgoptattrib{blockpar}] Change the paragraph-level headings not
 %   to be in ``run-in'' style, but to be typeset on their own line like section
 %   headings.
-% \item[secfmt=\pkgoptattribempty] Leave the argument empty to keep the original class styling;
-%   nothing will be overridden and the \pkgname{sectsty} package is not loaded.
+% \item[secfmt=\pkgoptattribempty] Leave the argument empty to keep the original
+%   class styling; nothing will be overridden and the \pkgname{sectsty} package
+%   is not loaded.
 % \end{pkgoptions}
 %
 % You can also directly modify the section heading style by redefining some
@@ -726,7 +729,7 @@
 % \item[par=indentminiskip] Paragraphs are indented, but there is also a small
 %   space between each paragraph.
 % \item[par=original] Do not modify the appearance of paragraphs, and leave the
-%   class default.
+%   original class' default.
 % \end{pkgoptions}
 %
 % \subsection{Adjusting Spacing of Lines and Words}
@@ -1084,8 +1087,9 @@
 % `default' title style as well as for other simpler styles.  Our implementation supports
 % |\thanks[N]{...}| and |\thanksmark[N]| as for footnotes.
 %
-% These newer implementations are only applied if one of our title styles is set.
-% Otherwise, the class defaults are left (which may be needed, e.g., for \RevTeX).
+% These newer implementations are only applied if one of our title styles is
+% set.  Otherwise, the class defaults are left untouched (which may be needed,
+% e.g., for \RevTeX).
 %
 % \paragraph{Implementation of \phfverb{\thanks} and friends for our main
 % `default' title style}
@@ -1329,12 +1333,11 @@
 % 
 % \subsubsection{Plugging into \phfverb{\maketitle}}
 %
-% Actually perform the definitions to make |\maketitle| produce the
-% title with the given style.  Specifically, we override
-% |\@maketitle|. The latter is called internally by |\maketitle|, and
-% the advantage of overriding |\@maketitle| only is that we inherit
-% the mechanism provided by the style class to deal with two-column
-% layouts.
+% Actually perform the definitions to make |\maketitle| produce the title with
+% the given style.  Specifically, we override |\@maketitle|. The latter is
+% called internally by |\maketitle|, and the advantage of overriding
+% |\@maketitle| only is that we inherit the mechanism provided by the original
+% class (e.g., |article|) to deal with two-column layouts.
 %
 % \begin{macro}{\phfnote@do@notetitle}
 %   This macro takes care of installing the correct title into the
