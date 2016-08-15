@@ -60,4 +60,7 @@ package documentation, run
 
 # License
 
-This material is subject to the [LaTeX Project Public License](http://www.ctan.org/license/lppl1.3), version 1.3 or above.
+(C) 2016 Philippe Faist, phfaist at gmail com
+
+This material is subject to the [LaTeX Project Public License](http://www.ctan.org/license/lppl1.3),
+version 1.3 or above.
