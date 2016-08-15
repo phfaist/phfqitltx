@@ -27,3 +27,12 @@ phfqit/phfqit.zip
 phfquotetext/phfquotetext.zip
 phfsvnwatermark/phfsvnwatermark.zip
 phfthm/phfthm.zip
+
+# pkg.mk
+phffullpagefigure/pkg.mk
+phfnote/pkg.mk
+phfparen/pkg.mk
+phfqit/pkg.mk
+phfquotetext/pkg.mk
+phfsvnwatermark/pkg.mk
+phfthm/pkg.mk
