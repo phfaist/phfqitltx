@@ -135,15 +135,19 @@ $(PKGTDSZIP): $(PKGSTY) $(PKGPDF)
 # make dist
 # ------------------------------------------------
 
+PKGZIP = $(PKG).zip
+
 DISTTMPDIR = $(CURDIR)/_install_dist_zip.make.tmp
 
-dist: $(PKGTDSZIP)
+$(PKGZIP): $(PKGTDSZIP)
 	rm -rf $(DISTTMPDIR)
 	mkdir -p $(DISTTMPDIR)/$(PKG)
 	cp $(PKGTDSZIP) $(DISTTMPDIR)
-	cp $(PKG).dtx $(PKGPDF) $(PKGREADME) Makefile $(DIST_ADDITIONAL_FILES) $(DISTTMPDIR)/$(PKG)
+	cp $(PKG).dtx $(PKGPDF) $(PKGREADME) Makefile pkg.mk $(DIST_ADDITIONAL_FILES) $(DISTTMPDIR)/$(PKG)
 	cd $(DISTTMPDIR) && zip -r $(CURDIR)/$(PKG).zip $(PKGTDSZIP) $(PKG)
 	rm -rf $(DISTTMPDIR)
+
+dist: $(PKGZIP)
 
 cleandist:
 	@rm -f $(PKG).zip

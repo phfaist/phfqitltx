@@ -3,7 +3,10 @@ PKG = phfnote
 
 DIST_ADDITIONAL_FILES = naturemagdoi.bst
 
-include ../mkcommon/pkg.mk
+-include pkg.mk
+
+pkg.mk:
+	ln -sf ../mkcommon/pkg.mk pkg.mk
 
 install:  install_sty install_doc
 	mkdir -p $(DESTDIR)$(PREFIX)/bibtex/bst/$(PKG)

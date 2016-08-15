@@ -7,10 +7,18 @@ PREFIX ?= $(DEFAULT_PREFIX)
 
 ALLPKGS = phfnote phfquotetext phfqit phffullpagefigure phfsvnwatermark phfparen phfthm
 
-.PHONY: help sty pdf install versioncheck tdszip dist clean cleanall cleanaux cleansty cleanpdf cleantdszip cleandist
+.PHONY: help clean cleanall sty cleansty pdf cleanpdf cleanaux install tdszip cleantdszip dist versioncheck cleandist
 
 # Don't remove intermediate files
 .SECONDARY:
+
+
+README = README.md
+
+
+ALLDTX = $(foreach x,$(ALLPKGS),$(x)/$(x).dtx)
+ALLSTY = $(foreach x,$(ALLPKGS),$(x)/$(x).sty)
+ALLPDF = $(foreach x,$(ALLPKGS),$(x)/$(x).pdf)
 
 
 # ------------------------------------------------
@@ -41,10 +49,25 @@ help:
 	@echo ""
 
 # ------------------------------------------------
+# make clean, make cleanall
+# ------------------------------------------------
+
+ALLCLEANCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) clean && ) true
+ALLCLEANALLCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) cleanall && ) true
+
+ALLLINKPKGMK = $(foreach x,$(ALLPKGS),$(x)/pkg.mk)
+
+clean:
+	$(ALLCLEANCMDS)
+
+cleanall:
+	$(ALLCLEANALLCMDS)
+	@rm -f $(ALLLINKPKGMK)
+
+# ------------------------------------------------
 # make sty
 # ------------------------------------------------
 
-ALLSTY = $(foreach x,$(ALLPKGS),$(x)/$(x).sty)
 ALLSTYCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) $(x).sty && ) true
 
 sty:
@@ -54,23 +77,9 @@ cleansty:
 	@rm -f $(ALLSTY)
 
 # ------------------------------------------------
-# make clean, make cleanall
-# ------------------------------------------------
-
-ALLCLEANCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C clean && ) true
-ALLCLEANALLCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C cleanall && ) true
-
-clean:
-	$(ALLCLEANCMDS)
-
-cleanall:
-	$(ALLCLEANALLCMDS)
-
-# ------------------------------------------------
 # make pdf
 # ------------------------------------------------
 
-ALLPDF = $(foreach x,$(ALLPKGS),$(x)/$(x).pdf)
 ALLPDFCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) $(x).pdf && ) true
 
 pdf:
@@ -83,7 +92,7 @@ cleanpdf:
 # make cleanaux
 # ------------------------------------------------
 
-ALLCLEANAUXCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C cleanaux && ) true
+ALLCLEANAUXCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) cleanaux && ) true
 
 cleanaux:
 	$(ALLCLEANAUXCMDS)
@@ -92,7 +101,7 @@ cleanaux:
 # make install
 # ------------------------------------------------
 
-ALLINSTALLCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) install && ) true
+ALLINSTALLCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) install PREFIX="$(PREFIX)" && ) true
 
 install:
 	$(ALLINSTALLCMDS)
@@ -103,26 +112,30 @@ install:
 # ------------------------------------------------
 
 ALLTDSZIPCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) $(x).tds.zip && ) true
+ALLCLEANTDSZIPCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) cleantdszip && ) true
 
 tdszip:
 	$(ALLTDSZIPCMDS)
 
 cleantdszip:
-	..........
+	$(ALLCLEANTDSZIPCMDS)
 
 # ------------------------------------------------
 # make dist
 # ------------------------------------------------
 
 ALLDISTCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) dist && ) true
+ALLCLEANDISTCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) cleandist && ) true
 
-dist:
+dist: versioncheck
 	$(ALLDISTCMDS)
 
-cleandist: ............
-	@rm -f phfqitltx.zip
+cleandist: 
+	$(ALLCLEANDISTCMDS)
 
-...........
+# ------------------------------------------------
+# make versioncheck
+# ------------------------------------------------
 
 versioncheck:
 	@echo
