@@ -11,3 +11,11 @@ $Id$, $Date$ and $Author$ via the `svn` or `svn-multi` packages.
 
 Run 'make sty' to generate the style file and 'make pdf' to generate the package
 documentation. Run 'make' or 'make help' for more info.
+
+
+# Author and License
+
+(C) 2016 Philippe Faist, phfaist at gmail com
+
+License: [LaTeX project public license](http://www.ctan.org/license/lppl1.3),
+version 1.3 or above

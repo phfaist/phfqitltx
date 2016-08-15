@@ -10,14 +10,17 @@ nice title which doesn't take up too much space, better page margin sizes, and
 some basic styling to make the note look nicer. At the same time, it is highly
 flexible and customizable.
 
-# Author and License
-
-(C) 2016 Philippe Faist, phfaist at gmail com
-
-License: LaTeX project public license, version 1.3 or above
 
 # Documentation
 
 Run 'make sty' to generate the style file and 'make pdf' to generate the package
 documentation. Run 'make' or 'make help' for more info.
+
+
+# Author and License
+
+(C) 2016 Philippe Faist, phfaist at gmail com
+
+License: [LaTeX project public license](http://www.ctan.org/license/lppl1.3),
+version 1.3 or above
 
