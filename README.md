@@ -2,7 +2,7 @@
 
 Collection of LaTeX utility packages for scientific documents
 
-Bundle Version: 2016/08/14 v1.0
+Bundle Version: 2016/08/15 v1.0
 
 These packages provide useful definitions which I use often when writing
 scientific documents (and more specifically for quantum information theory).

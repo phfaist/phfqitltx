@@ -10,6 +10,6 @@ instance. For example, the syntax " `\big( a + b ) " can be used to replace
 
 # Documentation
 
-Run 'make phfparen.sty' to generate the style file and 'make phfparen.pdf' to
-generate the package documentation. Run 'make' or 'make help' for more info.
+Run 'make sty' to generate the style file and 'make pdf' to generate the package
+documentation. Run 'make' or 'make help' for more info.
 

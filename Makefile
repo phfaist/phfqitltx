@@ -5,7 +5,8 @@
 DEFAULT_PREFIX := $(shell kpsewhich -var-value TEXMFHOME)
 PREFIX ?= $(DEFAULT_PREFIX)
 
-ALLPKGS = phfnote phfquotetext phfqit phffullpagefigure phfsvnwatermark phfparen phfthm
+# phfnote must go first (all docs need phfnote.sty)
+ALLPKGS = phfnote phffullpagefigure phfqit phfquotetext phfparen phfsvnwatermark phfthm
 
 .PHONY: help clean cleanall sty cleansty pdf cleanpdf cleanaux install tdszip cleantdszip dist versioncheck cleandist
 
@@ -68,7 +69,7 @@ cleanall:
 # make sty
 # ------------------------------------------------
 
-ALLSTYCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) $(x).sty && ) true
+ALLSTYCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) sty && ) true
 
 sty:
 	$(ALLSTYCMDS)
@@ -80,7 +81,7 @@ cleansty:
 # make pdf
 # ------------------------------------------------
 
-ALLPDFCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) $(x).pdf && ) true
+ALLPDFCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) pdf && ) true
 
 pdf:
 	$(ALLPDFCMDS)
@@ -111,7 +112,7 @@ install:
 # make tdszip
 # ------------------------------------------------
 
-ALLTDSZIPCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) $(x).tds.zip && ) true
+ALLTDSZIPCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) tdszip && ) true
 ALLCLEANTDSZIPCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) cleantdszip && ) true
 
 tdszip:

@@ -9,6 +9,5 @@ $Id$, $Date$ and $Author$ via the `svn` or `svn-multi` packages.
 
 # Documentation
 
-Run 'make phfsvnwatermark.sty' to generate the style file and
-'make phfsvnwatermark.pdf' to generate the package documentation. Run 'make' or
-'make help' for more info.
+Run 'make sty' to generate the style file and 'make pdf' to generate the package
+documentation. Run 'make' or 'make help' for more info.

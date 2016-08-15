@@ -11,5 +11,5 @@ and "Proof of Theorem 4: ..."
 
 # Documentation
 
-Run 'make phfthm.sty' to generate the style file and 'make phfthm.pdf' to
-generate the package documentation. Run 'make' or 'make help' for more info.
+Run 'make sty' to generate the style file and 'make pdf' to generate the package
+documentation. Run 'make' or 'make help' for more info.

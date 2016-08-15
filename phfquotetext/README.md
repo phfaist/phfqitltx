@@ -10,7 +10,6 @@ as normal paragraph content, ignoring any white space preformatting.
 
 # Documentation
 
-Run 'make phfquotetext.sty' to generate the style file and
-'make phfquotetext.pdf' to generate the package documentation. Run 'make' or
-'make help' for more info.
+Run 'make sty' to generate the style file and 'make pdf' to generate the package
+documentation. Run 'make' or 'make help' for more info.
 

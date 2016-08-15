@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfnote}
 %<*package>
-    [2016/08/14 v1.0 phfnote package]
+    [2016/08/15 v1.0 phfnote package]
 %</package>
 %
 %<*driver>
@@ -110,7 +110,7 @@
 % 
 % \title{\phfqitltxPkgTitle{phfnote}}
 % \author{Philippe Faist\quad\email{philippe.faist@bluewin.ch}}
-%
+% \date{\pkgfmtdate\filedate}
 % \maketitle
 %
 % \begin{abstract}
@@ -3042,12 +3042,28 @@
   \phfnoteRestoreDefs{verbatimstuff}
 %    \end{macrocode}
 % 
+% Common title stuff:
 %    \begin{macrocode}
   \def\phfqitltxPkgTitle##1{The \pkgname{##1} package\thanks{\itshape
     This document corresponds to \pkgname{##1}~\fileversion, dated \filedate. It
     is part of the
     \href{https://github.com/phfaist/phfqitltx/}{\pkgname{phfqitltx}} package
-    suite, see \url{https://github.com/phfaist/phfqitltx}.}}  }
+    suite, see \url{https://github.com/phfaist/phfqitltx}.}}
+%    \end{macrocode}
+% 
+% Utility to parse package file date into ``|\today|''-style date: invoke as
+% |\date{\pkgfmtdate\filedate}|.
+%    \begin{macrocode}
+  \def\pkgfmtdate##1{%
+    \edef\pkgfmtdate@thedate{##1}%
+    \expandafter\pkgfmtdate@next\pkgfmtdate@thedate\@nil%
+  }
+  \def\pkgfmtdate@next##1/##2/##3\@nil{% YYYY/MM/DD
+    \ifcase ##2 \or January\or February\or March\or April\or May%
+    \or June\or July\or August\or September\or October\or November\or December\fi\space ##3,%
+    \space ##1}
+  \robustify\pkgfmtdate@next
+}
 %    \end{macrocode}
 % \end{macro}
 % 

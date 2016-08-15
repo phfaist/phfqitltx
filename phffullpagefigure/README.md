@@ -9,7 +9,6 @@ with the corresponding caption reading for example "Figure 3 (on next page):
 
 # Documentation
 
-Run 'make phffullpagefigure.sty' to generate the style file and
-'make phffullpagefigure.pdf' to generate the package documentation. Run 'make'
-or 'make help' for more info.
+Run 'make sty' to generate the style file and 'make pdf' to generate the package
+documentation. Run 'make' or 'make help' for more info.
 

@@ -4,7 +4,7 @@
 #
 LATEX = latex
 
-PDFLATEX = pdflatex
+PDFLATEX = TEXINPUTS="$$TEXINPUTS:../phfnote" pdflatex
 PDFLATEXOPTS = -interaction=batchmode
 PDFLATEXOPTSLAST = -interaction=batchmode --synctex=1
 
@@ -24,25 +24,36 @@ PREFIX ?= $(DEFAULT_PREFIX)
 PKGREADME = README.md
 
 #
-# packages may specify additional files in the distribution with this variable (by default
-# empty)
+# packages may specify additional files in the distribution with this variable
+# (by default empty)
 #
 DIST_ADDITIONAL_FILES ?= 
 
 
+PKGDTX = $(PKG).dtx
+PKGINS = $(PKG).ins
+PKGSTY = $(PKG).sty
+PKGPDF = $(PKG).pdf
+PKGTDSZIP = $(PKG).tds.zip
+PKGZIP = $(PKG).zip
 
-.PHONY: default clean cleanall cleansty cleanaux cleanpdf cleantdszip cleandist  install_sty install_doc
 
+
+.PHONY: help sty pdf install install_sty install_doc tdszip dist clean cleanall cleansty cleanaux cleanpdf cleantdszip cleandist
 
 
 help:
 	@echo "Targets for $(PKG):"
-	@echo "make $(PKG).sty"
-	@echo "make $(PKG).pdf"
-	@echo "make install"
+	@echo "make sty             -- generate LaTeX package file $(PKG).sty"
+	@echo "make pdf             -- generate pdf documentation"
+	@echo "make install         -- install style and documentation files to TEXMF tree"
 	@echo "make install PREFIX=[specify texmf directory]"
-	@echo "make $(PKG).tds.zip"
-	@echo "make dist"
+	@echo "make $(PKG).tds.zip  -- create TDS.ZIP to include in CTAN upload"
+	@echo "make dist            -- create distribution ZIP, ready for upload to CTAN"
+	@echo "make clean           -- remove LaTeX auxiliary files"
+	@echo "make cleansty        -- remove generated style file"
+	@echo "make cleanpdf        -- remove generated pdf documentation"
+	@echo "make cleanall        -- remove all generated files, incl. distribution zip"
 
 
 clean: cleanaux
@@ -50,34 +61,28 @@ clean: cleanaux
 cleanall: cleansty cleanaux cleanpdf cleantdszip cleandist
 
 # ------------------------------------------------
-# make PKG.sty
+# make sty
 # ------------------------------------------------
 
-PKGSTY = $(PKG).sty
+sty: $(PKGSTY)
 
-$(PKGSTY): $(PKG).ins $(PKG).dtx
+$(PKGSTY): $(PKGINS) $(PKGDTX)
 	$(LATEX) $<
 
 cleansty:
 	@rm -f $(PKGSTY)
 
 # ------------------------------------------------
-# make PKG.pdf
+# make pdf
 # ------------------------------------------------
 
-PKGPDF = $(PKG).pdf
-
-cleanaux:
-	@rm -f *.aux *.log *.toc *.glo *.gls *.ind *.idx *.ilg *.out *.bbl *.blg *.synctex.gz *.hd
-
-cleanpdf:
-	@rm -f $(PKGPDF)
+pdf: $(PKG).pdf
 
 #
 # fake index & glossary so they get a TOC entry from the beginning, and so the page
 # numbers in the index are correct.
 #
-$(PKG).aux $(PKG).idx $(PKG).glo: $(PKG).dtx $(PKG).sty
+$(PKG).aux $(PKG).idx $(PKG).glo: $(PKGDTX) $(PKGSTY)
 	DTX=$< ; echo '\\begin{theindex}\\item index here \\end{theindex}' >$${DTX%.dtx}.ind
 	DTX=$< ; echo '\\begin{theglossary}\\item changes here\\end{theglossary}' >$${DTX%.dtx}.gls
 	$(PDFLATEX) $(PDFLATEXOPTS) $<
@@ -92,37 +97,45 @@ $(PKG).gls: $(PKG).glo
 
 # final steps of making the PKG.pdf doc file.  At the end, touch the ind and gls files so
 # that they don't look out-of-date (because the idx and glo files were overwritten again)
-$(PKG).pdf: $(PKG).dtx $(PKG).aux $(PKG).ind $(PKG).gls
+$(PKGPDF): $(PKGDTX) $(PKG).aux $(PKG).ind $(PKG).gls
 	$(PDFLATEX) $(PDFLATEXOPTS) $<
 	$(PDFLATEX) $(PDFLATEXOPTS) $<
 	$(PDFLATEX) $(PDFLATEXOPTSLAST) $<
 	touch $(PKG).ind $(PKG).gls $(PKG).pdf
 
 
+cleanaux:
+	@rm -f *.aux *.log *.toc *.glo *.gls *.ind *.idx *.ilg *.out *.bbl *.blg *.synctex.gz *.hd
+
+cleanpdf:
+	@rm -f $(PKGPDF)
+
+# ------------------------------------------------
+# 'make install' partial installation targets
+# ------------------------------------------------
+
 #
-# partial installation targets
+# The install target itself is defined per-package, in case packages want to install more
+# files (such as bibtex styles)
 #
 
-install_sty:
+install_sty: $(PKGSTY)
 	mkdir -p $(DESTDIR)$(PREFIX)/tex/latex/$(PKG)
-	cp $(PKG).sty  $(DESTDIR)$(PREFIX)/tex/latex/$(PKG)
+	cp $(PKGSTY)  $(DESTDIR)$(PREFIX)/tex/latex/$(PKG)
 
-install_doc:
+install_doc: $(PKGPDF)
 	mkdir -p $(DESTDIR)$(PREFIX)/doc/latex/$(PKG)
 	cp $(PKGPDF) $(PKGREADME)  $(DESTDIR)$(PREFIX)/doc/latex/$(PKG)
 
 
 
 # ------------------------------------------------
-# make PKG.tds.zip
+# make tdszip
 # ------------------------------------------------
 
-PKGTDSZIP = $(PKG).tds.zip
-
-cleantdszip:
-	@rm -f $(PKGTDSZIP)
-
 TDSTMPDIR = $(CURDIR)/_install_tds_zip.make.tmp
+
+tdszip: $(PKGTDSZIP)
 
 $(PKGTDSZIP): $(PKGSTY) $(PKGPDF)
 	mkdir $(TDSTMPDIR)
@@ -130,24 +143,25 @@ $(PKGTDSZIP): $(PKGSTY) $(PKGPDF)
 	cd $(TDSTMPDIR) && zip -r $(CURDIR)/$(PKGTDSZIP) *
 	rm -rf $(TDSTMPDIR)
 
+cleantdszip:
+	@rm -f $(PKGTDSZIP)
+
 
 # ------------------------------------------------
 # make dist
 # ------------------------------------------------
 
-PKGZIP = $(PKG).zip
-
 DISTTMPDIR = $(CURDIR)/_install_dist_zip.make.tmp
+
+dist: $(PKGZIP)
 
 $(PKGZIP): $(PKGTDSZIP)
 	rm -rf $(DISTTMPDIR)
 	mkdir -p $(DISTTMPDIR)/$(PKG)
 	cp $(PKGTDSZIP) $(DISTTMPDIR)
-	cp $(PKG).dtx $(PKGPDF) $(PKGREADME) Makefile pkg.mk $(DIST_ADDITIONAL_FILES) $(DISTTMPDIR)/$(PKG)
-	cd $(DISTTMPDIR) && zip -r $(CURDIR)/$(PKG).zip $(PKGTDSZIP) $(PKG)
+	cp $(PKGDTX) $(PKGINS) $(PKGPDF) $(PKGREADME) Makefile pkg.mk $(DIST_ADDITIONAL_FILES) $(DISTTMPDIR)/$(PKG)
+	cd $(DISTTMPDIR) && zip -r $(CURDIR)/$(PKGZIP) $(PKGTDSZIP) $(PKG)
 	rm -rf $(DISTTMPDIR)
 
-dist: $(PKGZIP)
-
 cleandist:
-	@rm -f $(PKG).zip
+	@rm -f $(PKGZIP)

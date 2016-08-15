@@ -14,6 +14,6 @@ etc.).
 
 # Documentation
 
-Run 'make phfqit.sty' to generate the style file and 'make phfqit.pdf' to
-generate the package documentation. Run 'make' or 'make help' for more info.
+Run 'make sty' to generate the style file and 'make pdf' to generate the package
+documentation. Run 'make' or 'make help' for more info.
 

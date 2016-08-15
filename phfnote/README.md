@@ -13,6 +13,6 @@ flexible and customizable.
 
 # Documentation
 
-Run 'make phfnote.sty' to generate the style file and 'make phfnote.pdf' to
-generate the package documentation. Run 'make' or 'make help' for more info.
+Run 'make sty' to generate the style file and 'make pdf' to generate the package
+documentation. Run 'make' or 'make help' for more info.
 
