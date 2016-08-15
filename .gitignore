@@ -14,7 +14,7 @@
 *.synctex.gz
 
 # auto-generated sty files
-*/*.sty
+phf*/*.sty
 
 # distribution files (TDS.ZIP)
 */*.tds.zip
