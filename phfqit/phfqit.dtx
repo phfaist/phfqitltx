@@ -325,6 +325,9 @@
 %
 % \section{Entropy Measures}
 %
+% DOC TODO: THIS DOC WILL BE OUTDATED AFTER MY CHANGES ........... !!!!!!!
+% ..................
+%
 % \subsection{Entropy, Conditional Entropy}
 % \label{sec:entropy-measures}
 %
@@ -566,7 +569,7 @@
 }
 \def\phfqit@IdentProc@do#1#2#3{%
   \operatorname{id}_{#1\notblank{#2}{\to #2}{}}%
-  \notblank{#3}{\expandafter\phfqit@inner@parens\phfqit@val@sizearg{#3}}{}%
+  \notblank{#3}{\expandafter\phfqitParens\phfqit@val@sizearg{#3}}{}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -858,7 +861,7 @@
 %
 %
 %
-% \subsection{Entropy Measures}
+% \subsection{Tools for Entropy Measures and Other Qit Quantities}
 %
 % \subsubsection{Some Internal Utilities}
 %
@@ -877,232 +880,316 @@
   \begingroup%
   \mathcode`\`="0060\relax%
   \gdef\phfqit@val@sizearg{}%
-  \@ifnextchar`{\phfqit@parsesizearg@withsize{#1}}{\endgroup#1}%
+  \def\phfqit@tmp@contwithsize{\phfqit@parsesizearg@withsize{#1}}%
+  \@ifnextchar`{\phfqit@tmp@contwithsize}{\endgroup#1}%
 }
 \def\phfqit@parsesizearg@withsize#1`#2{%
-  \def\@tmp@arg{#2}%
-  \def\@tmp@star{*}%
-  \def\@tmp@endgroupandcontinue{\endgroup#1}%
-  \ifx\@tmp@arg\@tmp@star\relax%
+  \def\phfqit@tmp@x{#2}%
+  \def\phfqit@tmp@star{*}%
+  \ifx\phfqit@tmp@x\phfqit@tmp@star%
     \gdef\phfqit@val@sizearg{*}%
-    \expandafter\@tmp@endgroupandcontinue%
+    \def\phfqit@tmp@cont{\endgroup#1}%
+    \expandafter\phfqit@tmp@cont%
   \else%
     \gdef\phfqit@val@sizearg{[#2]}%
-    \expandafter\@tmp@endgroupandcontinue%
+    \def\phfqit@tmp@cont{\endgroup#1}%
+    \expandafter\phfqit@tmp@cont%
   \fi%
 }
 %    \end{macrocode}
 % \end{macro}
-% 
 %
-% \begin{macro}{\phfqit@inner@parens}
+% \begin{macro}{\phfqitParens}
 %   Simple parenthesis-delimited expression, with
 %   |\DeclarePairedDelimiter|-compatible syntax.  For example,
-%   \par |\phfqit@inner@parens|\marg{content} \quad$\to$\quad
+%   \par |\phfqitParens|\marg{content} \quad$\to$\quad
 %   \fbox{\phfverb( \meta{content} \phfverb)}
-%   \par |\phfqit@inner@parens*|\marg{content} \quad$\to$\quad
+%   \par |\phfqitParens*|\marg{content} \quad$\to$\quad
 %   \fbox{\phfverb\left\phfverb( \meta{content} \phfverb\right\phfverb)}
-%   \par |\phfqit@inner@parens[\big]|\marg{content} \quad$\to$\quad
+%   \par |\phfqitParens[\big]|\marg{content} \quad$\to$\quad
 %   \fbox{\phfverb\bigl\phfverb( \meta{content} \phfverb\bigr\phfverb)}
 %
 %    \begin{macrocode}
-\DeclarePairedDelimiterX\phfqit@inner@parens[1]{(}{)}{#1}
+\DeclarePairedDelimiterX\phfqitParens[1]{(}{)}{#1}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\phfqitSquareBrackets}
+%   Simple bracket-delimited expression, with
+%   |\DeclarePairedDelimiter|-compatible syntax.  For example,
+%   \par |\phfqitSquareBrackets|\marg{content} \quad$\to$\quad
+%   \fbox{\phfverb( \meta{content} \phfverb)}
+%   \par |\phfqitSquareBrackets*|\marg{content} \quad$\to$\quad
+%   \fbox{\phfverb\left\phfverb( \meta{content} \phfverb\right\phfverb)}
+%   \par |\phfqitSquareBrackets[\big]|\marg{content} \quad$\to$\quad
+%   \fbox{\phfverb\bigl\phfverb( \meta{content} \phfverb\bigr\phfverb)}
+%
+%    \begin{macrocode}
+\DeclarePairedDelimiterX\phfqitSquareBrackets[1]{[}{]}{#1}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\phfqitCurlyBrackets}
+%   Simple bracket-delimited expression, with
+%   |\DeclarePairedDelimiter|-compatible syntax.  For example,
+%   \par |\phfqitSquareBrackets|\marg{content} \quad$\to$\quad
+%   \fbox{\phfverb( \meta{content} \phfverb)}
+%   \par |\phfqitSquareBrackets*|\marg{content} \quad$\to$\quad
+%   \fbox{\phfverb\left\phfverb( \meta{content} \phfverb\right\phfverb)}
+%   \par |\phfqitSquareBrackets[\big]|\marg{content} \quad$\to$\quad
+%   \fbox{\phfverb\bigl\phfverb( \meta{content} \phfverb\bigr\phfverb)}
+%
+%    \begin{macrocode}
+\DeclarePairedDelimiterX\phfqitCurlyBrackets[1]{\{}{\}}{#1}
 %    \end{macrocode}
 % \end{macro}
 %
 %
 %
-% \subsubsection{Entropy, Conditional Entropy, and Entropy Function}
+% \subsubsection{Basic machinery for Entropy-like Notation Objects}
 %
 % See user documentation in \autoref{sec:entropy-measures}.
 %
-% \begin{macro}{\HHSym}
-%   The symbol used to designate an entropy measure (not relative).
+% \begin{macro}{\QitObject}
+%   The argument is the entropic quantity type (or ``entropic quantity
+%   driver''): one of |Hbase|, |Hfnbase|, |Dbase|, |DCbase|, or a custom driver.
 %    \begin{macrocode}
-\newcommand\HHSym{H}
+\newcommand\QitObject[1]{%
+  \begingroup
+\message{DEBUG: \detokenize{\QitObject{#1}}}%
+  \def\QitObj@args{}%
+  \def\qitobjParseDone{\QitObj@proceedToRender{#1}}%
+  \def\qitobjDone{\endgroup\QitObjectDone}%
+  \csname QitObj@reg@#1@parse\endcsname%
+}
+\def\qitobjAddArg#1{%
+  \appto\QitObj@args{{#1}}%
+}
+\def\qitobjAddArgx#1{%
+  \expandafter\qitobjAddArg\expandafter{#1}%
+}
+\def\QitObj@proceedToRender#1{% internal
+\message{DEBUG: Rendering #1|\detokenize\expandafter{\QitObj@args}|}%
+  \expandafter\def\expandafter\x\expandafter{\csname QitObj@reg@#1@render\endcsname}%
+  \expandafter\x\QitObj@args%
+}
+\def\QitObjectDone{}
+\def\DefineQitObjectType#1#2#3{%
+  \csdef{#1}{\QitObject{#1}}%
+  \expandafter\robustify\csname #1\endcsname%
+  \cslet{QitObj@reg@#1@parse}#2%
+  \cslet{QitObj@reg@#1@render}#3%
+}%
 %    \end{macrocode}
 % \end{macro}
 %
 %
-% \begingroup\makeatletter
-% \begin{macro}{\@HHbase}
-%   Base macro for entropy macros.
+% \subsubsection{Entropic Quantity Type: Entropy, Conditional Entropy}
+%
+% \begin{macro}{\HbaseParse}
+%   Base parser macro for ``$H(A\mid B)$''-kind entropy measures.
 %
 %   USAGE:
-%   |\@HHbase|\marg{H-symbol}\hspace{0pt}\marg{subscript}\hspace{0pt}\relax
-%   \marg{superscript}\hspace{0pt}\meta{size-spec}\hspace{0pt}\oarg{state}\hspace{0pt}\relax
-%   \oarg{epsilon}\hspace{0pt}\marg{target system}\hspace{0pt}\oarg{conditioning system}
+%   |\Hbase|\marg{H-symbol}\hspace{0pt}\relax
+%   \marg{subscript}\hspace{0pt}\relax
+%   \meta{size-spec}\hspace{0pt}\oarg{state}\relax
+%   \hspace{0pt}\oarg{epsilon}\hspace{0pt}\marg{target system}\hspace{0pt}\relax
+%   \oarg{conditioning system}
 %
 %   The argument \meta{size-spec} is optional, and is documented in
 %   \autoref{topic:size-specification-backtick}.  For example \meta{size-spec} =
 %   |`*| or |`\Big|.
 %
-%   This command is robust.
-% 
 %   Examples: 
-%   \par |\@HHbase{\hat{H}}{\mathrm{max}}[\rho][\epsilon]{E}[X']|
+%   \par |\Hbase{}{\hat{H}}{\mathrm{max}}[\rho][\epsilon]{E}[X']|
 %   \quad$\to$\quad
-%   \fbox{$\@HHbase{\hat{H}}{\mathrm{max}}[\rho][\epsilon]{E}[X']$}
-%   \par |\@HHbase{\hat{H}}{\mathrm{max}}`*[\rho][\epsilon]{\bigotimes_i E}[X']|
+%   \fbox{$\Hbase{}{\hat{H}}{\mathrm{max}}[\rho][\epsilon]{E}[X']$}
+%   \par |\Hbase{}{\hat{H}}{\mathrm{max}}`*[\rho][\epsilon]{\bigotimes_i E}[X']|
 %   \quad$\to$\quad
-%   \fbox{$\@HHbase{\hat{H}}{\mathrm{max}}`*[\rho][\epsilon]{\displaystyle\bigotimes_i E}[X']$}
-%   \par |\@HHbase{\hat{H}}{\mathrm{max}}`\big[\rho][\epsilon]{E}[X']|
+%   \fbox{$\Hbase{}{\hat{H}}{\mathrm{max}}`*[\rho][\epsilon]{\displaystyle\bigotimes_i E}[X']$}
+%   \par |\Hbase{\def\HbaseRenderSup{#1}{\boldsymbol{#1}}}{\hat{H}}{\mathrm{max}}|\hspace{0pt}\relax
+%   |`\big[\rho][\epsilon]{E}[X']|
 %   \quad$\to$\quad
-%   \fbox{$\@HHbase{\hat{H}}{\mathrm{max}}`\big[\rho][\epsilon]{E}[X']$}
+%   \fbox{$\Hbase{\def\HbaseRenderSup{\boldsymbol}}{\hat{H}}{\mathrm{max}}`\big[\rho][\epsilon]{E}[X']$}
 %   
+% 
+%   The |\HbaseParse| macro is responsible for parsing the arguments to
+%   |\Hbase|.  We should parse the arguments using helper macros as needed,
+%   adding rendering arguments with |\qitobjAddArg| or |\qitobjAddArgx|, and
+%   then calling |\qitobjParseDone|.  The arguments are then automatically
+%   provided as arguments to the |\HbaseRender| function.  We just have to make
+%   sure we add the correct number of arguments in the correct order.
+%   
+%   The first three arguments are the mandatory arguments
+%   \marg{H-symbol}\hspace{0pt}\marg{subscript}
 %    \begin{macrocode}
-\def\@HHbase#1#2{%
-  #1_{#2}%
-  \@HHbase@parsesize%
+\def\HbaseParse#1#2{%
+  \qitobjAddArg{#1}%
+  \qitobjAddArg{#2}%
+  \phfqit@parsesizearg\HbaseParse@%
 }
-\robustify\@HHbase
 %    \end{macrocode}
 % 
+% Some helper macros are used to parse all the arguments properly.  First parse
+% an optional \oarg{state} argument.  Also, store the delimiter size argument
+% which |\phfqit@parsesizearg| has stored into |\phfqit@val@sizearg|.
+%    \begin{macrocode}
+\newcommand\HbaseParse@[1][]{%
+  \qitobjAddArgx{\phfqit@val@sizearg}%
+  \qitobjAddArg{#1}%
+  \HbaseParse@@%
+}
+%    \end{macrocode}
+% Then parse an optional \oarg{epsilon} argument, as well as a mandatory
+% \marg{target system} argument.
+%    \begin{macrocode}
+\newcommand\HbaseParse@@[2][]{%
+  \qitobjAddArg{#1}%
+  \qitobjAddArg{#2}%
+  \HbaseParse@@@%
+}
+%    \end{macrocode}
+% Finally, parse an optional \oarg{conditioning system}.
+%    \begin{macrocode}
+\newcommand\HbaseParse@@@[1][]{%
+  \qitobjAddArg{#1}%
+  \qitobjParseDone%
+}
+%    \end{macrocode}
 %
-% TODO: use our generic size parser, don't duplicate code....  this is
-% historical and I don't dare change it without thorough testing:
+% \begin{macro}{\HbaseRender}
+%   Render the entropy measure.
+%   \par |#1| = ``$H$'' symbol to use (e.g. |H|)
+%   \par |#2| = subscript (type of entropy, e.g. |\marthrm{min},0|)
+%   \par |#3| = possible size argument to expand in front of parens command (one
+%   of \emph{(empty)}, |*|, or |[\big]| using a standard sizing command)
+%   \par |#4| = the state (e.g. |\rho|), may be left empty
+%   \par |#5| = epsilon argument (superscript to entropy measure), if any, or
+%   leave argument empty
+%   \par |#6| = system to measure entropy of
+%   \par |#7| = conditioning system, if any, or else leave the argument empty
 %    \begin{macrocode}
-\def\@HHbase@parsesize{%
-  \begingroup\mathcode`\`="0060\relax%
-  \gdef\HH@tmp@sizearg{}%
-  \@ifnextchar`\@HHbase@withsize\@HHbase@endgroupandparseinner%
-}
-\def\@HHbase@withsize`#1{%
-  \def\@tmp@arg{#1}%
-  \def\@tmp@star{*}%
-  \ifx\@tmp@arg\@tmp@star\relax%
-    \gdef\HH@tmp@sizearg{*}%
-    \expandafter\@HHbase@endgroupandparseinner%
-  \else%
-    \gdef\HH@tmp@sizearg{[#1]}%
-    \expandafter\@HHbase@endgroupandparseinner%
-  \fi%
-}
-\def\@HHbase@endgroupandparseinner{\endgroup\@HHbase@parseinner}
-\newcommand\@HHbase@parseinner[1][]{%  arg: state
-  \def\HH@tmpstore@state{#1}%
-  \@HHbase@parseinner@%
-}
-\newcommand\@HHbase@parseinner@[2][]{% arg: epsilon and target system
-  \def\HH@tmpstore@epsilon{#1}%
-  \def\HH@tmpstore@system{#2}%
-  \@HHbase@parseinner@@%
-}
-\newcommand\@HHbase@parseinner@@[1][]{% arg: conditioning system
-  \def\HH@tmpstore@condsys{#1}%
-  \@HHbase@do@inner%
-}
-\newtoks\HH@tmp@toks
-\def\HH@addtoks#1\@HH@END@ADD@TOKS{\HH@tmp@toks=\expandafter{\the\HH@tmp@toks#1}}%
+\def\HbaseRender#1#2#3#4#5#6#7{%
+\message{DEBUG: HbaseRender\detokenize{{#1}{#2}{#3}{#4}{#5}{#6}{#7}}}%
 %    \end{macrocode}
-% \end{macro}
-% \begin{macro}{\@HHbase@do@inner}
-%   Format the entropy measure.  All information is stored in macros of the form
-%   |\HH@tmpstore@<FIELD>|.  The base string (entropy symbol and subscript) have
-%   already been typeset.
+%
+%   Start with the entropy symbol (`H'), the subscript, and the superscript:
 %    \begin{macrocode}
-\def\@HHbase@do@inner{%
+  \HbaseRenderSym{#1}_{\HbaseRenderSub{#2}}^{\HbaseRenderSup{#5}}
 %    \end{macrocode}
-% Add the superscript:
+% Render the contents of the entropy (parenthetic expression with system \&
+% conditioning system), only if the system or conditioning system or state are
+% not empty:
 %    \begin{macrocode}
-  ^{\HH@tmpstore@epsilon}%
-%    \end{macrocode}
-% If system is blank, we just want the symbol itself with no
-% argument. (|\notblank| is from the \pkgname{etoolbox} package.)  Otherwise, add the
-% rest:
-%    \begin{macrocode}
-  \expandafter\notblank\expandafter{\HH@tmpstore@system}{%
-%    \end{macrocode}
-% Construct the parenthetic argument to the entropy, which we will store in the
-% token register |\HH@tmp@toks|:
-%    \begin{macrocode}
-    \HH@tmp@toks={}%
-%    \end{macrocode}
-% \ldots{} add system name:
-%    \begin{macrocode}
-    \expandafter\HH@addtoks\HH@tmpstore@system\@HH@END@ADD@TOKS%
-%    \end{macrocode}
-% \ldots{} add conditional system, if specified:
-%    \begin{macrocode}
-    \expandafter\notblank\expandafter{\HH@tmpstore@condsys}{%
-      \HH@addtoks\mathclose{}\,\delimsize\vert\,\mathopen{}\@HH@END@ADD@TOKS%
-      \expandafter\HH@addtoks\HH@tmpstore@condsys\@HH@END@ADD@TOKS%
-    }{}%
-%    \end{macrocode}
-% The tokens are ready now. Prepare the argument to the |\phfqit@inner@parens|
-% command, and go:
-%    \begin{macrocode}
-    \edef\tmp@args{\expandonce{\HH@tmp@sizearg}{\the\HH@tmp@toks}}%
-    \expandafter\phfqit@inner@parens\tmp@args%
+  \notblank{#4#6#7}{%
+    \HbaseRenderContents{#3}{#6}{#7}%
 %    \end{macrocode}
 % Finally, add the state as subscript, if any:
 %    \begin{macrocode}
-    _{\HH@tmpstore@state}% 
-    %
+    \HbaseRenderTail{#4}%
   }{}%
-  %
+%    \end{macrocode}
+% We're done.
+%    \begin{macrocode}
+  \qitobjDone%
 }
 %    \end{macrocode}
 % \end{macro}
-% \endgroup
 %
-%
-%
-% Now, we have the proper entropy commands.
-%
-% \needspace{4\baselineskip}
-% \begin{macro}{\HH}
-% \begin{macro}{\Hzero}
-% \begin{macro}{\Hmin}
-% \begin{macro}{\Hmaxf}
-%   The definition of individual entropy macros just delegates to |\@HHbase|
-%   with the relevant subscript.
+% \needspace{5\baselineskip}
+% \begin{macro}{\HbaseRenderSym}
+% \begin{macro}{\HbaseRenderSub}
+% \begin{macro}{\HbaseRenderSup}
+% \begin{macro}{\HbaseRenderContents}
+% \begin{macro}{\HbaseRenderTail}
+%   Macros to render different parts of the entropy measure.  By default, don't
+%   do anything special to them (but this might be locally overridden in a
+%   group\ldots)
 %    \begin{macrocode}
-\newcommand\HH{\@HHbase{\HHSym}{}}
-\newcommand\Hzero{\@HHbase{\HHSym}{\mathrm{max},0}}
-\newcommand\Hmin{\@HHbase{\HHSym}{\mathrm{min}}}
-\newcommand\Hmaxf{\@HHbase{\HHSym}{\mathrm{max}}}
+\def\HbaseRenderSym#1{#1}%
+\def\HbaseRenderSub#1{#1}%
+\def\HbaseRenderSup#1{#1}%
+\def\HbaseRenderTail#1{_{#1}}%
+%    \end{macrocode}
+%
+% A useful token register.
+%    \begin{macrocode}
+\newtoks\Hbase@tmp@toks
+\def\Hbase@addtoks#1\@Hbase@END@ADD@TOKS{%
+  \Hbase@tmp@toks=\expandafter{\the\Hbase@tmp@toks#1}}%
+%    \end{macrocode}
+% Now we need to define the macro which formats the contents of the entropy.
+% The arguments are |#1| = possible sizing argument, |#2| = system name, |#3| =
+% conditioning system if any.
+%    \begin{macrocode}
+\def\HbaseRenderContents#1#2#3{%
+%    \end{macrocode}
+% We need to construct the parenthetic argument to the entropy, which we will
+% store in the token register |\Hbase@tmp@toks|.  Start with system name:
+%    \begin{macrocode}
+    \Hbase@tmp@toks={#2}%
+%    \end{macrocode}
+% \ldots{} add conditional system, if specified:
+%    \begin{macrocode}
+    \notblank{#3}{%
+      \Hbase@addtoks\mathclose{}\,\delimsize\vert\,\mathopen{}%
+          #3%
+          \@Hbase@END@ADD@TOKS%
+    }{}%
+%    \end{macrocode}
+% The tokens are ready now. Prepare the argument to the command
+% |\HbaseRenderContentsInnerParens| (normally just |\phfqitParens|), and go:
+%    \begin{macrocode}
+    \edef\tmp@args{\unexpanded{#1}{\the\Hbase@tmp@toks}}%
+    \expandafter\HbaseRenderContentsInnerParens\tmp@args%
+}
+\def\HbaseRenderContentsInnerParens{\phfqitParens}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
 %
-% \begin{macro}{\Hfunc}
-%   Entropy function.  Usage: |\Hfunc(x)|, |\Hfunc`*(x)|, |\Hfunc`\big(x)|.
-%
-%   TODO: Use our generic size-specification parser! Don't duplicate code!
+% \begin{macro}{\Hbase}
+%   Finally, we declare our base entropic quantity type:
 %    \begin{macrocode}
-\DeclareRobustCommand\Hfunc{%
-  \begingroup\mathcode`\`="0060\relax%
-  \gdef\Hfunc@tmp@sizearg{}%
-  \@ifnextchar`\Hfunc@withsize\Hfunc@next%
+\DefineQitObjectType{Hbase}{\HbaseParse}{\HbaseRender}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+%
+% \begin{macro}{\Hfnbase}
+%   Entropy function.  Usage: |\Hfnbase(x)|, |\Hfnbase`*(x)|, |\Hfnbase`\big(x)| $\to$
+%   $\Hfnbase(x)$, $\Hfnbase`*(x)$, $\Hfnbase`\big(x)$.
+%
+%   We can use the same renderer as |\Hbase|, we just need a different parser.
+%   The parser accepts the mandatory arguments
+%   \marg{H-symbol}\marg{subscript}\marg{superscript}.
+%    \begin{macrocode}
+\def\HfnbaseParse#1#2#3{%
+  \qitobjAddArg{#1}% H-sym
+  \qitobjAddArg{#2}% sub
+  \phfqit@parsesizearg{\HfnbaseParse@{#3}}%
 }
-\def\Hfunc@withsize`#1{%
-  \def\@tmp@arg{#1}%
-  \def\@tmp@star{*}%
-  \ifx\@tmp@arg\@tmp@star\relax%
-    \gdef\Hfunc@tmp@sizearg{*}%
-    \endgroup%
-    \expandafter\Hfunc@inner%
-  \else%
-    \gdef\Hfunc@tmp@sizearg{[#1]}%
-    \endgroup%
-    \expandafter\Hfunc@inner%
-  \fi%
+\def\HfnbaseParse@#1(#2){%
+  \qitobjAddArgx{\phfqit@val@sizearg}% size-arg
+  \qitobjAddArg{}% state
+  \qitobjAddArg{#1}% epsilon
+  \qitobjAddArg{#2}% system--main arg
+  \qitobjAddArg{}% cond system
+\message{DEBUG: Hfnbase args are |\detokenize\expandafter{\QitObj@args}|}%
+  \qitobjParseDone%
 }
-\def\Hfunc@next{\endgroup\Hfunc@inner}
-\def\Hfunc@inner(#1){%
-  \HHSym%  ({#1})%
-  \expandafter\phfqit@inner@parens\Hfunc@tmp@sizearg{#1}%
-}
+\DefineQitObjectType{Hfnbase}{\HfnbaseParse}{\HbaseRender}
 %    \end{macrocode}
 % \end{macro}
 % 
 %
 % \subsubsection{Relative Entropies}
 % 
-% User documentation in \autoref{sec:relative-entropies}
+% User documentation in \autoref{sec:relative-entropies}.
 %
 % \begin{macro}{\DDSym}
 %   Symbol to use to denote a relative entropy.
@@ -1355,6 +1442,33 @@
   \endgroup%
 }
 %    \end{macrocode}
+% \end{macro}
+%
+%
+% \subsection{Standard entropy measures}
+%
+%
+% Now, provide some standard entropy measures.
+%
+% \needspace{4\baselineskip}
+% \begin{macro}{\HH}
+% \begin{macro}{\Hzero}
+% \begin{macro}{\Hmin}
+% \begin{macro}{\Hmaxf}
+%   The definition of individual entropy macros just delegates to |\Hbase|
+%   with the relevant subscript.
+%    \begin{macrocode}
+\def\HSym{H}
+\def\HH{\Hbase{\HSym}{}}
+\def\Hzero{\Hbase{\HSym}{\mathrm{max},0}}
+\def\Hmin{\Hbase{\HSym}{\mathrm{min}}}
+\def\Hmaxf{\Hbase{\HSym}{\mathrm{max}}}
+\def\Hfn{\Hfnbase{\HSym}{}{}}
+\let\Hfunc\Hfn% backwards compatibility
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 %
 % \Finale

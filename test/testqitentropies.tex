@@ -3,47 +3,47 @@
 \usepackage{phfqit}
 
 % uncomment to check that the entropy macros correctly restore the mode of ` char
-\usepackage[backtickon]{phfparen}
+\usepackage[backtick=true]{phfparen}
 
 \begin{document}
 
-  \begin{gather*}
-    \DD{\rho}{\sigma} \quad
-    \DD*{\rho}{\sum\sigma} \quad
-    \DD`*{\rho}{\sum\sigma} \quad
-    \DD`\Big{\rho}{\sigma} \quad
-    \\
-    \DD^{\epsilon}`\Big{\rho}{\sigma} \quad
-    \DD_{\mathrm{sub}}`\Big{\rho}{\sigma} \quad
-    \DD_{\mathrm{sub}}`*{\rho}{\sigma} \quad
-    \DD_{\mathrm{sub}}^{\epsilon}`\Big{\rho}{\sigma} \quad
-    \\
-    \Dminf{\rho}{\sigma} \quad
-    \Dminf[\epsilon]{\rho}{\sigma} \quad
-    \Dminf`\Big{\rho}{\sigma} \quad
-    \Dminf[\epsilon]`\Big{\rho}{\sigma} \quad
-    \\
-    \DCond{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
-    \DCond{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
-    \DCond`\Big{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
-    \DCond`\Big{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
-    \DCond`*{\rho}{R}{X'}{\frac{\Gamma_R}{\tr\Gamma_R}}{\Gamma_{X'}} \\
-    \DCond`*{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\frac{\Gamma_R}{\tr\Gamma_R}}{\Gamma_{X'}} \\
-    %
-    \DCond[\epsilon]{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
-    \DCond[\epsilon]{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
-    \DCond[\epsilon]`\Big{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
-    \DCond[\epsilon]`\Big{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
-    \DCond[\epsilon]`*{\rho}{R}{X'}{\frac{\Gamma_R}{\tr\Gamma_R}}{\Gamma_{X'}} \\
-    \DCond[\epsilon]`*{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\frac{\Gamma_R}{\tr\Gamma_R}}{\Gamma_{X'}}
-    % \\
-  \end{gather*}
+  % \begin{gather*}
+  %   \DD{\rho}{\sigma} \quad
+  %   \DD*{\rho}{\sum\sigma} \quad
+  %   \DD`*{\rho}{\sum\sigma} \quad
+  %   \DD`\Big{\rho}{\sigma} \quad
+  %   \\
+  %   \DD^{\epsilon}`\Big{\rho}{\sigma} \quad
+  %   \DD_{\mathrm{sub}}`\Big{\rho}{\sigma} \quad
+  %   \DD_{\mathrm{sub}}`*{\rho}{\sigma} \quad
+  %   \DD_{\mathrm{sub}}^{\epsilon}`\Big{\rho}{\sigma} \quad
+  %   \\
+  %   \Dminf{\rho}{\sigma} \quad
+  %   \Dminf[\epsilon]{\rho}{\sigma} \quad
+  %   \Dminf`\Big{\rho}{\sigma} \quad
+  %   \Dminf[\epsilon]`\Big{\rho}{\sigma} \quad
+  %   \\
+  %   \DCoh{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
+  %   \DCoh{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
+  %   \DCoh`\Big{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
+  %   \DCoh`\Big{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
+  %   \DCoh`*{\rho}{R}{X'}{\frac{\Gamma_R}{\tr\Gamma_R}}{\Gamma_{X'}} \\
+  %   \DCoh`*{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\frac{\Gamma_R}{\tr\Gamma_R}}{\Gamma_{X'}} \\
+  %   %
+  %   \DCoh[\epsilon]{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
+  %   \DCoh[\epsilon]{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
+  %   \DCoh[\epsilon]`\Big{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
+  %   \DCoh[\epsilon]`\Big{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
+  %   \DCoh[\epsilon]`*{\rho}{R}{X'}{\frac{\Gamma_R}{\tr\Gamma_R}}{\Gamma_{X'}} \\
+  %   \DCoh[\epsilon]`*{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\frac{\Gamma_R}{\tr\Gamma_R}}{\Gamma_{X'}}
+  %   % \\
+  % \end{gather*}
 
 
   \begin{gather*}
-    \Hfunc(x) \quad
-    \Hfunc`\big( `\big[\sum_j] ) \quad
-    \Hfunc`*( `\big[\sum_j] ) \quad
+    \Hfn(x) \quad
+    \Hfn`\big( `\big[\sum_j] ) \quad
+    \Hfn`*( `\big[\sum_j] ) \quad
     \\
     \HH[\rho][\epsilon]{S}[M]  \quad
     \HH`*[\rho][\epsilon]{\bigcup_i S}[M] \quad
@@ -64,6 +64,10 @@
     \Hmin[\rho][\epsilon]{S}[M]  \quad
     \Hmin`*[\rho][\epsilon]{S}[M] \quad
     \Hmin`\big[\rho][\epsilon]{S}[M]  \quad
+    \\
+    \Hmin[\rho][\epsilon]{S}  \quad
+    \Hmin`*[\rho][\epsilon]{S} \quad
+    \Hmin`\big[\rho][\epsilon]{S}  \quad
     \\
     \Hmin{} \quad % just the symbol w/o args
   \end{gather*}
