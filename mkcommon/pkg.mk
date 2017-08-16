@@ -155,7 +155,7 @@ DISTTMPDIR = $(CURDIR)/_install_dist_zip.make.tmp
 
 dist: $(PKGZIP)
 
-# feedback from CTAN upload manager: not necessary to provide tds.zip in CTAN upload
+# feedback from CTAN upload manager: prefer not to provide tds.zip in CTAN upload
 $(PKGZIP):  #$(PKGTDSZIP)
 	rm -rf $(DISTTMPDIR)
 	mkdir -p $(DISTTMPDIR)/$(PKG)

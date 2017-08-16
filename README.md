@@ -2,8 +2,6 @@
 
 Collection of LaTeX utility packages for scientific documents
 
-Bundle Version: 2016/08/15 v1.0
-
 These packages provide useful definitions which I use often when writing
 scientific documents (and more specifically for quantum information theory).
 Some packages may be of more general use (formatting notes as a short document,
@@ -11,6 +9,9 @@ full-page figures, quoting unformatted text, adding an SVN version watermark).
 Other packages are meant for scientific documents (more advanced theorems/proofs
 framework, handy parens in equations).  The phfqit package is specifically for
 quantum information theory.
+
+Each package version evolves independently, and each package is submitted
+independently to CTAN.
 
 
 # List of Packages
@@ -58,9 +59,10 @@ package documentation, run
 
     > make pdf
 
+
 # License
 
-(C) 2016 Philippe Faist, phfaist at gmail com
+(C) 2016 Philippe Faist, philippe.faist@bluewin.ch
 
 This material is subject to the [LaTeX Project Public License](http://www.ctan.org/license/lppl1.3),
 version 1.3 or above.

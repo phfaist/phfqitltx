@@ -19,7 +19,7 @@ documentation. Run 'make' or 'make help' for more info.
 
 # Author and License
 
-(C) 2016 Philippe Faist, phfaist at gmail com
+(C) 2016 Philippe Faist, philippe.faist@bluewin.ch
 
 License: [LaTeX project public license](http://www.ctan.org/license/lppl1.3),
 version 1.3 or above
