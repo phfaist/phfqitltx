@@ -2,6 +2,9 @@
 # autosave files
 *~
 
+# .DS_Store
+.DS_Store
+
 # generated documentation and aux tex files
 *.pdf
 *.log
