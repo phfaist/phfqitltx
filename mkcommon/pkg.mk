@@ -155,12 +155,13 @@ DISTTMPDIR = $(CURDIR)/_install_dist_zip.make.tmp
 
 dist: $(PKGZIP)
 
-$(PKGZIP): # $(PKGTDSZIP)
+# feedback from CTAN upload manager: not necessary to provide tds.zip in CTAN upload
+$(PKGZIP):  #$(PKGTDSZIP)
 	rm -rf $(DISTTMPDIR)
 	mkdir -p $(DISTTMPDIR)/$(PKG)
-#	cp $(PKGTDSZIP) $(DISTTMPDIR)
+#	 cp $(PKGTDSZIP) $(DISTTMPDIR)
 	cp $(PKGDTX) $(PKGINS) $(PKGPDF) $(PKGREADME) Makefile pkg.mk $(DIST_ADDITIONAL_FILES) $(DISTTMPDIR)/$(PKG)
-	cd $(DISTTMPDIR) && zip -r $(CURDIR)/$(PKGZIP) $(PKGTDSZIP) $(PKG)
+	cd $(DISTTMPDIR) && zip -r $(CURDIR)/$(PKGZIP) $(PKG) #$(PKGTDSZIP)
 	rm -rf $(DISTTMPDIR)
 
 cleandist:

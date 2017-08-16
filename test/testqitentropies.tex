@@ -7,6 +7,10 @@
 
 \begin{document}
 
+  \begin{align*}
+    x &= \Re(z)\ ; & y &= \Im(z)\ .
+  \end{align*}
+
   \begin{gather*}
     \DD{\rho}{\sigma} \quad
     \DD`*{\rho}{\sum\sigma} \quad
@@ -25,7 +29,26 @@
     \Dminf[\epsilon]{\rho}{\sigma} \quad
     \Dminf`\Big{\rho}{\sigma} \quad
     \Dminf[\epsilon]`\Big{\rho}{\sigma} \quad
-    \\
+  \end{gather*}
+
+
+  \begin{gather*}
+    \DCohx{\rho}{X}{X'}{\Gamma_X}{\Gamma_{X'}} \\
+    \DCohx{*\sigma_{R_X}\otimes\rho_{X'}}{X}{X'}{\Gamma_X}{\Gamma_{X'}} \\
+    \DCohx`\Big{\rho}{X}{X'}{\Gamma_X}{\Gamma_{X'}} \\
+    \DCohx`\Big{*\sigma_{R_X}\otimes\rho_{X'}}{X}{X'}{\Gamma_X}{\Gamma_{X'}} \\
+    \DCohx`*{\rho}{X}{X'}{\frac{\Gamma_X}{\tr\Gamma_X}}{\Gamma_{X'}} \\
+    \DCohx`*{*\sigma_{R_X}\otimes\rho_{X'}}{X}{X'}{\frac{\Gamma_X}{\tr\Gamma_X}}{\Gamma_{X'}} \\
+    %
+    \DCohx[\epsilon]{\rho}{X}{X'}{\Gamma_X}{\Gamma_{X'}} \\
+    \DCohx[\epsilon]{*\sigma_{R_X}\otimes\rho_{X'}}{X}{X'}{\Gamma_X}{\Gamma_{X'}} \\
+    \DCohx[\epsilon]`\Big{\rho}{X}{X'}{\Gamma_X}{\Gamma_{X'}} \\
+    \DCohx[\epsilon]`\Big{*\sigma_{R_X}\otimes\rho_{X'}}{X}{X'}{\Gamma_X}{\Gamma_{X'}} \\
+    \DCohx[\epsilon]`*{\rho}{X}{X'}{\frac{\Gamma_X}{\tr\Gamma_X}}{\Gamma_{X'}} \\
+    \DCohx[\epsilon]`*{*\sigma_{R_X}\otimes\rho_{X'}}{X}{X'}{\frac{\Gamma_X}{\tr\Gamma_X}}{\Gamma_{X'}}
+  \end{gather*}
+
+  \begin{gather*}
     \DCoh{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
     \DCoh{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
     \DCoh`\Big{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}} \\
@@ -41,24 +64,6 @@
     \DCoh[\epsilon]`*{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\frac{\Gamma_R}{\tr\Gamma_R}}{\Gamma_{X'}}
     % \\
   \end{gather*}
-
-  \begin{gather*}
-    \DCohx{\rho}{X}{X'}{\Gamma_X}{\Gamma_{X'}} \\
-    \DCohx{*\sigma_{R_X}\otimes\rho_{X'}}{X}{X'}{\Gamma_X}{\Gamma_{X'}} \\
-    \DCohx`\Big{\rho}{X}{X'}{\Gamma_X}{\Gamma_{X'}} \\
-    \DCohx`\Big{*\sigma_R\otimes\rho_{X'}}{X}{X'}{\Gamma_X}{\Gamma_{X'}} \\
-    \DCohx`*{\rho}{X}{X'}{\frac{\Gamma_X}{\tr\Gamma_X}}{\Gamma_{X'}} \\
-    \DCohx`*{*\sigma_R\otimes\rho_{X'}}{X}{X'}{\frac{\Gamma_X}{\tr\Gamma_X}}{\Gamma_{X'}} \\
-    %
-    \DCohx[\epsilon]{\rho}{X}{X'}{\Gamma_X}{\Gamma_{X'}} \\
-    \DCohx[\epsilon]{*\sigma_R\otimes\rho_{X'}}{X}{X'}{\Gamma_X}{\Gamma_{X'}} \\
-    \DCohx[\epsilon]`\Big{\rho}{X}{X'}{\Gamma_X}{\Gamma_{X'}} \\
-    \DCohx[\epsilon]`\Big{*\sigma_R\otimes\rho_{X'}}{X}{X'}{\Gamma_X}{\Gamma_{X'}} \\
-    \DCohx[\epsilon]`*{\rho}{X}{X'}{\frac{\Gamma_X}{\tr\Gamma_X}}{\Gamma_{X'}} \\
-    \DCohx[\epsilon]`*{*\sigma_R\otimes\rho_{X'}}{X}{X'}{\frac{\Gamma_X}{\tr\Gamma_X}}{\Gamma_{X'}}
-    % \\
-  \end{gather*}
-
 
   \begin{gather*}
     \Hfn(x) \quad

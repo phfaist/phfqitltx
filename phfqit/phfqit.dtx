@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfqit}
 %<*package>
-    [2017/06/16 v2.0 phfqit package]
+    [2017/08/16 v2.0 phfqit package]
 %</package>
 %
 %<*driver>
@@ -67,7 +67,7 @@
 %
 % \GetFileInfo{phfqit.dtx}
 %
-% \DoNotIndex{\newcommand,\newenvironment,\def,\gdef,\edef,\xdef,\if,\else,\fi,\ifx}
+% \DoNotIndex{\newcommand,\newenvironment,\let,\def,\gdef,\edef,\xdef,\if,\else,\fi,\ifx,\cslet,\csdef,\begingroup,\endgroup,\expandafter,\csname,\endcsname,\appto,\hspace,\mathrm,\notblank,\the,\RequirePackage}
 % 
 % \title{\phfqitltxPkgTitle{phfqit}}
 % \author{Philippe Faist\quad\email{phfaist at gmail com}}
@@ -106,13 +106,29 @@
 %
 % \section{Basic Usage}
 %
-% This package is straightforward to use.  There are no package options.
+% \label{sec:pkg-options}
+%
+% This package is straightforward to use:
 % \begin{verbatim}
 % \usepackage{phfqit}
 % \end{verbatim}
 %
-% [TODO: In the future, use package options to control which definitions we
-% want?]
+% A single package option controls which entropy measures are defined for you.
+%
+% \begin{pkgoptions}
+% \item[qitobjdef=\meta{\phfverb{stdset} $\mid$ \phfverb{none}}] Load
+%   the predefined set of ``qit objects, '' i.e., entropy measures.  The entropy
+%   measures documented below (and specified as such) will be loaded unless you
+%   set \pkgoptionfmt{qitobjdef=none}.
+% \item[newReIm=\metatruefalsearg] Do not override \LaTeX{}'s default
+%   {\makeatletter $\phfqit@Re$ and $\phfqit@Im$} symbols by $\Re$ and $\Im$.
+%   See \autoref{sec:description-newReIm}.
+% \end{pkgoptions}
+% 
+% \changed[v2.0-pkg-opt-qitobjdef]{v2.0}{2017/08/16}{Added the
+% \phfverb{qitobjdef} package option}
+% \changed[v2.0-pkg-opt-newReIm]{v2.0}{2017/08/16}{Added the \phfverb{newReIm}
+% package option}
 %
 % \subsection{Semantic vs. Syntactic Notation}
 %
@@ -161,6 +177,7 @@
 % \end{center}
 %
 %
+%
 % \section{General Symbols (and Math Operators)}
 % \label{sec:symbols}
 %
@@ -187,15 +204,16 @@
 % \autoref{topic:size-specification-backtick}.
 %
 % \begingroup\catcode`\^=12\relax
-% \DescribeMacro{\ee^X}\endgroup
-% A macro for the exponential.  Type the \LaTeX{} code as if |\ee| were just the symbol,
-% i.e.\@ as |\ee^{<ARGUMENT>}|.  The ideas is that this macro may be redefined to change
-% the appearance of the $e$ symbol, or even to change the notation to |\exp{<ARGUMENT>}|
-% if needed for inline math.
+% \DescribeMacro{\ee^X}\endgroup A macro for the exponential.  Type the \LaTeX{}
+% code as if |\ee| were just the symbol, i.e.\@ as |\ee^{<ARGUMENT>}|.  The
+% ideas is that this macro may be redefined to change the appearance of the $e$
+% symbol, or even to change the notation to |\exp{<ARGUMENT>}| if needed for
+% inline math.
 %
 %
 % \subsection{Math/Linear Algebra Operators}
 % \label{sec:math-operators}
+% \label{sec:description-newReIm}
 %
 % \needspace{6\baselineskip}
 % \DescribeMacro{\tr} \DescribeMacro{\supp} \DescribeMacro{\rank}
@@ -208,12 +226,12 @@
 % \DescribeMacro{\Re} \DescribeMacro{\Im} Also, redefine |\Re| and |\Im| (real
 % and imaginary parts of a complex number), to the more readable $\Re(z)$ and
 % $\Im(z)$.  (The original symbols were {\makeatletter $\phfqit@Re(z)$ and
-% $\phfqit@Im(z)$}.)
+% $\phfqit@Im(z)$}.)  Keep the old definitions using the package option
+% \pkgoptionfmt{newReIm=false}.
 %
 % \subsection{Poly symbol}
 %
 % \DescribeMacro{\poly} Can be typeset in $\poly(n)$ time.
-% \iffalse meta-comment \changedreftext{v1.0-added-poly-command} \fi
 % 
 %
 % \subsection{Bits and Bit Strings}
@@ -334,8 +352,9 @@
 % $H_\mathrm{max,old}$.  This allows you to change the notation by redefining
 % the command |\Hzero|, while making sure that the correct quantity is
 % addressed.  (You might have both ``old''-style and ``new''-style max-entropy
-% in the same paper.)  The macros |\Hmin|, |\Hzero|, |\Hmaxf| and |\HH| may be
-% redefined to change the subscript by using the following code (change
+% in the same paper.  Their meaning should never change, even if you change your
+% mind on the notation.)  The macros |\Hmin|, |\Hzero|, |\Hmaxf| and |\HH| may
+% be redefined to change the subscript by using the following code (change
 % ``|\mathrm{max},0|'' to your favorite subscript text):
 % \begin{verbatim}
 % \renewcommand{\Hzero}{\Hbase{\HSym}{\mathrm{max},0}}
@@ -350,6 +369,9 @@
 %
 % You may also define your own Qit Object implementations. See
 % \autoref{sec:QitObjectImpl} for documentation on that.
+%
+% The actual entropy measure definitions |\Hmin|, |\Hmaxf|, etc., can be
+% disabled by specifying the package option \pkgoptionfmt{qitobjdef=none}.
 %
 %
 % \subsection{Entropy, Conditional Entropy}
@@ -392,6 +414,9 @@
 % \DescribeMacro{\Hmaxf} The max-entropy.  This macro has the same
 % arguments as for |\Hmin|.  For example, |\Hmaxf[][\epsilon]{X}[Y]| gives
 % $\Hmaxf[][\epsilon]{X}[Y]$.
+%
+% The commands |\Hmin|, |\HH|, |\Hzero|, and |\Hmaxf| are defined only if the
+% package option \pkgoptionfmt{qitobjdef=stdset} is set (which is the default).
 %
 % \DescribeMacro{\HSym} You may redefine this macro if you want to change the
 % ``$H$'' symbol of all entropy measures.
@@ -446,6 +471,9 @@
 %
 % \DescribeMacro{\Hfunc}
 % The alias |\Hfunc| is provided for backwards compatibility; same as |\Hfn|.
+%
+% The commands |\Hfn| and |\Hfunc| are defined only if the package option
+% \pkgoptionfmt{qitobjdef=stdset} is set (which is the default).
 %
 % \DescribeMacro{\Hfnbase} There is also a base macro for this kind of Qit
 % Object, |\Hfnbase|.  It allows you to specify an arbitrary symbol to use for
@@ -526,6 +554,10 @@
 % in, and it is not a zero-error quantity which is smoothed with the purified
 % distance.)
 %
+% The commands |\DD|, |\Dmax|, |\Dminz|, |\Dminf|, |\Dr| and |\DHyp| are defined
+% only if the package option \pkgoptionfmt{qitobjdef=stdset} is set (which is
+% the default).
+%
 % \DescribeMacro{\DSym} The symbol to use to denote a relative entropy.  You
 % may redefine this command to change the symbol.  (This works like |\HSym|
 % above.)
@@ -585,6 +617,9 @@
 % The \meta{size-spec} is of course optional and follows the same syntax as
 % everywhere else (\autoref{topic:size-specification-backtick}).
 %
+% The command |\DCohx| is defined only if the package option
+% \pkgoptionfmt{qitobjdef=stdset} is set (which is the default).
+%
 % \DescribeMacro{\emptysystem} Use the |\emptysystem| macro to denote a trivial
 % system.  For example, |\DCoh{\rho}{X}{\emptysystem}{\Gamma}{1}| gives
 % $\DCoh{\rho}{X}{\emptysystem}{\Gamma}{1}$.
@@ -627,6 +662,9 @@
 % 
 % The \meta{size-spec} is of course optional and follows the same syntax as
 % everywhere else (\autoref{topic:size-specification-backtick}).
+%
+% The command |\DCoh| is defined only if the package option
+% \pkgoptionfmt{qitobjdef=stdset} is set (which is the default).
 %
 %
 % \paragraph{Appearance and alternative notation}
@@ -820,6 +858,13 @@
 \RequirePackage{xparse}
 %    \end{macrocode}
 %
+% Package options are handled via \pkgname{xkeyval} \& \pkgname{kvoptions} (see
+% implementation doc for \pkgname{phfnote}).
+%    \begin{macrocode}
+\RequirePackage{xkeyval}
+\RequirePackage{kvoptions}
+%    \end{macrocode}
+% 
 % \subsection{Simple Symbols and Shorthands}
 % 
 % 
@@ -918,19 +963,19 @@
 % \end{macro}
 % \end{macro}
 % 
-% \begin{macro}{\Re}
-% \begin{macro}{\Im}
-%   Also, alter the appearance of |\Re| and |\Im| to something more readable.
+% \begin{macro}{\phfqit@Realpart}
+% \begin{macro}{\phfqit@Imagpart}
+%   Provide math operators for $\Re$ and $\Im$.  The aliasing to the actual
+%   commands |\Re| and |\Im| is done later, when we process the package options.
 %    \begin{macrocode}
 \let\phfqit@Re\Re
 \DeclareMathOperator{\phfqit@Realpart}{Re}%
-\renewcommand{\Re}{\phfqit@Realpart}
 \let\phfqit@Im\Im
 \DeclareMathOperator{\phfqit@Imagpart}{Im}%
-\renewcommand{\Im}{\phfqit@Imagpart}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+%
 %
 % \subsubsection{Poly}
 %
@@ -1285,8 +1330,7 @@
 %   \emph{Parser} and a \emph{Renderer} (a single \LaTeX{} macro each).  The
 %   more advanced |\DefineTunedQitObject| allows you in addition to specify
 %   local definitions to override defaults, as well as some initial arguments to
-%   the parser.  See the documentation in \autoref{sec:QitObjectImplementations}
-%   for more information.
+%   the parser.
 %    \begin{macrocode}
 \def\DefineQitObject#1#2#3{%
   \DefineTunedQitObject{#1}{#2}{#3}{}{}%
@@ -1926,15 +1970,119 @@
 % \end{macro}
 % 
 %
+% \subsection{Additional helpers for entropy measures}
+%
+% \begin{macro}{\HSym}
+%   Symbol to use to denote an entropy measure.
+%    \begin{macrocode}
+\def\HSym{H}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\DSym}
+%   Symbol to use to denote a relative entropy measure.
+%    \begin{macrocode}
+\newcommand\DSym{D}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\DCSym}
+%   Symbol to use for the coherent relative entropy measure.
+%    \begin{macrocode}
+\newcommand\DCSym{\bar\DSym}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\emptysystem}
+%   Designates the trivial system (uses symbol for empty set).  It is important
+%   to this, because of the automatic indexes set on the ``rho'' argument.
+%    \begin{macrocode}
+\def\emptysystem{\ensuremath{\emptyset}}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\DCohxRefSystemName}
+% \begin{macro}{\DCohxStateSubscripts}
+%   Macros helpful for defining |\DCohx|.
+%    \begin{macrocode}
+\def\DCohxRefSystemName#1{R_{#1}}
+\def\DCohxStateSubscripts#1#2{#2\DCohxRefSystemName{#1}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
 %
 %
-% \subsection{Standard entropy measures}
+% Finally, some macros provided for backwards compatibility:
+%    \begin{macrocode}
+\let\@HHbase\Hbase
+\let\@DDbase\Dbase
+\let\HHSym\HSym
+\let\DDSym\DSym
+%    \end{macrocode}
 %
 %
-% Now, provide some standard entropy measures.
+% \subsection{Handle package options}
 %
-% TODO: control whether these are provided or not, via a package option.
+% \changedreftext{v2.0-pkg-opt-qitobjdef}
 %
+% Initialization code for \pkgname{kvoptions} for our package options.  See
+% \autoref{sec:pkg-options}.
+%    \begin{macrocode}
+\SetupKeyvalOptions{
+   family=phfqit,
+   prefix=phfqit@opt@
+}
+%    \end{macrocode}
+% 
+% Set of predefined qit objects to load. Either |stdset| (standard set, the
+% default) or |none| (none).
+%    \begin{macrocode}
+\DeclareStringOption[stdset]{qitobjdef}
+%    \end{macrocode}
+%
+% Whether to override \LaTeX{}'s default {\makeatletter $\phfqit@Re$ and
+% $\phfqit@Im$} symbols by our more readable $\Re$ and $\Im$.
+%    \begin{macrocode}
+\DeclareBoolOption[true]{newReIm}
+%    \end{macrocode}
+%
+% 
+% Process package options.
+%    \begin{macrocode}
+\ProcessKeyvalOptions*
+%    \end{macrocode}
+%
+%
+% \subsubsection{Re/Im symbols}
+%
+% \begin{macro}{\Re}
+% \begin{macro}{\Im}
+%   Provide |\Re| and |\Im| commands to override \LaTeX{}'s default if the
+%   corresponding package option is set (which is the default).
+%    \begin{macrocode}
+\ifphfqit@opt@newReIm
+  \renewcommand{\Re}{\phfqit@Realpart}
+  \renewcommand{\Im}{\phfqit@Imagpart}
+\fi
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \subsubsection{Standard entropy measures}
+%
+% Load the requested set of qit objects. 
+%    \begin{macrocode}
+\def\phfqit@tmp@str@none{none}
+\def\phfqit@tmp@str@stdset{stdset}
+\ifx\phfqit@opt@qitobjdef\phfqit@tmp@str@none%
+%    \end{macrocode}
+% In this case, do not load any definitions.
+%    \begin{macrocode}
+\else\ifx\phfqit@opt@qitobjdef\phfqit@tmp@str@stdset%
+%    \end{macrocode}
+% In this case, provide our standard set of ``qit objects'' (i.e., entropy
+% measures).
+% 
 % \needspace{4\baselineskip}
 % \begin{macro}{\HH}
 % \begin{macro}{\Hzero}
@@ -1943,7 +2091,6 @@
 %   The definition of individual entropy macros just delegates to |\Hbase|
 %   with the relevant subscript.
 %    \begin{macrocode}
-\def\HSym{H}
 \def\HH{\Hbase{\HSym}{}}
 \def\Hzero{\Hbase{\HSym}{\mathrm{max},0}}
 \def\Hmin{\Hbase{\HSym}{\mathrm{min}}}
@@ -1956,19 +2103,6 @@
 % \end{macro}
 % \end{macro}
 %
-%
-%
-%
-%
-%
-% \begin{macro}{\DSym}
-%   Symbol to use to denote a relative entropy.
-%    \begin{macrocode}
-\newcommand\DSym{D}
-%    \end{macrocode}
-% \end{macro}
-%
-%
 % 
 % \begin{macro}{\DD}
 %   (Usual) quantum relative entropy.  (Actually this is more versatile, because
@@ -1978,7 +2112,6 @@
 \def\DD{\Dbase{\DSym}}
 %    \end{macrocode}
 % \end{macro}
-%
 % 
 % \begin{macro}{\Dminz}
 %   ``Old'' min-relative entropy, based on the R\'enyi-zero relative entropy.
@@ -2016,38 +2149,11 @@
 %    \end{macrocode}
 % \end{macro}
 %
-%
-%
-% \begin{macro}{\DCSym}
-%   Symbol to use for the coherent relative entropy
-%    \begin{macrocode}
-\newcommand\DCSym{\bar\DSym}
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\emptysystem}
-%   Designates the trivial system (uses symbol for empty set).  It is important
-%   to this, because of the automatic indexes set on the ``rho'' argument.
-%    \begin{macrocode}
-\def\emptysystem{\ensuremath{\emptyset}}
-%    \end{macrocode}
-% \end{macro}
-% 
 % \begin{macro}{\DCoh}
 %   Coherent relative entropy (old style).
 %    \begin{macrocode}
 \DefineTunedQitObject{DCoh}{\DCohbaseParse}{\DCohbaseRender}{{\DCSym}}{}
 %    \end{macrocode}   
-% \end{macro}
-%
-% \begin{macro}{\DCohxRefSystemName}
-% \begin{macro}{\DCohxStateSubscripts}
-%   Macros helpful for defining |\DCohx|.
-%    \begin{macrocode}
-\def\DCohxRefSystemName#1{R_{#1}}
-\def\DCohxStateSubscripts#1#2{#2\DCohxRefSystemName{#1}}
-%    \end{macrocode}
-% \end{macro}
 % \end{macro}
 %
 % \begin{macro}{\DCohx}
@@ -2060,14 +2166,19 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% Backwards-compatibility macros:
-%    \begin{macrocode}
-\let\@HHbase\Hbase
-\let\@DDbase\Dbase
-\let\HHSym\HSym
-\let\DDSym\DSym
-%    \end{macrocode}
-% 
 %
+% End case |qitobjdef=stdset|.  Last case is the final |\else| branch which is an
+% error, as we have an unknown set of standard definitions to load.
+%    \begin{macrocode}
+\else
+\PackageError{phfqit}{Invalid value `\phfqit@opt@qitobjdef' specified for
+  package option `qitobjdef'.  Please specify one of `stdset' (the default) or
+  `none'}{You specified an invalid value to the `qitobjdef' package option of
+  the `phfqit' package.}
+\fi
+\fi
+%    \end{macrocode}
+%
+% 
 % \Finale
 \endinput
