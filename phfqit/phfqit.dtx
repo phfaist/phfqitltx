@@ -563,26 +563,6 @@
 %
 % A macro for the coherent relative entropy is also available.
 %
-% \DescribeMacro{\DCoh}
-% Typeset a coherent relative entropy.  The syntax is:
-% 
-% |\DCoh|\hspace{0pt}\oarg{epsilon}\hspace{0pt}\relax
-% \meta{size-spec}\hspace{0pt}\marg{rho}\hspace{0pt}\relax
-% \marg{R}\hspace{0pt}\marg{X'}\hspace{0pt}\relax
-% \marg{$\Gamma_R$}\hspace{0pt}\marg{$\Gamma_{X'}$}
-%
-% For example, |\DCoh[\epsilon]{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}}| gives
-% $\DCoh[\epsilon]{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}}$.
-%
-% The subscript $X'R$ (or whatever the system names) is automatically added to
-% the \meta{rho} argument.  If this is not desired, then begin the \meta{rho}
-% argument with a star.  For example,
-% |\DCoh{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}}| gives
-% $\DCoh{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}}$.
-% 
-% The \meta{size-spec} is of course optional and follows the same syntax as
-% everywhere else (\autoref{topic:size-specification-backtick}).
-%
 % \DescribeMacro{\DCohx} Typeset a coherent relative entropy using an
 % alternative form for the reference system.  The syntax is:
 % 
@@ -628,6 +608,26 @@
 % entropy.  You may redefine this command to change the symbol.  (This works
 % like |\HSym| and |\DSym| above.)
 % 
+% \DescribeMacro{\DCoh}
+% Typeset a coherent relative entropy using the old notation.  The syntax is:
+% 
+% |\DCoh|\hspace{0pt}\oarg{epsilon}\hspace{0pt}\relax
+% \meta{size-spec}\hspace{0pt}\marg{rho}\hspace{0pt}\relax
+% \marg{R}\hspace{0pt}\marg{X'}\hspace{0pt}\relax
+% \marg{$\Gamma_R$}\hspace{0pt}\marg{$\Gamma_{X'}$}
+%
+% For example, |\DCoh[\epsilon]{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}}| gives
+% $\DCoh[\epsilon]{\rho}{R}{X'}{\Gamma_R}{\Gamma_{X'}}$.
+%
+% The subscript $X'R$ (or whatever the system names) is automatically added to
+% the \meta{rho} argument.  If this is not desired, then begin the \meta{rho}
+% argument with a star.  For example,
+% |\DCoh{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}}| gives
+% $\DCoh{*\sigma_R\otimes\rho_{X'}}{R}{X'}{\Gamma_R}{\Gamma_{X'}}$.
+% 
+% The \meta{size-spec} is of course optional and follows the same syntax as
+% everywhere else (\autoref{topic:size-specification-backtick}).
+%
 %
 % \paragraph{Appearance and alternative notation}
 % You may change the notation of any of the above relative entropy measures by
@@ -2034,23 +2034,31 @@
 % \end{macro}
 % 
 % \begin{macro}{\DCoh}
+%   Coherent relative entropy (old style).
 %    \begin{macrocode}
 \DefineTunedQitObject{DCoh}{\DCohbaseParse}{\DCohbaseRender}{{\DCSym}}{}
 %    \end{macrocode}   
 % \end{macro}
 %
-% \begin{macro}{\DCohx}
+% \begin{macro}{\DCohxRefSystemName}
+% \begin{macro}{\DCohxStateSubscripts}
+%   Macros helpful for defining |\DCohx|.
 %    \begin{macrocode}
 \def\DCohxRefSystemName#1{R_{#1}}
 \def\DCohxStateSubscripts#1#2{#2\DCohxRefSystemName{#1}}
-
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\DCohx}
+%   Coherent relative entropy (new style).
+%    \begin{macrocode}
 \DefineTunedQitObject{DCohx}{\DCohbaseParse}{\DCohbaseRender}%
 {{\DCSym}}{%
   \let\DCohbaseStateSubscripts\DCohxStateSubscripts%
 }
 %    \end{macrocode}
 % \end{macro}
-%
 %
 % Backwards-compatibility macros:
 %    \begin{macrocode}
