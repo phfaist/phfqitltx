@@ -1,4 +1,7 @@
 
+# autosave files
+*~
+
 # generated documentation and aux tex files
 *.pdf
 *.log
