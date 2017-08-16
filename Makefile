@@ -8,7 +8,7 @@ PREFIX ?= $(DEFAULT_PREFIX)
 # phfnote must go first (all docs need phfnote.sty)
 ALLPKGS = phfnote phffullpagefigure phfqit phfquotetext phfparen phfsvnwatermark phfthm
 
-.PHONY: help clean cleanall sty cleansty pdf cleanpdf cleanaux install tdszip cleantdszip dist versioncheck cleandist
+.PHONY: help clean cleanall sty cleansty pdf cleanpdf cleanaux install tdszip cleantdszip dist versionlist cleandist
 
 # Don't remove intermediate files
 .SECONDARY:
@@ -43,7 +43,7 @@ help:
 	@echo "    - 'make install PREFIX=/path/to/texlive/texmf' to install to custom texmf directory;"
 	@echo "    - 'make tdszip' to create TDS.ZIP files for automated installation in TEXMF tree;"
 	@echo "    - 'make dist' to generate a distribution ZIP file, ready to upload to CTAN;"
-	@echo "    - 'make versioncheck' to list the version information in the packages and the README file(s)."
+	@echo "    - 'make versionlist' to list the version information in the packages."
 	@echo ""
 	@echo "You may also run make on individual packages.  Run 'make' or 'make help' within"
 	@echo "the corresponding subdirectory for more info."
@@ -128,25 +128,25 @@ cleantdszip:
 ALLDISTCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) dist && ) true
 ALLCLEANDISTCMDS = $(foreach x,$(ALLPKGS),$(MAKE) -C $(x) cleandist && ) true
 
-dist: versioncheck
+dist: versionlist
 	$(ALLDISTCMDS)
 
 cleandist: 
 	$(ALLCLEANDISTCMDS)
 
 # ------------------------------------------------
-# make versioncheck
+# make versionlist
 # ------------------------------------------------
 
-versioncheck:
+versionlist:
 	@echo
 	@echo
 	@echo "================================================================================"
 	@echo
-	@echo "Please make sure that the version numbers are correct:"
-	@echo
-	@echo "In $(README): "
-	@grep -i 'Bundle Version:' $(README)
+#	@echo "Please make sure that the version numbers are correct:"
+#	@echo
+#	@echo "In $(README): "
+#	@grep -i 'Bundle Version:' $(README)
 	@echo "Individual package versions: "
 	@egrep -h '\[.* phf\w+ package\]' $(ALLDTX)
 	@echo
