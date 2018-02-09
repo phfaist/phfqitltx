@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfthm}
 %<*package>
-    [2016/08/15 v1.0 phfthm package]
+    [2018/02/08 v1.0 phfthm package]
 %</package>
 %
 %<*driver>
@@ -187,9 +187,9 @@
 %   environments |thm|, |prop|, |lem|, |cor|, |conj|, |rem| as theorem-like
 %   environments, and |defn| as a definition-like environment.
 % \item[thmset=rich] \DescribeEnv{idea} \DescribeEnv{question}
-%   \DescribeEnv{problem} Provides the same environments as the |default|
-%   theorem set, as well as in addition: |idea|, |question| and |problem| as
-%   theorem-like environments.
+%   \DescribeEnv{claim} \DescribeEnv{problem} Provides the same environments as
+%   the |default| theorem set, as well as in addition: |idea|, |question|,
+%   |claim|, and |problem| as theorem-like environments.
 % \end{pkgoptions}
 %
 % You may also load a theorem set at a later
@@ -490,6 +490,7 @@
 % \DescribeMacro{\definitionname}
 % \DescribeMacro{\ideaname}
 % \DescribeMacro{\questionname}
+% \DescribeMacro{\claimname}
 % \DescribeMacro{\problemname}
 %
 % This package is language agnostic (with titles defined by default in English),
@@ -510,6 +511,7 @@
 %   \def\definitionname{D\'efinition}%
 %   \def\ideaname{Id\'ee}%
 %   \def\questionname{Question}%
+%   \def\claimname{Affirmation}%
 %   \def\problemname{Probl\`eme}%
 % }
 % ... \selectlanguage{francais} ...
@@ -2150,6 +2152,7 @@
 \def\definitionname{Definition}
 \def\ideaname{Idea}
 \def\questionname{Question}
+\def\claimname{Claim}
 \def\problemname{Problem}
 %    \end{macrocode}
 % 
@@ -2230,6 +2233,7 @@
   \phfthm@thmset@default
   \phfthm@def@thmset@mktheorem{idea}{\ideaname}
   \phfthm@def@thmset@mktheorem{question}{\questionname}
+  \phfthm@def@thmset@mktheorem{claim}{\claimname}
   \phfthm@def@thmset@mktheorem{problem}{\problemname}
 }
 %    \end{macrocode}
