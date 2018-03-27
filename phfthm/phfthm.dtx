@@ -1123,7 +1123,7 @@
 % And also define the actual theorem environment, adding calls to hooks.
 %    \begin{macrocode}
     \newenvironment{#2}[1][]{%
-      \begin{phfthm@#2}[##1]%
+      \begin{phfthm@#2}[{##1}]%
         \begingroup%
           \csname phfthm@hook@start@#2\endcsname{##1}%
       }{%
