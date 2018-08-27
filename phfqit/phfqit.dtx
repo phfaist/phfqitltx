@@ -1949,10 +1949,19 @@
 %    \end{macrocode}
 % \ldots{} add conditional system, if specified:
 %    \begin{macrocode}
-    \notblank{#3#4}{%
+    \notblank{#3}{%
       \DCohbase@addtoks\mathclose{}\,\delimsize\Vert\,\mathopen{}%
-          #3\mathclose{},\mathopen{}#4\@DCohbase@END@ADD@TOKS%
-    }{}%
+          #3\@DCohbase@END@ADD@TOKS%
+        \notblank{#4}{%
+          \DCohbase@addtoks\mathclose{},\mathopen{}%
+              #4\@DCohbase@END@ADD@TOKS%
+        }{}%
+    }{%
+        \notblank{#4}{%
+          \PackageWarning{phfqit}{Value `#4' ignored because previous parameter
+            was blank}%
+        }{}%
+      }
 %    \end{macrocode}
 % The tokens are ready now. Prepare the argument to the command
 % |\DCohbaseRenderContentsInnerParens| (by default just |\phfqitParens|), and go:
