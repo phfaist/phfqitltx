@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfnote}
 %<*package>
-    [2016/08/15 v1.0 phfnote package]
+    [2018/08/27 v1.1 phfnote package]
 %</package>
 %
 %<*driver>
@@ -541,13 +541,22 @@
 %   \pkgname{amssymb}, \pkgname{amsfonts}, and \pkgname{amsthm}.  The
 %   \pkgname{xcolor} package is also loaded.
 %
-% \item[pkgset=rich] Include a fair amount of packages which may be useful.
-%   On top of the |minimal| package set, this set includes the packages
+% \item[pkgset=rich] Include a fair amount of packages which may be useful.  On
+%   top of the |minimal| package set, this set includes the packages
 %   \pkgname{enumitem}, \pkgname{graphicx}, \pkgname{microtype},
-%   \pkgname{caption}, \pkgname{setspace}, as well as \pkgname{inputenc}
-%   with the |utf8| option and \pkgname{fontenc} with the |T1| option.
+%   \pkgname{caption}, \pkgname{setspace}, as well as \pkgname{inputenc} with
+%   the |utf8| option and \pkgname{fontenc} with the |T1| option (the packages
+%   \pkgname{fontenc} and \pkgname{inputenc} are not loaded if running Xe(La)TeX
+%   or Lua(La)TeX, or if they are already loaded with possibly different
+%   options).
 %
 %   This package set is loaded by default.
+%
+%   \changed[chg-xe-luatex-input-fontenc-pkgset]{v1.1}{2018/08/27}{If running
+%   XeTeX or LuaTeX, then do not load \pkgname{inputenc} and \pkgname{fontenc}
+%   as part of \texttt{rich} and \texttt{extended} package sets.  Plus, do not
+%   load \pkgname{inputenc} (resp. \pkgname{fontenc}) if the package is already
+%   loaded}
 %
 % \item[pkgset=extended] Additionally, include packages \pkgname{float},
 %   \pkgname{verbdef}, \pkgname{csquotes}, \pkgname{dsfont}, \pkgname{bbm}
@@ -1894,11 +1903,30 @@
 
   \RequirePackage{graphicx}
 
-  \PassOptionsToPackage{T1}{fontenc}
-  \RequirePackage{fontenc}
-
-  \PassOptionsToPackage{utf8}{inputenc}
-  \RequirePackage{inputenc}
+%    \end{macrocode}
+% For this bit, use the \pkgname{iftex} package to determine if we're running
+% XeTeX or LuaTeX; if that's the case then we inhibit the loading of
+% \pkgname{inputenc} and \pkgname{fontenc}.
+%
+% Plus, load \pkgname{inputenc}, resp. \pkgname{fontenc}, only if it isn't
+% already loaded.
+%
+% \changedreftext{chg-xe-luatex-input-fontenc-pkgset}
+%    \begin{macrocode}
+  \def\phfnote@tmp@requireinputencfontenc{
+    \@ifpackageloaded{fontenc}{}{
+      \PassOptionsToPackage{T1}{fontenc}
+      \RequirePackage{fontenc}
+    }
+    \@ifpackageloaded{inputenc}{}{
+      \PassOptionsToPackage{utf8}{inputenc}
+      \RequirePackage{inputenc}
+    }
+  }
+  \RequirePackage{iftex}
+  \ifXeTeX\let\phfnote@tmp@requireinputencfontenc\relax\fi
+  \ifLuaTeX\let\phfnote@tmp@requireinputencfontenc\relax\fi
+  \phfnote@tmp@requireinputencfontenc
 }
 
 \def\phfnote@do@pkgset@extended{
