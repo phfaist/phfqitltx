@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfnote}
 %<*package>
-    [2018/08/27 v1.1 phfnote package]
+    [2018/08/31 v1.1 phfnote package]
 %</package>
 %
 %<*driver>
@@ -802,6 +802,21 @@
 % \item[hyperrefdefs=false] Do not load the \pkgname{hyperref} package, do not set
 %   sensible settings.
 % \item[nohyperrefdefs] Same as |hyperrefdefs=false|.
+% \end{pkgoptions}
+%
+% It is also possible to defer loading the \pkgname{hyperref} package for later,
+% so that you can import other packages that need to be loaded before
+% \pkgname{hyperref}.  In that case, simply call |\usepackage{hyperref}| later
+% at your convenience in the preamble.
+%
+% \begin{pkgoptions}
+% \item[hyperrefdefer=true] Do not immediately load the \pkgname{hyperref}
+%   package. The user promises to call |\usepackage{hyperref}| manually at some
+%   point in the preamble.
+% \item[hyperrefdefer=false] (the default) Load \pkgname{hyperref} immediately,
+%   the user doesn't have to worry about loading it.  However if other packages
+%   are loaded after \pkgname{phfnote}, you may run into some issues if
+%   \pkgname{hyperref} is already loaded.
 % \end{pkgoptions}
 %
 % \DescribeMacro{\url} In order to typeset URLs, the |\url| command is made
@@ -1983,8 +1998,8 @@
   \definecolor{docnotelinkcolor}{rgb}{0,0,0.4}%
 %    \end{macrocode}
 % 
-% Load URL package, and save a version of |\url| which is not patched
-% by \pkgname{hyperref}:
+% Load the \pkgname{url} package, and save a version of |\url| which is not
+% patched by \pkgname{hyperref}:
 %    \begin{macrocode}
   \RequirePackage{url}%
   \DeclareUrlCommand\phfnote@format@url{}%
@@ -1992,10 +2007,20 @@
 % 
 % Set up \pkgname{hyperref} options:
 %    \begin{macrocode}
-  \PassOptionsToPackage{bookmarks=true,backref=false}{hyperref}%
-  \RequirePackage{hyperref}%
-  %
-  \hypersetup{unicode=true,%
+  \PassOptionsToPackage{unicode=true,bookmarks=true,backref=false}{hyperref}%
+%    \end{macrocode}
+%
+% Give the option to the user of loading the \pkgname{hyperref} package manually
+% later, when desired.  But still in that case, allow user code to use
+% |\hypersetup|, by hooking to |\AfterPreamble| (see \pkgname{etoolbox}, it's
+% like |\AtBeginDocument| but does not fail if called in the document).
+%    \begin{macrocode}
+  \ifphfnote@opt@hyperrefdefer
+    \def\hypersetup##1{\AtBeginDocument{\hypersetup{##1}}}%
+  \else
+    \RequirePackage{hyperref}
+  \fi
+  \hypersetup{%
     bookmarksnumbered=false,bookmarksopen=false,bookmarksopenlevel=1,%
     breaklinks=true,pdfborder={0 0 0},colorlinks=true}%
   \hypersetup{%
@@ -2549,11 +2574,20 @@
 \DeclareComplementaryOption{nofootnotedefs}{footnotedefs}
 %    \end{macrocode}
 %
-% Load hyperref and corresponding definitions. \marginpar{\raggedleft
+% Load \pkgname{hyperref} and corresponding definitions. \marginpar{\raggedleft
 % \phfverb{[hyperrefdefs=...]}} See \autoref{sec:hyperrefdefs}.
 %    \begin{macrocode}
 \DeclareBoolOption[true]{hyperrefdefs}
 \DeclareComplementaryOption{nohyperrefdefs}{hyperrefdefs}
+%    \end{macrocode}
+%
+% Do not load \pkgname{hyperref} right away, leave the opportunity to import
+% other packages first. Hyperref will be imported manually with
+% |\usepackage{hyperref}|. |\hypersetup| may still be used, and simply defers
+% the settings to later at package load. \marginpar{\raggedleft
+% \phfverb{[hyperrefdefer=...]}} See \autoref{sec:hyperrefdefs}.
+%    \begin{macrocode}
+\DeclareBoolOption[false]{hyperrefdefer}
 %    \end{macrocode}
 %
 % Adjustments for bibliography, including default style. \marginpar{\raggedleft
