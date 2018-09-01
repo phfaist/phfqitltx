@@ -269,6 +269,58 @@
 %   case, the preset |reset| will guarantee all features to be deactivated.
 % \end{pkgoptions}
 %
+%
+%
+%
+% \section{Summary of Package Options}
+% \label{sec:package-options}
+%
+% \begin{pkgoptions}
+% \item[preset=\meta{preset name}] Load a preset specifying a predefined set of
+%   options for the general appearance of the document.  See documentation in
+%   \autoref{sec:presets}
+% \item[title=\meta{title style}] Set the title style.  Documentation in
+%   \autoref{sec:title-styles}
+% \item[abstract=\meta{abstract attributes}] Set the abstract style by
+%   specifying a comma-separated list of attributes.  Don't forget to
+%   put the list of attributes within braces,
+%   |[abstract={wide,noname,it}]|.  Documentation in
+%   \autoref{sec:abstract-attributes}
+% \item[pkgset=\meta{package set}] Specify a standard set of \LaTeX{}
+%   packages to load.  See \autoref{sec:package-sets}.
+% \item[pagegeomdefs=\meta{true or false}] Whether to care about page
+%   margins. |nopagegeomdefs| is synonym for |pagegeomdefs=false|.
+% \item[pagegeom=\meta{geom style}] Set a page margin style.  Only has effect if
+%   |pagegeomdefs=true|.  Options are documented in \autoref{sec:pagegeomdefs}.
+% \item[secfmt=\meta{section formatting attributes}] A list of attributes
+%   defining how section (and possibly paragraph) headings should look like.
+%   See \autoref{sec:secfmt}.
+% \item[par=\meta{par style}] Define how paragraphs should be spaced.  Refer to
+%   \autoref{sec:par-defs}.
+% \item[spacingdefs=\meta{true or false}] Adjust spacing of lines and words
+%   (\autoref{sec:spacingdefs}).
+% \item[fontdefs=\meta{true or false}] Adjust some fonts
+%   (\autoref{sec:fontdefs}).
+% \item[footnotedefs=\meta{true or false}] Adjust slighly the appearance of
+%   footnotes.  See \autoref{sec:footnotedefs}.
+% \item[hyperrefdefs=\meta{true or false}] Load the \pkgname{hyperref} package, and set
+%   some defaults settings.  See \autoref{sec:hyperrefdefs}.
+% \item[hyperrefdefer=\meta{true or false}] User may opt in to promise to load
+%   the \pkgname{hyperref} manually later, so that they can load other packages
+%   before.  See \autoref{sec:hyperrefdefs}.
+% \item[bibliographydefs=\meta{true or false}] Adjust the appearance and style
+%   of the bibliography.  See \autoref{sec:bibliographydefs}.
+% \end{pkgoptions}
+%
+% \begin{pkgtip}
+%   To activate only a subset of features, use \pkgoptionfmt{preset=reset} and then
+%   enable only the features required.  In this way, you can ensure that only those
+%   features which are explicitly specified are enabled.
+% \end{pkgtip}
+%
+%
+%
+%
 % \section{Features}
 %
 % This package provides a large collection of small features, which, put all
@@ -932,48 +984,7 @@
 % 
 %
 %
-% \section{Summary of Package Options}
-% \label{sec:package-options}
 %
-% \begin{pkgoptions}
-% \item[preset=\meta{preset name}] Load a preset specifying a predefined set of
-%   options for the general appearance of the document.  See documentation in
-%   \autoref{sec:presets}
-% \item[title=\meta{title style}] Set the title style.  Documentation in
-%   \autoref{sec:title-styles}
-% \item[abstract=\meta{abstract attributes}] Set the abstract style by
-%   specifying a comma-separated list of attributes.  Don't forget to
-%   put the list of attributes within braces,
-%   |[abstract={wide,noname,it}]|.  Documentation in
-%   \autoref{sec:abstract-attributes}
-% \item[pkgset=\meta{package set}] Specify a standard set of \LaTeX{}
-%   packages to load.  See \autoref{sec:package-sets}.
-% \item[pagegeomdefs=\meta{true or false}] Whether to care about page
-%   margins. |nopagegeomdefs| is synonym for |pagegeomdefs=false|.
-% \item[pagegeom=\meta{geom style}] Set a page margin style.  Only has effect if
-%   |pagegeomdefs=true|.  Options are documented in \autoref{sec:pagegeomdefs}.
-% \item[secfmt=\meta{section formatting attributes}] A list of attributes
-%   defining how section (and possibly paragraph) headings should look like.
-%   See \autoref{sec:secfmt}.
-% \item[par=\meta{par style}] Define how paragraphs should be spaced.  Refer to
-%   \autoref{sec:par-defs}.
-% \item[spacingdefs=\meta{true or false}] Adjust spacing of lines and words
-%   (\autoref{sec:spacingdefs}).
-% \item[fontdefs=\meta{true or false}] Adjust some fonts
-%   (\autoref{sec:fontdefs}).
-% \item[footnotedefs=\meta{true or false}] Adjust slighly the appearance of
-%   footnotes.  See \autoref{sec:footnotedefs}.
-% \item[hyperrefdefs=\meta{true or false}] Load the \pkgname{hyperref} package, and set
-%   some defaults settings.  See \autoref{sec:hyperrefdefs}.
-% \item[bibliographydefs=\meta{true or false}] Adjust the appearance and style
-%   of the bibliography.  See \autoref{sec:bibliographydefs}.
-% \end{pkgoptions}
-%
-% \begin{pkgtip}
-%   To activate only a subset of features, use \pkgoptionfmt{preset=reset} and then
-%   enable only the features required.  In this way, you can ensure that only those
-%   features which are explicitly specified are enabled.
-% \end{pkgtip}
 %
 %
 % \StopEventually{\PrintChangesAndIndex}
