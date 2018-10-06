@@ -932,79 +932,102 @@
 %
 % When elaborating documents, it is useful to leave inline comments and be able
 % to mark text changes, especially when collaborating with a team.  Often in
-% practice a simple macro definition will do, like:
+% practice a simple macro definition will do, like this:
 % \begin{verbatim}
 %   \newcommand{\phf}[1]{{\color{blue}#1}} % Philippe Faist
-% \end{verbatim}
+% \end{verbatim}\vspace{-\baselineskip}
+% But because I kinda like more fancy stuff, and I definitely didn't have time
+% to spare but still got distracted into programming \LaTeX{} macros, here is a
+% way of defining a custom command such as |\phf| above, but that allows several
+% syntax options that format the command differently.
+% \DescribeMacro{\phfMakeCommentingCommand} This is done using the
+% |\phfMakeCommentingCommand| macro.
 %
-% Because I kinda like more fancy stuff, here is a way of defining a custom
-% command such as |\phf| above, but that allows several syntax options that
-% format the command differently.  \DescribeMacro{\phfMakeCommentingCommand}
-% This is done using the |\phfMakeCommentingCommand| macro.
-%
-% \phfMakeCommentingCommand[color=blue,initials={PhF}]{phf}
-% Let's start with a simple example, defining the commenting command |\phf|:
+% \phfMakeCommentingCommand[color=orange,initials={PhF}]{phf}%
+% \phfMakeCommentingCommand[color=red,initials={AE}]{AlE}%
+% \phfMakeCommentingCommand[color=blue,initials={JB}]{JB}%
+% Let's start with a simple example. Suppose two authors, Albert Einstein and
+% John Bell, are commenting on the same document. They might define the
+% commenting commands |\AlE| and |\JB|:
 % \begin{verbatim}
-% \phfMakeCommentingCommand[color=blue,initials={PhF}]{phf}
-% \end{verbatim}
-% Then we can do stuff like:
-%
-% Lorem ipsum dolor sit amet. \phf{Nulla iaculis sem ut dignissim.}
-% Cras consectetur.  \phf[Somehow ``Quisque'' sounds better than
-% ``Facilisis''] \phf*{Facilisis} \phf{Quisque} orci mattis. Nulla
-% interdum, et blandit tempor \phf![This is wrong]. ...
-%
-% by typing:
+% \phfMakeCommentingCommand[color=red,initials={AE}]{AlE}
+% \phfMakeCommentingCommand[color=blue,initials={JB}]{JB}
+% \end{verbatim}\vspace{-\baselineskip}
+% They can then comment on text like this:
 % \begin{verbatim}
-% Lorem ipsum dolor sit amet. \phf{Nulla iaculis sem ut dignissim.}
-% Cras consectetur.  \phf[Somehow ``Quisque'' sounds better than
-% ``Facilisis''] \phf*{Facilisis} \phf{Quisque} orci mattis. Nulla
-% interdum, et blandit tempor \phf![This is wrong]. ...
-% \end{verbatim}
+% Quantum mechanics developed quickly in the 1920's thanks to the
+% works of Schr\"odinger, Heisenberg, and Dirac, who drew inspiration
+% from earlier ideas by Planck \AlE{and Einsten} \AlE[@JB, you forgot
+% about me!].  Quantum mechanics appears to allow spooky action at a
+% distance via some strange thing called ``entanglement,'' \JB*{but
+% this can be explained by hidden variables}\JB{which has revolutionized
+% our understanding of local realism.} \JB[@Albert, we talked about
+% this...]
+% \end{verbatim}\vspace{-\baselineskip}
+% which gives:
 %
-% Here is the full syntax of the commenting command.  I'm using |\xxx|
-% here as a placeholder for whatever you gave as main argument to
-% |\phfMakeCommentingCommand|.
+% {\itshape%
+% Quantum mechanics developed quickly in the 1920's thanks to the
+% works of Schr\"odinger, Heisenberg, and Dirac, who drew inspiration
+% from earlier ideas by Planck \AlE{and Einsten} \AlE[@JB, you forgot
+% about me!].  Quantum mechanics appears to allow spooky action at a
+% distance via some strange thing called ``entanglement,'' \JB*{but
+% this can be explained by hidden variables}\JB{which has revolutionized
+% our understanding of local realism.} \JB[@Albert, we talked about
+% this...]%
+% }
 %
-% |\xxx{some text here}| --- \phf{some text here} --- typeset the
-% given text in color, perhaps to mark an addition by author |xxx| to
+% Here is the full syntax of the commenting command.
+%
+% |\AlE{some text here}| --- \AlE{some text here} --- typeset the
+% given text in color, perhaps to mark an addition by author |AlE| to
 % the document.
 %
-% |\xxx[please revise this]| --- \phf[please revise this] --- typeset
-% an inline comment, which is not a portion of text that is part of
-% the document content but rather that comments it and refers to it.
+% |\AlE[please revise this]| --- \AlE[please revise this] --- typeset an inline
+% comment, which is not a portion of text that is part of the document content
+% but rather that comments it and refers to it.
 %
-% |\xxx*{text to be removed}| --- \phf*{text to be removed} ---
+% |\AlE*{text to be removed}| --- \AlE*{text to be removed} ---
 % typeset the given text in a lighter color surrounded by markers,
 % perhaps to indicate that the text should be suppressed.
 %
-% |\xxx!{important piece of text}| --- \phf!{important piece of text}
+% |\AlE!{important piece of text}| --- \AlE!{important piece of text}
 % --- typeset the given text marking it as important.
 %
-% |\xxx![something really important]| --- \phf![something really
-% important] --- typeset the given comment and mark it as important.
+% |\AlE![a really important comment]| --- \AlE![a really important comment] ---
+% typeset the given comment and mark it as important.
 %
 % In each of these cases (except for comments in square brackets),
-% instead of specifying the argument using curly brackets, you can use
-% |\xxx .... \endxxx|:\\
-% |\xxx text here\endxxx| --- \phf text here\endphf \\
-% |\xxx! important\endxxx| --- \phf! important\endphf \\
-% |\xxx* remove\endxxx| --- \phf* remove\endphf
+% you can use the syntax |\AlE .... \endAlE| instead of specifying the
+% argument using curly brackets:\\
+% |\AlE text here\endAlE| --- \AlE text here\endAlE \\
+% |\AlE! important\endAlE| --- \AlE! important\endAlE \\
+% |\AlE* remove\endAlE| --- \AlE* remove\endAlE
 %
 % For simple text, you can also use the |\begin|/|\end| syntax:\\
-% |\begin{xxx} text here\end{xxx}| --- \begin{phf} text here\end{phf}
+% |\begin{AlE} text here\end{AlE}| --- \begin{AlE} text here\end{AlE}
 %
+% \begin{pkgtip}
+% Note that in contrast to optional
+% arguments in most LaTeX macros, the argument is allowed to contain matching
+% square brackets, for instance \relax%
+% |\AlE[this works [as you'd expect]]| \AlE[this [works] as you'd expect]
 %
-% Now let's see exactly how to define your customized |\xxx| command.
+% In any case you can protect the argument as usual with curly braces:
+% |\AlE[{this is [weird}]| \AlE[{this is [weird}]
+% \end{pkgtip}
+%
+% Now let's see exactly how to define your customized |\AlE| command.
 % \DescribeMacro{\phfMakeCommentingCommand} The command
 % |\phfMakeCommentingCommand| takes the following syntax:
 %
 % |\phfMakeCommentingCommand|\oarg{key=value,key2=value2,...}\marg{cmd name}
 %
 % The \marg{command name} should be given as a text name (e.g.,
-% |{xxx}|), and not as a macro.  They key-value pairs may be one of the following:
+% |{AlE}|), and not as a macro.  They key-value pairs may be one of the following:
 %
 %
+% \phfMakeCommentingCommand[color=blue,initials={PhF},formatinitials=box]{phfbox}
 % \phfMakeCommentingCommand[color=blue,initials={PhF},formatinitials=nobox]{phfnobox}
 % \phfMakeCommentingCommand[color=blue,initials={PhF},formatinitials=hide]{phfhideinitials}
 % \phfMakeCommentingCommand[color=green!50!blue,initials={Philippe Faist},formatinitials=footnote]{phffootnote}
@@ -1020,19 +1043,22 @@
 %   except if you loaded the older |color| package or you have
 %   |pkgset=none|.)
 % \item[initials=\marg{your initials}] The initials to typeset at the
-%   beginning of a comment. \phf[like here, the initials are ``PhF'']
+%   beginning of a comment.
 % \item[formatinitials=\meta{keyword or command}] The command that will be used
-%   to format the initials.  By default (|formatinitials=default|), the initials
-%   are typeset in smaller sans serif font in a small frame \phf[like this].
-%   Specify |formatinitials=nobox| to remove the frame \phfnobox[like this].  Or
-%   specify |formatinitials=hide| to hide the initials altogether,
-%   \phfhideinitials[like this].  You can also specify |formatinitials=footnote|
-%   to hide the initials at the point of text but with a footnote to associate
-%   colored comments with the name (for this to work more nicely, specify your
-%   full name with |initials={...}|) \phffootnote[Here is an example].  [In the
-%   latter case, you may redefine |\phfCCChangesBy|, e.g.,
-%   |\renewcommand{\phfCCChangesBy}{Changes in this color are by\ }| to change
-%   the text in the footnote.]
+%   to format the initials.  By default (|formatinitials=default| or
+%   |formatinitials=margin|), the initials are displayed on the margin of the
+%   paragraph the first time the change occurs on a given page, like in the
+%   examples above.  You may also specify |formatinitials=box|, in which case
+%   the initials are typeset in smaller sans serif font in a small frame
+%   \phfbox[like this].  Specify |formatinitials=nobox| to remove the frame
+%   \phfnobox[like this].  Or specify |formatinitials=hide| to hide the initials
+%   altogether, \phfhideinitials[like this].  You can also specify
+%   |formatinitials=footnote| to hide the initials at the point of text but with
+%   a footnote to associate colored comments with the name (for this to work
+%   more nicely, specify your full name with |initials={...}|) \phffootnote[Here
+%   is an example].  [In the latter case, you may redefine |\phfCCChangesBy|,
+%   e.g., |\renewcommand{\phfCCChangesBy}{Changes in this color are by\ }| to
+%   change the text in the footnote.]
 %
 %   You may also specify any \LaTeX{} command, which will then be used to format
 %   the initials.
@@ -1053,10 +1079,10 @@
 %   removed. This amount of horizontal space is added before and after.
 % \item[rmbegin=\marg{LaTeX text and/or commands}] Stuff to typeset at
 %   the beginning of a piece of text to be removed.  By default, three
-%   crosses (with some spacing adjustments).
+%   crosses.
 % \item[rmend=\marg{LaTeX text and/or commands}] Stuff to typeset at
 %   the end of a piece of text to be removed.  By default, three
-%   crosses (with some spacing adjustments).
+%   crosses.
 % \item[ifont=\marg{LaTeX commands}] The font commands to issue when
 %   typesetting important text. \phf!{By default, the text is in
 %   larger boldface format like this}
@@ -1064,10 +1090,10 @@
 %   amount of horizontal space is added before and after.
 % \item[ibegin=\marg{LaTeX text and/or commands}] Stuff to typeset at
 %   the beginning of a piece of important text.  By default, three
-%   exclamation marks (with some spacing adjustments).
+%   exclamation marks.
 % \item[iend=\marg{LaTeX text and/or commands}] Stuff to typeset at
 %   the end of a piece of important text.  By default, three
-%   exclamation marks (with some spacing adjustments).
+%   exclamation marks.
 % \end{cmdoptions}
 % 
 % After invoking |\phfMakeCommentingCommand|, the colors |xxxcolor|,
@@ -1078,7 +1104,7 @@
 % |hyperrefdefs=true|).  You may redefine these colors afterwards with
 % |\colorlet| if you wish:
 % \begin{verbatim}
-% \colorlet{xxxrmcolor}{gray}
+% \colorlet{AlErmcolor}{gray}
 % \end{verbatim}
 %
 % \changed[chg-inline-commenting]{v1.1}{2018/10/03}{Added support for inline
@@ -1122,7 +1148,7 @@
 % size to a fraction of the surrounding font size.  The fraction may be
 % specified as an optional argument.  A fraction of 0.8 makes the text size 0.8
 % times that of the surrounding text, that is, smaller than the surrounding
-% text.  A value of 1 does not change the font size.  If the fraction is not
+% text.  A value of~1 does not change the font size.  If the fraction is not
 % specified, the value stored in |\notesmallerfrac| is used.
 %
 % \DescribeMacro{\notesmallerfrac} The fraction by which |\notesmaller| typesets
@@ -2529,8 +2555,9 @@
 %    \end{macrocode}
 %
 % In the series of defaults, we also have the predefined initials formatting.
+% Define the |hide|, |box|, and |nobox| styles first.
 %    \begin{macrocode}
-\def\phf@cc@formatinitialsstyle@default#1{%
+\def\phf@cc@formatinitialsstyle@box#1{%
   \hspace{0.25em}\relax
   \raisebox{1pt}{{\fboxsep=1pt\relax\fbox{\normalfont\sffamily\tiny#1}}}%
   \hspace{0.25em}}
@@ -2539,6 +2566,27 @@
   {\normalfont\sffamily\tiny#1}%
   \hspace{0.25em}}
 \def\phf@cc@formatinitialsstyle@hide#1{}
+%    \end{macrocode}
+% Define the |margin| style now.  Define an auxiliary global macro to remember
+% whenever we've already displayed the margin note on a given page.
+%    \begin{macrocode}
+\def\phf@cc@formatinitialsstyle@margin#1{%
+  \ifcsname phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur @\roman{page}\endcsname
+    % already displayed on this page, don't repeat
+  \else
+    \csgdef{phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur @\roman{page}}{}%
+    \expandafter\marginpar\expandafter{\strut\expandafter{%
+        \expandafter\color\expandafter{\phf@cc@val@cur color}%
+        \hfill\fboxsep=1pt\relax\fbox{\normalfont\sffamily\footnotesize #1}}}%
+  \fi
+}
+\robustify\phf@cc@formatinitialsstyle@margin
+\let\phf@cc@formatinitialsstyle@default\phf@cc@formatinitialsstyle@margin
+%    \end{macrocode}
+% Define the |footnote| style. Works very similarly to the |footnote| style.
+% Note you can redefine |\phfCCChangesBy| to whatever you please, and it can
+% even take the name as |#1| argument.
+%    \begin{macrocode}
 \def\phf@cc@formatinitialsstyle@footnote#1{%
   \ifcsname phf@cc@valfmtinitialsfootnote@intlspage@\phf@cc@val@cur @\roman{page}\endcsname
     % already displayed on this page, don't repeat
@@ -2641,9 +2689,11 @@
 % This helper macro prints out the initials, if any.
 %    \begin{macrocode}
 \def\phf@cc@showinitials{%
-  \edef\phf@cc@tmpx{\expandafter\expandonce\csname phf@cc@val@\phf@cc@val@cur @initials\endcsname}%
+  \edef\phf@cc@tmpx{%
+    \expandafter\expandonce\csname phf@cc@val@\phf@cc@val@cur @initials\endcsname}%
   \expandafter\notblank\expandafter{\phf@cc@tmpx}{%
-    \csname phf@cc@val@\phf@cc@val@cur @formatinitials\expandafter\endcsname\expandafter{\phf@cc@tmpx}}{}%
+    \csname phf@cc@val@\phf@cc@val@cur @formatinitials%
+        \expandafter\endcsname\expandafter{\phf@cc@tmpx}}{}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -2725,6 +2775,7 @@
 % chars, and go.
 %    \begin{macrocode}
 \NewDocumentCommand\phf@cc@comment{O{}}{%
+  \normalfont%
   \csname phf@cc@val@\phf@cc@val@cur @cfont\endcsname%
   \preto\phf@cc@val@grpcmds{%
     \csname phf@cc@val@\phf@cc@val@cur @cbegin\endcsname%
