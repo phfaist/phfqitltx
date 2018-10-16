@@ -288,10 +288,9 @@
 %   \autoref{sec:abstract-attributes}
 % \item[pkgset=\meta{package set}] Specify a standard set of \LaTeX{}
 %   packages to load.  See \autoref{sec:package-sets}.
-% \item[pagegeomdefs=\meta{true or false}] Whether to care about page
-%   margins. |nopagegeomdefs| is synonym for |pagegeomdefs=false|.
-% \item[pagegeom=\meta{geom style}] Set a page margin style.  Only has effect if
-%   |pagegeomdefs=true|.  Options are documented in \autoref{sec:pagegeomdefs}.
+% \item[pagegeom=\meta{geom style}] Set a page margin style.  Use |nopagegeom|
+%   to leave page geometry unchanged.  Options are documented in
+%   \autoref{sec:pagegeomdefs}.
 % \item[secfmt=\meta{section formatting attributes}] A list of attributes
 %   defining how section (and possibly paragraph) headings should look like.
 %   See \autoref{sec:secfmt}.
@@ -317,8 +316,6 @@
 %   enable only the features required.  In this way, you can ensure that only those
 %   features which are explicitly specified are enabled.
 % \end{pkgtip}
-%
-%
 %
 %
 % \section{Features}
@@ -370,14 +367,19 @@
 %     \vspace*{3em}\notetitle@style@article\null \shortlipsum \morepagecontents
 %   \end{phfnoteDocVirtualPage}
 %
-% \item[title=] An empty argument to |title| instructs \pkgname{phfnote} not to
-%   override any title definition, thus preserving the default class title
-%   style.
+% \item[notitle] Also equivalently, |title=false|. Instructs \pkgname{phfnote}
+%   not to override any title definition, thus preserving the default class
+%   title style.
 %
 %   Beware that some other title goodies, such as our more advanced |\thanks|
 %   notes, or spacing adjustments for the abstract, will probably not work.
+%
+%   For compatibility with previous versions of |phfnote|, you may also specify
+%   an empty option value, |title=|.
 % \end{pkgoptions}
 %
+% \changed[chg-title-false-pkgoption]{v1.1}{2018/10/16}{Package options
+% \phfverb{notitle} and \phfverb{title=false}}
 %
 % \subsubsection{Customizing the style of the \phfverb{default} and \phfverb{small} title styles}
 % 
@@ -632,16 +634,8 @@
 % and whether the document is typeset in two columns.
 %
 % If you want anything more complicated than what is provided by a default
-% setting here, just use |pagegeomdefs=false| and invoke the \pkgname{geometry} package
-% directly with your preferred set of options.
-%
-% \begin{pkgoptions}
-% \item[pagegeomdefs=true] Include the \pkgname{geometry} package, using the default
-%   settings or whatever is specified with the |pagegeom| option.
-% \item[pagegeomdefs=false] Do not attempt to change the document margins, and
-%   don't load the \pkgname{geometry} package.
-% \item[nopagegeomdefs] Same as |pagegeomdefs=false|.
-% \end{pkgoptions}
+% setting here, just use the |nopagegeom| package option and invoke the
+% \pkgname{geometry} package directly with your preferred set of options.
 %
 % The page geometry predefined settings are the following.
 %
@@ -649,6 +643,8 @@
 % \item[pagegeom=default] Default settings. Not too wide, not too
 %   narrow. Settings vary according to single or double column setting, and
 %   according to default font point size.
+% \item[nopagegeom] Also, |pagegeom=false|.  Do not change page geometry
+%   settings, do not load the \pkgname{geometry} package.
 % \item[pagegeom=narrow] Narrower style.  For single-column documents, this is
 %   closer to the typographically-advertised-optimal of 50--80 characters per
 %   line, but it might look narrow to some.
@@ -658,6 +654,19 @@
 %   note can fit.  This style is used in this package documentation, for
 %   example.
 % \end{pkgoptions}
+%
+%
+% The following package options are OBSOLETE:
+% \begin{pkgoptions}
+% \item[pagegeomdefs=\meta{true or false}] Whether to care about page
+%   margins. |nopagegeomdefs| is synonym for |pagegeomdefs=false|.  This option
+%   is OBSOLETE, please use |nopagegeom| or |pagegeom=false| instead of
+%   |pagegeomdefs=false| and |pagegeom| (or |pagegeom=...| with setting) instead
+%   of |pagegeomdefs=true|.
+% \end{pkgoptions}
+% \changed[chg-pagegeom-pkgoption-onoff]{v1.1}{2018/10/16}{Changed how to turn
+% on/off the page geometry settings.  Use \phfverb{nopagegeom} or
+% \phfverb{pagegeom=false} instead of \phfverb{pagegeomdefs=true|false}}
 % 
 %
 % \subsection{Section Headers Styling}
@@ -1571,34 +1580,37 @@
 %    \begin{macrocode}
 \def\phfnote@do@notetitle#1{
 %    \end{macrocode}
-% If we have an empty title style, then we leave default title provided by the class. 
+% If we have the title style |false|, or an empty title style, then we leave
+% default title provided by the class.
 %    \begin{macrocode}
-  \if\relax\detokenize\expandafter{#1}\relax
-  \else
+  \ifstrequal{#1}{false}{}{%
+    \if\relax\detokenize\expandafter{#1}\relax
+    \else
 %    \end{macrocode}
 % Otherwise, we have a title style to set.  Do some checks that the given style is indeed
 % defined.
 %    \begin{macrocode}
-    \ifcsname notetitle@style@#1\endcsname
-      \def\phfnote@tmp@titsty{#1}%
-    \else
-      \PackageError{phfnote}{Unknown title style: '#1'.}{Unknown title
-        style: '#1'. Please consult the package documentation for available
-        styles.}
-      \def\phfnote@tmp@titsty{default}%
-    \fi
+      \ifcsname notetitle@style@#1\endcsname
+        \def\phfnote@tmp@titsty{#1}%
+      \else
+        \PackageError{phfnote}{Unknown title style: '#1'.}{Unknown title
+          style: '#1'. Please consult the package documentation for available
+          styles.}
+        \def\phfnote@tmp@titsty{default}%
+      \fi
 %    \end{macrocode}
 % Apply new (default) definitions of |\thanks|, |\thanksmark| and |\title|.  Do this here
 % only, because this can clash with more complicated versions from, e.g., \RevTeX.
 %    \begin{macrocode}
-    \let\title\notetitle@title
-    \let\thanks\notetitle@thanks
-    \let\thanksmark\notetitle@thanksmark
+      \let\title\notetitle@title
+      \let\thanks\notetitle@thanks
+      \let\thanksmark\notetitle@thanksmark
 %    \end{macrocode}
 % Now, actually overload the title style by redefining |\@maketitle|.
 %    \begin{macrocode}
-    \def\@maketitle{\csname notetitle@style@\phfnote@tmp@titsty\endcsname}
-  \fi
+      \def\@maketitle{\csname notetitle@style@\phfnote@tmp@titsty\endcsname}%
+    \fi
+  }%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1834,17 +1846,21 @@
 % \end{macro}
 % 
 % 
-% \begin{macro}{\phfnote@do@pagegeomdefs}
-%   Finally, provide a helper to set the page geometry.  Just call the right macro.
+% \begin{macro}{\phfnote@do@pagegeom}
+%   Finally, provide a helper to set the page geometry.  Just call the right
+%   macro.  If the argument is |false|, don't do anything.
 %    \begin{macrocode}
-\newcommand{\phfnote@do@pagegeomdefs}[1]{
-  \ifcsname phfnote@pagegeomstyle@#1\endcsname
-    \csname phfnote@pagegeomstyle@#1\endcsname
-  \else
-    \PackageWarning{phfnote}{Unknown page geometry style: `#1'!}
-  \fi
-
-  \RequirePackage{geometry}%
+\newcommand{\phfnote@do@pagegeom}[1]{
+  \ifstrequal{#1}{false}{}{%
+    \message{phfnote: Setting page geometry style #1}%
+    \ifcsname phfnote@pagegeomstyle@#1\endcsname
+      \csname phfnote@pagegeomstyle@#1\endcsname
+    \else
+      \PackageWarning{phfnote}{Unknown page geometry style: `#1'!}%
+    \fi
+    %
+    \RequirePackage{geometry}%
+  }%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -3017,6 +3033,7 @@
 % See \autoref{sec:title-styles}.
 %    \begin{macrocode}
 \DeclareStringOption[default]{title}
+\DeclareVoidOption{notitle}{\def\phfnote@opt@title{false}}
 %    \end{macrocode}
 % 
 %
@@ -3036,12 +3053,18 @@
 % \phfverb{[pagegeomdefs=...]}} \marginpar{\raggedleft \phfverb{[pagegeom=...]}}
 % See \autoref{sec:pagegeomdefs}.
 %    \begin{macrocode}
+\DeclareStringOption[default]{pagegeom}
+\DeclareVoidOption{nopagegeom}{\def\phfnote@opt@pagegeom{false}}
+%    \end{macrocode}
+%
+% Obsolete options---
+%    \begin{macrocode}
 \DeclareBoolOption[true]{pagegeomdefs}
 \DeclareComplementaryOption{nopagegeomdefs}{pagegeomdefs}
-\DeclareStringOption[default]{pagegeom}
 %    \end{macrocode}
+% ---we handle these as follows. By default, |\ifphfnote@opt@pagegeomdefs| is
+% true. If it isn't, that means it was overridden and we need to respect that.
 % 
-%
 %
 % Styling of section headings.  \marginpar{\raggedleft \phfverb{[secfmt=...]}}
 % See \autoref{sec:secfmt}.
@@ -3123,6 +3146,22 @@
 }
 %    \end{macrocode}
 %
+%
+%
+% Small utility to deal with obsolete |XXXdefs=true/false| options.  If the
+% (obsolete) bool option |#1| is set to false (which means it was set
+% explicitly, so this must be respected), then emit a package warning and set
+% option |#2| (the regular option) to the string value |false|.
+%    \begin{macrocode}
+\def\phfnote@ifpkgoptfalsesetfalse#1#2{%
+  \edef\x{%
+    \expandafter\noexpand\csname ifphfnote@opt@#1\endcsname\noexpand\else
+      \noexpand\PackageWarning{phfnote}{Option #1 is obsolete. Please use "#2=false'' instead.}%
+      \noexpand\csgdef{phfnote@opt@#2}{false}\noexpand\fi}%
+  \x
+}
+%    \end{macrocode}
+% 
 % \subsubsection{Define Global Presets}
 % \label{impl:presets}
 %
@@ -3155,7 +3194,7 @@
 \newcommand\phfnote@presetcommon@xnote[1][noteitsf]{
   \def\phfnote@opt@title{default}
   \def\phfnote@opt@par{skip}
-  \phfnote@opt@pagegeomdefstrue
+  %\phfnote@opt@pagegeomdefstrue
   \def\phfnote@opt@pagegeom{wide}
   \setlength{\footnotesep}{5pt}
   \g@addto@macro\phfnote@hook@atendload{
@@ -3642,7 +3681,7 @@
 \def\phfnote@preset@reset{
   \def\phfnote@opt@pkgset{none}
   \def\phfnote@opt@title{}
-  \phfnote@opt@pagegeomdefsfalse
+  \def\phfnote@opt@pagegeom{false}
   \phfnote@opt@spacingdefsfalse
   \def\phfnote@opt@par{original}
   \def\phfnote@opt@abstract{original}
@@ -3680,23 +3719,22 @@
 % Take action according to the user options.
 %
 %    \begin{macrocode}
-\phfnote@do@pkgset{\phfnote@opt@pkgset}
+\expandafter\phfnote@do@pkgset\expandafter{\phfnote@opt@pkgset}
 
-\phfnote@do@notetitle{\phfnote@opt@title}
+\expandafter\phfnote@do@notetitle\expandafter{\phfnote@opt@title}
 
-\phfnote@do@noteabstract{\phfnote@opt@abstract}
+\expandafter\phfnote@do@noteabstract\expandafter{\phfnote@opt@abstract}
 
-\phfnote@do@secfmt{\phfnote@opt@secfmt}
+\expandafter\phfnote@do@secfmt\expandafter{\phfnote@opt@secfmt}
 
-\ifphfnote@opt@pagegeomdefs
-  \phfnote@do@pagegeomdefs{\phfnote@opt@pagegeom}
-\fi
+\phfnote@ifpkgoptfalsesetfalse{pagegeomdefs}{pagegeom}% deal with obsolete option
+\expandafter\phfnote@do@pagegeom\expandafter{\phfnote@opt@pagegeom}
 
 \ifphfnote@opt@spacingdefs
   \phfnote@do@spacing
 \fi
 
-\phfnote@do@par{\phfnote@opt@par}
+\expandafter\phfnote@do@par\expandafter{\phfnote@opt@par}
 
 \ifphfnote@opt@hyperrefdefs
   \phfnote@do@pdfhyperrefdefs

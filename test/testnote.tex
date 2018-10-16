@@ -2,9 +2,10 @@
 
 \newif\iftestnoteNeedsMinPkgs\testnoteNeedsMinPkgsfalse
 
-\usepackage{phfnote}
+%\usepackage{phfnote}
 %\usepackage[pkgset=minimal,title=default]{phfnote}\testnoteNeedsMinPkgstrue \usepackage{setspace}
 %\usepackage[title=default,pkgset=extended,abstract={noname,compact}]{phfnote}
+\usepackage[notitle,pkgset=extended,secfmt={section,secsquares,secnummargin}]{phfnote}
 %\usepackage[title=default,pkgset=extended,secfmt={section,secsquares,secnummargin}]{phfnote}
 %\usepackage[title=small,pkgset=extended]{phfnote}
 %\usepackage[preset=sfnote,pkgset=extended,pagegeom=bigmargin]{phfnote}
@@ -16,7 +17,7 @@
 %\usepackage[preset=pkgdoc]{phfnote}
 %\usepackage[preset=reset,pkgset=extended,title=small,secfmt={section},spacingdefs,fontdefs,pagegeomdefs,pagegeom=xwide,bibliographydefs,abstract={wide,small,it}]{phfnote} \usepackage{hyperref}\makeatletter\let\email\phfnote@email\makeatother\phfnotePdfLinkColor{red}
 %\usepackage[preset=reset,pkgset=extended]{phfnote} \usepackage{hyperref}\makeatletter\let\email\phfnote@email\makeatother\phfnotePdfLinkColor{red}\let\oldbibliography\bibliography\def\bibliography{\catcode`\&=12\relax\oldbibliography}\bibliographystyle{unsrturl}
-
+%\usepackage[preset=sfssnote,pkgset=extended,pagegeomdefs=false,pagegeom=xwide]{phfnote}
 
 
 \iftestnoteNeedsMinPkgs
@@ -94,6 +95,8 @@
 \newcommand{\POps}{\mathscr{P}}
 \newcommand{\DOps}{\mathscr{S}_=}
 
+
+\providecommand\thanksmark[1][]{[#1]}
 
 
 \title{Notes on Lambda-Majorization\thanks[9]{... a generalization of majorization}%
