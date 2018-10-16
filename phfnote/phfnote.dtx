@@ -828,6 +828,8 @@
 %   You may also use |par=false|.
 % \end{pkgoptions}
 %
+%
+% Obsolete options:
 % \begin{pkgoptions}
 % \item[par=original] OBSOLETE---use |nopar| instead.
 % \end{pkgoptions}
@@ -954,11 +956,9 @@
 % Finally, an entry in the table of contents is generated.
 %
 % \begin{pkgoptions}
-% \item[bibliographydefs=true] Load the \pkgname{hyperref} package, and set some sensible
-%   settings.  Also ensures the |\email| and |\url| commands are made available.
-% \item[bibliographydefs=false] Do not load the \pkgname{hyperref} package, do not set
-%   sensible settings.
-% \item[nobibliographydefs] Same as |bibliographydefs=false|.
+% \item[bibliographydefs=true] Set some default bibliography settings.
+% \item[nobibliographydefs] Do not set some bibliography settings.  You may also
+%   use |bibliographydefs=false|.
 % \end{pkgoptions}
 %
 % \DescribeMacro{\bibliography} \DescribeMacro{\bibliographystyle} The
@@ -2474,9 +2474,11 @@
 % \begin{macro}{\phfnote@do@bibliographydefs}
 %   Make our changes live.  Will be called later according to package options.
 %    \begin{macrocode}
-\def\phfnote@do@bibliographydefs{%
-  \let\bibliographystyle\phfnote@bibliographystyle%
-  \let\bibliography\phfnote@bibliography%
+\def\phfnote@do@bibliographydefs#1{%
+  \ifstrequal{#1}{false}{}{%
+    \let\bibliographystyle\phfnote@bibliographystyle%
+    \let\bibliography\phfnote@bibliography%
+  }
 }
 %    \end{macrocode}
 % \end{macro}
@@ -3175,8 +3177,8 @@
 % Adjustments for bibliography, including default style. \marginpar{\raggedleft
 % \phfverb{[bibliographydefs=...]}} See \autoref{sec:bibliographydefs}.
 %    \begin{macrocode}
-\DeclareBoolOption[true]{bibliographydefs}
-\DeclareComplementaryOption{nobibliographydefs}{bibliographydefs}
+\DeclareStringOption[true]{bibliographydefs}
+\DeclareVoidOption{nobibliographydefs}{\def\phfnote@opt@bibliographydefs{false}}
 %    \end{macrocode}
 % 
 % 
@@ -3745,7 +3747,7 @@
   \phfnote@opt@hyperrefdefsfalse
   \def\phfnote@opt@fontdefs{false}
   \def\phfnote@opt@secfmt{false}
-  \phfnote@opt@bibliographydefsfalse
+  \def\phfnote@opt@bibliographydefs{false}
   \def\phfnote@opt@footnotedefs{false}
 %    \end{macrocode}
 % 
@@ -3797,9 +3799,7 @@
 
 \expandafter\phfnote@do@fontdefs\expandafter{\phfnote@opt@fontdefs}
 
-\ifphfnote@opt@bibliographydefs
-  \phfnote@do@bibliographydefs
-\fi
+\expandafter\phfnote@do@bibliographydefs\expandafter{\phfnote@opt@bibliographydefs}
 
 \expandafter\phfnote@do@footnotedefs\expandafter{\phfnote@opt@footnotedefs}
 
