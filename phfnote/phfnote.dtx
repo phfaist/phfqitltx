@@ -519,16 +519,16 @@
 %   then by default.
 % \item[abstract=\pkgoptattrib{noname}] The title ``Abstract.'' above the text
 %   will not be typeset.  The abstract text is typeset directly instead.
-% \item[abstract=\pkgoptattrib{original}] Revert to the original class' default
-%   implementation of the |abstract| environment before \pkgname{phfnote} was
-%   loaded.  The original class' implementation is restored and no longer
-%   tampered with.
 % \item[abstract=\pkgoptattrib{small}] Use a smaller font for the abstract text
 %   (|\small| font).
 % \item[abstract=\pkgoptattrib{compact}] Reduce spacing before and after the
 %   abstract.  If the abstract is short, this might look slightly better.
 % \item[abstract=\pkgoptattrib{it}] Typeset the abstract text using an italic
 %   typeface.
+% \item[noabstract] Do not (re)define the |abstract| environment, do not execute
+%   abstract definitions.  This leaves the original |abstract| environment
+%   definition of the underlying \LaTeX{} class.  You can also equivalently say
+%   |abstract=false|.
 % \end{pkgoptions}
 %
 % 
@@ -549,6 +549,19 @@
 % \DescribeMacro{\noteabstractbeforespacing}
 % (|\noteabstractbeforespacing|) the abstract can further be
 % specified, also as macros.
+%
+%
+% Obsolete options:
+% \begin{pkgoptions}
+% \item[abstract=\pkgoptattrib{original}] Revert to the original class' default
+%   implementation of the |abstract| environment before \pkgname{phfnote} was
+%   loaded.  The original class' implementation is restored and no longer
+%   tampered with.  This option is OBSOLETE, use |noabstract| instead.
+% \end{pkgoptions}
+%
+% \changed[chg-noabstract-pkgoption]{v1.1}{2018/10/16}{Package options
+% \phfverb{noabstract} and \phfverb{abstract=false}}
+%
 %
 % \subsection{Table of Contents}
 % \label{sec:inline-toc}
@@ -677,10 +690,10 @@
 % But really, these options are quite basic.  You should use \pkgname{titlesec} or
 % \pkgname{sectsty} directly if you want anything serious.
 %
-% The section headings are customized using the \pkgname{sectsty} package.  If this
-% conflicts in your document, then use the |[secfmt={}]| package option to
-% indicate that section headings should NOT be styled by this package.  Then take
-% care of section styling manually.
+% The section headings are customized using the \pkgname{sectsty} package.  If
+% this conflicts in your document, then use the |nosecfmt| package option to
+% indicate that section headings should NOT be styled by this package.  Then
+% you have the full freedom to take care of section styling manually.
 %
 % Package options may be used to customize the appearance of the section
 % headings by specifying a list of attributes.  When you combine arguments, make
@@ -735,9 +748,9 @@
 % \item[secfmt=\pkgoptattrib{blockpar}] Change the paragraph-level headings not
 %   to be in ``run-in'' style, but to be typeset on their own line like section
 %   headings.
-% \item[secfmt=\pkgoptattribempty] Leave the argument empty to keep the original
-%   class styling; nothing will be overridden and the \pkgname{sectsty} package
-%   is not loaded.
+% \item[nosecfmt] Keep the original class styling; nothing will be overridden
+%   and the \pkgname{sectsty} package is not loaded.  (Equivalently, you may
+%   specify |secfmt=false|.)
 % \end{pkgoptions}
 %
 % You can also directly modify the section heading style by redefining some
@@ -786,6 +799,17 @@
 % arguments, the font definitions to apply for headings of level |\paragraph|
 % and |\subparagraph|.
 %
+% Obsolete options:
+% \begin{pkgoptions}
+% \item[secfmt=\pkgoptattribempty] Leave the argument empty to keep the original
+%   class styling; nothing will be overridden and the \pkgname{sectsty} package
+%   is not loaded.  This option is OBSOLETE, use |nosecfmt| instead.
+% \end{pkgoptions}
+% 
+% \changed[chg-secfmt-false-pkgoption]{v1.1}{2018/10/16}{Package options
+% \phfverb{nosecfmt} and \phfverb{secfmt=false}}
+%
+%
 % \subsection{Appearance of Paragraphs}
 % \label{sec:par-defs}
 %
@@ -798,9 +822,19 @@
 %   and not indented.
 % \item[par=indentminiskip] Paragraphs are indented, but there is also a small
 %   space between each paragraph.
-% \item[par=original] Do not modify the appearance of paragraphs, and leave the
-%   original class' default.
+% \item[nopar] Do not modify the appearance of paragraphs, and leave the
+%   original class' default.  
+%   
+%   You may also use |par=false|.
 % \end{pkgoptions}
+%
+% \begin{pkgoptions}
+% \item[par=original] OBSOLETE---use |nopar| instead.
+% \end{pkgoptions}
+%
+% \changed[chg-par-false-pkgoption]{v1.1}{2018/10/16}{Package options
+% \phfverb{nopar} and \phfverb{par=false}}
+%
 %
 % \subsection{Adjusting Spacing of Lines and Words}
 % \label{sec:spacingdefs}
@@ -813,10 +847,10 @@
 % 
 % \begin{pkgoptions}
 % \item[spacingdefs=true] Apply adjustments to line and word spacing.
-% \item[spacingdefs=false] Do not attempt any adjustments of line or word
-%   spacing.
-% \item[nospacingdefs] Alias for |spacingdefs=false|.
+% \item[nospacingdefs] Do not attempt any adjustments of line or word spacing.  You
+%   can also use the alias |spacingdefs=false|.
 % \end{pkgoptions}
+%
 %
 %
 % \subsection{Adjustments for Fonts}
@@ -831,12 +865,14 @@
 % instead of the default |OT1|.
 %
 % \begin{pkgoptions}
-% \item[fontdefs=true] Apply adjustments to fonts.
-% \item[fontdefs=false] Do not apply adjustments to fonts.
-% \item[nofontdefs] Same as |fontdefs=false|.
+% \item[fontdefs=true] Apply adjustments to fonts.  This is on by default,
+%   except on Xe\TeX{} and Lua\TeX{}.
+% \item[nofontdefs] Do not apply adjustments to fonts.  You can also set
+%   |fontdefs=false|.
 % \end{pkgoptions}
 %
-% \subsection{Footnote Figure Style}
+%
+% \subsection{Footnote Style}
 % \label{sec:footnotedefs}
 %
 % The footnotes' appearance can also be slightly enhanced.
@@ -844,8 +880,8 @@
 % \begin{pkgoptions}
 % \item[footnotedefs=true] Changes the symbol appearance a little bit---the
 %   footnote number is smaller and typeset in boldface.
-% \item[footnotedefs=false] Do not change the footnote appearance.
-% \item[nofootnotedefs] Same as |footnotedefs=false|.
+% \item[nofootnotedefs] Do not change the footnote appearance.  You can also set
+%   |footnotedefs=false|.
 % \end{pkgoptions}
 % 
 %
@@ -1724,12 +1760,14 @@
 %   This helper both defines the |abstract| environment, and also sets the abstract
 %   attributes.  This macro will be called according to the package options.
 %
-%  |#1| = a comma-separated list of attributes.
+%  |#1| = a comma-separated list of attributes, or the string |false|.
 %    \begin{macrocode}
-\def\phfnote@do@noteabstract#1{
-  \let\abstract\noteabstract
-  \let\endabstract\endnoteabstract
-  \phfnote@internal@execattribs{noteabstract@attr@}{abstract attribute}{#1}
+\def\phfnote@do@noteabstract#1{%
+  \ifstrequal{#1}{false}{}{%
+    \let\abstract\noteabstract
+    \let\endabstract\endnoteabstract
+    \phfnote@internal@execattribs{noteabstract@attr@}{abstract attribute}{#1}
+  }%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1880,36 +1918,38 @@
 %   Also set an |\emergencystretch| so that lines get spaced out for underfull boxes,
 %   rather than overflowing far into the margin.
 %    \begin{macrocode}
-\def\phfnote@do@spacing{
-  \@ifpackageloaded{setspace}{
-    \def\phfnote@dostretch##1{%
-      \setstretch{##1}\phfnote@docaptionstretch{##1}}
-  }{
-    \def\phfnote@dostretch##1{%
-      \renewcommand\baselinestretch{##1}\phfnote@docaptionstretch{##1}}
-  }
-  \@ifpackageloaded{caption}{
-    \def\phfnote@docaptionstretch##1{\captionsetup{font={stretch=##1}}}
-  }{
-    \def\phfnote@docaptionstretch##1{\PackageWarning{phfnote}{Can't
-        set line spacing for captions, because the package `caption'
-        is not loaded.  Please load it before `phfnote', or use an
-        appropriate (e.g. `rich') pkgset which loads this package
-        automatically .}}
-  }
-  \if@twocolumn
-    \phfnote@dostretch{1.0} % leave default
-    \emergencystretch=3em\relax
-  \else
-    \ifcase\@ptsize% 10pt
-      \phfnote@dostretch{1.1}
-    \or% 11pt
-      \phfnote@dostretch{1.0} % 1.05? better 1.0...
-    \or% 12pt
-      \phfnote@dostretch{1.0} % 1.03? not really noticeable...
+\def\phfnote@do@spacingdefs#1{
+  \ifstrequal{#1}{false}{}{%
+    \@ifpackageloaded{setspace}{
+      \def\phfnote@dostretch##1{%
+        \setstretch{##1}\phfnote@docaptionstretch{##1}}
+    }{
+      \def\phfnote@dostretch##1{%
+        \renewcommand\baselinestretch{##1}\phfnote@docaptionstretch{##1}}
+    }
+    \@ifpackageloaded{caption}{
+      \def\phfnote@docaptionstretch##1{\captionsetup{font={stretch=##1}}}
+    }{
+      \def\phfnote@docaptionstretch##1{\PackageWarning{phfnote}{Can't
+          set line spacing for captions, because the package `caption'
+          is not loaded.  Please load it before `phfnote', or use an
+          appropriate pkgset (e.g. `rich') which loads this package
+          automatically.}}
+    }
+    \if@twocolumn
+      \phfnote@dostretch{1.0} % leave default
+      \emergencystretch=3em\relax
+    \else
+      \ifcase\@ptsize% 10pt
+        \phfnote@dostretch{1.1}
+      \or% 11pt
+        \phfnote@dostretch{1.0} % 1.05? better 1.0...
+      \or% 12pt
+        \phfnote@dostretch{1.0} % 1.03? not really noticeable...
+      \fi
+      \emergencystretch=6em\relax
     \fi
-    \emergencystretch=6em\relax
-  \fi
+  }
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1943,11 +1983,13 @@
 %   |skip|.
 %    \begin{macrocode}
 \def\phfnote@do@par#1{%
-  \ifcsname phfnote@par@#1\endcsname
-    \csname phfnote@par@#1\endcsname
-  \else
-    \PackageWarning{phfnote}{Bad paragraph setting: #1. Leaving original}
-  \fi
+  \ifstrequal{#1}{false}{}{%
+    \ifcsname phfnote@par@#1\endcsname
+      \csname phfnote@par@#1\endcsname
+    \else
+      \PackageWarning{phfnote}{Bad paragraph setting: #1. Leaving original}
+    \fi
+  }
 }
 %    \end{macrocode}
 % \end{macro}
@@ -2077,12 +2119,14 @@
 % 
 %
 % \begin{macro}{\phfnote@do@secfmt}
-%   Actually perform the required styling, according to the package
-%   options given as argument.  The argument is a comma-separated list
-%   of attributes specified by the user.
+%   Actually perform the required styling, according to the package options
+%   given as argument.  The argument is a comma-separated list of attributes
+%   specified by the user, or the string |false|.
 %    \begin{macrocode}
 \def\phfnote@do@secfmt#1{%
-  \phfnote@internal@execattribs{phfnote@do@secfmt@}{section formatting preset}{#1}
+  \ifstrequal{#1}{false}{}{%
+    \phfnote@internal@execattribs{phfnote@do@secfmt@}{section formatting preset}{#1}%
+  }
 }
 %    \end{macrocode}
 % \end{macro}
@@ -2333,14 +2377,21 @@
 %   encoding which is better.  Also, use Computer Modern Bright as
 %   sans-serif font by default instead of Computer Modern Sans Serif.
 %
+%   If on Xe\TeX{} or Lua\TeX{}, don't do anything.
+%
 %    \begin{macrocode}
-\def\phfnote@do@fontdefs{
- 
-  \PassOptionsToPackage{T1}{fontenc}
-  \RequirePackage{fontenc}
-
-  \renewcommand\sfdefault{cmbr}
-  
+\def\phfnote@do@fontdefs#1{
+  \ifstrequal{#1}{false}{}{%
+    \RequirePackage{iftex}
+    \let\phfnote@tmp@do\@firstofone
+    \ifXeTeX \let\phfnote@tmp@do\@gobble \fi
+    \ifLuaTeX \let\phfnote@tmp@do\@gobble \fi
+    \phfnote@tmp@do{
+      \PassOptionsToPackage{T1}{fontenc}
+      \RequirePackage{fontenc}
+      \renewcommand\sfdefault{cmbr}
+    }
+  }
 }
 %    \end{macrocode}
 % \end{macro}
@@ -2438,14 +2489,16 @@
 %   Adjust the formatting of footnotes so they look better.  Again,
 %   this is called later according to the package options.
 %    \begin{macrocode}
-\def\phfnote@do@footnotedefs{
-  \let\phfnote@orig@makefnmark\@makefnmark
-%%  \def\@makefnmark{\hbox{\@textsuperscript{%
-%%      \normalfont\tiny\fontseries{sb}\selectfont\@thefnmark}}}
-  \def\@makefnmark{\hbox{\@textsuperscript{%
-        \normalfont\tiny\bfseries\@thefnmark}}}
-%%  \def\@makefnmark{\hbox{\@textsuperscript{%
-%%      \normalfont\scriptsize\bfseries\@thefnmark}}}% too large
+\def\phfnote@do@footnotedefs#1{
+  \ifstrequal{#1}{false}{}{%
+    \let\phfnote@orig@makefnmark\@makefnmark
+%%    \def\@makefnmark{\hbox{\@textsuperscript{%
+%%        \normalfont\tiny\fontseries{sb}\selectfont\@thefnmark}}}
+    \def\@makefnmark{\hbox{\@textsuperscript{%
+          \normalfont\tiny\bfseries\@thefnmark}}}
+%%    \def\@makefnmark{\hbox{\@textsuperscript{%
+%%        \normalfont\scriptsize\bfseries\@thefnmark}}}% too large
+  }
 }
 %    \end{macrocode}
 % \end{macro}
@@ -3041,6 +3094,7 @@
 % \phfverb{[abstract=...]}}  (\autoref{sec:abstract-attributes}).
 %    \begin{macrocode}
 \DeclareStringOption[]{abstract}
+\DeclareVoidOption{noabstract}{\def\phfnote@opt@abstract{false}}
 %    \end{macrocode}
 %
 % Option for Package sets \marginpar{\raggedleft \phfverb{[pkgset=...]}}
@@ -3070,33 +3124,36 @@
 % See \autoref{sec:secfmt}.
 %    \begin{macrocode}
 \DeclareStringOption[section]{secfmt}
+\DeclareVoidOption{nosecfmt}{\def\phfnote@opt@secfmt{false}}
 %    \end{macrocode}
 %
 % How to treat paragraphs.  \marginpar{\raggedleft \phfverb{[par=...]}} See
 % \autoref{sec:par-defs}.
 %    \begin{macrocode}
 \DeclareStringOption[skip]{par}
+\DeclareVoidOption{nopar}{\def\phfnote@opt@par{false}}
 %    \end{macrocode} 
 % 
 % Add definitions to adjust spacing of lines and words. \marginpar{\raggedleft
 % \phfverb{[spacingdefs=...]}}  See \autoref{sec:spacingdefs}.
 %    \begin{macrocode}
-\DeclareBoolOption[true]{spacingdefs}
-\DeclareComplementaryOption{nospacingdefs}{spacingdefs}
+\DeclareStringOption[true]{spacingdefs}
+\DeclareVoidOption{nospacingdefs}{\def\phfnote@opt@spacing{false}}
 %    \end{macrocode}
+%
 %
 % Do some adjustments to the fonts. \marginpar{\raggedleft
 % \phfverb{[fontdefs=...]}} See \autoref{sec:fontdefs}.
 %    \begin{macrocode}
-\DeclareBoolOption[true]{fontdefs}
-\DeclareComplementaryOption{nofontdefs}{fontdefs}
+\DeclareStringOption[true]{fontdefs}
+\DeclareVoidOption{nofontdefs}{\def\phfnote@opt@fontdefs{false}}
 %    \end{macrocode}
 %
 % Adjustments for footnotes. \marginpar{\raggedleft
 % \phfverb{[footnotedefs=...]}}  See \autoref{sec:footnotedefs}.
 %    \begin{macrocode}
-\DeclareBoolOption[true]{footnotedefs}
-\DeclareComplementaryOption{nofootnotedefs}{footnotedefs}
+\DeclareStringOption[true]{footnotedefs}
+\DeclareVoidOption{nofootnotedefs}{\def\phfnote@opt@footnotedefs{false}}
 %    \end{macrocode}
 %
 % Load \pkgname{hyperref} and corresponding definitions. \marginpar{\raggedleft
@@ -3216,8 +3273,8 @@
 %    \begin{macrocode}
 \def\phfnote@preset@sfnote{
   \phfnote@presetcommon@xnote
-  \phfnote@opt@footnotedefstrue
-  \phfnote@opt@fontdefstrue
+  \def\phfnote@opt@footnotedefs{true}
+  \def\phfnote@opt@fontdefs{true}
   \renewcommand\familydefault{\sfdefault}
   \renewcommand{\notesectionallfontfamily}{\sfdefault}
 }
@@ -3229,7 +3286,7 @@
 %    \end{macrocode}
 % \ldots but override:
 %    \begin{macrocode}
-  \phfnote@opt@fontdefsfalse
+  \def\phfnote@opt@fontdefs{false}
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
   \renewcommand\sfdefault{cmss}
@@ -3242,7 +3299,7 @@
 %    \end{macrocode}
 % \ldots but override:
 %    \begin{macrocode}
-  \phfnote@opt@fontdefsfalse
+  \def\phfnote@opt@fontdefs{false}
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
   \PassOptionsToPackage{default,osfigures,scale=0.9}{opensans}
@@ -3250,7 +3307,7 @@
 }
 \def\phfnote@preset@utopianote{
   \phfnote@presetcommon@xnote[noteit]
-  \phfnote@opt@fontdefsfalse
+  \def\phfnote@opt@fontdefs{false}
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
   \RequirePackage{fourier}
@@ -3260,8 +3317,8 @@
 }
 \def\phfnote@preset@mnmynote{
   \phfnote@presetcommon@xnote[noteit]
-  \phfnote@opt@footnotedefsfalse
-  \phfnote@opt@fontdefsfalse
+  \def\phfnote@opt@footnotedefs{false}
+  \def\phfnote@opt@fontdefs{false}
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
   \renewcommand{\notesectionallfontfamily}{\sfdefault}
@@ -3294,7 +3351,7 @@
 %    \begin{macrocode}
 \def\phfnote@preset@pkgdoc{
   \phfnote@presetcommon@xnote[noteit]
-  \phfnote@opt@fontdefsfalse
+  \def\phfnote@opt@fontdefs{false}
 %    \end{macrocode}
 % 
 % Then set up the font, which is done in a separate macro
@@ -3680,21 +3737,21 @@
 %    \begin{macrocode}
 \def\phfnote@preset@reset{
   \def\phfnote@opt@pkgset{none}
-  \def\phfnote@opt@title{}
+  \def\phfnote@opt@title{false}
   \def\phfnote@opt@pagegeom{false}
-  \phfnote@opt@spacingdefsfalse
-  \def\phfnote@opt@par{original}
-  \def\phfnote@opt@abstract{original}
+  \def\phfnote@opt@spacing{false}
+  \def\phfnote@opt@par{false}
+  \def\phfnote@opt@abstract{false}
   \phfnote@opt@hyperrefdefsfalse
-  \phfnote@opt@fontdefsfalse
-  \def\phfnote@opt@secfmt{}
+  \def\phfnote@opt@fontdefs{false}
+  \def\phfnote@opt@secfmt{false}
   \phfnote@opt@bibliographydefsfalse
-  \phfnote@opt@footnotedefsfalse
+  \def\phfnote@opt@footnotedefs{false}
 %    \end{macrocode}
 % 
 % \begin{pkgwarning}
-%   SELF-NOTE: DO NOT FORGET TO ADD HERE RESET COMMANDS FOR ANY NEW OPTION THAT
-%   WE PROVIDE IN THE FUTURE.
+%   NOTE TO SELF: DO NOT FORGET TO ADD HERE RESET COMMANDS FOR ANY NEW OPTION
+%   THAT WE PROVIDE IN THE FUTURE.
 % \end{pkgwarning}
 % 
 %    \begin{macrocode}
@@ -3730,9 +3787,7 @@
 \phfnote@ifpkgoptfalsesetfalse{pagegeomdefs}{pagegeom}% deal with obsolete option
 \expandafter\phfnote@do@pagegeom\expandafter{\phfnote@opt@pagegeom}
 
-\ifphfnote@opt@spacingdefs
-  \phfnote@do@spacing
-\fi
+\expandafter\phfnote@do@spacingdefs\expandafter{\phfnote@opt@spacingdefs}
 
 \expandafter\phfnote@do@par\expandafter{\phfnote@opt@par}
 
@@ -3740,17 +3795,14 @@
   \phfnote@do@pdfhyperrefdefs
 \fi
 
-\ifphfnote@opt@fontdefs
-  \phfnote@do@fontdefs
-\fi
+\expandafter\phfnote@do@fontdefs\expandafter{\phfnote@opt@fontdefs}
 
 \ifphfnote@opt@bibliographydefs
   \phfnote@do@bibliographydefs
 \fi
 
-\ifphfnote@opt@footnotedefs
-  \phfnote@do@footnotedefs
-\fi
+\expandafter\phfnote@do@footnotedefs\expandafter{\phfnote@opt@footnotedefs}
+
 %    \end{macrocode}
 % 
 % Finally, execute the hook we set up for definitions at the end of the package
