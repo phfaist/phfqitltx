@@ -304,9 +304,6 @@
 %   footnotes.  See \autoref{sec:footnotedefs}.
 % \item[hyperrefdefs=\meta{true or false}] Load the \pkgname{hyperref} package, and set
 %   some defaults settings.  See \autoref{sec:hyperrefdefs}.
-% \item[hyperrefdefer=\meta{true or false}] User may opt in to promise to load
-%   the \pkgname{hyperref} manually later, so that they can load other packages
-%   before.  See \autoref{sec:hyperrefdefs}.
 % \item[bibliographydefs=\meta{true or false}] Adjust the appearance and style
 %   of the bibliography.  See \autoref{sec:bibliographydefs}.
 % \end{pkgoptions}
@@ -896,12 +893,19 @@
 % personally like better (dark blue links as in this document).
 %
 % \begin{pkgoptions}
-% \item[hyperrefdefs=true] Load the \pkgname{hyperref} package, and set some sensible
-%   settings.  Also ensures the |\email| and |\url| commands are made available.
-% \item[hyperrefdefs=false] Do not load the \pkgname{hyperref} package, do not set
-%   sensible settings.
-% \item[nohyperrefdefs] Same as |hyperrefdefs=false|.
+% \item[hyperrefdefs,hyperrefdefs=true] Load the \pkgname{hyperref} package, and
+%   set some sensible default settings.  Also ensures the |\email| and |\url| commands
+%   are made available.  You can tune 
+% \item[nohyperrefdefs] Do not load the \pkgname{hyperref} package.  Do not set
+%   any defaults.  Do not care to provide |\email| or |\url|.  Same as
+%   |hyperrefdefs=false|.
+% \item[hyperrefdefs=\pkgoptattrib{defer}] ..............
+% \item[hyperrefdefs=\pkgoptattrib{clearoptions}] ..............
+% \item[hyperrefdefs=\pkgoptattrib{noemail}] ..............
+% \item[hyperrefdefs=\pkgoptattrib{noload}] ..............
 % \end{pkgoptions}
+%
+% ..........................................
 %
 % It is also possible to defer loading the \pkgname{hyperref} package for later,
 % so that you can import other packages that need to be loaded before
@@ -911,11 +915,11 @@
 % \begin{pkgoptions}
 % \item[hyperrefdefer=true] Do not immediately load the \pkgname{hyperref}
 %   package. The user promises to call |\usepackage{hyperref}| manually at some
-%   point in the preamble.
+%   point in the preamble. .............................................. 
 % \item[hyperrefdefer=false] (the default) Load \pkgname{hyperref} immediately,
 %   the user doesn't have to worry about loading it.  However if other packages
 %   are loaded after \pkgname{phfnote}, you may run into some issues if
-%   \pkgname{hyperref} is already loaded.
+%   \pkgname{hyperref} is already loaded. ....................................
 % \end{pkgoptions}
 %
 % \DescribeMacro{\url} In order to typeset URLs, the |\url| command is made
@@ -926,6 +930,7 @@
 % The text is displayed as a hyperlink, which when clicked opens a e-mail
 % composer to that address (via a |mailto:XXX| link).  For example, try
 % |\email{pulp_fiction@tarantino.com}|.
+% ............................................. |\phfnoteEmail|
 %
 % \DescribeMacro{\phfnotePdfLinkColor} The command |\phfnotePdfLinkColor| may by
 % used to set the color of the links.  It takes one argument, a color
@@ -2241,68 +2246,96 @@
 %   The name `|docnotelinkcolor|' is historical and hard-coded in many
 %   other files I've used, so I'm DEFINITELY NOT changing it.
 % \end{pkgnote}
-% 
-% \needspace{3\baselineskip}
-% \begin{macro}{\phfnote@do@pdfhyperrefdefs}
-% \begin{macro}{\email}
-% \begin{macro}{\url}
-%   Load the \pkgname{hyperref} package and provide sensible defaults.
+%
+%
+%
+% Helpers---default set of hyperref options, and other helper macros.
 %    \begin{macrocode}
-\newcommand{\phfnote@do@pdfhyperrefdefs}{%
-%    \end{macrocode}
-% Make sure a color-managing package is loaded, {color} or {xcolor}, and define our default color:
-%    \begin{macrocode}
-  \phfnote@requirecolorpackage%
-  \definecolor{docnotelinkcolor}{rgb}{0,0,0.4}%
-%    \end{macrocode}
-% 
-% Load the \pkgname{url} package, and save a version of |\url| which is not
-% patched by \pkgname{hyperref}:
-%    \begin{macrocode}
-  \RequirePackage{url}%
-  \DeclareUrlCommand\phfnote@format@url{}%
-%    \end{macrocode}
-% 
-% Set up \pkgname{hyperref} options:
-%    \begin{macrocode}
-  \PassOptionsToPackage{unicode=true,bookmarks=true,backref=false}{hyperref}%
+\def\phfnote@hyperrefdefs@val@options{%
+  unicode=true,bookmarksnumbered=false,bookmarksopen=false,bookmarksopenlevel=1,%
+  breaklinks=true,pdfborder={0 0 0},colorlinks=true,%
+  anchorcolor=docnotelinkcolor,citecolor=docnotelinkcolor,%
+  filecolor=docnotelinkcolor,linkcolor=docnotelinkcolor,%
+  menucolor=docnotelinkcolor,runcolor=docnotelinkcolor,%
+  urlcolor=docnotelinkcolor%
+}%
+\def\phfnote@hyperrefdefs@deferredhypersetup#1{\AtBeginDocument{\hypersetup{#1}}}
+\def\phfnote@hyperrefdefs@loadhyperrefdopkgoptions{%
+    \PassOptionsToPackage{unicode=true,bookmarks=true,backref=false}{hyperref}}
+\def\phfnote@hyperrefdefs@loadhyperref{%
+    \phfnote@hyperrefdefs@loadhyperrefdopkgoptions
+    \RequirePackage{hyperref}}
+\def\phfnote@hyperrefdefs@provideemail{\let\email\phfnote@email}
+\def\phfnote@hyperrefdefs@afterhook{}
 %    \end{macrocode}
 %
-% Give the option to the user of loading the \pkgname{hyperref} package manually
-% later, when desired.  But still in that case, allow user code to use
-% |\hypersetup|, by hooking to |\AfterPreamble| (see \pkgname{etoolbox}, it's
-% like |\AtBeginDocument| but does not fail if called in the document).
+% Define the attributes that can be set for hyperref-related options.  See
+% \autoref{sec:hyperrefdefs}.
+%
 %    \begin{macrocode}
-  \ifphfnote@opt@hyperrefdefer
-    \def\hypersetup##1{\AtBeginDocument{\hypersetup{##1}}}%
-  \else
-    \RequirePackage{hyperref}
-  \fi
-  \hypersetup{%
-    bookmarksnumbered=false,bookmarksopen=false,bookmarksopenlevel=1,%
-    breaklinks=true,pdfborder={0 0 0},colorlinks=true}%
-  \hypersetup{%
-    anchorcolor=docnotelinkcolor,citecolor=docnotelinkcolor,%
-    filecolor=docnotelinkcolor,linkcolor=docnotelinkcolor,%
-    menucolor=docnotelinkcolor,runcolor=docnotelinkcolor,%
-    urlcolor=docnotelinkcolor}%
+\def\phfnote@do@hyperrefdefs@true{}% in case someone set hyperrefdefs=true
+\def\phfnote@do@hyperrefdefs@defer{
+  \def\phfnote@hyperrefdefs@loadhyperref{%
+    \phfnote@hyperrefdefs@loadhyperrefdopkgoptions
+    \let\hypersetup\phfnote@hyperrefdefs@deferredhypersetup}
+}
+\def\phfnote@do@hyperrefdefs@clearoptions{
+  \def\phfnote@hyperrefdefs@val@options{}
+}
+\def\phfnote@do@hyperrefdefs@noemail{
+  \def\phfnote@hyperrefdefs@provideemail{}
+}
+\def\phfnote@do@hyperrefdefs@noload{
+  \def\phfnote@hyperrefdefs@loadhyperref{}
+  \let\hypersetup\@gobble
+}
 %    \end{macrocode}
-% 
-% Provide an |\email| command for specifying e-mails.  Note that the |\url| command is
-% already provided by the packages \pkgname{url} and \pkgname{hyperref}.
+%
+%
+% \begin{macro}{\phfnote@do@hyperrefdefs}
+% \begin{macro}{\email}
+% \begin{macro}{\url}
+%   Do all stuff related to hyperref.
 %    \begin{macrocode}
-  \let\email\phfnote@email%
+\def\phfnote@do@hyperrefdefs#1{%
+  \ifstrequal{#1}{false}{}{%
 %    \end{macrocode}
-% 
-% And finally set a nicer default |\url|/|\email| style:
+% Make sure a color-managing package is loaded, {color} or {xcolor}, and define
+% our default link color:
 %    \begin{macrocode}
-  \urlstyle{notesf}%
+    \phfnote@requirecolorpackage%
+    \definecolor{docnotelinkcolor}{rgb}{0,0,0.4}%
+%    \end{macrocode}
+% Load the \pkgname{url} package, and save a version of |\url| which is not
+% patched by \pkgname{hyperref} to format URLs, and provide |\phfnoteEmail| for
+% emails (not |\email| right away because it might conflict with RevTeX. Provide
+% |\email| later after parsing attribs):
+%    \begin{macrocode}
+    \RequirePackage{url}%
+    \DeclareUrlCommand\phfnote@format@url{}%
+    \let\phfnoteEmail\phfnote@email
+%    \end{macrocode}
+%
+% Set up everything according to the user's selected attributes.
+%    \begin{macrocode}
+    \phfnote@internal@execattribs{phfnote@do@hyperrefdefs@}{phfnote hyperref-related option}{#1}%
+%    \end{macrocode}
+%
+% And now, load the hyperref package (or don't, if it's deferred), and set some
+% options.
+%    \begin{macrocode}
+    \phfnote@hyperrefdefs@loadhyperref
+    \expandafter\hypersetup\expandafter{\phfnote@hyperrefdefs@val@options}
+    \phfnote@hyperrefdefs@provideemail
+    \urlstyle{notesf}
+    \phfnote@hyperrefdefs@afterhook
+  }
 }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
 % \end{macro}
-% 
+%
 % \begin{macro}{\phfnotePdfLinkColor}
 %   Set links color.  Use as |\phfnotePdfLinkColor|\marg{color}.
 %   Color may be any color name or specification recognized by the
@@ -2328,9 +2361,12 @@
 %   Provide base macros to be able to build up |\email| command for emails and other
 %   URL-like commands which should sanitize their arguments.
 %
-%   Also prepare the command |\phfnote@email| which will be renamed |\email| in our
+%   Also prepare the command |\phfnoteEmail| which will be renamed |\email| in our
 %   \pkgname{hyperref} package setup (see above).
 % 
+%   NOTE: The commands |\phfnote@email| and |\phfnote@format@url| will only work
+%   if you don't have |hyperrefdefs=false|.  They will work with
+%   |hyperrefdefs=noload| if you don't want to load the |hyperref| package.
 %    \begin{macrocode}
 \def\phfnote@sanitize@url{%
   \catcode`\$12%
@@ -2343,7 +2379,6 @@
   % \catcode`\^^M10%  newline = space
   \relax%
 }%
-\providecommand\phfnote@format@url{\texttt}
 \def\phfnote@email{\begingroup\phfnote@sanitize@url\phfnote@impl@email@}%
 \def\phfnote@impl@email@#1{\endgroup\href{mailto:#1}{\phfnote@format@url{#1}}}%
 %    \end{macrocode}
@@ -2448,6 +2483,11 @@
 %    \begin{macrocode}
     \providecommand\eprint[2][]{\href{http://arxiv.org/abs/##2}{arXiv:##2}}
 %    \end{macrocode}
+%
+% Fix for RevTeX styles that use |\doibase| with a newline following them ---
+%    \begin{macrocode}
+    \providecommand\doibase{\phfnote@doibasefix}
+%    \end{macrocode}
 % 
 % Relay the call to the ``old'' |\bibliography| command to actually implement the
 % bibliography.
@@ -2455,6 +2495,7 @@
     \phfnote@old@bibliography{#1}%
   \endgroup%
 }
+\def\phfnote@doibasefix 10.{https://doi.org/10.}
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\phfnote@bibliographystyle}
@@ -3161,17 +3202,8 @@
 % Load \pkgname{hyperref} and corresponding definitions. \marginpar{\raggedleft
 % \phfverb{[hyperrefdefs=...]}} See \autoref{sec:hyperrefdefs}.
 %    \begin{macrocode}
-\DeclareBoolOption[true]{hyperrefdefs}
-\DeclareComplementaryOption{nohyperrefdefs}{hyperrefdefs}
-%    \end{macrocode}
-%
-% Do not load \pkgname{hyperref} right away, leave the opportunity to import
-% other packages first. Hyperref will be imported manually with
-% |\usepackage{hyperref}|. |\hypersetup| may still be used, and simply defers
-% the settings to later at package load. \marginpar{\raggedleft
-% \phfverb{[hyperrefdefer=...]}} See \autoref{sec:hyperrefdefs}.
-%    \begin{macrocode}
-\DeclareBoolOption[false]{hyperrefdefer}
+\DeclareStringOption[]{hyperrefdefs}[]
+\DeclareVoidOption{nohyperrefdefs}{\def\phfnote@opt@hyperrefdefs{false}}
 %    \end{macrocode}
 %
 % Adjustments for bibliography, including default style. \marginpar{\raggedleft
@@ -3449,7 +3481,7 @@
 % \textbf{Hyperref:} No ``default'' \pkgname{hyperref} definitions, we'll use
 % \pkgname{hyperdoc} instead.
 %    \begin{macrocode}
-  \phfnote@opt@hyperrefdefsfalse
+  \def\phfnote@opt@hyperrefdefs{false}
   \g@addto@macro\phfnote@hook@atendload{
     \definecolor{docnotelinkcolor}{rgb}{0,0,0.4}%
     \RequirePackage{url}%
@@ -3464,7 +3496,7 @@
       filecolor=docnotelinkcolor,linkcolor=docnotelinkcolor,%
       menucolor=docnotelinkcolor,runcolor=docnotelinkcolor,%
       urlcolor=docnotelinkcolor}%
-    \let\email\phfnote@email%
+    \let\email\phfnoteEmail%
     \urlstyle{noteit}
   }
 %    \end{macrocode}
@@ -3744,7 +3776,7 @@
   \def\phfnote@opt@spacing{false}
   \def\phfnote@opt@par{false}
   \def\phfnote@opt@abstract{false}
-  \phfnote@opt@hyperrefdefsfalse
+  \def\phfnote@opt@hyperrefdefs{false}
   \def\phfnote@opt@fontdefs{false}
   \def\phfnote@opt@secfmt{false}
   \def\phfnote@opt@bibliographydefs{false}
@@ -3793,9 +3825,7 @@
 
 \expandafter\phfnote@do@par\expandafter{\phfnote@opt@par}
 
-\ifphfnote@opt@hyperrefdefs
-  \phfnote@do@pdfhyperrefdefs
-\fi
+\expandafter\phfnote@do@hyperrefdefs\expandafter{\phfnote@opt@hyperrefdefs}
 
 \expandafter\phfnote@do@fontdefs\expandafter{\phfnote@opt@fontdefs}
 

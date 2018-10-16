@@ -8,7 +8,7 @@
 %\usepackage[title=default,pkgset=extended,noabstract]{phfnote}
 %\usepackage[notitle,pkgset=extended,secfmt={section,secsquares,secnummargin}]{phfnote}
 %\usepackage[title=default,pkgset=extended,secfmt={section,secsquares,secnummargin}]{phfnote}
-\usepackage[title=default,pkgset=extended,secfmt={section}]{phfnote}
+%\usepackage[title=default,pkgset=extended,secfmt={section}]{phfnote}
 %\usepackage[title=default,pkgset=extended,secfmt={section},fontdefs=false]{phfnote}
 %\usepackage[title=small,pkgset=extended]{phfnote}
 %\usepackage[preset=sfnote,pkgset=extended,pagegeom=bigmargin]{phfnote}
@@ -21,6 +21,9 @@
 %\usepackage[preset=reset,pkgset=extended,title=small,secfmt={section},spacingdefs,fontdefs,pagegeomdefs,pagegeom=xwide,bibliographydefs,abstract={wide,small,it}]{phfnote} \usepackage{hyperref}\makeatletter\let\email\phfnote@email\makeatother\phfnotePdfLinkColor{red}
 %\usepackage[preset=reset,pkgset=extended]{phfnote} \usepackage{hyperref}\makeatletter\let\email\phfnote@email\makeatother\phfnotePdfLinkColor{red}\let\oldbibliography\bibliography\def\bibliography{\catcode`\&=12\relax\oldbibliography}\bibliographystyle{unsrturl}
 %\usepackage[preset=sfssnote,pkgset=extended,pagegeomdefs=false,pagegeom=xwide]{phfnote}
+\usepackage[title=default,pkgset=extended,secfmt={section},hyperrefdefs=true]{phfnote}\usepackage{hyperref}
+%\usepackage[title=default,pkgset=extended,secfmt={section},hyperrefdefs=defer]{phfnote}\usepackage{hyperref}
+%\usepackage[title=default,pkgset=extended,secfmt={section},hyperrefdefs=noload]{phfnote} \def\href#1#2{#2}
 
 
 \iftestnoteNeedsMinPkgs
@@ -150,7 +153,7 @@
 
 This example document contains early material which was ultimately further developed and
 published open-access in \emph{Nature Communications},
-\url{http://dx.doi.org/10.1038/ncomms8669}.
+\url{http://dx.doi.org/10.1038/ncomms8669}.  An email would be \email{someone-a@some_place.com}
 
 Landauer's Principle~\cite{Landauer1961_5392446Erasure}, and more generally the relation between the second law
 of thermodynamics and information theory, has driven much attention in the past decades. Studies have notably
