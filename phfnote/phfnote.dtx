@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfnote}
 %<*package>
-    [2018/09/20 v1.1 phfnote package]
+    [2018/10/16 v3.0 phfnote package]
 %</package>
 %
 %<*driver>
@@ -279,33 +279,33 @@
 % \item[preset=\meta{preset name}] Load a preset specifying a predefined set of
 %   options for the general appearance of the document.  See documentation in
 %   \autoref{sec:presets}
-% \item[title=\meta{title style}] Set the title style.  Documentation in
-%   \autoref{sec:title-styles}
-% \item[abstract=\meta{abstract attributes}] Set the abstract style by
+% \item[title=\meta{title style},notitle] Set the title style. Use
+%   \pkgoptionfmt{notitle} to disable feature and use latex default.
+%   Documentation in \autoref{sec:title-styles}
+% \item[abstract=\meta{abstract attributes},noabstract] Set the abstract style by
 %   specifying a comma-separated list of attributes.  Don't forget to
 %   put the list of attributes within braces,
 %   |[abstract={wide,noname,it}]|.  Documentation in
 %   \autoref{sec:abstract-attributes}
 % \item[pkgset=\meta{package set}] Specify a standard set of \LaTeX{}
 %   packages to load.  See \autoref{sec:package-sets}.
-% \item[pagegeom=\meta{geom style}] Set a page margin style.  Use |nopagegeom|
+% \item[pagegeom=\meta{geom style},nopagegeom] Set a page margin style.  Use |nopagegeom|
 %   to leave page geometry unchanged.  Options are documented in
 %   \autoref{sec:pagegeomdefs}.
-% \item[secfmt=\meta{section formatting attributes}] A list of attributes
-%   defining how section (and possibly paragraph) headings should look like.
-%   See \autoref{sec:secfmt}.
-% \item[par=\meta{par style}] Define how paragraphs should be spaced.  Refer to
-%   \autoref{sec:par-defs}.
-% \item[spacingdefs=\meta{true or false}] Adjust spacing of lines and words
+% \item[secfmt=\meta{section formatting attributes},nosecfmt] A list of
+%   attributes defining how section (and possibly paragraph) headings should
+%   look like.  See \autoref{sec:secfmt}.
+% \item[par=\meta{par style},nopar] Define how paragraphs should be spaced.
+%   Refer to \autoref{sec:par-defs}.
+% \item[spacingdefs,nospacingdefs] Adjust spacing of lines and words
 %   (\autoref{sec:spacingdefs}).
-% \item[fontdefs=\meta{true or false}] Adjust some fonts
-%   (\autoref{sec:fontdefs}).
-% \item[footnotedefs=\meta{true or false}] Adjust slighly the appearance of
+% \item[fontdefs,nofontdefs] Adjust some fonts (\autoref{sec:fontdefs}).
+% \item[footnotedefs,nofootnotedefs] Adjust slightly the appearance of
 %   footnotes.  See \autoref{sec:footnotedefs}.
-% \item[hyperrefdefs=\meta{true or false}] Load the \pkgname{hyperref} package, and set
-%   some defaults settings.  See \autoref{sec:hyperrefdefs}.
-% \item[bibliographydefs=\meta{true or false}] Adjust the appearance and style
-%   of the bibliography.  See \autoref{sec:bibliographydefs}.
+% \item[hyperrefdefs=\meta{settings},nohyperrefdefs] Load the \pkgname{hyperref}
+%   package, and set some defaults settings.  See \autoref{sec:hyperrefdefs}.
+% \item[bibliographydefs,nobibliographydefs] Adjust the appearance and style of
+%   the bibliography.  See \autoref{sec:bibliographydefs}.
 % \end{pkgoptions}
 %
 % \begin{pkgtip}
@@ -375,8 +375,8 @@
 %   an empty option value, |title=|.
 % \end{pkgoptions}
 %
-% \changed[chg-title-false-pkgoption]{v1.1}{2018/10/16}{Package options
-% \phfverb{notitle} and \phfverb{title=false}}
+% \changed[chg-title-false-pkgoption]{v3.0}{2018/10/16}{Improved
+% \phfverb{title,notitle} package options syntax}
 %
 % \subsubsection{Customizing the style of the \phfverb{default} and \phfverb{small} title styles}
 % 
@@ -556,9 +556,8 @@
 %   tampered with.  This option is OBSOLETE, use |noabstract| instead.
 % \end{pkgoptions}
 %
-% \changed[chg-noabstract-pkgoption]{v1.1}{2018/10/16}{Package options
-% \phfverb{noabstract} and \phfverb{abstract=false}}
-%
+% \changed[chg-noabstract-pkgoption]{v3.0}{2018/10/16}{Improved
+% \phfverb{abstract,noabstract} package options syntax}
 %
 % \subsection{Table of Contents}
 % \label{sec:inline-toc}
@@ -674,9 +673,9 @@
 %   |pagegeomdefs=false| and |pagegeom| (or |pagegeom=...| with setting) instead
 %   of |pagegeomdefs=true|.
 % \end{pkgoptions}
-% \changed[chg-pagegeom-pkgoption-onoff]{v1.1}{2018/10/16}{Changed how to turn
-% on/off the page geometry settings.  Use \phfverb{nopagegeom} or
-% \phfverb{pagegeom=false} instead of \phfverb{pagegeomdefs=true|false}}
+% \changed[chg-pagegeom-pkgoption-onoff]{v3.0}{2018/10/16}{Changed how to turn
+% on/off the page geometry settings by improving the \phfverb{pagegeom} package
+% options, deprecated \phfverb{pagegeomdefs} option}
 % 
 %
 % \subsection{Section Headers Styling}
@@ -803,8 +802,8 @@
 %   is not loaded.  This option is OBSOLETE, use |nosecfmt| instead.
 % \end{pkgoptions}
 % 
-% \changed[chg-secfmt-false-pkgoption]{v1.1}{2018/10/16}{Package options
-% \phfverb{nosecfmt} and \phfverb{secfmt=false}}
+% \changed[chg-secfmt-false-pkgoption]{v3.0}{2018/10/16}{Improved
+% \phfverb{secfmt,nosecfmt} package options syntax}
 %
 %
 % \subsection{Appearance of Paragraphs}
@@ -831,8 +830,8 @@
 % \item[par=original] OBSOLETE---use |nopar| instead.
 % \end{pkgoptions}
 %
-% \changed[chg-par-false-pkgoption]{v1.1}{2018/10/16}{Package options
-% \phfverb{nopar} and \phfverb{par=false}}
+% \changed[chg-par-false-pkgoption]{v3.0}{2018/10/16}{Improved
+% \phfverb{par,nopar} package options syntax}
 %
 %
 % \subsection{Adjusting Spacing of Lines and Words}
@@ -845,7 +844,10 @@
 % long words.
 % 
 % \begin{pkgoptions}
-% \item[spacingdefs=true] Apply adjustments to line and word spacing.
+% \item[spacingdefs] Apply adjustments to line and word spacing.
+%
+%   This feature is on by default.  You can also use |spacingdefs=true|.
+%
 % \item[nospacingdefs] Do not attempt any adjustments of line or word spacing.  You
 %   can also use the alias |spacingdefs=false|.
 % \end{pkgoptions}
@@ -864,10 +866,14 @@
 % instead of the default |OT1|.
 %
 % \begin{pkgoptions}
-% \item[fontdefs=true] Apply adjustments to fonts.  This is on by default,
-%   except on Xe\TeX{} and Lua\TeX{}.
+% \item[fontdefs] Apply adjustments to fonts.  This is on by default, except on
+%   Xe\TeX{} and Lua\TeX{}.
+%
+%   You can also use |fontdefs=true|.
+%
 % \item[nofontdefs] Do not apply adjustments to fonts.  You can also set
 %   |fontdefs=false|.
+%
 % \end{pkgoptions}
 %
 %
@@ -877,8 +883,11 @@
 % The footnotes' appearance can also be slightly enhanced.
 %
 % \begin{pkgoptions}
-% \item[footnotedefs=true] Changes the symbol appearance a little bit---the
+% \item[footnotedefs] Changes the symbol appearance a little bit---the
 %   footnote number is smaller and typeset in boldface.
+%
+%   You can also use |footnotedefs=true|. This feature is on by default.
+%
 % \item[nofootnotedefs] Do not change the footnote appearance.  You can also set
 %   |footnotedefs=false|.
 % \end{pkgoptions}
@@ -893,44 +902,82 @@
 % personally like better (dark blue links as in this document).
 %
 % \begin{pkgoptions}
-% \item[hyperrefdefs,hyperrefdefs=true] Load the \pkgname{hyperref} package, and
+% \item[hyperrefdefs] Load the \pkgname{hyperref} package, and
 %   set some sensible default settings.  Also ensures the |\email| and |\url| commands
-%   are made available.  You can tune 
+%   are made available.
+%
+%   You can also use |hyperrefdefs=true|. This feature is on by default.
+%
 % \item[nohyperrefdefs] Do not load the \pkgname{hyperref} package.  Do not set
-%   any defaults.  Do not care to provide |\email| or |\url|.  Same as
-%   |hyperrefdefs=false|.
-% \item[hyperrefdefs=\pkgoptattrib{defer}] ..............
-% \item[hyperrefdefs=\pkgoptattrib{clearoptions}] ..............
-% \item[hyperrefdefs=\pkgoptattrib{noemail}] ..............
-% \item[hyperrefdefs=\pkgoptattrib{noload}] ..............
+%   any settings.  Do not care to provide |\email| or |\url|.  Same as
+%   |hyperrefdefs=false|.  Depending on the situation, you might prefer to
+%   specify |hyperrefdefs=defer| or |hyperrefdefs=noload|, see below.
+%
+% \item[hyperrefdefs=defer] Prepare the document for hyperlinks,
+%   schedule settings for \pkgname{hyperref}, but do not actually load the
+%   \pkgname{hyperref} package.
+%
+%   This is useful if you would like to load more packages that need to be
+%   loaded before loading \pkgname{hyperref}.  A lot of packages need to be
+%   loaded before \pkgname{hyperref} so if you load several other packages,
+%   you're probably better off using this option and calling
+%   |\usepackage{hyperref}| at the end of your preamble (before
+%   |\begin{document}|, rather than chasing mysterious errors.
+%     \iffalse \end{document} -- [...emacs indentation gets fooled easily...] \fi
+%   
+%   When using this option it is the user's responsibility to load the load the
+%   package with |\usepackage{hyperref}| somewhere in the preamble.  You will
+%   get an error if you don't do this.
+%
+% \item[hyperrefdefs=noemail] Do not override any existing
+%   |\email| command.  Use this for instance in Rev\TeX{}, where our
+%   implementation of |\email| clashes with Rev\TeX{}'s |\email| command which
+%   is used to specify e-mail addresses for authors.
+%
+%   The version of this command by \pkgname{phfnote} is still available as
+%   |\phfnoteEmail|.
+%
+% \item[hyperrefdefs=noload] Do not load the \pkgname{hyperref}
+%   package, and don't bother to set any related settings.  However,
+%   \pkgname{url} package is loaded, and the commands |\url| and |\email| are
+%   provided (they output the same visual text but don't produce a clickable
+%   color link).
+%
+% \item[hyperrefdefs=clearoptions] Do not attempt to set any options via
+%   |\hypersetup| (and don't schedule setting any such options later).  You'll
+%   get \pkgname{hyperref}'s default settings, so it's up to you to call
+%   |\hypersetup| with however you'd like to see your links look like.
+%
 % \end{pkgoptions}
 %
-% ..........................................
+% Attributes may be combined, as in |hyperrefdefs={noemail,noload}|.  In this
+% case make sure you put them in a braced group.  Also, beware that attributes
+% are not merged between different occurrences of the |hyperrefdefs| keyword in
+% the package options; the last occurrence defines all set attributes.
 %
-% It is also possible to defer loading the \pkgname{hyperref} package for later,
-% so that you can import other packages that need to be loaded before
-% \pkgname{hyperref}.  In that case, simply call |\usepackage{hyperref}| later
-% at your convenience in the preamble.
+% When the |hyperref| package is loaded, it is done so with the |unicode=true|
+% package option.  In case you need, you can specify your own package options
+% with |hyperrefdefs=defer| and then calling |\usepackage[...]{hyperref}|.  For
+% most options though it's simpler to use |\hypersetup{...}|.
 %
-% \begin{pkgoptions}
-% \item[hyperrefdefer=true] Do not immediately load the \pkgname{hyperref}
-%   package. The user promises to call |\usepackage{hyperref}| manually at some
-%   point in the preamble. .............................................. 
-% \item[hyperrefdefer=false] (the default) Load \pkgname{hyperref} immediately,
-%   the user doesn't have to worry about loading it.  However if other packages
-%   are loaded after \pkgname{phfnote}, you may run into some issues if
-%   \pkgname{hyperref} is already loaded. ....................................
-% \end{pkgoptions}
 %
 % \DescribeMacro{\url} In order to typeset URLs, the |\url| command is made
-% available from the package \pkgname{url} (which is then linkified by \pkgname{hyperref}).  For
-% example, you can type |\url{https://github.com/phfaist/}|.
+% available from the package \pkgname{url} (which is then linkified by
+% \pkgname{hyperref}).  For example, you can type
+% |\url{https://github.com/phfaist/}|.
 %
-% \DescribeMacro{\email} A similar command allows to typeset e-mail addresses.
-% The text is displayed as a hyperlink, which when clicked opens a e-mail
-% composer to that address (via a |mailto:XXX| link).  For example, try
-% |\email{pulp_fiction@tarantino.com}|.
-% ............................................. |\phfnoteEmail|
+% \DescribeMacro{\email} \DescribeMacro{\phfnoteEmail} A similar command allows
+% to typeset e-mail addresses.  The text is displayed as a hyperlink, which when
+% clicked opens a e-mail composer to that address (via a |mailto:XXX| link).
+% For example, try |\email{pulp_fiction@tarantino.com}|.  The command
+% |\phfnoteEmail| is an alias for this, which is defined even if the |noemail|
+% attribute is given.
+%
+% The commands |\url| and |\email| (along with |\phfnoteEmail|) are defined
+% unless |nohyperrefs| (or |hyperrefdefs=false|) is specified.  If you would
+% like to use these commands but not load the |hyperref| package, consider using
+% |hyperrefdefs=noload|.
+% 
 %
 % \DescribeMacro{\phfnotePdfLinkColor} The command |\phfnotePdfLinkColor| may by
 % used to set the color of the links.  It takes one argument, a color
@@ -945,6 +992,9 @@
 %   of a package set as long as you're not using the option |pkgset=none|;
 %   see \autoref{sec:package-sets}.)
 % \end{pkgnote}
+%
+% The internal name for the link color is |docnotelinkcolor|.  (This is
+% historical, and I'm not going to change it.)
 %
 %
 % \subsection{Bibliography Definitions}
@@ -961,7 +1011,10 @@
 % Finally, an entry in the table of contents is generated.
 %
 % \begin{pkgoptions}
-% \item[bibliographydefs=true] Set some default bibliography settings.
+% \item[bibliographydefs] Set some default bibliography settings.
+%
+%   This feature is on by default.  You can also use |bibliographydefs=true|.
+%
 % \item[nobibliographydefs] Do not set some bibliography settings.  You may also
 %   use |bibliographydefs=false|.
 % \end{pkgoptions}
@@ -1061,7 +1114,7 @@
 % Note that in contrast to optional
 % arguments in most LaTeX macros, the argument is allowed to contain matching
 % square brackets, for instance \relax%
-% |\AlE[this works [as you'd expect]]| \AlE[this [works] as you'd expect]
+% |\AlE[this works [as you'd expect]]| \AlE[this works [as you'd expect]]
 %
 % In any case you can protect the argument as usual with curly braces:
 % |\AlE[{this is [weird}]| \AlE[{this is [weird}]
@@ -1147,17 +1200,16 @@
 % \end{cmdoptions}
 % 
 % After invoking |\phfMakeCommentingCommand|, the colors |xxxcolor|,
-% |xxxrmcolor| and |xxxrmcolorlink| are automatically defined (of
-% course, replace |xxx| with your commenting macro name).  These are
-% used respectively for a usual comment color, text to be removed, and
-% for links in text to be removed (requires package option
-% |hyperrefdefs=true|).  You may redefine these colors afterwards with
-% |\colorlet| if you wish:
+% |xxxrmcolor| and |xxxrmcolorlink| are automatically defined (of course,
+% replace |xxx| with your commenting macro name).  These are used respectively
+% for a usual comment color, text to be removed, and for links in text to be
+% removed.  You may redefine these colors afterwards with |\colorlet| if you
+% wish:
 % \begin{verbatim}
 % \colorlet{AlErmcolor}{gray}
 % \end{verbatim}
 %
-% \changed[chg-inline-commenting]{v1.1}{2018/10/03}{Added support for inline
+% \changed[chg-inline-commenting]{v3.0}{2018/10/03}{Added support for inline
 % commenting using \phfverb\phfMakeCommentingCommand}
 %
 %
@@ -2252,7 +2304,7 @@
 % Helpers---default set of hyperref options, and other helper macros.
 %    \begin{macrocode}
 \def\phfnote@hyperrefdefs@val@options{%
-  unicode=true,bookmarksnumbered=false,bookmarksopen=false,bookmarksopenlevel=1,%
+  bookmarksnumbered=false,bookmarksopen=false,bookmarksopenlevel=1,%
   breaklinks=true,pdfborder={0 0 0},colorlinks=true,%
   anchorcolor=docnotelinkcolor,citecolor=docnotelinkcolor,%
   filecolor=docnotelinkcolor,linkcolor=docnotelinkcolor,%
@@ -2260,10 +2312,11 @@
   urlcolor=docnotelinkcolor%
 }%
 \def\phfnote@hyperrefdefs@deferredhypersetup#1{\AtBeginDocument{\hypersetup{#1}}}
-\def\phfnote@hyperrefdefs@loadhyperrefdopkgoptions{%
-    \PassOptionsToPackage{unicode=true,bookmarks=true,backref=false}{hyperref}}
+\providecommand\phfnote@hyperrefdefs@dopkgoptions{%
+  \PassOptionsToPackage{unicode=true}{hyperref}
+}
 \def\phfnote@hyperrefdefs@loadhyperref{%
-    \phfnote@hyperrefdefs@loadhyperrefdopkgoptions
+    \phfnote@hyperrefdefs@dopkgoptions
     \RequirePackage{hyperref}}
 \def\phfnote@hyperrefdefs@provideemail{\let\email\phfnote@email}
 \def\phfnote@hyperrefdefs@afterhook{}
@@ -2273,10 +2326,10 @@
 % \autoref{sec:hyperrefdefs}.
 %
 %    \begin{macrocode}
-\def\phfnote@do@hyperrefdefs@true{}% in case someone set hyperrefdefs=true
+\def\phfnote@do@hyperrefdefs@true{}% for explicit value "hyperrefdefs=true"
 \def\phfnote@do@hyperrefdefs@defer{
   \def\phfnote@hyperrefdefs@loadhyperref{%
-    \phfnote@hyperrefdefs@loadhyperrefdopkgoptions
+    \phfnote@hyperrefdefs@dopkgoptions
     \let\hypersetup\phfnote@hyperrefdefs@deferredhypersetup}
 }
 \def\phfnote@do@hyperrefdefs@clearoptions{
@@ -3478,25 +3531,13 @@
 %    \end{macrocode}
 %
 %
-% \textbf{Hyperref:} No ``default'' \pkgname{hyperref} definitions, we'll use
-% \pkgname{hyperdoc} instead.
+% \textbf{Hyperref:} Request default \pkgname{hyperref} definitions with
+% |hyperrefdefs=defer|, but we'll load \pkgname{hyperdoc} instead of
+% \pkgname{hyperref}.
 %    \begin{macrocode}
-  \def\phfnote@opt@hyperrefdefs{false}
+  \def\phfnote@opt@hyperrefdefs{defer}
   \g@addto@macro\phfnote@hook@atendload{
-    \definecolor{docnotelinkcolor}{rgb}{0,0,0.4}%
-    \RequirePackage{url}%
-    \DeclareUrlCommand\phfnote@format@url{}%
     \RequirePackage{hypdoc}
-    % 
-    \hypersetup{bookmarks=true,backref=false,unicode=true,%
-      bookmarksnumbered=false,bookmarksopen=false,bookmarksopenlevel=1,%
-      breaklinks=true,pdfborder={0 0 0},colorlinks=true}%
-    \hypersetup{%
-      anchorcolor=docnotelinkcolor,citecolor=docnotelinkcolor,%
-      filecolor=docnotelinkcolor,linkcolor=docnotelinkcolor,%
-      menucolor=docnotelinkcolor,runcolor=docnotelinkcolor,%
-      urlcolor=docnotelinkcolor}%
-    \let\email\phfnoteEmail%
     \urlstyle{noteit}
   }
 %    \end{macrocode}
@@ -3552,7 +3593,7 @@
         {##1}{\expandonce\phfnotechanged@tmpa}}%
       \par\hspace*{0pt}\refstepcounter{phfnotechanged}\label{phfnotechanged:##1}%
       \begingroup\let\phfnote@changedreftext@par\relax
-        \changedreftext{##1}%
+        \changedreftext[\@secondoftwo]{##1}%
       \endgroup
       \changes{##2}{##3}{\hyperref[phfnotechanged:##1]{##4}}%
     \fi
@@ -3567,20 +3608,21 @@
 % of |\changedreftext|\marg{label name}.
 %    \begin{macrocode}
   \def\phfnote@changedreftext@par{\par}
-  \newcommand*\changedreftext[1]{%
+  \newcommand*\changedreftext[2][\phfnote@changedrefto]{%
     \phfnote@changedreftext@par%
-    \ifcsname phfnote@changed@lbl@##1\endcsname
-      \hyperref[phfnotechanged:##1]{%
+    \ifcsname phfnote@changed@lbl@##2\endcsname
+      ##1{##2}{%
         \expandafter\expandafter\expandafter\changedtextfmt%
-            \csname phfnote@changed@lbl@##1\endcsname
+            \csname phfnote@changed@lbl@##2\endcsname
       }
     \else
-      \hyperref[phfnotechanged:##1]{%
+      \hyperref[phfnotechanged:##2]{%
         \changedtextfmt{???}{???}{[\textbf{missing ref}]}%
       }%
     \fi
     \par
   }
+  \def\phfnote@changedrefto##1{\hyperref[phfnotechanged:##1]}
 %    \end{macrocode}
 % 
 % The macro |\changedtextfmt|\marg{v1.0}\marg{2016/05/22}\marg{description}
@@ -3597,7 +3639,7 @@
 %    \begin{macrocode}
   \RequirePackage{enumitem}
   \newlist{pkgoptions}{description}{1}
-  \setlist[pkgoptions]{font=\pkgoptionfmt[{\vspace*{5pt}}],style=nextline}
+  \setlist[pkgoptions]{font=\pkgoptionfmt@many[{\vspace*{5pt}}],style=nextline}
 %    \end{macrocode}
 % 
 % But patch the |pkgoptions|' |\item| command, so that it puts an additional
@@ -3613,7 +3655,7 @@
       \pkgoptions@old@item}%
   }{}{\PackageWarning{phfnote}{preset xpkgdoc: Failed to patch command
       \string\pkgoptions}}
-  \def\pkgoptionscombineitem{\leavevmode\vspace{\dimexpr-\baselineskip-\parskip-\itemsep\relax}}
+  %\def\pkgoptionscombineitem{\leavevmode\vspace{\dimexpr-\baselineskip-\parskip-\itemsep\relax}}
 %    \end{macrocode}
 % 
 % For convenience, also provide a |\meta|-like command for boolean arguments
@@ -3632,6 +3674,12 @@
   \newcommand\pkgoptionfmt[2][]{%
     \begingroup\let\meta\pkgoptfmt@meta\pkgopt@fbox{\normalfont\ttfamily ##2}\endgroup%
     \expandafter\phfnote@pkgdoc@index\expandafter{\@firstofone ##2}%
+    ##1}
+  \newcommand\pkgoptionfmt@many[2][]{%
+    \def\pkgoptionfmt@tmp@addcomma{}
+    \def\do####1{\pkgoptionfmt@tmp@addcomma\pkgoptionfmt{\vphantom{##2}####1}%
+      \def\pkgoptionfmt@tmp@addcomma{\hskip0.25em\relax,\hskip0.8em\relax}}%
+    \expandafter\docsvlist\expandafter{\@firstofone ##2}%
     ##1}
   \let\pkgopt@save@meta\meta
   \def\pkgopt@fbox{\fbox}
@@ -3654,6 +3702,8 @@
       \let\marg\@gobble%
       \let\oarg\@gobble%
       \let\parg\@gobble%
+      \let\vphantom\@gobble%
+      \let\hphantom\@gobble%
       \let\pkgoptattrib\@firstofone%
       \let\pkgoptattribnodots\@firstofone%
       \let\pkgoptattribempty\@empty%
