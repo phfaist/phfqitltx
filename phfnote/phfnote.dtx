@@ -1328,7 +1328,7 @@
     \ifcsname #1\next\endcsname%
       \csname #1\next\endcsname%
     \else%
-      \PackageWarning{phfnote}{Unknown #2: '\next'. Ignoring.}
+      \PackageError{phfnote}{Unknown #2: '\next'. Ignoring.}
     \fi
   }
 }
@@ -2548,7 +2548,7 @@
     \phfnote@old@bibliography{#1}%
   \endgroup%
 }
-\def\phfnote@doibasefix 10.{https://doi.org/10.}
+\def\phfnote@doibasefix#110.{https://doi.org/10.}
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\phfnote@bibliographystyle}
