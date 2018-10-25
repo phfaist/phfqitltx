@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfnote}
 %<*package>
-    [2018/10/16 v3.0 phfnote package]
+    [2018/10/25 v3.0 phfnote package]
 %</package>
 %
 %<*driver>
@@ -377,6 +377,9 @@
 %
 % \changed[chg-title-false-pkgoption]{v3.0}{2018/10/16}{Improved
 % \phfverb{title,notitle} package options syntax}
+%
+% \changed[chg-title-default-spacing]{v3.0}{2018/10/25}{Improved spacing in the
+% default title style}
 %
 % \subsubsection{Customizing the style of the \phfverb{default} and \phfverb{small} title styles}
 % 
@@ -1471,12 +1474,17 @@
 %   by the minipage in |\end{minipage}|.
 %  \begin{macrocode}
 \def\phfnote@finalizempfootnotes{%
-  \global\setbox\@mpfootins=\vbox{%
-    \parskip=0pt\parindent=0pt\parshape 1 0.04\textwidth 0.96\textwidth\relax%
-    \noindent\leavevmode%
-    \reset@font\footnotesize%
-    \phfnote@fmt@titlefootnotes%
-    \phfnote@mpfootmaterial}%
+  \if\relax\detokenize\expandafter{\phfnote@mpfootmaterial}\relax
+  \else
+    \global\setbox\@mpfootins=\vbox{%
+      \parskip=\z@\relax
+      \parindent=\z@\relax
+      \parshape 1 0.04\textwidth 0.96\textwidth\relax%
+      \noindent\leavevmode%
+      \reset@font\footnotesize%
+      \phfnote@fmt@titlefootnotes%
+      \phfnote@mpfootmaterial}%
+  \fi
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1559,44 +1567,49 @@
 %
 % \paragraph{Title style: `default'}
 %
-% Implementation our main `default' title style.  See \autoref{sec:main-default-title-style}.
+% Implementation our main `default' title style.  See
+% \autoref{sec:main-default-title-style}.
 %
 % \begin{macro}{\notetitle@style@default}
 %    The default title style.  Nothing mysterious, hopefully.
 %    \begin{macrocode}
 \newcommand{\notetitle@style@default}{%
-  \begingroup\par\raggedright%
-    \phfnote@setupthanksmpfootnote%
+  \begingroup
+    \parskip=\z@\relax
+    \parindent=\z@\relax
+    \par\raggedright
+    \phfnote@setupthanksmpfootnote
     \vspace*{\notetitletopspace}%
     \phfnote@title@checksetspace{default}%
     \begin{minipage}{\textwidth}%
       \begin{singlespace}%
-        \parskip=0pt\parindent=0pt\relax%
-        {\let\phfnote@old@par\par%
-          \def\par{\phfnote@old@par%
-            \parskip=1.5ex\relax\parshape 1 0pt \textwidth\relax%
+        {\let\phfnote@old@par\par
+          \def\par{\phfnote@old@par
+            \parskip=1.5ex\relax\parshape 1 0pt \textwidth\relax
             \noindent}%
-          \par%
-          \Large  {\notetitlefont \@title}\par}%
-        \vskip 2mm\relax
-        \if\relax\detokenize\expandafter{\@author}\relax\else%
-          \par\parshape 1 0.04\textwidth 0.96\textwidth\relax%
-          {\notetitleauthorfont \@author}%
-          \vskip 2mm\relax%
+          \par
+          \Large{\expandafter\notetitlefont\expandafter{\@title}}%
+          \phfnote@old@par
+          \vspace{1.5ex}%
+        }%
+        \if\relax\detokenize\expandafter{\@author}\relax\else
+          \parshape 1 0.04\textwidth 0.96\textwidth\relax
+          {\expandafter\notetitleauthorfont\expandafter{\@author}}\par
+          \vspace{2mm}%
         \fi
-        \if\relax\detokenize\expandafter{\@date}\relax\else%
-          \par\parshape 1 0.04\textwidth 0.96\textwidth\relax%
-          {\notetitledatefont \@date}
-          \vskip 2mm\relax%
+        \if\relax\detokenize\expandafter{\@date}\relax\else
+          \parshape 1 0.04\textwidth 0.96\textwidth\relax
+          {\expandafter\notetitledatefont\expandafter{\@date}}\par
+          \vspace{2mm}%
         \fi
-        \global\let\@thanks\@empty%
-        \phfnote@finalizempfootnotes%
+        \global\let\@thanks\@empty
+        \phfnote@finalizempfootnotes
       \end{singlespace}%
-    \end{minipage}\par%
+    \end{minipage}\par
     \vspace*{2mm}%
-    \notetitlehrule\relax%
-    \par%
-  \endgroup%
+    \notetitlehrule\relax
+    \par
+  \endgroup
   \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
 }
 %    \end{macrocode}
@@ -1698,6 +1711,13 @@
       \let\title\notetitle@title
       \let\thanks\notetitle@thanks
       \let\thanksmark\notetitle@thanksmark
+%    \end{macrocode}
+% Also, LaTeX initializes |\@author| with code that generates a warning that no
+% author is given.  We don't want that.  It's perfectly fine not to have an
+% author, and in this case this must be empty so that our title routines can
+% properly handle this case.
+%    \begin{macrocode}
+      \def\@author{}%
 %    \end{macrocode}
 % Now, actually overload the title style by redefining |\@maketitle|.
 %    \begin{macrocode}
