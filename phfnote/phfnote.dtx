@@ -351,6 +351,14 @@
 %   As you can see, it saves more space on the page compared to the default
 %   article title.
 %
+%   \changed[chg-title-default-spacing]{v3.0}{2018/10/25}{The default title
+%   style was redesigned to improved spacing of the elements in all cases
+%   including multiline titles, author and/or date not specified, and presence
+%   or absence of thanks notes.}
+%
+%   If you would like your document to appear exactly as with \pkgname{phfnote}
+%   version 1.0, then you can set the special title style |title=defaultv1|.
+%
 % \item[title=small] A smaller title style which displays all the relevant
 %   information on a single line.  This is useful for when even the default
 %   title style appears too large.  It looks like this:
@@ -375,11 +383,26 @@
 %   an empty option value, |title=|.
 % \end{pkgoptions}
 %
+% \begin{pkgtip}
+%   When using the |default| title style, the argument to |\title| may contain
+%   blank lines.  In this case, each part is typeset on a separate line with an
+%   appropriate spacing.  For instance:
+% \begin{verbatim}
+% \title{Letter of Motivation
+%
+% John Doe}
+% \end{verbatim}
+%   will be typeset as
+%   \begin{phfnoteDocVirtualPage}
+%     \expandafter\def\csname @title\endcsname{Letter of Motivation\par John Doe}
+%     \expandafter\def\csname @author\endcsname{}
+%     \expandafter\def\csname @date\endcsname{}
+%     \notetitle@style@default\null \morepagecontents
+%   \end{phfnoteDocVirtualPage}
+% \end{pkgtip}
+%
 % \changed[chg-title-false-pkgoption]{v3.0}{2018/10/16}{Improved
 % \phfverb{title,notitle} package options syntax}
-%
-% \changed[chg-title-default-spacing]{v3.0}{2018/10/25}{Improved spacing in the
-% default title style}
 %
 % \subsubsection{Customizing the style of the \phfverb{default} and \phfverb{small} title styles}
 % 
@@ -1472,10 +1495,13 @@
 %   This simply takes all the tokens collected in |\phfnote@mpfootmaterial| (see just
 %   above), and typesets it in the |\@mpfootins| box.  The latter is automatically typeset
 %   by the minipage in |\end{minipage}|.
+%
+%   The argument |#1| is the skip length between the text and the footnotes.
 %  \begin{macrocode}
-\def\phfnote@finalizempfootnotes{%
+\def\phfnote@finalizempfootnotes#1{%
   \if\relax\detokenize\expandafter{\phfnote@mpfootmaterial}\relax
   \else
+    \global\skip\@mpfootins=#1\relax
     \global\setbox\@mpfootins=\vbox{%
       \parskip=\z@\relax
       \parindent=\z@\relax
@@ -1577,40 +1603,139 @@
   \begingroup
     \parskip=\z@\relax
     \parindent=\z@\relax
+    \phfnote@titledefault@ismultiparfalse
+    \gdef\phfnote@tmp@nextskip{\z@}%
     \par\raggedright
     \phfnote@setupthanksmpfootnote
     \vspace*{\notetitletopspace}%
     \phfnote@title@checksetspace{default}%
     \begin{minipage}{\textwidth}%
       \begin{singlespace}%
-        {\let\phfnote@old@par\par
-          \def\par{\phfnote@old@par
-            \parskip=1.5ex\relax\parshape 1 0pt \textwidth\relax
-            \noindent}%
-          \par
-          \Large{\expandafter\notetitlefont\expandafter{\@title}}%
+        {\par
+          \let\phfnote@old@par\par
+          \notetitle@titledefault@preparetitle{\expandafter\notetitlefont\expandafter{\@title}}%
           \phfnote@old@par
-          \vspace{1.5ex}%
+          \ifphfnote@titledefault@ismultipar
+            \vspace{\parskip}%
+            \gdef\phfnote@tmp@nextskip{\z@}%
+          \else
+            \gdef\phfnote@tmp@nextskip{\notetitleinnervsep}%
+          \fi
         }%
         \if\relax\detokenize\expandafter{\@author}\relax\else
+          \vspace{2\dimexpr\phfnote@tmp@nextskip\relax}%
           \parshape 1 0.04\textwidth 0.96\textwidth\relax
-          {\expandafter\notetitleauthorfont\expandafter{\@author}}\par
-          \vspace{2mm}%
+          \strut{\expandafter\notetitleauthorfont\expandafter{\@author}}\par
+          \gdef\phfnote@tmp@nextskip{\notetitleinnervsep}%
         \fi
         \if\relax\detokenize\expandafter{\@date}\relax\else
+          \vspace{\phfnote@tmp@nextskip}%
           \parshape 1 0.04\textwidth 0.96\textwidth\relax
-          {\expandafter\notetitledatefont\expandafter{\@date}}\par
-          \vspace{2mm}%
+          \strut{\expandafter\notetitledatefont\expandafter{\@date}}\par
+          \gdef\phfnote@tmp@nextskip{\notetitleinnervsep}%
         \fi
         \global\let\@thanks\@empty
-        \phfnote@finalizempfootnotes
+        \phfnote@finalizempfootnotes{\phfnote@tmp@nextskip}%
       \end{singlespace}%
     \end{minipage}\par
-    \vspace*{2mm}%
+    \vspace*{\notetitleinnervsep}%
     \notetitlehrule\relax
     \par
   \endgroup
   \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% Some helpers for the default title style.
+%
+% \begin{macro}{\ifphfnote@titledefault@ismultipar}
+%   This flag registers whether or not the title has multiple paragraphs (and
+%   thus renders on several spaced lines).  It is set to |true| by redefining
+%   the |\par| command in the title (see |\notetitle@titledefault@preparetitle|
+%   below).
+%    \begin{macrocode}
+\newif\ifphfnote@titledefault@ismultipar
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\notetitle@titledefault@preparetitle}
+%   This helper sets everything up to display the title.  It redefines |\par| to
+%   register that the title has several paragraphs.  Also, note that |\parskip|
+%   is inserted in |\leavevmode|, so that setting |\parskip| as below only
+%   affects subsequent paragraphs.
+%
+%   To change the parskip amount, you may simply patch this command, e.g., as
+%   |\appto\notetitle@titledefault@preparetitle{\parskip=1.2ex\relax}|.
+%    \begin{macrocode}
+\newcommand\notetitle@titledefault@preparetitle{%
+  \def\par{\phfnote@old@par\global\phfnote@titledefault@ismultipartrue}
+  \leavevmode\parskip=1.5ex\relax
+  \Large}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\notetitleinnervsep}
+%   Controls the vertical spacing between individual elements of the title.
+%    \begin{macrocode}
+\newcommand\notetitleinnervsep{1.2ex}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \paragraph{Title style: `defaultv1'}
+%
+% \begin{macro}{\notetitle@style@defaultv1}
+%   The default title style, copied from \pkgname{phfnote} v1.0.  DO NOT
+%   CHANGE.  Kept only for backwards compatibility, in case someone had spent
+%   lots of time fine-tuning their title and patching the v1 of this package, or
+%   if they want the document to appear exactly as the v1 of the package.
+%
+%   [We need to use |\csdef| because of the ``1'' in the title name, which is
+%   not valid in an \TeX{} usual escape sequence (!!)]
+%    \begin{macrocode}
+\csdef{notetitle@style@defaultv1}{%
+  \begingroup\par\raggedright%
+    \phfnote@setupthanksmpfootnote%
+    \vspace*{\notetitletopspace}%
+    \phfnote@title@checksetspace{default}%
+    \begin{minipage}{\textwidth}%
+      \begin{singlespace}%
+        \parskip=0pt\parindent=0pt\relax%
+        {\let\phfnote@old@par\par%
+          \def\par{\phfnote@old@par%
+            \parskip=1.5ex\relax\parshape 1 0pt \textwidth\relax%
+            \noindent}%
+          \par%
+          \Large  {\notetitlefont \@title}\par}%
+        \vskip 2mm\relax
+        \if\relax\detokenize\expandafter{\@author}\relax\else%
+          \par\parshape 1 0.04\textwidth 0.96\textwidth\relax%
+          {\notetitleauthorfont \@author}%
+          \vskip 2mm\relax%
+        \fi
+        \if\relax\detokenize\expandafter{\@date}\relax\else%
+          \par\parshape 1 0.04\textwidth 0.96\textwidth\relax%
+          {\notetitledatefont \@date}
+          \vskip 2mm\relax%
+        \fi
+        \global\let\@thanks\@empty%
+        \csname phfnote@finalizempfootnotes@v1\endcsname%
+      \end{singlespace}%
+    \end{minipage}\par%
+    \vspace*{2mm}%
+    \notetitlehrule\relax%
+    \par%
+  \endgroup%
+  \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
+}
+\csdef{phfnote@finalizempfootnotes@v1}{%
+  \global\setbox\@mpfootins=\vbox{%
+    \parskip=0pt\parindent=0pt\parshape 1 0.04\textwidth 0.96\textwidth\relax%
+    \noindent\leavevmode%
+    \reset@font\footnotesize%
+    \phfnote@fmt@titlefootnotes%
+    \phfnote@mpfootmaterial}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1627,9 +1752,10 @@
   \begingroup\par\raggedright%
     \let\footnote\thanks%
     \vspace*{\notetitletopspace}%
-    {\notetitlefont \@title}%
-    \hfill\makebox{\fontsize{9pt}{10pt}\selectfont {\notetitleauthorfont \@author}%
-      \hspace*{2mm}--\hspace*{2mm}{\emph{\notetitledatefont \@date}}}%
+    {\expandafter\notetitlefont\expandafter{\@title}}%
+    \hfill\makebox{\fontsize{9pt}{10pt}\selectfont
+      {\expandafter\notetitleauthorfont\expandafter{\@author}}%
+      \hspace*{2mm}--\hspace*{2mm}{\emph{\expandafter\notetitledatefont\expandafter{\@date}}}}%
     \vspace*{1mm}\notetitlehrule\relax\vspace*{1mm}%
     \par%
   \endgroup%
