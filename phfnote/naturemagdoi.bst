@@ -1594,9 +1594,7 @@ FUNCTION {begin.bib}
   "\makeatletter"
   write$ newline$
 
-  "\let\doibase\relax"
-  write$ newline$
-  "\providecommand \doibase [0]{http://dx.doi.org/}"
+  "\providecommand \doibase [0]{https://doi.org/}"
   write$ newline$
   "\providecommand \@sanitize@url [0]{\catcode `\\12\catcode `\$12\catcode"
   write$ newline$

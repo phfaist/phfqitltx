@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfnote}
 %<*package>
-    [2018/09/20 v1.1 phfnote package]
+    [2018/10/25 v3.0 phfnote package]
 %</package>
 %
 %<*driver>
@@ -279,37 +279,33 @@
 % \item[preset=\meta{preset name}] Load a preset specifying a predefined set of
 %   options for the general appearance of the document.  See documentation in
 %   \autoref{sec:presets}
-% \item[title=\meta{title style}] Set the title style.  Documentation in
-%   \autoref{sec:title-styles}
-% \item[abstract=\meta{abstract attributes}] Set the abstract style by
+% \item[title=\meta{title style},notitle] Set the title style. Use
+%   \pkgoptionfmt{notitle} to disable feature and use latex default.
+%   Documentation in \autoref{sec:title-styles}
+% \item[abstract=\meta{abstract attributes},noabstract] Set the abstract style by
 %   specifying a comma-separated list of attributes.  Don't forget to
 %   put the list of attributes within braces,
 %   |[abstract={wide,noname,it}]|.  Documentation in
 %   \autoref{sec:abstract-attributes}
 % \item[pkgset=\meta{package set}] Specify a standard set of \LaTeX{}
 %   packages to load.  See \autoref{sec:package-sets}.
-% \item[pagegeomdefs=\meta{true or false}] Whether to care about page
-%   margins. |nopagegeomdefs| is synonym for |pagegeomdefs=false|.
-% \item[pagegeom=\meta{geom style}] Set a page margin style.  Only has effect if
-%   |pagegeomdefs=true|.  Options are documented in \autoref{sec:pagegeomdefs}.
-% \item[secfmt=\meta{section formatting attributes}] A list of attributes
-%   defining how section (and possibly paragraph) headings should look like.
-%   See \autoref{sec:secfmt}.
-% \item[par=\meta{par style}] Define how paragraphs should be spaced.  Refer to
-%   \autoref{sec:par-defs}.
-% \item[spacingdefs=\meta{true or false}] Adjust spacing of lines and words
+% \item[pagegeom=\meta{geom style},nopagegeom] Set a page margin style.  Use |nopagegeom|
+%   to leave page geometry unchanged.  Options are documented in
+%   \autoref{sec:pagegeomdefs}.
+% \item[secfmt=\meta{section formatting attributes},nosecfmt] A list of
+%   attributes defining how section (and possibly paragraph) headings should
+%   look like.  See \autoref{sec:secfmt}.
+% \item[par=\meta{par style},nopar] Define how paragraphs should be spaced.
+%   Refer to \autoref{sec:par-defs}.
+% \item[spacingdefs,nospacingdefs] Adjust spacing of lines and words
 %   (\autoref{sec:spacingdefs}).
-% \item[fontdefs=\meta{true or false}] Adjust some fonts
-%   (\autoref{sec:fontdefs}).
-% \item[footnotedefs=\meta{true or false}] Adjust slighly the appearance of
+% \item[fontdefs,nofontdefs] Adjust some fonts (\autoref{sec:fontdefs}).
+% \item[footnotedefs,nofootnotedefs] Adjust slightly the appearance of
 %   footnotes.  See \autoref{sec:footnotedefs}.
-% \item[hyperrefdefs=\meta{true or false}] Load the \pkgname{hyperref} package, and set
-%   some defaults settings.  See \autoref{sec:hyperrefdefs}.
-% \item[hyperrefdefer=\meta{true or false}] User may opt in to promise to load
-%   the \pkgname{hyperref} manually later, so that they can load other packages
-%   before.  See \autoref{sec:hyperrefdefs}.
-% \item[bibliographydefs=\meta{true or false}] Adjust the appearance and style
-%   of the bibliography.  See \autoref{sec:bibliographydefs}.
+% \item[hyperrefdefs=\meta{settings},nohyperrefdefs] Load the \pkgname{hyperref}
+%   package, and set some defaults settings.  See \autoref{sec:hyperrefdefs}.
+% \item[bibliographydefs,nobibliographydefs] Adjust the appearance and style of
+%   the bibliography.  See \autoref{sec:bibliographydefs}.
 % \end{pkgoptions}
 %
 % \begin{pkgtip}
@@ -317,8 +313,6 @@
 %   enable only the features required.  In this way, you can ensure that only those
 %   features which are explicitly specified are enabled.
 % \end{pkgtip}
-%
-%
 %
 %
 % \section{Features}
@@ -357,6 +351,14 @@
 %   As you can see, it saves more space on the page compared to the default
 %   article title.
 %
+%   \changed[chg-title-default-spacing]{v3.0}{2018/10/25}{The default title
+%   style was redesigned to improved spacing of the elements in all cases
+%   including multiline titles, author and/or date not specified, and presence
+%   or absence of thanks notes.}
+%
+%   If you would like your document to appear exactly as with \pkgname{phfnote}
+%   version 1.0, then you can set the special title style |title=defaultv1|.
+%
 % \item[title=small] A smaller title style which displays all the relevant
 %   information on a single line.  This is useful for when even the default
 %   title style appears too large.  It looks like this:
@@ -370,14 +372,37 @@
 %     \vspace*{3em}\notetitle@style@article\null \shortlipsum \morepagecontents
 %   \end{phfnoteDocVirtualPage}
 %
-% \item[title=] An empty argument to |title| instructs \pkgname{phfnote} not to
-%   override any title definition, thus preserving the default class title
-%   style.
+% \item[notitle] Also equivalently, |title=false|. Instructs \pkgname{phfnote}
+%   not to override any title definition, thus preserving the default class
+%   title style.
 %
 %   Beware that some other title goodies, such as our more advanced |\thanks|
 %   notes, or spacing adjustments for the abstract, will probably not work.
+%
+%   For compatibility with previous versions of |phfnote|, you may also specify
+%   an empty option value, |title=|.
 % \end{pkgoptions}
 %
+% \begin{pkgtip}
+%   When using the |default| title style, the argument to |\title| may contain
+%   blank lines.  In this case, each part is typeset on a separate line with an
+%   appropriate spacing.  For instance:
+% \begin{verbatim}
+% \title{Letter of Motivation
+%
+% John Doe}
+% \end{verbatim}
+%   will be typeset as
+%   \begin{phfnoteDocVirtualPage}
+%     \expandafter\def\csname @title\endcsname{Letter of Motivation\par John Doe}
+%     \expandafter\def\csname @author\endcsname{}
+%     \expandafter\def\csname @date\endcsname{}
+%     \notetitle@style@default\null \morepagecontents
+%   \end{phfnoteDocVirtualPage}
+% \end{pkgtip}
+%
+% \changed[chg-title-false-pkgoption]{v3.0}{2018/10/16}{Improved
+% \phfverb{title,notitle} package options syntax}
 %
 % \subsubsection{Customizing the style of the \phfverb{default} and \phfverb{small} title styles}
 % 
@@ -517,16 +542,16 @@
 %   then by default.
 % \item[abstract=\pkgoptattrib{noname}] The title ``Abstract.'' above the text
 %   will not be typeset.  The abstract text is typeset directly instead.
-% \item[abstract=\pkgoptattrib{original}] Revert to the original class' default
-%   implementation of the |abstract| environment before \pkgname{phfnote} was
-%   loaded.  The original class' implementation is restored and no longer
-%   tampered with.
 % \item[abstract=\pkgoptattrib{small}] Use a smaller font for the abstract text
 %   (|\small| font).
 % \item[abstract=\pkgoptattrib{compact}] Reduce spacing before and after the
 %   abstract.  If the abstract is short, this might look slightly better.
 % \item[abstract=\pkgoptattrib{it}] Typeset the abstract text using an italic
 %   typeface.
+% \item[noabstract] Do not (re)define the |abstract| environment, do not execute
+%   abstract definitions.  This leaves the original |abstract| environment
+%   definition of the underlying \LaTeX{} class.  You can also equivalently say
+%   |abstract=false|.
 % \end{pkgoptions}
 %
 % 
@@ -547,6 +572,18 @@
 % \DescribeMacro{\noteabstractbeforespacing}
 % (|\noteabstractbeforespacing|) the abstract can further be
 % specified, also as macros.
+%
+%
+% Obsolete options:
+% \begin{pkgoptions}
+% \item[abstract=\pkgoptattrib{original}] Revert to the original class' default
+%   implementation of the |abstract| environment before \pkgname{phfnote} was
+%   loaded.  The original class' implementation is restored and no longer
+%   tampered with.  This option is OBSOLETE, use |noabstract| instead.
+% \end{pkgoptions}
+%
+% \changed[chg-noabstract-pkgoption]{v3.0}{2018/10/16}{Improved
+% \phfverb{abstract,noabstract} package options syntax}
 %
 % \subsection{Table of Contents}
 % \label{sec:inline-toc}
@@ -632,16 +669,8 @@
 % and whether the document is typeset in two columns.
 %
 % If you want anything more complicated than what is provided by a default
-% setting here, just use |pagegeomdefs=false| and invoke the \pkgname{geometry} package
-% directly with your preferred set of options.
-%
-% \begin{pkgoptions}
-% \item[pagegeomdefs=true] Include the \pkgname{geometry} package, using the default
-%   settings or whatever is specified with the |pagegeom| option.
-% \item[pagegeomdefs=false] Do not attempt to change the document margins, and
-%   don't load the \pkgname{geometry} package.
-% \item[nopagegeomdefs] Same as |pagegeomdefs=false|.
-% \end{pkgoptions}
+% setting here, just use the |nopagegeom| package option and invoke the
+% \pkgname{geometry} package directly with your preferred set of options.
 %
 % The page geometry predefined settings are the following.
 %
@@ -649,6 +678,8 @@
 % \item[pagegeom=default] Default settings. Not too wide, not too
 %   narrow. Settings vary according to single or double column setting, and
 %   according to default font point size.
+% \item[nopagegeom] Also, |pagegeom=false|.  Do not change page geometry
+%   settings, do not load the \pkgname{geometry} package.
 % \item[pagegeom=narrow] Narrower style.  For single-column documents, this is
 %   closer to the typographically-advertised-optimal of 50--80 characters per
 %   line, but it might look narrow to some.
@@ -658,6 +689,19 @@
 %   note can fit.  This style is used in this package documentation, for
 %   example.
 % \end{pkgoptions}
+%
+%
+% The following package options are OBSOLETE:
+% \begin{pkgoptions}
+% \item[pagegeomdefs=\meta{true or false}] Whether to care about page
+%   margins. |nopagegeomdefs| is synonym for |pagegeomdefs=false|.  This option
+%   is OBSOLETE, please use |nopagegeom| or |pagegeom=false| instead of
+%   |pagegeomdefs=false| and |pagegeom| (or |pagegeom=...| with setting) instead
+%   of |pagegeomdefs=true|.
+% \end{pkgoptions}
+% \changed[chg-pagegeom-pkgoption-onoff]{v3.0}{2018/10/16}{Changed how to turn
+% on/off the page geometry settings by improving the \phfverb{pagegeom} package
+% options, deprecated \phfverb{pagegeomdefs} option}
 % 
 %
 % \subsection{Section Headers Styling}
@@ -668,10 +712,10 @@
 % But really, these options are quite basic.  You should use \pkgname{titlesec} or
 % \pkgname{sectsty} directly if you want anything serious.
 %
-% The section headings are customized using the \pkgname{sectsty} package.  If this
-% conflicts in your document, then use the |[secfmt={}]| package option to
-% indicate that section headings should NOT be styled by this package.  Then take
-% care of section styling manually.
+% The section headings are customized using the \pkgname{sectsty} package.  If
+% this conflicts in your document, then use the |nosecfmt| package option to
+% indicate that section headings should NOT be styled by this package.  Then
+% you have the full freedom to take care of section styling manually.
 %
 % Package options may be used to customize the appearance of the section
 % headings by specifying a list of attributes.  When you combine arguments, make
@@ -726,9 +770,9 @@
 % \item[secfmt=\pkgoptattrib{blockpar}] Change the paragraph-level headings not
 %   to be in ``run-in'' style, but to be typeset on their own line like section
 %   headings.
-% \item[secfmt=\pkgoptattribempty] Leave the argument empty to keep the original
-%   class styling; nothing will be overridden and the \pkgname{sectsty} package
-%   is not loaded.
+% \item[nosecfmt] Keep the original class styling; nothing will be overridden
+%   and the \pkgname{sectsty} package is not loaded.  (Equivalently, you may
+%   specify |secfmt=false|.)
 % \end{pkgoptions}
 %
 % You can also directly modify the section heading style by redefining some
@@ -777,6 +821,17 @@
 % arguments, the font definitions to apply for headings of level |\paragraph|
 % and |\subparagraph|.
 %
+% Obsolete options:
+% \begin{pkgoptions}
+% \item[secfmt=\pkgoptattribempty] Leave the argument empty to keep the original
+%   class styling; nothing will be overridden and the \pkgname{sectsty} package
+%   is not loaded.  This option is OBSOLETE, use |nosecfmt| instead.
+% \end{pkgoptions}
+% 
+% \changed[chg-secfmt-false-pkgoption]{v3.0}{2018/10/16}{Improved
+% \phfverb{secfmt,nosecfmt} package options syntax}
+%
+%
 % \subsection{Appearance of Paragraphs}
 % \label{sec:par-defs}
 %
@@ -789,9 +844,21 @@
 %   and not indented.
 % \item[par=indentminiskip] Paragraphs are indented, but there is also a small
 %   space between each paragraph.
-% \item[par=original] Do not modify the appearance of paragraphs, and leave the
-%   original class' default.
+% \item[nopar] Do not modify the appearance of paragraphs, and leave the
+%   original class' default.  
+%   
+%   You may also use |par=false|.
 % \end{pkgoptions}
+%
+%
+% Obsolete options:
+% \begin{pkgoptions}
+% \item[par=original] OBSOLETE---use |nopar| instead.
+% \end{pkgoptions}
+%
+% \changed[chg-par-false-pkgoption]{v3.0}{2018/10/16}{Improved
+% \phfverb{par,nopar} package options syntax}
+%
 %
 % \subsection{Adjusting Spacing of Lines and Words}
 % \label{sec:spacingdefs}
@@ -803,11 +870,14 @@
 % long words.
 % 
 % \begin{pkgoptions}
-% \item[spacingdefs=true] Apply adjustments to line and word spacing.
-% \item[spacingdefs=false] Do not attempt any adjustments of line or word
-%   spacing.
-% \item[nospacingdefs] Alias for |spacingdefs=false|.
+% \item[spacingdefs] Apply adjustments to line and word spacing.
+%
+%   This feature is on by default.  You can also use |spacingdefs=true|.
+%
+% \item[nospacingdefs] Do not attempt any adjustments of line or word spacing.  You
+%   can also use the alias |spacingdefs=false|.
 % \end{pkgoptions}
+%
 %
 %
 % \subsection{Adjustments for Fonts}
@@ -822,21 +892,30 @@
 % instead of the default |OT1|.
 %
 % \begin{pkgoptions}
-% \item[fontdefs=true] Apply adjustments to fonts.
-% \item[fontdefs=false] Do not apply adjustments to fonts.
-% \item[nofontdefs] Same as |fontdefs=false|.
+% \item[fontdefs] Apply adjustments to fonts.  This is on by default, except on
+%   Xe\TeX{} and Lua\TeX{}.
+%
+%   You can also use |fontdefs=true|.
+%
+% \item[nofontdefs] Do not apply adjustments to fonts.  You can also set
+%   |fontdefs=false|.
+%
 % \end{pkgoptions}
 %
-% \subsection{Footnote Figure Style}
+%
+% \subsection{Footnote Style}
 % \label{sec:footnotedefs}
 %
 % The footnotes' appearance can also be slightly enhanced.
 %
 % \begin{pkgoptions}
-% \item[footnotedefs=true] Changes the symbol appearance a little bit---the
+% \item[footnotedefs] Changes the symbol appearance a little bit---the
 %   footnote number is smaller and typeset in boldface.
-% \item[footnotedefs=false] Do not change the footnote appearance.
-% \item[nofootnotedefs] Same as |footnotedefs=false|.
+%
+%   You can also use |footnotedefs=true|. This feature is on by default.
+%
+% \item[nofootnotedefs] Do not change the footnote appearance.  You can also set
+%   |footnotedefs=false|.
 % \end{pkgoptions}
 % 
 %
@@ -849,36 +928,82 @@
 % personally like better (dark blue links as in this document).
 %
 % \begin{pkgoptions}
-% \item[hyperrefdefs=true] Load the \pkgname{hyperref} package, and set some sensible
-%   settings.  Also ensures the |\email| and |\url| commands are made available.
-% \item[hyperrefdefs=false] Do not load the \pkgname{hyperref} package, do not set
-%   sensible settings.
-% \item[nohyperrefdefs] Same as |hyperrefdefs=false|.
+% \item[hyperrefdefs] Load the \pkgname{hyperref} package, and
+%   set some sensible default settings.  Also ensures the |\email| and |\url| commands
+%   are made available.
+%
+%   You can also use |hyperrefdefs=true|. This feature is on by default.
+%
+% \item[nohyperrefdefs] Do not load the \pkgname{hyperref} package.  Do not set
+%   any settings.  Do not care to provide |\email| or |\url|.  Same as
+%   |hyperrefdefs=false|.  Depending on the situation, you might prefer to
+%   specify |hyperrefdefs=defer| or |hyperrefdefs=noload|, see below.
+%
+% \item[hyperrefdefs=defer] Prepare the document for hyperlinks,
+%   schedule settings for \pkgname{hyperref}, but do not actually load the
+%   \pkgname{hyperref} package.
+%
+%   This is useful if you would like to load more packages that need to be
+%   loaded before loading \pkgname{hyperref}.  A lot of packages need to be
+%   loaded before \pkgname{hyperref} so if you load several other packages,
+%   you're probably better off using this option and calling
+%   |\usepackage{hyperref}| at the end of your preamble (before
+%   |\begin{document}|, rather than chasing mysterious errors.
+%     \iffalse \end{document} -- [...emacs indentation gets fooled easily...] \fi
+%   
+%   When using this option it is the user's responsibility to load the load the
+%   package with |\usepackage{hyperref}| somewhere in the preamble.  You will
+%   get an error if you don't do this.
+%
+% \item[hyperrefdefs=noemail] Do not override any existing
+%   |\email| command.  Use this for instance in Rev\TeX{}, where our
+%   implementation of |\email| clashes with Rev\TeX{}'s |\email| command which
+%   is used to specify e-mail addresses for authors.
+%
+%   The version of this command by \pkgname{phfnote} is still available as
+%   |\phfnoteEmail|.
+%
+% \item[hyperrefdefs=noload] Do not load the \pkgname{hyperref}
+%   package, and don't bother to set any related settings.  However,
+%   \pkgname{url} package is loaded, and the commands |\url| and |\email| are
+%   provided (they output the same visual text but don't produce a clickable
+%   color link).
+%
+% \item[hyperrefdefs=clearoptions] Do not attempt to set any options via
+%   |\hypersetup| (and don't schedule setting any such options later).  You'll
+%   get \pkgname{hyperref}'s default settings, so it's up to you to call
+%   |\hypersetup| with however you'd like to see your links look like.
+%
 % \end{pkgoptions}
 %
-% It is also possible to defer loading the \pkgname{hyperref} package for later,
-% so that you can import other packages that need to be loaded before
-% \pkgname{hyperref}.  In that case, simply call |\usepackage{hyperref}| later
-% at your convenience in the preamble.
+% Attributes may be combined, as in |hyperrefdefs={noemail,noload}|.  In this
+% case make sure you put them in a braced group.  Also, beware that attributes
+% are not merged between different occurrences of the |hyperrefdefs| keyword in
+% the package options; the last occurrence defines all set attributes.
 %
-% \begin{pkgoptions}
-% \item[hyperrefdefer=true] Do not immediately load the \pkgname{hyperref}
-%   package. The user promises to call |\usepackage{hyperref}| manually at some
-%   point in the preamble.
-% \item[hyperrefdefer=false] (the default) Load \pkgname{hyperref} immediately,
-%   the user doesn't have to worry about loading it.  However if other packages
-%   are loaded after \pkgname{phfnote}, you may run into some issues if
-%   \pkgname{hyperref} is already loaded.
-% \end{pkgoptions}
+% When the |hyperref| package is loaded, it is done so with the |unicode=true|
+% package option.  In case you need, you can specify your own package options
+% with |hyperrefdefs=defer| and then calling |\usepackage[...]{hyperref}|.  For
+% most options though it's simpler to use |\hypersetup{...}|.
+%
 %
 % \DescribeMacro{\url} In order to typeset URLs, the |\url| command is made
-% available from the package \pkgname{url} (which is then linkified by \pkgname{hyperref}).  For
-% example, you can type |\url{https://github.com/phfaist/}|.
+% available from the package \pkgname{url} (which is then linkified by
+% \pkgname{hyperref}).  For example, you can type
+% |\url{https://github.com/phfaist/}|.
 %
-% \DescribeMacro{\email} A similar command allows to typeset e-mail addresses.
-% The text is displayed as a hyperlink, which when clicked opens a e-mail
-% composer to that address (via a |mailto:XXX| link).  For example, try
-% |\email{pulp_fiction@tarantino.com}|.
+% \DescribeMacro{\email} \DescribeMacro{\phfnoteEmail} A similar command allows
+% to typeset e-mail addresses.  The text is displayed as a hyperlink, which when
+% clicked opens a e-mail composer to that address (via a |mailto:XXX| link).
+% For example, try |\email{pulp_fiction@tarantino.com}|.  The command
+% |\phfnoteEmail| is an alias for this, which is defined even if the |noemail|
+% attribute is given.
+%
+% The commands |\url| and |\email| (along with |\phfnoteEmail|) are defined
+% unless |nohyperrefs| (or |hyperrefdefs=false|) is specified.  If you would
+% like to use these commands but not load the |hyperref| package, consider using
+% |hyperrefdefs=noload|.
+% 
 %
 % \DescribeMacro{\phfnotePdfLinkColor} The command |\phfnotePdfLinkColor| may by
 % used to set the color of the links.  It takes one argument, a color
@@ -893,6 +1018,9 @@
 %   of a package set as long as you're not using the option |pkgset=none|;
 %   see \autoref{sec:package-sets}.)
 % \end{pkgnote}
+%
+% The internal name for the link color is |docnotelinkcolor|.  (This is
+% historical, and I'm not going to change it.)
 %
 %
 % \subsection{Bibliography Definitions}
@@ -909,11 +1037,12 @@
 % Finally, an entry in the table of contents is generated.
 %
 % \begin{pkgoptions}
-% \item[bibliographydefs=true] Load the \pkgname{hyperref} package, and set some sensible
-%   settings.  Also ensures the |\email| and |\url| commands are made available.
-% \item[bibliographydefs=false] Do not load the \pkgname{hyperref} package, do not set
-%   sensible settings.
-% \item[nobibliographydefs] Same as |bibliographydefs=false|.
+% \item[bibliographydefs] Set some default bibliography settings.
+%
+%   This feature is on by default.  You can also use |bibliographydefs=true|.
+%
+% \item[nobibliographydefs] Do not set some bibliography settings.  You may also
+%   use |bibliographydefs=false|.
 % \end{pkgoptions}
 %
 % \DescribeMacro{\bibliography} \DescribeMacro{\bibliographystyle} The
@@ -1011,7 +1140,7 @@
 % Note that in contrast to optional
 % arguments in most LaTeX macros, the argument is allowed to contain matching
 % square brackets, for instance \relax%
-% |\AlE[this works [as you'd expect]]| \AlE[this [works] as you'd expect]
+% |\AlE[this works [as you'd expect]]| \AlE[this works [as you'd expect]]
 %
 % In any case you can protect the argument as usual with curly braces:
 % |\AlE[{this is [weird}]| \AlE[{this is [weird}]
@@ -1097,17 +1226,16 @@
 % \end{cmdoptions}
 % 
 % After invoking |\phfMakeCommentingCommand|, the colors |xxxcolor|,
-% |xxxrmcolor| and |xxxrmcolorlink| are automatically defined (of
-% course, replace |xxx| with your commenting macro name).  These are
-% used respectively for a usual comment color, text to be removed, and
-% for links in text to be removed (requires package option
-% |hyperrefdefs=true|).  You may redefine these colors afterwards with
-% |\colorlet| if you wish:
+% |xxxrmcolor| and |xxxrmcolorlink| are automatically defined (of course,
+% replace |xxx| with your commenting macro name).  These are used respectively
+% for a usual comment color, text to be removed, and for links in text to be
+% removed.  You may redefine these colors afterwards with |\colorlet| if you
+% wish:
 % \begin{verbatim}
 % \colorlet{AlErmcolor}{gray}
 % \end{verbatim}
 %
-% \changed[chg-inline-commenting]{v1.1}{2018/10/03}{Added support for inline
+% \changed[chg-inline-commenting]{v3.0}{2018/10/03}{Added support for inline
 % commenting using \phfverb\phfMakeCommentingCommand}
 %
 %
@@ -1226,7 +1354,7 @@
     \ifcsname #1\next\endcsname%
       \csname #1\next\endcsname%
     \else%
-      \PackageWarning{phfnote}{Unknown #2: '\next'. Ignoring.}
+      \PackageError{phfnote}{Unknown #2: '\next'. Ignoring.}
     \fi
   }
 }
@@ -1367,14 +1495,22 @@
 %   This simply takes all the tokens collected in |\phfnote@mpfootmaterial| (see just
 %   above), and typesets it in the |\@mpfootins| box.  The latter is automatically typeset
 %   by the minipage in |\end{minipage}|.
+%
+%   The argument |#1| is the skip length between the text and the footnotes.
 %  \begin{macrocode}
-\def\phfnote@finalizempfootnotes{%
-  \global\setbox\@mpfootins=\vbox{%
-    \parskip=0pt\parindent=0pt\parshape 1 0.04\textwidth 0.96\textwidth\relax%
-    \noindent\leavevmode%
-    \reset@font\footnotesize%
-    \phfnote@fmt@titlefootnotes%
-    \phfnote@mpfootmaterial}%
+\def\phfnote@finalizempfootnotes#1{%
+  \if\relax\detokenize\expandafter{\phfnote@mpfootmaterial}\relax
+  \else
+    \global\skip\@mpfootins=#1\relax
+    \global\setbox\@mpfootins=\vbox{%
+      \parskip=\z@\relax
+      \parindent=\z@\relax
+      \parshape 1 0.04\textwidth 0.96\textwidth\relax%
+      \noindent\leavevmode%
+      \reset@font\footnotesize%
+      \phfnote@fmt@titlefootnotes%
+      \phfnote@mpfootmaterial}%
+  \fi
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1457,12 +1593,108 @@
 %
 % \paragraph{Title style: `default'}
 %
-% Implementation our main `default' title style.  See \autoref{sec:main-default-title-style}.
+% Implementation our main `default' title style.  See
+% \autoref{sec:main-default-title-style}.
 %
 % \begin{macro}{\notetitle@style@default}
 %    The default title style.  Nothing mysterious, hopefully.
 %    \begin{macrocode}
 \newcommand{\notetitle@style@default}{%
+  \begingroup
+    \parskip=\z@\relax
+    \parindent=\z@\relax
+    \phfnote@titledefault@ismultiparfalse
+    \gdef\phfnote@tmp@nextskip{\z@}%
+    \par\raggedright
+    \phfnote@setupthanksmpfootnote
+    \vspace*{\notetitletopspace}%
+    \phfnote@title@checksetspace{default}%
+    \begin{minipage}{\textwidth}%
+      \begin{singlespace}%
+        {\par
+          \let\phfnote@old@par\par
+          \notetitle@titledefault@preparetitle{\expandafter\notetitlefont\expandafter{\@title}}%
+          \phfnote@old@par
+          \ifphfnote@titledefault@ismultipar
+            \vspace{\parskip}%
+            \gdef\phfnote@tmp@nextskip{\z@}%
+          \else
+            \gdef\phfnote@tmp@nextskip{\notetitleinnervsep}%
+          \fi
+        }%
+        \if\relax\detokenize\expandafter{\@author}\relax\else
+          \vspace{2\dimexpr\phfnote@tmp@nextskip\relax}%
+          \parshape 1 0.04\textwidth 0.96\textwidth\relax
+          \strut{\expandafter\notetitleauthorfont\expandafter{\@author}}\par
+          \gdef\phfnote@tmp@nextskip{\notetitleinnervsep}%
+        \fi
+        \if\relax\detokenize\expandafter{\@date}\relax\else
+          \vspace{\phfnote@tmp@nextskip}%
+          \parshape 1 0.04\textwidth 0.96\textwidth\relax
+          \strut{\expandafter\notetitledatefont\expandafter{\@date}}\par
+          \gdef\phfnote@tmp@nextskip{\notetitleinnervsep}%
+        \fi
+        \global\let\@thanks\@empty
+        \phfnote@finalizempfootnotes{\phfnote@tmp@nextskip}%
+      \end{singlespace}%
+    \end{minipage}\par
+    \vspace*{\notetitleinnervsep}%
+    \notetitlehrule\relax
+    \par
+  \endgroup
+  \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% Some helpers for the default title style.
+%
+% \begin{macro}{\ifphfnote@titledefault@ismultipar}
+%   This flag registers whether or not the title has multiple paragraphs (and
+%   thus renders on several spaced lines).  It is set to |true| by redefining
+%   the |\par| command in the title (see |\notetitle@titledefault@preparetitle|
+%   below).
+%    \begin{macrocode}
+\newif\ifphfnote@titledefault@ismultipar
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\notetitle@titledefault@preparetitle}
+%   This helper sets everything up to display the title.  It redefines |\par| to
+%   register that the title has several paragraphs.  Also, note that |\parskip|
+%   is inserted in |\leavevmode|, so that setting |\parskip| as below only
+%   affects subsequent paragraphs.
+%
+%   To change the parskip amount, you may simply patch this command, e.g., as
+%   |\appto\notetitle@titledefault@preparetitle{\parskip=1.2ex\relax}|.
+%    \begin{macrocode}
+\newcommand\notetitle@titledefault@preparetitle{%
+  \def\par{\phfnote@old@par\global\phfnote@titledefault@ismultipartrue}
+  \leavevmode\parskip=1.5ex\relax
+  \Large}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\notetitleinnervsep}
+%   Controls the vertical spacing between individual elements of the title.
+%    \begin{macrocode}
+\newcommand\notetitleinnervsep{1.2ex}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \paragraph{Title style: `defaultv1'}
+%
+% \begin{macro}{\notetitle@style@defaultv1}
+%   The default title style, copied from \pkgname{phfnote} v1.0.  DO NOT
+%   CHANGE.  Kept only for backwards compatibility, in case someone had spent
+%   lots of time fine-tuning their title and patching the v1 of this package, or
+%   if they want the document to appear exactly as the v1 of the package.
+%
+%   [We need to use |\csdef| because of the ``1'' in the title name, which is
+%   not valid in an \TeX{} usual escape sequence (!!)]
+%    \begin{macrocode}
+\csdef{notetitle@style@defaultv1}{%
   \begingroup\par\raggedright%
     \phfnote@setupthanksmpfootnote%
     \vspace*{\notetitletopspace}%
@@ -1488,7 +1720,7 @@
           \vskip 2mm\relax%
         \fi
         \global\let\@thanks\@empty%
-        \phfnote@finalizempfootnotes%
+        \csname phfnote@finalizempfootnotes@v1\endcsname%
       \end{singlespace}%
     \end{minipage}\par%
     \vspace*{2mm}%
@@ -1496,6 +1728,14 @@
     \par%
   \endgroup%
   \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
+}
+\csdef{phfnote@finalizempfootnotes@v1}{%
+  \global\setbox\@mpfootins=\vbox{%
+    \parskip=0pt\parindent=0pt\parshape 1 0.04\textwidth 0.96\textwidth\relax%
+    \noindent\leavevmode%
+    \reset@font\footnotesize%
+    \phfnote@fmt@titlefootnotes%
+    \phfnote@mpfootmaterial}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1512,9 +1752,10 @@
   \begingroup\par\raggedright%
     \let\footnote\thanks%
     \vspace*{\notetitletopspace}%
-    {\notetitlefont \@title}%
-    \hfill\makebox{\fontsize{9pt}{10pt}\selectfont {\notetitleauthorfont \@author}%
-      \hspace*{2mm}--\hspace*{2mm}{\emph{\notetitledatefont \@date}}}%
+    {\expandafter\notetitlefont\expandafter{\@title}}%
+    \hfill\makebox{\fontsize{9pt}{10pt}\selectfont
+      {\expandafter\notetitleauthorfont\expandafter{\@author}}%
+      \hspace*{2mm}--\hspace*{2mm}{\emph{\expandafter\notetitledatefont\expandafter{\@date}}}}%
     \vspace*{1mm}\notetitlehrule\relax\vspace*{1mm}%
     \par%
   \endgroup%
@@ -1571,34 +1812,44 @@
 %    \begin{macrocode}
 \def\phfnote@do@notetitle#1{
 %    \end{macrocode}
-% If we have an empty title style, then we leave default title provided by the class. 
+% If we have the title style |false|, or an empty title style, then we leave
+% default title provided by the class.
 %    \begin{macrocode}
-  \if\relax\detokenize\expandafter{#1}\relax
-  \else
+  \ifstrequal{#1}{false}{}{%
+    \if\relax\detokenize\expandafter{#1}\relax
+    \else
 %    \end{macrocode}
 % Otherwise, we have a title style to set.  Do some checks that the given style is indeed
 % defined.
 %    \begin{macrocode}
-    \ifcsname notetitle@style@#1\endcsname
-      \def\phfnote@tmp@titsty{#1}%
-    \else
-      \PackageError{phfnote}{Unknown title style: '#1'.}{Unknown title
-        style: '#1'. Please consult the package documentation for available
-        styles.}
-      \def\phfnote@tmp@titsty{default}%
-    \fi
+      \ifcsname notetitle@style@#1\endcsname
+        \def\phfnote@tmp@titsty{#1}%
+      \else
+        \PackageError{phfnote}{Unknown title style: '#1'.}{Unknown title
+          style: '#1'. Please consult the package documentation for available
+          styles.}
+        \def\phfnote@tmp@titsty{default}%
+      \fi
 %    \end{macrocode}
 % Apply new (default) definitions of |\thanks|, |\thanksmark| and |\title|.  Do this here
 % only, because this can clash with more complicated versions from, e.g., \RevTeX.
 %    \begin{macrocode}
-    \let\title\notetitle@title
-    \let\thanks\notetitle@thanks
-    \let\thanksmark\notetitle@thanksmark
+      \let\title\notetitle@title
+      \let\thanks\notetitle@thanks
+      \let\thanksmark\notetitle@thanksmark
+%    \end{macrocode}
+% Also, LaTeX initializes |\@author| with code that generates a warning that no
+% author is given.  We don't want that.  It's perfectly fine not to have an
+% author, and in this case this must be empty so that our title routines can
+% properly handle this case.
+%    \begin{macrocode}
+      \def\@author{}%
 %    \end{macrocode}
 % Now, actually overload the title style by redefining |\@maketitle|.
 %    \begin{macrocode}
-    \def\@maketitle{\csname notetitle@style@\phfnote@tmp@titsty\endcsname}
-  \fi
+      \def\@maketitle{\csname notetitle@style@\phfnote@tmp@titsty\endcsname}%
+    \fi
+  }%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1712,12 +1963,14 @@
 %   This helper both defines the |abstract| environment, and also sets the abstract
 %   attributes.  This macro will be called according to the package options.
 %
-%  |#1| = a comma-separated list of attributes.
+%  |#1| = a comma-separated list of attributes, or the string |false|.
 %    \begin{macrocode}
-\def\phfnote@do@noteabstract#1{
-  \let\abstract\noteabstract
-  \let\endabstract\endnoteabstract
-  \phfnote@internal@execattribs{noteabstract@attr@}{abstract attribute}{#1}
+\def\phfnote@do@noteabstract#1{%
+  \ifstrequal{#1}{false}{}{%
+    \let\abstract\noteabstract
+    \let\endabstract\endnoteabstract
+    \phfnote@internal@execattribs{noteabstract@attr@}{abstract attribute}{#1}
+  }%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1834,17 +2087,21 @@
 % \end{macro}
 % 
 % 
-% \begin{macro}{\phfnote@do@pagegeomdefs}
-%   Finally, provide a helper to set the page geometry.  Just call the right macro.
+% \begin{macro}{\phfnote@do@pagegeom}
+%   Finally, provide a helper to set the page geometry.  Just call the right
+%   macro.  If the argument is |false|, don't do anything.
 %    \begin{macrocode}
-\newcommand{\phfnote@do@pagegeomdefs}[1]{
-  \ifcsname phfnote@pagegeomstyle@#1\endcsname
-    \csname phfnote@pagegeomstyle@#1\endcsname
-  \else
-    \PackageWarning{phfnote}{Unknown page geometry style: `#1'!}
-  \fi
-
-  \RequirePackage{geometry}%
+\newcommand{\phfnote@do@pagegeom}[1]{
+  \ifstrequal{#1}{false}{}{%
+    \message{phfnote: Setting page geometry style #1}%
+    \ifcsname phfnote@pagegeomstyle@#1\endcsname
+      \csname phfnote@pagegeomstyle@#1\endcsname
+    \else
+      \PackageWarning{phfnote}{Unknown page geometry style: `#1'!}%
+    \fi
+    %
+    \RequirePackage{geometry}%
+  }%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1864,36 +2121,38 @@
 %   Also set an |\emergencystretch| so that lines get spaced out for underfull boxes,
 %   rather than overflowing far into the margin.
 %    \begin{macrocode}
-\def\phfnote@do@spacing{
-  \@ifpackageloaded{setspace}{
-    \def\phfnote@dostretch##1{%
-      \setstretch{##1}\phfnote@docaptionstretch{##1}}
-  }{
-    \def\phfnote@dostretch##1{%
-      \renewcommand\baselinestretch{##1}\phfnote@docaptionstretch{##1}}
-  }
-  \@ifpackageloaded{caption}{
-    \def\phfnote@docaptionstretch##1{\captionsetup{font={stretch=##1}}}
-  }{
-    \def\phfnote@docaptionstretch##1{\PackageWarning{phfnote}{Can't
-        set line spacing for captions, because the package `caption'
-        is not loaded.  Please load it before `phfnote', or use an
-        appropriate (e.g. `rich') pkgset which loads this package
-        automatically .}}
-  }
-  \if@twocolumn
-    \phfnote@dostretch{1.0} % leave default
-    \emergencystretch=3em\relax
-  \else
-    \ifcase\@ptsize% 10pt
-      \phfnote@dostretch{1.1}
-    \or% 11pt
-      \phfnote@dostretch{1.0} % 1.05? better 1.0...
-    \or% 12pt
-      \phfnote@dostretch{1.0} % 1.03? not really noticeable...
+\def\phfnote@do@spacingdefs#1{
+  \ifstrequal{#1}{false}{}{%
+    \@ifpackageloaded{setspace}{
+      \def\phfnote@dostretch##1{%
+        \setstretch{##1}\phfnote@docaptionstretch{##1}}
+    }{
+      \def\phfnote@dostretch##1{%
+        \renewcommand\baselinestretch{##1}\phfnote@docaptionstretch{##1}}
+    }
+    \@ifpackageloaded{caption}{
+      \def\phfnote@docaptionstretch##1{\captionsetup{font={stretch=##1}}}
+    }{
+      \def\phfnote@docaptionstretch##1{\PackageWarning{phfnote}{Can't
+          set line spacing for captions, because the package `caption'
+          is not loaded.  Please load it before `phfnote', or use an
+          appropriate pkgset (e.g. `rich') which loads this package
+          automatically.}}
+    }
+    \if@twocolumn
+      \phfnote@dostretch{1.0} % leave default
+      \emergencystretch=3em\relax
+    \else
+      \ifcase\@ptsize% 10pt
+        \phfnote@dostretch{1.1}
+      \or% 11pt
+        \phfnote@dostretch{1.0} % 1.05? better 1.0...
+      \or% 12pt
+        \phfnote@dostretch{1.0} % 1.03? not really noticeable...
+      \fi
+      \emergencystretch=6em\relax
     \fi
-    \emergencystretch=6em\relax
-  \fi
+  }
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1927,11 +2186,13 @@
 %   |skip|.
 %    \begin{macrocode}
 \def\phfnote@do@par#1{%
-  \ifcsname phfnote@par@#1\endcsname
-    \csname phfnote@par@#1\endcsname
-  \else
-    \PackageWarning{phfnote}{Bad paragraph setting: #1. Leaving original}
-  \fi
+  \ifstrequal{#1}{false}{}{%
+    \ifcsname phfnote@par@#1\endcsname
+      \csname phfnote@par@#1\endcsname
+    \else
+      \PackageWarning{phfnote}{Bad paragraph setting: #1. Leaving original}
+    \fi
+  }
 }
 %    \end{macrocode}
 % \end{macro}
@@ -2061,12 +2322,14 @@
 % 
 %
 % \begin{macro}{\phfnote@do@secfmt}
-%   Actually perform the required styling, according to the package
-%   options given as argument.  The argument is a comma-separated list
-%   of attributes specified by the user.
+%   Actually perform the required styling, according to the package options
+%   given as argument.  The argument is a comma-separated list of attributes
+%   specified by the user, or the string |false|.
 %    \begin{macrocode}
 \def\phfnote@do@secfmt#1{%
-  \phfnote@internal@execattribs{phfnote@do@secfmt@}{section formatting preset}{#1}
+  \ifstrequal{#1}{false}{}{%
+    \phfnote@internal@execattribs{phfnote@do@secfmt@}{section formatting preset}{#1}%
+  }
 }
 %    \end{macrocode}
 % \end{macro}
@@ -2181,68 +2444,97 @@
 %   The name `|docnotelinkcolor|' is historical and hard-coded in many
 %   other files I've used, so I'm DEFINITELY NOT changing it.
 % \end{pkgnote}
-% 
-% \needspace{3\baselineskip}
-% \begin{macro}{\phfnote@do@pdfhyperrefdefs}
-% \begin{macro}{\email}
-% \begin{macro}{\url}
-%   Load the \pkgname{hyperref} package and provide sensible defaults.
+%
+%
+%
+% Helpers---default set of hyperref options, and other helper macros.
 %    \begin{macrocode}
-\newcommand{\phfnote@do@pdfhyperrefdefs}{%
-%    \end{macrocode}
-% Make sure a color-managing package is loaded, {color} or {xcolor}, and define our default color:
-%    \begin{macrocode}
-  \phfnote@requirecolorpackage%
-  \definecolor{docnotelinkcolor}{rgb}{0,0,0.4}%
-%    \end{macrocode}
-% 
-% Load the \pkgname{url} package, and save a version of |\url| which is not
-% patched by \pkgname{hyperref}:
-%    \begin{macrocode}
-  \RequirePackage{url}%
-  \DeclareUrlCommand\phfnote@format@url{}%
-%    \end{macrocode}
-% 
-% Set up \pkgname{hyperref} options:
-%    \begin{macrocode}
-  \PassOptionsToPackage{unicode=true,bookmarks=true,backref=false}{hyperref}%
+\def\phfnote@hyperrefdefs@val@options{%
+  bookmarksnumbered=false,bookmarksopen=false,bookmarksopenlevel=1,%
+  breaklinks=true,pdfborder={0 0 0},colorlinks=true,%
+  anchorcolor=docnotelinkcolor,citecolor=docnotelinkcolor,%
+  filecolor=docnotelinkcolor,linkcolor=docnotelinkcolor,%
+  menucolor=docnotelinkcolor,runcolor=docnotelinkcolor,%
+  urlcolor=docnotelinkcolor%
+}%
+\def\phfnote@hyperrefdefs@deferredhypersetup#1{\AtBeginDocument{\hypersetup{#1}}}
+\providecommand\phfnote@hyperrefdefs@dopkgoptions{%
+  \PassOptionsToPackage{unicode=true}{hyperref}
+}
+\def\phfnote@hyperrefdefs@loadhyperref{%
+    \phfnote@hyperrefdefs@dopkgoptions
+    \RequirePackage{hyperref}}
+\def\phfnote@hyperrefdefs@provideemail{\let\email\phfnote@email}
+\def\phfnote@hyperrefdefs@afterhook{}
 %    \end{macrocode}
 %
-% Give the option to the user of loading the \pkgname{hyperref} package manually
-% later, when desired.  But still in that case, allow user code to use
-% |\hypersetup|, by hooking to |\AfterPreamble| (see \pkgname{etoolbox}, it's
-% like |\AtBeginDocument| but does not fail if called in the document).
+% Define the attributes that can be set for hyperref-related options.  See
+% \autoref{sec:hyperrefdefs}.
+%
 %    \begin{macrocode}
-  \ifphfnote@opt@hyperrefdefer
-    \def\hypersetup##1{\AtBeginDocument{\hypersetup{##1}}}%
-  \else
-    \RequirePackage{hyperref}
-  \fi
-  \hypersetup{%
-    bookmarksnumbered=false,bookmarksopen=false,bookmarksopenlevel=1,%
-    breaklinks=true,pdfborder={0 0 0},colorlinks=true}%
-  \hypersetup{%
-    anchorcolor=docnotelinkcolor,citecolor=docnotelinkcolor,%
-    filecolor=docnotelinkcolor,linkcolor=docnotelinkcolor,%
-    menucolor=docnotelinkcolor,runcolor=docnotelinkcolor,%
-    urlcolor=docnotelinkcolor}%
+\def\phfnote@do@hyperrefdefs@true{}% for explicit value "hyperrefdefs=true"
+\def\phfnote@do@hyperrefdefs@defer{
+  \def\phfnote@hyperrefdefs@loadhyperref{%
+    \phfnote@hyperrefdefs@dopkgoptions
+    \let\hypersetup\phfnote@hyperrefdefs@deferredhypersetup}
+}
+\def\phfnote@do@hyperrefdefs@clearoptions{
+  \def\phfnote@hyperrefdefs@val@options{}
+}
+\def\phfnote@do@hyperrefdefs@noemail{
+  \def\phfnote@hyperrefdefs@provideemail{}
+}
+\def\phfnote@do@hyperrefdefs@noload{
+  \def\phfnote@hyperrefdefs@loadhyperref{}
+  \let\hypersetup\@gobble
+}
 %    \end{macrocode}
-% 
-% Provide an |\email| command for specifying e-mails.  Note that the |\url| command is
-% already provided by the packages \pkgname{url} and \pkgname{hyperref}.
+%
+%
+% \begin{macro}{\phfnote@do@hyperrefdefs}
+% \begin{macro}{\email}
+% \begin{macro}{\url}
+%   Do all stuff related to hyperref.
 %    \begin{macrocode}
-  \let\email\phfnote@email%
+\def\phfnote@do@hyperrefdefs#1{%
+  \ifstrequal{#1}{false}{}{%
 %    \end{macrocode}
-% 
-% And finally set a nicer default |\url|/|\email| style:
+% Make sure a color-managing package is loaded, {color} or {xcolor}, and define
+% our default link color:
 %    \begin{macrocode}
-  \urlstyle{notesf}%
+    \phfnote@requirecolorpackage%
+    \definecolor{docnotelinkcolor}{rgb}{0,0,0.4}%
+%    \end{macrocode}
+% Load the \pkgname{url} package, and save a version of |\url| which is not
+% patched by \pkgname{hyperref} to format URLs, and provide |\phfnoteEmail| for
+% emails (not |\email| right away because it might conflict with RevTeX. Provide
+% |\email| later after parsing attribs):
+%    \begin{macrocode}
+    \RequirePackage{url}%
+    \DeclareUrlCommand\phfnote@format@url{}%
+    \let\phfnoteEmail\phfnote@email
+%    \end{macrocode}
+%
+% Set up everything according to the user's selected attributes.
+%    \begin{macrocode}
+    \phfnote@internal@execattribs{phfnote@do@hyperrefdefs@}{phfnote hyperref-related option}{#1}%
+%    \end{macrocode}
+%
+% And now, load the hyperref package (or don't, if it's deferred), and set some
+% options.
+%    \begin{macrocode}
+    \phfnote@hyperrefdefs@loadhyperref
+    \expandafter\hypersetup\expandafter{\phfnote@hyperrefdefs@val@options}
+    \phfnote@hyperrefdefs@provideemail
+    \urlstyle{notesf}
+    \phfnote@hyperrefdefs@afterhook
+  }
 }
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
 % \end{macro}
-% 
+%
 % \begin{macro}{\phfnotePdfLinkColor}
 %   Set links color.  Use as |\phfnotePdfLinkColor|\marg{color}.
 %   Color may be any color name or specification recognized by the
@@ -2268,9 +2560,12 @@
 %   Provide base macros to be able to build up |\email| command for emails and other
 %   URL-like commands which should sanitize their arguments.
 %
-%   Also prepare the command |\phfnote@email| which will be renamed |\email| in our
+%   Also prepare the command |\phfnoteEmail| which will be renamed |\email| in our
 %   \pkgname{hyperref} package setup (see above).
 % 
+%   NOTE: The commands |\phfnote@email| and |\phfnote@format@url| will only work
+%   if you don't have |hyperrefdefs=false|.  They will work with
+%   |hyperrefdefs=noload| if you don't want to load the |hyperref| package.
 %    \begin{macrocode}
 \def\phfnote@sanitize@url{%
   \catcode`\$12%
@@ -2283,7 +2578,6 @@
   % \catcode`\^^M10%  newline = space
   \relax%
 }%
-\providecommand\phfnote@format@url{\texttt}
 \def\phfnote@email{\begingroup\phfnote@sanitize@url\phfnote@impl@email@}%
 \def\phfnote@impl@email@#1{\endgroup\href{mailto:#1}{\phfnote@format@url{#1}}}%
 %    \end{macrocode}
@@ -2317,14 +2611,21 @@
 %   encoding which is better.  Also, use Computer Modern Bright as
 %   sans-serif font by default instead of Computer Modern Sans Serif.
 %
+%   If on Xe\TeX{} or Lua\TeX{}, don't do anything.
+%
 %    \begin{macrocode}
-\def\phfnote@do@fontdefs{
- 
-  \PassOptionsToPackage{T1}{fontenc}
-  \RequirePackage{fontenc}
-
-  \renewcommand\sfdefault{cmbr}
-  
+\def\phfnote@do@fontdefs#1{
+  \ifstrequal{#1}{false}{}{%
+    \RequirePackage{iftex}
+    \let\phfnote@tmp@do\@firstofone
+    \ifXeTeX \let\phfnote@tmp@do\@gobble \fi
+    \ifLuaTeX \let\phfnote@tmp@do\@gobble \fi
+    \phfnote@tmp@do{
+      \PassOptionsToPackage{T1}{fontenc}
+      \RequirePackage{fontenc}
+      \renewcommand\sfdefault{cmbr}
+    }
+  }
 }
 %    \end{macrocode}
 % \end{macro}
@@ -2381,6 +2682,11 @@
 %    \begin{macrocode}
     \providecommand\eprint[2][]{\href{http://arxiv.org/abs/##2}{arXiv:##2}}
 %    \end{macrocode}
+%
+% Fix for RevTeX styles that use |\doibase| with a newline following them ---
+%    \begin{macrocode}
+    \providecommand\doibase{\phfnote@doibasefix}
+%    \end{macrocode}
 % 
 % Relay the call to the ``old'' |\bibliography| command to actually implement the
 % bibliography.
@@ -2388,6 +2694,7 @@
     \phfnote@old@bibliography{#1}%
   \endgroup%
 }
+\def\phfnote@doibasefix#110.{https://doi.org/10.}
 %    \end{macrocode}
 % \end{macro}
 % \begin{macro}{\phfnote@bibliographystyle}
@@ -2407,9 +2714,11 @@
 % \begin{macro}{\phfnote@do@bibliographydefs}
 %   Make our changes live.  Will be called later according to package options.
 %    \begin{macrocode}
-\def\phfnote@do@bibliographydefs{%
-  \let\bibliographystyle\phfnote@bibliographystyle%
-  \let\bibliography\phfnote@bibliography%
+\def\phfnote@do@bibliographydefs#1{%
+  \ifstrequal{#1}{false}{}{%
+    \let\bibliographystyle\phfnote@bibliographystyle%
+    \let\bibliography\phfnote@bibliography%
+  }
 }
 %    \end{macrocode}
 % \end{macro}
@@ -2422,14 +2731,16 @@
 %   Adjust the formatting of footnotes so they look better.  Again,
 %   this is called later according to the package options.
 %    \begin{macrocode}
-\def\phfnote@do@footnotedefs{
-  \let\phfnote@orig@makefnmark\@makefnmark
-%%  \def\@makefnmark{\hbox{\@textsuperscript{%
-%%      \normalfont\tiny\fontseries{sb}\selectfont\@thefnmark}}}
-  \def\@makefnmark{\hbox{\@textsuperscript{%
-        \normalfont\tiny\bfseries\@thefnmark}}}
-%%  \def\@makefnmark{\hbox{\@textsuperscript{%
-%%      \normalfont\scriptsize\bfseries\@thefnmark}}}% too large
+\def\phfnote@do@footnotedefs#1{
+  \ifstrequal{#1}{false}{}{%
+    \let\phfnote@orig@makefnmark\@makefnmark
+%%    \def\@makefnmark{\hbox{\@textsuperscript{%
+%%        \normalfont\tiny\fontseries{sb}\selectfont\@thefnmark}}}
+    \def\@makefnmark{\hbox{\@textsuperscript{%
+          \normalfont\tiny\bfseries\@thefnmark}}}
+%%    \def\@makefnmark{\hbox{\@textsuperscript{%
+%%        \normalfont\scriptsize\bfseries\@thefnmark}}}% too large
+  }
 }
 %    \end{macrocode}
 % \end{macro}
@@ -3017,6 +3328,7 @@
 % See \autoref{sec:title-styles}.
 %    \begin{macrocode}
 \DeclareStringOption[default]{title}
+\DeclareVoidOption{notitle}{\def\phfnote@opt@title{false}}
 %    \end{macrocode}
 % 
 %
@@ -3024,6 +3336,7 @@
 % \phfverb{[abstract=...]}}  (\autoref{sec:abstract-attributes}).
 %    \begin{macrocode}
 \DeclareStringOption[]{abstract}
+\DeclareVoidOption{noabstract}{\def\phfnote@opt@abstract{false}}
 %    \end{macrocode}
 %
 % Option for Package sets \marginpar{\raggedleft \phfverb{[pkgset=...]}}
@@ -3036,67 +3349,67 @@
 % \phfverb{[pagegeomdefs=...]}} \marginpar{\raggedleft \phfverb{[pagegeom=...]}}
 % See \autoref{sec:pagegeomdefs}.
 %    \begin{macrocode}
+\DeclareStringOption[default]{pagegeom}
+\DeclareVoidOption{nopagegeom}{\def\phfnote@opt@pagegeom{false}}
+%    \end{macrocode}
+%
+% Obsolete options---
+%    \begin{macrocode}
 \DeclareBoolOption[true]{pagegeomdefs}
 \DeclareComplementaryOption{nopagegeomdefs}{pagegeomdefs}
-\DeclareStringOption[default]{pagegeom}
 %    \end{macrocode}
+% ---we handle these as follows. By default, |\ifphfnote@opt@pagegeomdefs| is
+% true. If it isn't, that means it was overridden and we need to respect that.
 % 
-%
 %
 % Styling of section headings.  \marginpar{\raggedleft \phfverb{[secfmt=...]}}
 % See \autoref{sec:secfmt}.
 %    \begin{macrocode}
 \DeclareStringOption[section]{secfmt}
+\DeclareVoidOption{nosecfmt}{\def\phfnote@opt@secfmt{false}}
 %    \end{macrocode}
 %
 % How to treat paragraphs.  \marginpar{\raggedleft \phfverb{[par=...]}} See
 % \autoref{sec:par-defs}.
 %    \begin{macrocode}
 \DeclareStringOption[skip]{par}
+\DeclareVoidOption{nopar}{\def\phfnote@opt@par{false}}
 %    \end{macrocode} 
 % 
 % Add definitions to adjust spacing of lines and words. \marginpar{\raggedleft
 % \phfverb{[spacingdefs=...]}}  See \autoref{sec:spacingdefs}.
 %    \begin{macrocode}
-\DeclareBoolOption[true]{spacingdefs}
-\DeclareComplementaryOption{nospacingdefs}{spacingdefs}
+\DeclareStringOption[true]{spacingdefs}
+\DeclareVoidOption{nospacingdefs}{\def\phfnote@opt@spacingdefs{false}}
 %    \end{macrocode}
+%
 %
 % Do some adjustments to the fonts. \marginpar{\raggedleft
 % \phfverb{[fontdefs=...]}} See \autoref{sec:fontdefs}.
 %    \begin{macrocode}
-\DeclareBoolOption[true]{fontdefs}
-\DeclareComplementaryOption{nofontdefs}{fontdefs}
+\DeclareStringOption[true]{fontdefs}
+\DeclareVoidOption{nofontdefs}{\def\phfnote@opt@fontdefs{false}}
 %    \end{macrocode}
 %
 % Adjustments for footnotes. \marginpar{\raggedleft
 % \phfverb{[footnotedefs=...]}}  See \autoref{sec:footnotedefs}.
 %    \begin{macrocode}
-\DeclareBoolOption[true]{footnotedefs}
-\DeclareComplementaryOption{nofootnotedefs}{footnotedefs}
+\DeclareStringOption[true]{footnotedefs}
+\DeclareVoidOption{nofootnotedefs}{\def\phfnote@opt@footnotedefs{false}}
 %    \end{macrocode}
 %
 % Load \pkgname{hyperref} and corresponding definitions. \marginpar{\raggedleft
 % \phfverb{[hyperrefdefs=...]}} See \autoref{sec:hyperrefdefs}.
 %    \begin{macrocode}
-\DeclareBoolOption[true]{hyperrefdefs}
-\DeclareComplementaryOption{nohyperrefdefs}{hyperrefdefs}
-%    \end{macrocode}
-%
-% Do not load \pkgname{hyperref} right away, leave the opportunity to import
-% other packages first. Hyperref will be imported manually with
-% |\usepackage{hyperref}|. |\hypersetup| may still be used, and simply defers
-% the settings to later at package load. \marginpar{\raggedleft
-% \phfverb{[hyperrefdefer=...]}} See \autoref{sec:hyperrefdefs}.
-%    \begin{macrocode}
-\DeclareBoolOption[false]{hyperrefdefer}
+\DeclareStringOption[]{hyperrefdefs}[]
+\DeclareVoidOption{nohyperrefdefs}{\def\phfnote@opt@hyperrefdefs{false}}
 %    \end{macrocode}
 %
 % Adjustments for bibliography, including default style. \marginpar{\raggedleft
 % \phfverb{[bibliographydefs=...]}} See \autoref{sec:bibliographydefs}.
 %    \begin{macrocode}
-\DeclareBoolOption[true]{bibliographydefs}
-\DeclareComplementaryOption{nobibliographydefs}{bibliographydefs}
+\DeclareStringOption[true]{bibliographydefs}
+\DeclareVoidOption{nobibliographydefs}{\def\phfnote@opt@bibliographydefs{false}}
 %    \end{macrocode}
 % 
 % 
@@ -3123,6 +3436,22 @@
 }
 %    \end{macrocode}
 %
+%
+%
+% Small utility to deal with obsolete |XXXdefs=true/false| options.  If the
+% (obsolete) bool option |#1| is set to false (which means it was set
+% explicitly, so this must be respected), then emit a package warning and set
+% option |#2| (the regular option) to the string value |false|.
+%    \begin{macrocode}
+\def\phfnote@ifpkgoptfalsesetfalse#1#2{%
+  \edef\x{%
+    \expandafter\noexpand\csname ifphfnote@opt@#1\endcsname\noexpand\else
+      \noexpand\PackageWarning{phfnote}{Option #1 is obsolete. Please use "#2=false'' instead.}%
+      \noexpand\csgdef{phfnote@opt@#2}{false}\noexpand\fi}%
+  \x
+}
+%    \end{macrocode}
+% 
 % \subsubsection{Define Global Presets}
 % \label{impl:presets}
 %
@@ -3155,7 +3484,7 @@
 \newcommand\phfnote@presetcommon@xnote[1][noteitsf]{
   \def\phfnote@opt@title{default}
   \def\phfnote@opt@par{skip}
-  \phfnote@opt@pagegeomdefstrue
+  %\phfnote@opt@pagegeomdefstrue
   \def\phfnote@opt@pagegeom{wide}
   \setlength{\footnotesep}{5pt}
   \g@addto@macro\phfnote@hook@atendload{
@@ -3177,8 +3506,8 @@
 %    \begin{macrocode}
 \def\phfnote@preset@sfnote{
   \phfnote@presetcommon@xnote
-  \phfnote@opt@footnotedefstrue
-  \phfnote@opt@fontdefstrue
+  \def\phfnote@opt@footnotedefs{true}
+  \def\phfnote@opt@fontdefs{true}
   \renewcommand\familydefault{\sfdefault}
   \renewcommand{\notesectionallfontfamily}{\sfdefault}
 }
@@ -3190,7 +3519,7 @@
 %    \end{macrocode}
 % \ldots but override:
 %    \begin{macrocode}
-  \phfnote@opt@fontdefsfalse
+  \def\phfnote@opt@fontdefs{false}
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
   \renewcommand\sfdefault{cmss}
@@ -3203,7 +3532,7 @@
 %    \end{macrocode}
 % \ldots but override:
 %    \begin{macrocode}
-  \phfnote@opt@fontdefsfalse
+  \def\phfnote@opt@fontdefs{false}
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
   \PassOptionsToPackage{default,osfigures,scale=0.9}{opensans}
@@ -3211,7 +3540,7 @@
 }
 \def\phfnote@preset@utopianote{
   \phfnote@presetcommon@xnote[noteit]
-  \phfnote@opt@fontdefsfalse
+  \def\phfnote@opt@fontdefs{false}
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
   \RequirePackage{fourier}
@@ -3221,8 +3550,8 @@
 }
 \def\phfnote@preset@mnmynote{
   \phfnote@presetcommon@xnote[noteit]
-  \phfnote@opt@footnotedefsfalse
-  \phfnote@opt@fontdefsfalse
+  \def\phfnote@opt@footnotedefs{false}
+  \def\phfnote@opt@fontdefs{false}
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
   \renewcommand{\notesectionallfontfamily}{\sfdefault}
@@ -3255,7 +3584,7 @@
 %    \begin{macrocode}
 \def\phfnote@preset@pkgdoc{
   \phfnote@presetcommon@xnote[noteit]
-  \phfnote@opt@fontdefsfalse
+  \def\phfnote@opt@fontdefs{false}
 %    \end{macrocode}
 % 
 % Then set up the font, which is done in a separate macro
@@ -3348,25 +3677,13 @@
 %    \end{macrocode}
 %
 %
-% \textbf{Hyperref:} No ``default'' \pkgname{hyperref} definitions, we'll use
-% \pkgname{hyperdoc} instead.
+% \textbf{Hyperref:} Request default \pkgname{hyperref} definitions with
+% |hyperrefdefs=defer|, but we'll load \pkgname{hyperdoc} instead of
+% \pkgname{hyperref}.
 %    \begin{macrocode}
-  \phfnote@opt@hyperrefdefsfalse
+  \def\phfnote@opt@hyperrefdefs{defer}
   \g@addto@macro\phfnote@hook@atendload{
-    \definecolor{docnotelinkcolor}{rgb}{0,0,0.4}%
-    \RequirePackage{url}%
-    \DeclareUrlCommand\phfnote@format@url{}%
     \RequirePackage{hypdoc}
-    % 
-    \hypersetup{bookmarks=true,backref=false,unicode=true,%
-      bookmarksnumbered=false,bookmarksopen=false,bookmarksopenlevel=1,%
-      breaklinks=true,pdfborder={0 0 0},colorlinks=true}%
-    \hypersetup{%
-      anchorcolor=docnotelinkcolor,citecolor=docnotelinkcolor,%
-      filecolor=docnotelinkcolor,linkcolor=docnotelinkcolor,%
-      menucolor=docnotelinkcolor,runcolor=docnotelinkcolor,%
-      urlcolor=docnotelinkcolor}%
-    \let\email\phfnote@email%
     \urlstyle{noteit}
   }
 %    \end{macrocode}
@@ -3422,7 +3739,7 @@
         {##1}{\expandonce\phfnotechanged@tmpa}}%
       \par\hspace*{0pt}\refstepcounter{phfnotechanged}\label{phfnotechanged:##1}%
       \begingroup\let\phfnote@changedreftext@par\relax
-        \changedreftext{##1}%
+        \changedreftext[\@secondoftwo]{##1}%
       \endgroup
       \changes{##2}{##3}{\hyperref[phfnotechanged:##1]{##4}}%
     \fi
@@ -3437,20 +3754,21 @@
 % of |\changedreftext|\marg{label name}.
 %    \begin{macrocode}
   \def\phfnote@changedreftext@par{\par}
-  \newcommand*\changedreftext[1]{%
+  \newcommand*\changedreftext[2][\phfnote@changedrefto]{%
     \phfnote@changedreftext@par%
-    \ifcsname phfnote@changed@lbl@##1\endcsname
-      \hyperref[phfnotechanged:##1]{%
+    \ifcsname phfnote@changed@lbl@##2\endcsname
+      ##1{##2}{%
         \expandafter\expandafter\expandafter\changedtextfmt%
-            \csname phfnote@changed@lbl@##1\endcsname
+            \csname phfnote@changed@lbl@##2\endcsname
       }
     \else
-      \hyperref[phfnotechanged:##1]{%
+      \hyperref[phfnotechanged:##2]{%
         \changedtextfmt{???}{???}{[\textbf{missing ref}]}%
       }%
     \fi
     \par
   }
+  \def\phfnote@changedrefto##1{\hyperref[phfnotechanged:##1]}
 %    \end{macrocode}
 % 
 % The macro |\changedtextfmt|\marg{v1.0}\marg{2016/05/22}\marg{description}
@@ -3467,7 +3785,7 @@
 %    \begin{macrocode}
   \RequirePackage{enumitem}
   \newlist{pkgoptions}{description}{1}
-  \setlist[pkgoptions]{font=\pkgoptionfmt[{\vspace*{5pt}}],style=nextline}
+  \setlist[pkgoptions]{font=\pkgoptionfmt@many[{\vspace*{5pt}}],style=nextline}
 %    \end{macrocode}
 % 
 % But patch the |pkgoptions|' |\item| command, so that it puts an additional
@@ -3483,7 +3801,7 @@
       \pkgoptions@old@item}%
   }{}{\PackageWarning{phfnote}{preset xpkgdoc: Failed to patch command
       \string\pkgoptions}}
-  \def\pkgoptionscombineitem{\leavevmode\vspace{\dimexpr-\baselineskip-\parskip-\itemsep\relax}}
+  %\def\pkgoptionscombineitem{\leavevmode\vspace{\dimexpr-\baselineskip-\parskip-\itemsep\relax}}
 %    \end{macrocode}
 % 
 % For convenience, also provide a |\meta|-like command for boolean arguments
@@ -3502,6 +3820,12 @@
   \newcommand\pkgoptionfmt[2][]{%
     \begingroup\let\meta\pkgoptfmt@meta\pkgopt@fbox{\normalfont\ttfamily ##2}\endgroup%
     \expandafter\phfnote@pkgdoc@index\expandafter{\@firstofone ##2}%
+    ##1}
+  \newcommand\pkgoptionfmt@many[2][]{%
+    \def\pkgoptionfmt@tmp@addcomma{}
+    \def\do####1{\pkgoptionfmt@tmp@addcomma\pkgoptionfmt{\vphantom{##2}####1}%
+      \def\pkgoptionfmt@tmp@addcomma{\hskip0.25em\relax,\hskip0.8em\relax}}%
+    \expandafter\docsvlist\expandafter{\@firstofone ##2}%
     ##1}
   \let\pkgopt@save@meta\meta
   \def\pkgopt@fbox{\fbox}
@@ -3524,6 +3848,8 @@
       \let\marg\@gobble%
       \let\oarg\@gobble%
       \let\parg\@gobble%
+      \let\vphantom\@gobble%
+      \let\hphantom\@gobble%
       \let\pkgoptattrib\@firstofone%
       \let\pkgoptattribnodots\@firstofone%
       \let\pkgoptattribempty\@empty%
@@ -3641,21 +3967,21 @@
 %    \begin{macrocode}
 \def\phfnote@preset@reset{
   \def\phfnote@opt@pkgset{none}
-  \def\phfnote@opt@title{}
-  \phfnote@opt@pagegeomdefsfalse
-  \phfnote@opt@spacingdefsfalse
-  \def\phfnote@opt@par{original}
-  \def\phfnote@opt@abstract{original}
-  \phfnote@opt@hyperrefdefsfalse
-  \phfnote@opt@fontdefsfalse
-  \def\phfnote@opt@secfmt{}
-  \phfnote@opt@bibliographydefsfalse
-  \phfnote@opt@footnotedefsfalse
+  \def\phfnote@opt@title{false}
+  \def\phfnote@opt@pagegeom{false}
+  \def\phfnote@opt@spacingdefs{false}
+  \def\phfnote@opt@par{false}
+  \def\phfnote@opt@abstract{false}
+  \def\phfnote@opt@hyperrefdefs{false}
+  \def\phfnote@opt@fontdefs{false}
+  \def\phfnote@opt@secfmt{false}
+  \def\phfnote@opt@bibliographydefs{false}
+  \def\phfnote@opt@footnotedefs{false}
 %    \end{macrocode}
 % 
 % \begin{pkgwarning}
-%   SELF-NOTE: DO NOT FORGET TO ADD HERE RESET COMMANDS FOR ANY NEW OPTION THAT
-%   WE PROVIDE IN THE FUTURE.
+%   NOTE TO SELF: DO NOT FORGET TO ADD HERE RESET COMMANDS FOR ANY NEW OPTION
+%   THAT WE PROVIDE IN THE FUTURE.
 % \end{pkgwarning}
 % 
 %    \begin{macrocode}
@@ -3680,39 +4006,29 @@
 % Take action according to the user options.
 %
 %    \begin{macrocode}
-\phfnote@do@pkgset{\phfnote@opt@pkgset}
+\expandafter\phfnote@do@pkgset\expandafter{\phfnote@opt@pkgset}
 
-\phfnote@do@notetitle{\phfnote@opt@title}
+\expandafter\phfnote@do@notetitle\expandafter{\phfnote@opt@title}
 
-\phfnote@do@noteabstract{\phfnote@opt@abstract}
+\expandafter\phfnote@do@noteabstract\expandafter{\phfnote@opt@abstract}
 
-\phfnote@do@secfmt{\phfnote@opt@secfmt}
+\expandafter\phfnote@do@secfmt\expandafter{\phfnote@opt@secfmt}
 
-\ifphfnote@opt@pagegeomdefs
-  \phfnote@do@pagegeomdefs{\phfnote@opt@pagegeom}
-\fi
+\phfnote@ifpkgoptfalsesetfalse{pagegeomdefs}{pagegeom}% deal with obsolete option
+\expandafter\phfnote@do@pagegeom\expandafter{\phfnote@opt@pagegeom}
 
-\ifphfnote@opt@spacingdefs
-  \phfnote@do@spacing
-\fi
+\expandafter\phfnote@do@spacingdefs\expandafter{\phfnote@opt@spacingdefs}
 
-\phfnote@do@par{\phfnote@opt@par}
+\expandafter\phfnote@do@par\expandafter{\phfnote@opt@par}
 
-\ifphfnote@opt@hyperrefdefs
-  \phfnote@do@pdfhyperrefdefs
-\fi
+\expandafter\phfnote@do@hyperrefdefs\expandafter{\phfnote@opt@hyperrefdefs}
 
-\ifphfnote@opt@fontdefs
-  \phfnote@do@fontdefs
-\fi
+\expandafter\phfnote@do@fontdefs\expandafter{\phfnote@opt@fontdefs}
 
-\ifphfnote@opt@bibliographydefs
-  \phfnote@do@bibliographydefs
-\fi
+\expandafter\phfnote@do@bibliographydefs\expandafter{\phfnote@opt@bibliographydefs}
 
-\ifphfnote@opt@footnotedefs
-  \phfnote@do@footnotedefs
-\fi
+\expandafter\phfnote@do@footnotedefs\expandafter{\phfnote@opt@footnotedefs}
+
 %    \end{macrocode}
 % 
 % Finally, execute the hook we set up for definitions at the end of the package
