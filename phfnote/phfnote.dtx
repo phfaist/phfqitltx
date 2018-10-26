@@ -373,6 +373,9 @@
 %     \csname notetitle@style@pretty2\endcsname\null \shortlipsum \morepagecontents
 %   \end{phfnoteDocVirtualPage}
 %
+%   \changed[chg-title-add-style-pretty]{v3.0}{2018/10/25}{Added the
+%   \phfverb{pretty} and \phfverb{pretty2} title styles.}
+%
 %   This title style is highly customizable (see below), in fact the |pretty2|
 %   style is an alias for the |pretty| style, with adjusted settings.
 %
@@ -391,6 +394,14 @@
 %   \begin{phfnoteDocVirtualPage}
 %     \vspace*{3em}\notetitle@style@article\null \shortlipsum \morepagecontents
 %   \end{phfnoteDocVirtualPage}
+%
+%   \changed[chg-title-article-spacing]{v3.0}{2018/10/26}{The \phfverb{article}
+%   title style was redesigned to use our new title engine, with improved
+%   spacing of the elements in all cases including multiline titles, author
+%   and/or date not specified, and presence or absence of thanks notes.}
+%
+%   If you would like your document to appear exactly as with \pkgname{phfnote}
+%   version 1.0, then you can set the special title style |title=articlev1|.
 %
 % \item[notitle] Also equivalently, |title=false|. Instructs \pkgname{phfnote}
 %   not to override any title definition, thus preserving the default class
@@ -426,6 +437,7 @@
 %
 % \subsubsection{Customizing the style of the \phfverb{default}, \phfverb{pretty}
 % and \phfverb{small} title styles}
+% \label{sec:title-styles-customization}
 % 
 % You may customize the appearance of the |default| and |small| title styles by
 % overriding some macros.
@@ -550,6 +562,14 @@
 %   This behavior is such as to prevent interference with more advanced class
 %   mechanisms, such as \RevTeX's.
 % \end{pkgwarning}
+%
+% \begin{pkgtip}
+%   For \pkgname{phfnote}'s title styles, you can issue the commands
+%   |\notetitleusempfootnotestrue| or |\notetitleusempfootnotesfalse|
+%   (documentation in \autoref{sec:title-styles-customization}) to decide
+%   whether the thanks notes are issued in a separate title line, or if they are
+%   displayed as regular footnotes at the bottom of the page.
+% \end{pkgtip}
 %
 %
 % \subsection{Abstract}
@@ -1120,7 +1140,7 @@
 % practice a simple macro definition will do, like this:
 % \begin{verbatim}
 %   \newcommand{\phf}[1]{{\color{blue}#1}} % Philippe Faist
-% \end{verbatim}\vspace{-\baselineskip}
+% \end{verbatim}
 % But because I kinda like more fancy stuff, and I definitely didn't have time
 % to spare but still got distracted into programming \LaTeX{} macros, here is a
 % way of defining a custom command such as |\phf| above, but that allows several
@@ -1137,7 +1157,7 @@
 % \begin{verbatim}
 % \phfMakeCommentingCommand[color=red,initials={AE}]{AlE}
 % \phfMakeCommentingCommand[color=blue,initials={JB}]{JB}
-% \end{verbatim}\vspace{-\baselineskip}
+% \end{verbatim}
 % They can then comment on text like this:
 % \begin{verbatim}
 % Quantum mechanics developed quickly in the 1920's thanks to the
@@ -1148,7 +1168,7 @@
 % this can be explained by hidden variables}\JB{which has revolutionized
 % our understanding of local realism.} \JB[@Albert, we talked about
 % this...]
-% \end{verbatim}\vspace{-\baselineskip}
+% \end{verbatim}
 % which gives:
 %
 % {\itshape%
@@ -2179,7 +2199,7 @@
 %    \begin{macrocode}
 \let\notetitle@style@article\notetitle@style@default
 \newcommand{\notetitle@stylesetup@article}{
-  \def\notetitletopspace{-3em}
+  %\def\notetitletopspace{-3em}
   \def\notetitlebottomspace{2.5em}
   \def\notetitleinnervsep{1.5em}
   \def\notetitlefont{}
@@ -4382,6 +4402,12 @@
     title={TIP}
   }
   \phfnoteRestoreDefs{verbatimstuff}
+%    \end{macrocode}
+%
+% Patch the |verbatim| environment to remove extraneous space after the
+% environment caused by I don't know what weird cause:
+%    \begin{macrocode}
+  \appto\endverbatim{\vspace{-\baselineskip}}
 %    \end{macrocode}
 % 
 % Common title stuff:
