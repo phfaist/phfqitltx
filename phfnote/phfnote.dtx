@@ -1795,6 +1795,14 @@
 % \begin{macro}{\notetitleendrender}
 %   The title is rendered enclosed by calls to these macros.  By default, render
 %   the title in a minipage.
+%
+%   WARNING: An important thing to note is that if you use
+%   |\notetitle@default@usesavebox|, then the saved box is an |\hbox|, not a
+%   |\vbox| (more flexibility).  That means that the |\notetitlebeginrender| and
+%   |\notetitleendrender| commands must open and close some environment (or a
+%   |\vbox| or something like that) so that the whole
+%   |\notetitlebeginrender...\notetitleendrender| construction results in
+%   something that can be placed in an |\hbox|.
 %    \begin{macrocode}
 \def\notetitlebeginrender{\begin{minipage}{\notetitlewidth}}
 \def\notetitleendrender{\end{minipage}}
@@ -1888,8 +1896,14 @@
     \fi
     \vspace*{\notetitletopspace}%
     \def\x{}%
+%    \end{macrocode}
+% 
+% Now, draw the title (either in a box, or directly).  If we save in a box, use
+% an |\hbox|, not a |\vbox|, because we get size problems otherwise.  See
+% |\notetitlebeginrender| and |\notetitleendrender|.
+%    \begin{macrocode}
     \ifnotetitle@default@usesavebox
-      \def\x{\setbox\notetitle@default@mainbox=\vbox\bgroup}%
+      \def\x{\setbox\notetitle@default@mainbox=\hbox\bgroup}
     \fi
     \x\notetitlebeginrender
     \begingroup
