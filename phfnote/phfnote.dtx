@@ -355,7 +355,7 @@
 %   \changed[chg-title-default-spacing]{v3.0}{2018/10/25}{The default title
 %   style was redesigned to improved spacing of the elements in all cases
 %   including multiline titles, author and/or date not specified, and presence
-%   or absence of thanks notes.}
+%   or absence of thanks notes}
 %
 %   If you would like your document to appear exactly as with \pkgname{phfnote}
 %   version 1.0, then you can set the special title style |title=defaultv1|.
@@ -374,7 +374,7 @@
 %   \end{phfnoteDocVirtualPage}
 %
 %   \changed[chg-title-add-style-pretty]{v3.0}{2018/10/25}{Added the
-%   \phfverb{pretty} and \phfverb{pretty2} title styles.}
+%   \phfverb{pretty} and \phfverb{pretty2} title styles}
 %
 %   This title style is highly customizable (see below), in fact the |pretty2|
 %   style is an alias for the |pretty| style, with adjusted settings.
@@ -392,13 +392,14 @@
 % \item[title=article] Mimics the default title style from the |article| class,
 %   but saves a little more space.  It looks like this:
 %   \begin{phfnoteDocVirtualPage}
-%     \vspace*{3em}\notetitle@style@article\null \shortlipsum \morepagecontents
+%     \notetitle@stylesetup@article
+%     \notetitle@style@article\null \shortlipsum \morepagecontents
 %   \end{phfnoteDocVirtualPage}
 %
 %   \changed[chg-title-article-spacing]{v3.0}{2018/10/26}{The \phfverb{article}
 %   title style was redesigned to use our new title engine, with improved
 %   spacing of the elements in all cases including multiline titles, author
-%   and/or date not specified, and presence or absence of thanks notes.}
+%   and/or date not specified, and presence or absence of thanks notes}
 %
 %   If you would like your document to appear exactly as with \pkgname{phfnote}
 %   version 1.0, then you can set the special title style |title=articlev1|.
@@ -875,6 +876,7 @@
 % Beware that if you redefine |\notesectionallfont| then you are responsible for
 % honoring, or ignoring, the value of |\notesectionallfontfamily|.
 %
+% \needspace{5\baselineskip}
 % \DescribeMacro{\notesectionfont} \DescribeMacro{\notesubsectionfont}
 % \DescribeMacro{\notesubsubsectionfont} \DescribeMacro{\noteparagraphfont}
 % \DescribeMacro{\notesubparagraphfont} These macros define the font commands to
