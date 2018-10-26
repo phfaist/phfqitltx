@@ -403,9 +403,9 @@
 % \end{pkgoptions}
 %
 % \begin{pkgtip}
-%   When using the |default| title style, the argument to |\title| may contain
-%   blank lines.  In this case, each part is typeset on a separate line with an
-%   appropriate spacing.  For instance:
+%   When using the |default| and |pretty*| title styles, the argument to
+%   |\title| may contain blank lines.  In this case, each part is typeset on a
+%   separate line with an appropriate spacing.  For instance:
 % \begin{verbatim}
 % \title{Letter of Motivation
 %
@@ -453,22 +453,28 @@
 % \begin{verbatim}
 % \renewcommand{\notetitlehrule}{\hrule height 0.8pt}
 % \end{verbatim}
+%
+% The |small| title style allows you to customize the separator between the
+% author and the date:
+% \begin{verbatim}
+% \renewcommand\notetitlesmallauthordatesep{\hspace*{0.5em}\cdot\hspace*{0.5em}}
+% \end{verbatim}
 % 
 %
 % The |pretty| and |pretty2| styles provide a few macros that you can adjust to
 % your needs:
 % \begin{verbatim}
-%   \def\notetitleprettysiderulewidth{10pt}
-%  \def\notetitleprettysidespacewidth{10pt}
-%  \def\notetitleprettysiderulefmt{}
-%  \def\notetitleprettytopspace{10pt}
-%  \def\notetitleprettybottomspace{10pt}
-%  \def\notetitleprettyboxhrulewidth{0pt}
+% \def\notetitleprettysiderulewidth{10pt}
+% \def\notetitleprettysidespacewidth{10pt}
+% \def\notetitleprettysiderulefmt{}
+% \def\notetitleprettytopspace{10pt}
+% \def\notetitleprettybottomspace{10pt}
+% \def\notetitleprettyboxhrulewidth{0pt}
 %
-%  \colorlet{notetitleprettysidebarcolor}{blue!40!black}
-%  \colorlet{notetitleprettyhrulecolor}{notetitleprettysidebarcolor}
-%  \colorlet{notetitleprettytextcolor}{blue!20!black}
-%  \colorlet{notetitleprettybgcolor}{white!95!blue}
+% \colorlet{notetitleprettysiderulecolor}{blue!40!black}
+% \colorlet{notetitleprettyhrulecolor}{notetitleprettysiderulecolor}
+% \colorlet{notetitleprettytextcolor}{blue!20!black}
+% \colorlet{notetitleprettybgcolor}{white!95!blue}
 % \end{verbatim}
 %
 %
@@ -1761,7 +1767,8 @@
 %   This macro is the main formatting command for the title's global appearance.
 %   After the title is typeset in a \TeX{} box register, this macro is invoked
 %   to actually display it.  The default title style simply displays it with a
-%   rule below, but the |pretty| title style does fancier things.
+%   rule below, but the |pretty| title style does fancier things.  Note this is
+%   only used if |\ifnotetitle@default@useminipage| is true.
 %    \begin{macrocode}
 \newcommand\notetitleusemainbox[1]{%
   \par
@@ -1771,11 +1778,48 @@
 }
 %    \end{macrocode}
 % \end{macro}
-%
+% 
+% \begin{macro}{\notetitlebeginrender}
+% \begin{macro}{\notetitleendrender}
+%   If |\ifnotetitle@default@useminipage| is false, the title is directly
+%   rendered enclosed by calls to these macros.
+%    \begin{macrocode}
+\def\notetitlebeginrender{}
+\def\notetitleendrender{}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% 
 % \begin{macro}{\notetitle@default@mainbox}
 %   The main box register in which the title contents is saved.
 %    \begin{macrocode}
 \newsavebox\notetitle@default@mainbox
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ifnotetitle@default@useminipage}
+%   This |if| controls whether or not we set up the title with a minipage.  This
+%   includes the ability to use footnotes inside the minipage, and also to play
+%   around with the box, measure its height/width, place it into graphics, etc.
+%   But if we want a simple title with regular footnotes, this is not necessary.
+%
+%   If this is true, then the rendering route using a box is used, etc., and
+%   |\notetitleusemainbox| is called.  Otherwise, |\notetitleusemainbox| is not
+%   called, and instead, the content is directly rendered between calls to
+%   |\notetitlebeginrender| and |\notetitleendrender|.
+%    \begin{macrocode}
+\newif\ifnotetitle@default@useminipage
+\notetitle@default@useminipagetrue
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\notetitle@default@setup}
+%   Any additional setup to be done at the beginning.
+%    \begin{macrocode}
+\def\notetitle@default@setup{%
+    \notetitle@default@ismultiparfalse
+    \gdef\phfnote@tmp@nextskip{\z@}%
+    \par\raggedright}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1794,22 +1838,33 @@
   \begingroup
     \parskip=\z@\relax
     \parindent=\z@\relax
-    \notetitle@default@ismultiparfalse
-    \gdef\phfnote@tmp@nextskip{\z@}%
-    \par\raggedright
-    \phfnote@setupthanksmpfootnote
+    \notetitle@default@setup
+    \ifnotetitle@default@useminipage
+      \phfnote@setupthanksmpfootnote
+    \fi
     \vspace*{\notetitletopspace}%
     \phfnote@title@checksetspace{default}%
-    \setbox\notetitle@default@mainbox=\hbox{%
-      \begin{minipage}{\notetitlewidth}%
+    \ifnotetitle@default@useminipage
+      \def\x{\setbox\notetitle@default@mainbox=\hbox\bgroup%
+          \begin{minipage}{\notetitlewidth}}%
+    \else
+      \def\x{\notetitlebeginrender}%
+    \fi
+    \x
         \begin{singlespace}%
           \notetitlemakecontents
-          \global\let\@thanks\@empty
-          \phfnote@finalizempfootnotes{\phfnote@tmp@nextskip}%
+          \ifnotetitle@default@useminipage
+            \global\let\@thanks\@empty
+            \phfnote@finalizempfootnotes{\phfnote@tmp@nextskip}%
+          \fi
         \end{singlespace}%
-      \end{minipage}%
-    }%
-    \notetitleusemainbox{\notetitle@default@mainbox}\par%
+    \ifnotetitle@default@useminipage
+      \def\x{\end{minipage}\egroup
+        \notetitleusemainbox{\notetitle@default@mainbox}\par}%
+    \else
+      \def\x{\notetitleendrender\par}
+    \fi
+    \x
   \endgroup
   \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
 }
@@ -1949,8 +2004,8 @@
   \def\notetitleprettybottomspace{10pt}
   \def\notetitleprettyboxhrulewidth{0pt}
 
-  \definecolor{notetitleprettysidebarcolor}{RGB}{0,68,126}
-  \colorlet{notetitleprettyhrulecolor}{notetitleprettysidebarcolor}
+  \definecolor{notetitleprettysiderulecolor}{RGB}{0,68,126}
+  \colorlet{notetitleprettyhrulecolor}{notetitleprettysiderulecolor}
   \definecolor{notetitleprettytextcolor}{RGB}{25,25,38}
   \colorlet{notetitleprettybgcolor}{white}
 }
@@ -1963,7 +2018,7 @@
   \notetitle@pretty@tmplenht=\ht#1\relax%
   \notetitle@pretty@tmplendp=\dp#1\relax%
   \edef\tmp@dorule{%
-    {\noexpand\color{notetitleprettysidebarcolor}%
+    {\noexpand\color{notetitleprettysiderulecolor}%
     \noexpand\rule{\notetitleprettysiderulewidth}{%
       \dimexpr \notetitleprettytopspace+
           \notetitleprettybottomspace+
@@ -1993,16 +2048,16 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}
+% \begin{macro}{\notetitle@stylesetup@pretty2}
 %   The |pretty2| style simply loads the |pretty| style, and ajusts some
 %   settings.
 %    \begin{macrocode}
 \csdef{notetitle@stylesetup@pretty2}{%
   \notetitle@stylesetup@pretty
 
-  \definecolor{notetitleprettysidebarcolor}{RGB}{0,68,126}
-  \colorlet{notetitleprettyhrulecolor}{notetitleprettysidebarcolor}
-  \colorlet{notetitleprettytextcolor}{notetitleprettysidebarcolor!50!black}
+  \definecolor{notetitleprettysiderulecolor}{RGB}{0,68,126}
+  \colorlet{notetitleprettyhrulecolor}{notetitleprettysiderulecolor}
+  \colorlet{notetitleprettytextcolor}{notetitleprettysiderulecolor!50!black}
   \colorlet{notetitleprettybgcolor}{white!95!notetitleprettytextcolor}
 
   \def\notetitleprettyboxhrulewidth{.4pt}
@@ -2017,9 +2072,46 @@
 % Implementation an alternate `small' title style.
 %
 % \begin{macro}{\notetitle@style@small}
-%    The default title style.  Nothing mysterious, hopefully.
+%    The small title style. Again, use the main title engine, but customize the settings.
 %    \begin{macrocode}
-\newcommand{\notetitle@style@small}{%
+\let\notetitle@style@small\notetitle@style@default
+\newcommand\notetitle@stylesetup@small{%
+  \notetitle@default@useminipagefalse
+  \appto\notetitle@default@setup{%
+    \let\footnote\thanks%
+  }
+  \def\notetitlemakecontents{%
+    {\expandafter\notetitlefont\expandafter{\@title}}%
+    \hfill\makebox{\fontsize{9pt}{10pt}\selectfont
+      \notetitle@small@renderauthordate}%
+  }
+  \def\notetitlebeginrender{\par}
+  \def\notetitleendrender{%
+    \vspace*{\notetitleinnervsep}\notetitlehrule\relax\vspace*{\notetitleinnervsep}}
+  \def\notetitle@small@renderauthordate{%
+    \expandafter\notblank\expandafter{\@author}{%
+      \expandafter\notblank\expandafter{\@date}{% both not blank
+        {\expandafter\notetitleauthorfont\expandafter{\@author}}%
+        \notetitlesmallauthordatesep
+        {\emph{\expandafter\notetitledatefont\expandafter{\@date}}}%
+      }{% only author
+        {\expandafter\notetitleauthorfont\expandafter{\@author}}%
+      }%
+    }{% only date
+      {\emph{\expandafter\notetitledatefont\expandafter{\@date}}}%
+    }}
+
+  \def\notetitleinnervsep{1mm}
+  \def\notetitlesmallauthordatesep{\hspace*{2mm}--\hspace*{2mm}}
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% Style |smallv1| provided for backwards compatibility, to make sure that all
+% spacing and formatting is exactly the same as for \pkgname{phfnote} version
+% 1.0.
+%    \begin{macrocode}
+\csdef{notetitle@style@smallv1}{%
   \begingroup\par\raggedright%
     \let\footnote\thanks%
     \vspace*{\notetitletopspace}%
@@ -2033,7 +2125,6 @@
   \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
 }
 %    \end{macrocode}
-% \end{macro}
 %
 % 
 % \paragraph{Title style: `article'}
