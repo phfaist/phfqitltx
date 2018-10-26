@@ -382,6 +382,7 @@
 %   information on a single line.  This is useful for when even the default
 %   title style appears too large.  It looks like this:
 %   \begin{phfnoteDocVirtualPage}
+%     \notetitle@stylesetup@small
 %     \notetitle@style@small\null \shortlipsum \morepagecontents
 %   \end{phfnoteDocVirtualPage}
 %
@@ -399,7 +400,7 @@
 %   notes, or spacing adjustments for the abstract, will probably not work.
 %
 %   For compatibility with previous versions of |phfnote|, you may also specify
-%   an empty option value, |title=|.
+%   an empty option value ``|title=|''.
 % \end{pkgoptions}
 %
 % \begin{pkgtip}
@@ -464,15 +465,17 @@
 % The |pretty| and |pretty2| styles provide a few macros that you can adjust to
 % your needs:
 % \begin{verbatim}
-% \def\notetitleprettysiderulewidth{10pt}
-% \def\notetitleprettysidespacewidth{10pt}
-% \def\notetitleprettysiderulefmt{}
+% \def\notetitleprettylsiderulewidth{10pt}
+% \def\notetitleprettylsidespacewidth{10pt}
+% \def\notetitleprettyrsiderulewidth{10pt}
+% \def\notetitleprettyrsidespacewidth{10pt}
 % \def\notetitleprettytopspace{10pt}
 % \def\notetitleprettybottomspace{10pt}
 % \def\notetitleprettyboxhrulewidth{0pt}
 %
-% \colorlet{notetitleprettysiderulecolor}{blue!40!black}
-% \colorlet{notetitleprettyhrulecolor}{notetitleprettysiderulecolor}
+% \colorlet{notetitleprettylsiderulecolor}{blue!40!black}
+% \colorlet{notetitleprettyrsiderulecolor}{notetitleprettylsiderulecolor}
+% \colorlet{notetitleprettyhrulecolor}{notetitleprettylsiderulecolor}
 % \colorlet{notetitleprettytextcolor}{blue!20!black}
 % \colorlet{notetitleprettybgcolor}{white!95!blue}
 % \end{verbatim}
@@ -1993,19 +1996,24 @@
     \color{notetitleprettytextcolor}\centering}
   \def\phfnote@mpfootnotes@fontparsetup{\color{notetitleprettytextcolor}}
 
-  \def\notetitlewidth{\dimexpr\textwidth-2\dimexpr\notetitleprettysiderulewidth\relax
-    -2\dimexpr\notetitleprettysidespacewidth\relax}
+  \def\notetitlewidth{\dimexpr\textwidth
+    -\notetitleprettylsiderulewidth
+    -\notetitleprettyrsiderulewidth
+    -\notetitleprettylsidespacewidth
+    -\notetitleprettylsidespacewidth\relax}
   \let\notetitleusemainbox\notetitle@pretty@usemainbox
 
-  \def\notetitleprettysiderulewidth{10pt}
-  \def\notetitleprettysidespacewidth{10pt}
-  \def\notetitleprettysiderulefmt{}
+  \def\notetitleprettylsiderulewidth{10pt}
+  \def\notetitleprettylsidespacewidth{10pt}
+  \def\notetitleprettyrsiderulewidth{10pt}
+  \def\notetitleprettyrsidespacewidth{10pt}
   \def\notetitleprettytopspace{10pt}
   \def\notetitleprettybottomspace{10pt}
   \def\notetitleprettyboxhrulewidth{0pt}
 
-  \definecolor{notetitleprettysiderulecolor}{RGB}{0,68,126}
-  \colorlet{notetitleprettyhrulecolor}{notetitleprettysiderulecolor}
+  \definecolor{notetitleprettylsiderulecolor}{RGB}{0,68,126}
+  \colorlet{notetitleprettyrsiderulecolor}{notetitleprettylsiderulecolor}
+  \colorlet{notetitleprettyhrulecolor}{notetitleprettylsiderulecolor}
   \definecolor{notetitleprettytextcolor}{RGB}{25,25,38}
   \colorlet{notetitleprettybgcolor}{white}
 }
@@ -2017,32 +2025,32 @@
   \parindent=\z@\relax
   \notetitle@pretty@tmplenht=\ht#1\relax%
   \notetitle@pretty@tmplendp=\dp#1\relax%
-  \edef\tmp@dorule{%
-    {\noexpand\color{notetitleprettysiderulecolor}%
-    \noexpand\rule{\notetitleprettysiderulewidth}{%
-      \dimexpr \notetitleprettytopspace+
-          \notetitleprettybottomspace+
-          \notetitleprettyboxhrulewidth+
-          \notetitleprettyboxhrulewidth+
-          \notetitle@pretty@tmplendp+
-          \notetitle@pretty@tmplenht\relax}}}%
+  \edef\tmp@dorule##1##2{%
+    {\noexpand\color{notetitlepretty##1siderulecolor}%
+      \noexpand\rule{##2}{%
+        \dimexpr \notetitleprettytopspace+
+            \notetitleprettybottomspace+
+            \notetitleprettyboxhrulewidth+
+            \notetitleprettyboxhrulewidth+
+            \notetitle@pretty@tmplendp+
+            \notetitle@pretty@tmplenht\relax}}}%
   \fboxsep=0pt% for \colorbox
   \par\hbox{%
-    \tmp@dorule%
+    \tmp@dorule{l}{\notetitleprettylsiderulewidth}%
     \colorbox{notetitleprettybgcolor}{%
       \vbox{%
         {\color{notetitleprettyhrulecolor}\hrule height \notetitleprettyboxhrulewidth\relax}%
         \hbox{%
-          \hskip \notetitleprettysidespacewidth\relax
+          \hskip \notetitleprettylsidespacewidth\relax
           % \fbox% DEBUG
           {\vbox{\vskip \notetitleprettytopspace\relax
               \box#1%
               \vskip \notetitleprettybottomspace\relax}}%
-          \hskip \notetitleprettysidespacewidth\relax
+          \hskip \notetitleprettyrsidespacewidth\relax
         }%
         {\color{notetitleprettyhrulecolor}\hrule height \notetitleprettyboxhrulewidth\relax}%
       }}%
-    \tmp@dorule%
+    \tmp@dorule{r}{\notetitleprettyrsiderulewidth}%
   }\par
 }
 %    \end{macrocode}
@@ -2055,9 +2063,10 @@
 \csdef{notetitle@stylesetup@pretty2}{%
   \notetitle@stylesetup@pretty
 
-  \definecolor{notetitleprettysiderulecolor}{RGB}{0,68,126}
-  \colorlet{notetitleprettyhrulecolor}{notetitleprettysiderulecolor}
-  \colorlet{notetitleprettytextcolor}{notetitleprettysiderulecolor!50!black}
+  \definecolor{notetitleprettylsiderulecolor}{RGB}{0,68,126}
+  \colorlet{notetitleprettyrsiderulecolor}{notetitleprettylsiderulecolor}
+  \colorlet{notetitleprettyhrulecolor}{notetitleprettylsiderulecolor}
+  \colorlet{notetitleprettytextcolor}{notetitleprettylsiderulecolor!50!black}
   \colorlet{notetitleprettybgcolor}{white!95!notetitleprettytextcolor}
 
   \def\notetitleprettyboxhrulewidth{.4pt}

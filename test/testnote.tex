@@ -10,11 +10,11 @@
 %\usepackage[title=default,pkgset=extended,secfmt={section,secsquares,secnummargin}]{phfnote}
 %\usepackage[title=default,pkgset=extended,secfmt={section}]{phfnote}
 %\usepackage[title=default,pkgset=extended,secfmt={section},fontdefs=false]{phfnote}
-\usepackage[title=small,pkgset=extended]{phfnote}
+%\usepackage[title=small,pkgset=extended]{phfnote}
 %\usepackage[title=smallv1,pkgset=extended]{phfnote}
 %\usepackage[title=defaultv1,pkgset=extended]{phfnote}
 %\usepackage[title=pretty,pkgset=extended]{phfnote}
-%\usepackage[title=pretty2,pkgset=extended]{phfnote}
+\usepackage[title=pretty2,pkgset=extended]{phfnote}
 %\usepackage[preset=sfnote,pkgset=extended,pagegeom=bigmargin]{phfnote}
 %\usepackage[preset=sfssnote,pkgset=extended,pagegeom=narrow]{phfnote}
 %\usepackage[preset=opensansnote,pkgset=extended,pagegeom=narrow]{phfnote}
@@ -107,6 +107,22 @@
 
 
 \providecommand\thanksmark[1][]{[#1]}
+
+\iftrue%\iffalse  % swap true/false with META-T
+  \def\notetitleprettylsiderulewidth{10pt}
+  \def\notetitleprettylsidespacewidth{20pt}
+  \def\notetitleprettyrsiderulewidth{.4pt}
+  \def\notetitleprettyrsidespacewidth{29.6pt}
+  \def\notetitleprettytopspace{10pt}
+  \def\notetitleprettybottomspace{20pt}
+  \def\notetitleprettyboxhrulewidth{1pt}
+
+  \definecolor{notetitleprettylsiderulecolor}{RGB}{0,68,126}
+  \colorlet{notetitleprettyrsiderulecolor}{blue}
+  \colorlet{notetitleprettyhrulecolor}{red}
+  \colorlet{notetitleprettytextcolor}{notetitleprettylsiderulecolor!50!black}
+  \colorlet{notetitleprettybgcolor}{white!95!notetitleprettytextcolor}
+\fi
 
 
 \iffalse%\iftrue  % swap true/false with META-T
