@@ -455,6 +455,16 @@
 % \renewcommand{\notetitlehrule}{\hrule height 0.8pt}
 % \end{verbatim}
 %
+% \DescribeMacro{\notetitleusempfootnotestrue}
+% \DescribeMacro{\notetitleusempfootnotesfalse} The commands
+% |\notetitleusempfootnotestrue| and |\notetitleusempfootnotesfalse| set
+% respectively whether any |\thanks| commands in the title generate footnotes
+% inside the title area (which is drawn within a minipage), i.e., all thanks
+% notes are collected on an additional line below the date, or whether they
+% appear as regular footnotes at the bottom of the page.  Simply call the
+% relevant command to set either setting (don't redefine these).
+%
+%
 % The |small| title style allows you to customize the separator between the
 % author and the date:
 % \begin{verbatim}
@@ -462,16 +472,17 @@
 % \end{verbatim}
 % 
 %
-% The |pretty| and |pretty2| styles provide a few macros that you can adjust to
-% your needs:
+% In addition to the above settings for the default title style, the |pretty|
+% and |pretty2| styles provide a few macros that you can adjust some visual
+% aspects to your needs:
 % \begin{verbatim}
-% \def\notetitleprettylsiderulewidth{10pt}
-% \def\notetitleprettylsidespacewidth{10pt}
-% \def\notetitleprettyrsiderulewidth{10pt}
-% \def\notetitleprettyrsidespacewidth{10pt}
-% \def\notetitleprettytopspace{10pt}
-% \def\notetitleprettybottomspace{10pt}
-% \def\notetitleprettyboxhrulewidth{0pt}
+% \renewcommand\notetitleprettylsiderulewidth{10pt}
+% \renewcommand\notetitleprettylsidespacewidth{10pt}
+% \renewcommand\notetitleprettyrsiderulewidth{10pt}
+% \renewcommand\notetitleprettyrsidespacewidth{10pt}
+% \renewcommand\notetitleprettytopspace{10pt}
+% \renewcommand\notetitleprettybottomspace{10pt}
+% \renewcommand\notetitleprettyboxhrulewidth{0pt}
 %
 % \colorlet{notetitleprettylsiderulecolor}{blue!40!black}
 % \colorlet{notetitleprettyrsiderulecolor}{notetitleprettylsiderulecolor}
@@ -1399,7 +1410,9 @@
     \ifcsname #1\next\endcsname%
       \csname #1\next\endcsname%
     \else%
-      \PackageError{phfnote}{Unknown #2: '\next'. Ignoring.}
+      \PackageError{phfnote}{Unknown #2: '\next'. Ignoring.}{The given #2 '\next'
+        is invalid.  Consult the package documentation for information about
+        valid attributes.}
     \fi
   }
 }
@@ -1460,21 +1473,6 @@
 %    \end{macrocode}
 % \end{macro}
 % 
-% \begin{macro}{\phfnote@title@checksetspace}
-%   Some of our title styles require the \pkgname{setspace} package.  This utility checks that
-%   this package is loaded, and generates an error otherwise.
-%
-%   |#1| = the current title style name; this is required only for the error message.
-%    \begin{macrocode}
-\def\phfnote@title@checksetspace#1{%
-  \ifdefined\singlespace\else%
-    \PackageError{phfnote}{Note title style `#1' requires the
-      `setspace' package to be loaded!  Please load it, or use a
-      pkgset which loads it automatically}%
-  \fi%
-}
-%    \end{macrocode}
-% \end{macro}
 %
 % \subsubsection{Implementation of \phfverb\thanks{} and \phfverb\thanksmark}
 %
@@ -1730,24 +1728,29 @@
 %   everything nicely.  Note that if you redefine this, then it's up to you to
 %   honor what to do with |\notetitlefontparsetup|, |\notetitlefont|,
 %   |\notetitleauthorfont|, etc.
+%
+%   The default implementation of |\notetitlemakecontents| allows
+%   |\notetitle*fontparsetup| to take a single argument, the whole
+%   title/author/date including necessary formatting.  In that case make sure to
+%   enclose that argument in a group.
 %    \begin{macrocode}
 \newcommand\notetitlemakecontents{
   \notetitlemakecontentstop
   {\par
     \let\phfnote@old@par\par
     \notetitle@titledefault@preparetitle
-    \notetitlefontparsetup
-    {\expandafter\notetitlefont\expandafter{\@title}}%
+    \notetitlefontparsetup{%
+      \expandafter\notetitlefont\expandafter{\@title}}%
     \phfnote@old@par
     \notetitleaftertitleskip
   }%
   \if\relax\detokenize\expandafter{\@author}\relax\else
-    \notetitleauthorfontparsetup
-    {\expandafter\notetitleauthorfont\expandafter{\@author}}\par
+    \notetitleauthorfontparsetup{%
+      \expandafter\notetitleauthorfont\expandafter{\@author}}\par
   \fi
   \if\relax\detokenize\expandafter{\@date}\relax\else
-    \notetitledatefontparsetup
-    {\expandafter\notetitledatefont\expandafter{\@date}}\par
+    \notetitledatefontparsetup{%
+      \expandafter\notetitledatefont\expandafter{\@date}}\par
   \fi
   \notetitlemakecontentsbottom
 }
@@ -1766,12 +1769,24 @@
 % \end{macro}
 % \end{macro}
 % 
+% \begin{macro}{\notetitlebeginrender}
+% \begin{macro}{\notetitleendrender}
+%   The title is rendered enclosed by calls to these macros.  By default, render
+%   the title in a minipage.
+%    \begin{macrocode}
+\def\notetitlebeginrender{\begin{minipage}{\notetitlewidth}}
+\def\notetitleendrender{\end{minipage}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% 
+% 
 % \begin{macro}{\notetitleusemainbox}
 %   This macro is the main formatting command for the title's global appearance.
 %   After the title is typeset in a \TeX{} box register, this macro is invoked
 %   to actually display it.  The default title style simply displays it with a
 %   rule below, but the |pretty| title style does fancier things.  Note this is
-%   only used if |\ifnotetitle@default@useminipage| is true.
+%   only used if |\ifnotetitle@default@usesavebox| is true.
 %    \begin{macrocode}
 \newcommand\notetitleusemainbox[1]{%
   \par
@@ -1781,18 +1796,7 @@
 }
 %    \end{macrocode}
 % \end{macro}
-% 
-% \begin{macro}{\notetitlebeginrender}
-% \begin{macro}{\notetitleendrender}
-%   If |\ifnotetitle@default@useminipage| is false, the title is directly
-%   rendered enclosed by calls to these macros.
-%    \begin{macrocode}
-\def\notetitlebeginrender{}
-\def\notetitleendrender{}
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% 
+%
 % \begin{macro}{\notetitle@default@mainbox}
 %   The main box register in which the title contents is saved.
 %    \begin{macrocode}
@@ -1800,19 +1804,33 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\ifnotetitle@default@useminipage}
-%   This |if| controls whether or not we set up the title with a minipage.  This
-%   includes the ability to use footnotes inside the minipage, and also to play
-%   around with the box, measure its height/width, place it into graphics, etc.
-%   But if we want a simple title with regular footnotes, this is not necessary.
+% \begin{macro}{\ifnotetitle@default@usesavebox}
+%   This |if| controls whether or not we set up the title in a temporary \TeX{}
+%   box register first, before displaying it.  This allows to play around with
+%   the box, measure its height/width, place it into graphics, etc.  But if we
+%   want a simple title, this is not necessary, and it might break some more
+%   fragile constructions (footnotes, etc).
 %
-%   If this is true, then the rendering route using a box is used, etc., and
-%   |\notetitleusemainbox| is called.  Otherwise, |\notetitleusemainbox| is not
-%   called, and instead, the content is directly rendered between calls to
-%   |\notetitlebeginrender| and |\notetitleendrender|.
+%   If this is true, then the macro |\notetitleusemainbox| is called to render
+%   the box.  Otherwise, |\notetitleusemainbox| is not called and the title is
+%   rendered directly.
 %    \begin{macrocode}
-\newif\ifnotetitle@default@useminipage
-\notetitle@default@useminipagetrue
+\newif\ifnotetitle@default@usesavebox
+\notetitle@default@usesaveboxtrue
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ifnotetitleusempfootnotes}
+%   Whether any |\thanks| commands in the title generate footnotes inside the
+%   minipage (i.e., a line at the bottom with e.g.\ affiliations), or whether
+%   they appear as regular footnotes at the bottom of the page.
+%
+%   This conditional may only be set to true if the rendering happens in a
+%   minipage.  The minipage must be opened in |\notetitlebeginrender| and closed
+%   in |\notetitleendrender|.
+%    \begin{macrocode}
+\newif\ifnotetitleusempfootnotes
+\notetitleusempfootnotestrue
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1841,33 +1859,40 @@
   \begingroup
     \parskip=\z@\relax
     \parindent=\z@\relax
+    \providecommand\singlespace{}%
     \notetitle@default@setup
-    \ifnotetitle@default@useminipage
+    \ifnotetitleusempfootnotes
       \phfnote@setupthanksmpfootnote
     \fi
     \vspace*{\notetitletopspace}%
-    \phfnote@title@checksetspace{default}%
-    \ifnotetitle@default@useminipage
-      \def\x{\setbox\notetitle@default@mainbox=\hbox\bgroup%
-          \begin{minipage}{\notetitlewidth}}%
-    \else
-      \def\x{\notetitlebeginrender}%
+    \def\x{}%
+    \ifnotetitle@default@usesavebox
+      \def\x{\setbox\notetitle@default@mainbox=\vbox\bgroup}%
     \fi
-    \x
-        \begin{singlespace}%
-          \notetitlemakecontents
-          \ifnotetitle@default@useminipage
+    \x\notetitlebeginrender
+    \begingroup
+          \singlespace%
+          \notetitlemakecontents\par
+          \ifnotetitleusempfootnotes
+            \expandafter\ifstrequal\expandafter{\@mpfn}{mpfootnote}{}{%
+              \PackageError{phfnote}{phfnote title: can only have
+                'usempfootnotes' in a minipage}{Make sure you open a
+                \string\begin{minipage} in the definition of
+                  \string\notetitlebeginrender \space and correspondingly close
+                  it with \string\end{minipage} in \string\notetitleendrender}%
+            }
             \global\let\@thanks\@empty
             \phfnote@finalizempfootnotes{\phfnote@tmp@nextskip}%
           \fi
-        \end{singlespace}%
-    \ifnotetitle@default@useminipage
-      \def\x{\end{minipage}\egroup
-        \notetitleusemainbox{\notetitle@default@mainbox}\par}%
-    \else
-      \def\x{\notetitleendrender\par}
+    \endgroup
+    \notetitleendrender
+    \def\x{}%
+    \ifnotetitle@default@usesavebox
+      \def\x{\egroup
+        \notetitleusemainbox{\notetitle@default@mainbox}}%
     \fi
     \x
+    \par
   \endgroup
   \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
 }
@@ -1919,7 +1944,7 @@
   \begingroup\par\raggedright%
     \phfnote@setupthanksmpfootnote%
     \vspace*{\notetitletopspace}%
-    \phfnote@title@checksetspace{default}%
+    \phfnote@title@checksetspace{defaultv1}%
     \begin{minipage}{\textwidth}%
       \begin{singlespace}%
         \parskip=0pt\parindent=0pt\relax%
@@ -1957,6 +1982,13 @@
     \reset@font\footnotesize%
     \phfnote@fmt@titlefootnotes%
     \phfnote@mpfootmaterial}%
+}
+\def\phfnote@title@checksetspace#1{%
+  \ifdefined\singlespace\else%
+    \PackageError{phfnote}{Note title style `#1' requires the
+      `setspace' package to be loaded!  Please load it, or use a
+      pkgset which loads it automatically}{}%
+  \fi%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -2085,17 +2117,19 @@
 %    \begin{macrocode}
 \let\notetitle@style@small\notetitle@style@default
 \newcommand\notetitle@stylesetup@small{%
-  \notetitle@default@useminipagefalse
-  \appto\notetitle@default@setup{%
-    \let\footnote\thanks%
-  }
+  \notetitleusempfootnotesfalse
+
   \def\notetitlemakecontents{%
     {\expandafter\notetitlefont\expandafter{\@title}}%
     \hfill\makebox{\fontsize{9pt}{10pt}\selectfont
       \notetitle@small@renderauthordate}%
   }
-  \def\notetitlebeginrender{\par}
-  \def\notetitleendrender{%
+  %\notetitle@default@usesaveboxfalse
+  %\def\notetitlebeginrender{\par}
+  %\def\notetitleendrender{%
+  %  \vspace*{\notetitleinnervsep}\notetitlehrule\relax\vspace*{\notetitleinnervsep}}
+  \def\notetitleusemainbox##1{%
+    \par\box##1%
     \vspace*{\notetitleinnervsep}\notetitlehrule\relax\vspace*{\notetitleinnervsep}}
   \def\notetitle@small@renderauthordate{%
     \expandafter\notblank\expandafter{\@author}{%
@@ -2141,9 +2175,47 @@
 % Implementation the `article' title style.
 %
 % \begin{macro}{\notetitle@style@article}
-%    The title style definition.  Nothing mysterious, hopefully.
+% \begin{macro}{\notetitle@stylesetup@article}
 %    \begin{macrocode}
-\newcommand{\notetitle@style@article}{%
+\let\notetitle@style@article\notetitle@style@default
+\newcommand{\notetitle@stylesetup@article}{
+  \def\notetitletopspace{-3em}
+  \def\notetitlebottomspace{2.5em}
+  \def\notetitleinnervsep{1.5em}
+  \def\notetitlefont{}
+  \def\notetitlefontparsetup{%
+    \LARGE\centering}
+  \def\notetitleauthorfontparsetup##1{%
+    \notetitledonextvskip%
+    {\large\centering
+    \lineskip .5em\relax%
+    \begin{tabular}[t]{c}%
+      ##1%
+    \end{tabular}\par}}
+  \def\notetitleauthorfont{\large}
+  \def\notetitledatefontparsetup{%
+    \notetitledonextvskip
+    \centering}
+  \def\phfnote@mpfootnotes@fontparsetup{}
+  \def\notetitleusemainbox##1{%
+    \par
+    \box##1%
+  }
+  \appto\notetitle@default@setup{%
+    %\def\singlespace{}%
+  }
+
+  \notetitleusempfootnotesfalse
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% 
+%
+% \begin{macro}{\notetitle@style@articlev1}
+%    Backwards compatibility style |articlev1|.
+%    \begin{macrocode}
+\csdef{notetitle@style@articlev1}{%
   \vspace*{-3em}%
   \begingroup
     \centering
@@ -3661,7 +3733,7 @@
     \csname phfnote@restoredefs@#1\endcsname%
   \else%
     \PackageError{phfnote}{\string\phfnoteRestoreDefs: no such
-      definitions stored (#1)}
+      definitions stored (#1)}{}
   \fi%
 }
 %    \end{macrocode}
