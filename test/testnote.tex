@@ -2,7 +2,7 @@
 
 \newif\iftestnoteNeedsMinPkgs\testnoteNeedsMinPkgsfalse
 
-\usepackage{phfnote}
+%\usepackage{phfnote}
 %\usepackage[pkgset=minimal,title=default]{phfnote}\testnoteNeedsMinPkgstrue \usepackage{setspace}
 %\usepackage[title=default,pkgset=extended,abstract={noname,compact}]{phfnote}
 %\usepackage[title=default,pkgset=extended,noabstract]{phfnote}
@@ -12,6 +12,8 @@
 %\usepackage[title=default,pkgset=extended,secfmt={section},fontdefs=false]{phfnote}
 %\usepackage[title=small,pkgset=extended]{phfnote}
 %\usepackage[title=defaultv1,pkgset=extended]{phfnote}
+%\usepackage[title=pretty,pkgset=extended]{phfnote}
+\usepackage[title=pretty2,pkgset=extended]{phfnote}
 %\usepackage[preset=sfnote,pkgset=extended,pagegeom=bigmargin]{phfnote}
 %\usepackage[preset=sfssnote,pkgset=extended,pagegeom=narrow]{phfnote}
 %\usepackage[preset=opensansnote,pkgset=extended,pagegeom=narrow]{phfnote}
@@ -106,6 +108,7 @@
 \providecommand\thanksmark[1][]{[#1]}
 
 
+\iffalse%\iftrue  % swap true/false with META-T
 \title{Notes on Lambda-Majorization\thanks[9]{... a generalization of majorization}%
 %,  and many many many many many many many
 %
@@ -116,13 +119,17 @@
 %\date{}
 \date{\today\thanks{and not tomorrow, really really really today.}}
 
-% %\def\notetitleinnervsep{0pt}
-% \csdef{phfnote@fmt@titlefootnotes}{\itshape}
-% \title{A title goes like this}
-% %\author{Mister Me}
-% %\author{Mister Me\thanks{Thanks to someone.}}
-% \date{}
-% %\date{\today}
+\else
+
+%\def\notetitleinnervsep{0pt}
+\csdef{phfnote@fmt@titlefootnotes}{\itshape}
+\title{A title goes like this}
+%\author{Mister Me}
+%\author{Mister Me\thanks{Thanks to someone.}}
+%\date{}
+\date{\today}
+
+\fi
 
 
 \begin{document}
@@ -151,6 +158,7 @@
 %\fi
 
 \inlinetoc
+
 
 \section{Introduction and Framework}
 

@@ -50,6 +50,7 @@
     \def\@title{Notes on Lambda-Majorization}%
     \def\@author{Ph. Faist}%
     \def\@date{23.12.2011}%
+    \let\RequirePackage\@gobble%
     \def\notetitletopspace{0pt}%
     \def\notetitlefont{\sffamily\bfseries}%
     \def\morepagecontents{\par\vspace{1em}\centering\ldots}%
@@ -359,6 +360,24 @@
 %   If you would like your document to appear exactly as with \pkgname{phfnote}
 %   version 1.0, then you can set the special title style |title=defaultv1|.
 %
+% \item[title=pretty,title=pretty2] A prettier, fancier title style.  The title
+%   is centered, with two side bars providing a visual guide.  The |pretty|
+%   style looks like this:
+%   \begin{phfnoteDocVirtualPage}
+%     \notetitle@stylesetup@pretty
+%     \notetitle@style@pretty\null \shortlipsum \morepagecontents
+%   \end{phfnoteDocVirtualPage}
+%   And the |pretty2| style looks like this:
+%   \begin{phfnoteDocVirtualPage}
+%     \csname notetitle@stylesetup@pretty2\endcsname
+%     \csname notetitle@style@pretty2\endcsname\null \shortlipsum \morepagecontents
+%   \end{phfnoteDocVirtualPage}
+%
+%   This title style is highly customizable (see below), in fact the |pretty2|
+%   style is an alias for the |pretty| style, with adjusted settings.
+%
+%   These styles require the |xcolor| package (it will be loaded automatically).
+%
 % \item[title=small] A smaller title style which displays all the relevant
 %   information on a single line.  This is useful for when even the default
 %   title style appears too large.  It looks like this:
@@ -404,7 +423,8 @@
 % \changed[chg-title-false-pkgoption]{v3.0}{2018/10/16}{Improved
 % \phfverb{title,notitle} package options syntax}
 %
-% \subsubsection{Customizing the style of the \phfverb{default} and \phfverb{small} title styles}
+% \subsubsection{Customizing the style of the \phfverb{default}, \phfverb{pretty}
+% and \phfverb{small} title styles}
 % 
 % You may customize the appearance of the |default| and |small| title styles by
 % overriding some macros.
@@ -434,6 +454,22 @@
 % \renewcommand{\notetitlehrule}{\hrule height 0.8pt}
 % \end{verbatim}
 % 
+%
+% The |pretty| and |pretty2| styles provide a few macros that you can adjust to
+% your needs:
+% \begin{verbatim}
+%   \def\notetitleprettysiderulewidth{10pt}
+%  \def\notetitleprettysidespacewidth{10pt}
+%  \def\notetitleprettysiderulefmt{}
+%  \def\notetitleprettytopspace{10pt}
+%  \def\notetitleprettybottomspace{10pt}
+%  \def\notetitleprettyboxhrulewidth{0pt}
+%
+%  \colorlet{notetitleprettysidebarcolor}{blue!40!black}
+%  \colorlet{notetitleprettyhrulecolor}{notetitleprettysidebarcolor}
+%  \colorlet{notetitleprettytextcolor}{blue!20!black}
+%  \colorlet{notetitleprettybgcolor}{white!95!blue}
+% \end{verbatim}
 %
 %
 % \subsubsection{Title notes: \phfverb\thanks{} and \phfverb\thanksmark}
@@ -1505,7 +1541,7 @@
     \global\setbox\@mpfootins=\vbox{%
       \parskip=\z@\relax
       \parindent=\z@\relax
-      \parshape 1 0.04\textwidth 0.96\textwidth\relax%
+      \phfnote@mpfootnotes@fontparsetup
       \noindent\leavevmode%
       \reset@font\footnotesize%
       \phfnote@fmt@titlefootnotes%
@@ -1526,6 +1562,8 @@
 %   |\phfnote@mpfootnoteglue| is the glue which is used between two footnote texts (as
 %   they are typeset in a single paragraph).
 %    \begin{macrocode}
+\def\phfnote@mpfootnotes@fontparsetup{%
+  \parshape 1 0.04\textwidth 0.96\textwidth\relax}
 \def\phfnote@fmt@titlefootnotes{}
 \def\phfnote@mympfootnotemark#1{\@textsuperscript{\normalfont#1}}
 \def\phfnote@mpfootnoteglue{\hskip 1.2em plus 2em minus 0.5em\relax}
@@ -1591,71 +1629,203 @@
 %
 % The title styles are documented in \autoref{sec:title-styles}.
 %
+% 
 % \paragraph{Title style: `default'}
 %
 % Implementation our main `default' title style.  See
 % \autoref{sec:main-default-title-style}.
 %
+% \begin{macro}{\notetitleinnervsep}
+%   Controls the vertical spacing between individual elements of the title.
+%    \begin{macrocode}
+\newcommand\notetitleinnervsep{1.2ex}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\notetitlewidth}
+%   Controls the width of the area in which the title content is typeset.  For
+%   more complex titles (e.g., |pretty| style, the title is typeset in a smaller
+%   width than the text width to allow room for decorations).
+%    \begin{macrocode}
+\def\notetitlewidth{\textwidth}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\notetitleparskip}
+%   The paragraph skip that is used if the title contains multiple paragraphs.
+%    \begin{macrocode}
+\def\notetitleparskip{1.5ex}% parskip for multiple pars in main title
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\notetitlefontparsetup}
+% \begin{macro}{\notetitleaftertitleskip}
+%   |\notetitlefontparsetup| sets up any necessary \LaTeX{} commands to typeset
+%   the main title.  This should set the font size, and then maybe |\centering|,
+%   a |\parshape|, or a text color.
+%    \begin{macrocode}
+\def\notetitlefontparsetup{\Large}
+%    \end{macrocode}
+%   |\notetitleaftertitleskip| generates the spacing after the main title.  The
+%   default implementation behaves differently whether the title was
+%   multi-paragraph or not.
+%    \begin{macrocode}
+\def\notetitleaftertitleskip{%
+  \ifnotetitle@default@ismultipar
+    \vspace{\parskip}%
+    \gdef\phfnote@tmp@nextskip{\z@}%
+  \else
+    \gdef\phfnote@tmp@nextskip{\notetitleinnervsep}%
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\notetitleauthorfontparsetup}
+% \begin{macro}{\notetitledatefontparsetup}
+%   These macros set up any necessary \LaTeX{} commands to typeset the author
+%   and the date.  This should set the font size, and then maybe |\centering|, a
+%   |\parshape|, or a text color.  These should use calls to
+%   |\notetitledontextvskip| to adjust vertical spacing between the title items.
+%    \begin{macrocode}
+\def\notetitleauthorfontparsetup{%
+  \notetitledonextvskip[2]%
+  \parshape 1 0.04\textwidth 0.96\textwidth\relax
+  \strut
+}
+\def\notetitledatefontparsetup{%
+  \notetitledonextvskip
+  \parshape 1 0.04\textwidth 0.96\textwidth\relax
+  \strut
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\notetitledonextvskip}
+%   This helper macro is not meant to be redefined, but rather invoked from
+%   |\notetitleauthorfontparsetup| and |\notetitledatefontparsetup|.  It adds
+%   the vertical space that was stored in |\phfnote@tmp@nextskip|.
+%    \begin{macrocode}
+\newcommand\notetitledonextvskip[1][]{%
+  \vspace{#1\dimexpr\phfnote@tmp@nextskip\relax}%
+  \gdef\phfnote@tmp@nextskip{\notetitleinnervsep}%
+}
+%    \end{macrocode}
+% \end{macro} 
+%
+% \begin{macro}{\notetitlemakecontents}
+%   Helper command that produces the content of the title.  The default
+%   implementation uses the set |\title|, |\author|, and |\date| to render
+%   everything nicely.  Note that if you redefine this, then it's up to you to
+%   honor what to do with |\notetitlefontparsetup|, |\notetitlefont|,
+%   |\notetitleauthorfont|, etc.
+%    \begin{macrocode}
+\newcommand\notetitlemakecontents{
+  \notetitlemakecontentstop
+  {\par
+    \let\phfnote@old@par\par
+    \notetitle@titledefault@preparetitle
+    \notetitlefontparsetup
+    {\expandafter\notetitlefont\expandafter{\@title}}%
+    \phfnote@old@par
+    \notetitleaftertitleskip
+  }%
+  \if\relax\detokenize\expandafter{\@author}\relax\else
+    \notetitleauthorfontparsetup
+    {\expandafter\notetitleauthorfont\expandafter{\@author}}\par
+  \fi
+  \if\relax\detokenize\expandafter{\@date}\relax\else
+    \notetitledatefontparsetup
+    {\expandafter\notetitledatefont\expandafter{\@date}}\par
+  \fi
+  \notetitlemakecontentsbottom
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\notetitlemakecontentstop}
+% \begin{macro}{\notetitlemakecontentsbottom}
+%   If you just want to insert stuff before/after in the title box, then you
+%   don't have to redefine all of |\notetitlemakecontents|, you can simply
+%   redefine these macros to whatever you like.
+%    \begin{macrocode}
+\def\notetitlemakecontentstop{}
+\def\notetitlemakecontentsbottom{}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}{\notetitleusemainbox}
+%   This macro is the main formatting command for the title's global appearance.
+%   After the title is typeset in a \TeX{} box register, this macro is invoked
+%   to actually display it.  The default title style simply displays it with a
+%   rule below, but the |pretty| title style does fancier things.
+%    \begin{macrocode}
+\newcommand\notetitleusemainbox[1]{%
+  \par
+  \box#1%
+  \vspace*{\notetitleinnervsep}%
+  \notetitlehrule\relax
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\notetitle@default@mainbox}
+%   The main box register in which the title contents is saved.
+%    \begin{macrocode}
+\newsavebox\notetitle@default@mainbox
+%    \end{macrocode}
+% \end{macro}
+%
+% Now we have the main implementation of the default title style.
+%
 % \begin{macro}{\notetitle@style@default}
-%    The default title style.  Nothing mysterious, hopefully.
+%   A default title style, providing a flexible engine with powerful
+%   customization features (the same engine is used for the |pretty| title
+%   style).
+%
+%   The strategy goes like this: First typeset everything in a minipage enclosed
+%   in a box register, and then display that box register using
+%   |\notetitleusemainbox|.
 %    \begin{macrocode}
 \newcommand{\notetitle@style@default}{%
   \begingroup
     \parskip=\z@\relax
     \parindent=\z@\relax
-    \phfnote@titledefault@ismultiparfalse
+    \notetitle@default@ismultiparfalse
     \gdef\phfnote@tmp@nextskip{\z@}%
     \par\raggedright
     \phfnote@setupthanksmpfootnote
     \vspace*{\notetitletopspace}%
     \phfnote@title@checksetspace{default}%
-    \begin{minipage}{\textwidth}%
-      \begin{singlespace}%
-        {\par
-          \let\phfnote@old@par\par
-          \notetitle@titledefault@preparetitle{\expandafter\notetitlefont\expandafter{\@title}}%
-          \phfnote@old@par
-          \ifphfnote@titledefault@ismultipar
-            \vspace{\parskip}%
-            \gdef\phfnote@tmp@nextskip{\z@}%
-          \else
-            \gdef\phfnote@tmp@nextskip{\notetitleinnervsep}%
-          \fi
-        }%
-        \if\relax\detokenize\expandafter{\@author}\relax\else
-          \vspace{2\dimexpr\phfnote@tmp@nextskip\relax}%
-          \parshape 1 0.04\textwidth 0.96\textwidth\relax
-          \strut{\expandafter\notetitleauthorfont\expandafter{\@author}}\par
-          \gdef\phfnote@tmp@nextskip{\notetitleinnervsep}%
-        \fi
-        \if\relax\detokenize\expandafter{\@date}\relax\else
-          \vspace{\phfnote@tmp@nextskip}%
-          \parshape 1 0.04\textwidth 0.96\textwidth\relax
-          \strut{\expandafter\notetitledatefont\expandafter{\@date}}\par
-          \gdef\phfnote@tmp@nextskip{\notetitleinnervsep}%
-        \fi
-        \global\let\@thanks\@empty
-        \phfnote@finalizempfootnotes{\phfnote@tmp@nextskip}%
-      \end{singlespace}%
-    \end{minipage}\par
-    \vspace*{\notetitleinnervsep}%
-    \notetitlehrule\relax
-    \par
+    \setbox\notetitle@default@mainbox=\hbox{%
+      \begin{minipage}{\notetitlewidth}%
+        \begin{singlespace}%
+          \notetitlemakecontents
+          \global\let\@thanks\@empty
+          \phfnote@finalizempfootnotes{\phfnote@tmp@nextskip}%
+        \end{singlespace}%
+      \end{minipage}%
+    }%
+    \notetitleusemainbox{\notetitle@default@mainbox}\par%
   \endgroup
   \vskip\notetitlebelowspace\relax% don't change this, abstract needs to \removelastskip
 }
 %    \end{macrocode}
 % \end{macro}
-% 
+%
+%
 % Some helpers for the default title style.
 %
-% \begin{macro}{\ifphfnote@titledefault@ismultipar}
+% \begin{macro}{\ifnotetitle@default@ismultipar}
 %   This flag registers whether or not the title has multiple paragraphs (and
 %   thus renders on several spaced lines).  It is set to |true| by redefining
 %   the |\par| command in the title (see |\notetitle@titledefault@preparetitle|
 %   below).
 %    \begin{macrocode}
-\newif\ifphfnote@titledefault@ismultipar
+\newif\ifnotetitle@default@ismultipar
 %    \end{macrocode}
 % \end{macro}
 % 
@@ -1669,18 +1839,11 @@
 %   |\appto\notetitle@titledefault@preparetitle{\parskip=1.2ex\relax}|.
 %    \begin{macrocode}
 \newcommand\notetitle@titledefault@preparetitle{%
-  \def\par{\phfnote@old@par\global\phfnote@titledefault@ismultipartrue}
-  \leavevmode\parskip=1.5ex\relax
-  \Large}
+  \def\par{\phfnote@old@par\global\notetitle@default@ismultipartrue}
+  \leavevmode\parskip=\notetitleparskip\relax}
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\notetitleinnervsep}
-%   Controls the vertical spacing between individual elements of the title.
-%    \begin{macrocode}
-\newcommand\notetitleinnervsep{1.2ex}
-%    \end{macrocode}
-% \end{macro}
 %
 %
 % \paragraph{Title style: `defaultv1'}
@@ -1739,6 +1902,114 @@
 }
 %    \end{macrocode}
 % \end{macro}
+%
+%
+% \paragraph{Title style: `pretty' and `pretty2'}
+%
+% The |pretty| \& |pretty2| styles uses the same engine as the default, with
+% different settings.
+%
+% \begin{macro}{\notetitle@style@pretty}
+% \begin{macro}{\notetitle@style@pretty2}
+%   Alias the main maketitle engine to the default one.
+%    \begin{macrocode}
+\let\notetitle@style@pretty\notetitle@style@default
+\cslet{notetitle@style@pretty2}\notetitle@style@default
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}{\notetitle@stylesetup@pretty}
+%   Setup macro that makes everything nice.  Do all these defs in the macro
+%   definition, and not directly in the global space, to avoid polluting the
+%   \LaTeX{} environment with useless definitions if we don't use this title
+%   style.
+%    \begin{macrocode}
+\def\notetitle@stylesetup@pretty{%
+  \RequirePackage{xcolor}
+  \def\notetitlefont{\bfseries}
+  \def\notetitlefontparsetup{%
+    \color{notetitleprettytextcolor}\centering}
+  \def\notetitleauthorfontparsetup{%
+    \notetitledonextvskip[2]%
+    \color{notetitleprettytextcolor}\centering}
+  \def\notetitledatefontparsetup{%
+    \notetitledonextvskip
+    \color{notetitleprettytextcolor}\centering}
+  \def\phfnote@mpfootnotes@fontparsetup{\color{notetitleprettytextcolor}}
+
+  \def\notetitlewidth{\dimexpr\textwidth-2\dimexpr\notetitleprettysiderulewidth\relax
+    -2\dimexpr\notetitleprettysidespacewidth\relax}
+  \let\notetitleusemainbox\notetitle@pretty@usemainbox
+
+  \def\notetitleprettysiderulewidth{10pt}
+  \def\notetitleprettysidespacewidth{10pt}
+  \def\notetitleprettysiderulefmt{}
+  \def\notetitleprettytopspace{10pt}
+  \def\notetitleprettybottomspace{10pt}
+  \def\notetitleprettyboxhrulewidth{0pt}
+
+  \definecolor{notetitleprettysidebarcolor}{RGB}{0,68,126}
+  \colorlet{notetitleprettyhrulecolor}{notetitleprettysidebarcolor}
+  \definecolor{notetitleprettytextcolor}{RGB}{25,25,38}
+  \colorlet{notetitleprettybgcolor}{white}
+}
+\newlength\notetitle@pretty@tmplenht
+\newlength\notetitle@pretty@tmplendp
+
+\def\notetitle@pretty@usemainbox#1{%
+  \parskip=\z@\relax
+  \parindent=\z@\relax
+  \notetitle@pretty@tmplenht=\ht#1\relax%
+  \notetitle@pretty@tmplendp=\dp#1\relax%
+  \edef\tmp@dorule{%
+    {\noexpand\color{notetitleprettysidebarcolor}%
+    \noexpand\rule{\notetitleprettysiderulewidth}{%
+      \dimexpr \notetitleprettytopspace+
+          \notetitleprettybottomspace+
+          \notetitleprettyboxhrulewidth+
+          \notetitleprettyboxhrulewidth+
+          \notetitle@pretty@tmplendp+
+          \notetitle@pretty@tmplenht\relax}}}%
+  \fboxsep=0pt% for \colorbox
+  \par\hbox{%
+    \tmp@dorule%
+    \colorbox{notetitleprettybgcolor}{%
+      \vbox{%
+        {\color{notetitleprettyhrulecolor}\hrule height \notetitleprettyboxhrulewidth\relax}%
+        \hbox{%
+          \hskip \notetitleprettysidespacewidth\relax
+          % \fbox% DEBUG
+          {\vbox{\vskip \notetitleprettytopspace\relax
+              \box#1%
+              \vskip \notetitleprettybottomspace\relax}}%
+          \hskip \notetitleprettysidespacewidth\relax
+        }%
+        {\color{notetitleprettyhrulecolor}\hrule height \notetitleprettyboxhrulewidth\relax}%
+      }}%
+    \tmp@dorule%
+  }\par
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}
+%   The |pretty2| style simply loads the |pretty| style, and ajusts some
+%   settings.
+%    \begin{macrocode}
+\csdef{notetitle@stylesetup@pretty2}{%
+  \notetitle@stylesetup@pretty
+
+  \definecolor{notetitleprettysidebarcolor}{RGB}{0,68,126}
+  \colorlet{notetitleprettyhrulecolor}{notetitleprettysidebarcolor}
+  \colorlet{notetitleprettytextcolor}{notetitleprettysidebarcolor!50!black}
+  \colorlet{notetitleprettybgcolor}{white!95!notetitleprettytextcolor}
+
+  \def\notetitleprettyboxhrulewidth{.4pt}
+}
+%    \end{macrocode}
+% \end{macro}
+% 
 %
 %
 % \paragraph{Title style: `small'}
@@ -1845,8 +2116,13 @@
 %    \begin{macrocode}
       \def\@author{}%
 %    \end{macrocode}
-% Now, actually overload the title style by redefining |\@maketitle|.
+% Now, actually overload the title style by redefining |\@maketitle|.  Also, if
+% the style defines a ``setup'' macro |\notetitle@stylesetup@...|, then we
+% invoke it.
 %    \begin{macrocode}
+      \ifcsname notetitle@stylesetup@\phfnote@tmp@titsty\endcsname
+        \csname notetitle@stylesetup@\phfnote@tmp@titsty\endcsname
+      \fi
       \def\@maketitle{\csname notetitle@style@\phfnote@tmp@titsty\endcsname}%
     \fi
   }%
