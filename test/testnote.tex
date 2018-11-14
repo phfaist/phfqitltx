@@ -10,12 +10,12 @@
 %\usepackage[title=default,pkgset=extended,secfmt={section,secsquares,secnummargin}]{phfnote}
 %\usepackage[title=default,pkgset=extended,secfmt={section}]{phfnote}
 %\usepackage[title=default,pkgset=extended,secfmt={section},fontdefs=false]{phfnote}
-\usepackage[title=default,pkgset=extended]{phfnote}
+%\usepackage[title=default,pkgset=extended]{phfnote}
 %\usepackage[title=defaultv1,pkgset=extended]{phfnote}
 %\usepackage[title=small,pkgset=extended]{phfnote}
 %\usepackage[title=smallv1,pkgset=extended]{phfnote}
 %\usepackage[title=pretty,pkgset=extended]{phfnote}
-%\usepackage[title=pretty2,pkgset=extended]{phfnote}
+\usepackage[title=pretty2,pkgset=extended]{phfnote}
 %\usepackage[title=article,pkgset=extended]{phfnote}
 %\usepackage[title=articlev1,pkgset=extended]{phfnote}
 %\usepackage[preset=sfnote,pkgset=extended,pagegeom=bigmargin]{phfnote}
@@ -111,7 +111,7 @@
 
 \providecommand\thanksmark[1][]{[#1]}
 
-\iftrue%\iffalse  % swap true/false with META-T
+\iffalse%\iftrue  % swap true/false with META-T
   \def\notetitleprettylsiderulewidth{10pt}
   \def\notetitleprettylsidespacewidth{20pt}
   \def\notetitleprettyrsiderulewidth{.4pt}
@@ -120,7 +120,7 @@
   \def\notetitleprettybottomspace{20pt}
   \def\notetitleprettyboxhrulewidth{1pt}
 
-  \def\notetitlebeginrender{}\def\notetitleendrender{}
+  \def\notetitlebeginrender{\vbox\bgroup}\def\notetitleendrender{\egroup}
   \notetitleusempfootnotesfalse
 
   \definecolor{notetitleprettylsiderulecolor}{RGB}{0,68,126}
@@ -146,12 +146,14 @@
 
 %\def\notetitleinnervsep{0pt}
 %\renewcommand\notetitlesmallauthordatesep{\hspace*{.5em}\cdot\hspace*{.5em}}
-\csdef{phfnote@fmt@titlefootnotes}{\itshape}
-\title{A title goes like this}
-%\author{Mister Me}
-\author{Mister Me\thanks{Thanks to someone.}}
+%\csdef{phfnote@fmt@titlefootnotes}{\itshape}
+%\title{A title goes like this}
+\title{A two-part title can be set\par With a \string\par\ command}
+%\title{A very long title would go like this: Lorem ipsum dolor amet stuff with excelsior borat et solus}
+\author{Mister Me}
+%\author{Mister Me\thanks{Thanks to someone.}}
 %\date{}
-\date{\today}
+%\date{\today}
 
 \fi
 

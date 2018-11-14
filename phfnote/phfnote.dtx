@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfnote}
 %<*package>
-    [2018/10/25 v3.0 phfnote package]
+    [2018/11/14 v3.0 phfnote package]
 %</package>
 %
 %<*driver>
@@ -1667,7 +1667,7 @@
 % \begin{macro}{\notetitleinnervsep}
 %   Controls the vertical spacing between individual elements of the title.
 %    \begin{macrocode}
-\newcommand\notetitleinnervsep{1.2ex}
+\newcommand\notetitleinnervsep{1.15ex}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1683,7 +1683,7 @@
 % \begin{macro}{\notetitleparskip}
 %   The paragraph skip that is used if the title contains multiple paragraphs.
 %    \begin{macrocode}
-\def\notetitleparskip{1.5ex}% parskip for multiple pars in main title
+\def\notetitleparskip{1.4ex}% parskip for multiple pars in main title
 %    \end{macrocode}
 % \end{macro}
 % 
@@ -1693,7 +1693,7 @@
 %   the main title.  This should set the font size, and then maybe |\centering|,
 %   a |\parshape|, or a text color.
 %    \begin{macrocode}
-\def\notetitlefontparsetup{\Large}
+\def\notetitlefontparsetup{\raggedright\setstretch{1.05}\Large}
 %    \end{macrocode}
 %   |\notetitleaftertitleskip| generates the spacing after the main title.  The
 %   default implementation behaves differently whether the title was
@@ -1702,7 +1702,8 @@
 \def\notetitleaftertitleskip{%
   \ifnotetitle@default@ismultipar
     \vspace{\parskip}%
-    \gdef\phfnote@tmp@nextskip{\z@}%
+    %\gdef\phfnote@tmp@nextskip{\z@}%
+    \gdef\phfnote@tmp@nextskip{0.5\dimexpr\notetitleinnervsep\relax}%
   \else
     \gdef\phfnote@tmp@nextskip{\notetitleinnervsep}%
   \fi
@@ -1958,7 +1959,7 @@
 %   |\appto\notetitle@titledefault@preparetitle{\parskip=1.2ex\relax}|.
 %    \begin{macrocode}
 \newcommand\notetitle@titledefault@preparetitle{%
-  \def\par{\phfnote@old@par\global\notetitle@default@ismultipartrue}
+  \def\par{\phfnote@old@par\global\notetitle@default@ismultipartrue}%
   \leavevmode\parskip=\notetitleparskip\relax}
 %    \end{macrocode}
 % \end{macro}
