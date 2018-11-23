@@ -14,8 +14,8 @@
 %\usepackage[title=defaultv1,pkgset=extended]{phfnote}
 %\usepackage[title=small,pkgset=extended]{phfnote}
 %\usepackage[title=smallv1,pkgset=extended]{phfnote}
-%\usepackage[title=pretty,pkgset=extended]{phfnote}
-\usepackage[title=pretty2,pkgset=extended]{phfnote}
+\usepackage[title=pretty,pkgset=extended]{phfnote}
+%\usepackage[title=pretty2,pkgset=extended]{phfnote}
 %\usepackage[title=article,pkgset=extended]{phfnote}
 %\usepackage[title=articlev1,pkgset=extended]{phfnote}
 %\usepackage[preset=sfnote,pkgset=extended,pagegeom=bigmargin]{phfnote}
@@ -118,20 +118,29 @@
   \def\notetitleprettyrsidespacewidth{29.6pt}
   \def\notetitleprettytopspace{10pt}
   \def\notetitleprettybottomspace{20pt}
-  \def\notetitleprettyboxhrulewidth{1pt}
+  \def\notetitleprettytophrulewidth{1pt}
+  \def\notetitleprettybottomhrulewidth{2pt}
 
-  \def\notetitlebeginrender{\vbox\bgroup}\def\notetitleendrender{\egroup}
-  \notetitleusempfootnotesfalse
+  %  \def\notetitlebeginrender{\vbox\bgroup\hsize=6cm}\def\notetitleendrender{\egroup}
+  %  \notetitleusempfootnotesfalse
 
   \definecolor{notetitleprettylsiderulecolor}{RGB}{0,68,126}
   \colorlet{notetitleprettyrsiderulecolor}{blue}
-  \colorlet{notetitleprettyhrulecolor}{red}
+  \colorlet{notetitleprettytophrulecolor}{red}
+  \colorlet{notetitleprettybottomhrulecolor}{red!35!green}
   \colorlet{notetitleprettytextcolor}{notetitleprettylsiderulecolor!50!black}
   \colorlet{notetitleprettybgcolor}{white!95!notetitleprettytextcolor}
+
+  % \def\notetitleprettyboxtophrule{%
+  %   {\color{red!35!green}\hrule height 1ex}}
 \fi
 
+  \iffalse%\iftrue
+    \def\notetitlewidth{1.2\textwidth}
+  \fi
 
-\iftrue%\iffalse  % swap true/false with META-T
+
+\iffalse%\iftrue  % swap true/false with META-T
 \title{Notes on Lambda-Majorization\thanks[9]{... a generalization of majorization}%
 %,  and many many many many many many many
 %

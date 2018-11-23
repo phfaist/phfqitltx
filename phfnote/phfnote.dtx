@@ -495,11 +495,13 @@
 % \renewcommand\notetitleprettyrsidespacewidth{10pt}
 % \renewcommand\notetitleprettytopspace{10pt}
 % \renewcommand\notetitleprettybottomspace{10pt}
-% \renewcommand\notetitleprettyboxhrulewidth{0pt}
+% \renewcommand\notetitleprettytophrulewidth{0pt}
+% \renewcommand\notetitleprettybottomhrulewidth{0pt}
 %
 % \colorlet{notetitleprettylsiderulecolor}{blue!40!black}
 % \colorlet{notetitleprettyrsiderulecolor}{notetitleprettylsiderulecolor}
-% \colorlet{notetitleprettyhrulecolor}{notetitleprettylsiderulecolor}
+% \colorlet{notetitleprettytophrulecolor}{notetitleprettylsiderulecolor}
+% \colorlet{notetitleprettybottomhrulecolor}{notetitleprettylsiderulecolor}
 % \colorlet{notetitleprettytextcolor}{blue!20!black}
 % \colorlet{notetitleprettybgcolor}{white!95!blue}
 % \end{verbatim}
@@ -2078,11 +2080,13 @@
   \def\notetitleprettyrsidespacewidth{10pt}
   \def\notetitleprettytopspace{10pt}
   \def\notetitleprettybottomspace{10pt}
-  \def\notetitleprettyboxhrulewidth{0pt}
+  \def\notetitleprettytophrulewidth{0pt}
+  \def\notetitleprettybottomhrulewidth{0pt}
 
   \definecolor{notetitleprettylsiderulecolor}{RGB}{0,68,126}
   \colorlet{notetitleprettyrsiderulecolor}{notetitleprettylsiderulecolor}
-  \colorlet{notetitleprettyhrulecolor}{notetitleprettylsiderulecolor}
+  \colorlet{notetitleprettytophrulecolor}{notetitleprettylsiderulecolor}
+  \colorlet{notetitleprettybottomhrulecolor}{notetitleprettylsiderulecolor}
   \definecolor{notetitleprettytextcolor}{RGB}{25,25,38}
   \colorlet{notetitleprettybgcolor}{white}
 }
@@ -2099,16 +2103,18 @@
       \noexpand\rule{##2}{%
         \dimexpr \notetitleprettytopspace+
             \notetitleprettybottomspace+
-            \notetitleprettyboxhrulewidth+
-            \notetitleprettyboxhrulewidth+
+            \notetitleprettytophrulewidth+
+            \notetitleprettybottomhrulewidth+
             \notetitle@pretty@tmplendp+
             \notetitle@pretty@tmplenht\relax}}}%
   \fboxsep=0pt% for \colorbox
-  \par\hbox{%
+  \par\hbox to \textwidth{%
+    \hskip 0pt plus 0.1fil minus 0.1fil\relax%
     \tmp@dorule{l}{\notetitleprettylsiderulewidth}%
     \colorbox{notetitleprettybgcolor}{%
       \vbox{%
-        {\color{notetitleprettyhrulecolor}\hrule height \notetitleprettyboxhrulewidth\relax}%
+        {\color{notetitleprettytophrulecolor}%
+          \hrule height \notetitleprettytophrulewidth\relax}%
         \hbox{%
           \hskip \notetitleprettylsidespacewidth\relax
           % \fbox% DEBUG
@@ -2117,10 +2123,12 @@
               \vskip \notetitleprettybottomspace\relax}}%
           \hskip \notetitleprettyrsidespacewidth\relax
         }%
-        {\color{notetitleprettyhrulecolor}\hrule height \notetitleprettyboxhrulewidth\relax}%
+        {\color{notetitleprettybottomhrulecolor}%
+          \hrule height \notetitleprettybottomhrulewidth\relax}%
       }}%
     \tmp@dorule{r}{\notetitleprettyrsiderulewidth}%
-  }\par
+  \hskip 0pt plus 0.1fil minus 0.1fil\relax}%
+  \par%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -2134,11 +2142,13 @@
 
   \definecolor{notetitleprettylsiderulecolor}{RGB}{0,68,126}
   \colorlet{notetitleprettyrsiderulecolor}{notetitleprettylsiderulecolor}
-  \colorlet{notetitleprettyhrulecolor}{notetitleprettylsiderulecolor}
+  \colorlet{notetitleprettytophrulecolor}{notetitleprettylsiderulecolor}
+  \colorlet{notetitleprettybottomhrulecolor}{notetitleprettylsiderulecolor}
   \colorlet{notetitleprettytextcolor}{notetitleprettylsiderulecolor!50!black}
   \colorlet{notetitleprettybgcolor}{white!95!notetitleprettytextcolor}
 
-  \def\notetitleprettyboxhrulewidth{.4pt}
+  \def\notetitleprettytophrulewidth{.4pt}
+  \def\notetitleprettybottomhrulewidth{.4pt}
 }
 %    \end{macrocode}
 % \end{macro}
