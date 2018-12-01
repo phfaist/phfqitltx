@@ -769,7 +769,6 @@
 %   example.
 % \end{pkgoptions}
 %
-%
 % The following package options are OBSOLETE:
 % \begin{pkgoptions}
 % \item[pagegeomdefs=\meta{true or false}] Whether to care about page
@@ -778,18 +777,24 @@
 %   |pagegeomdefs=false| and |pagegeom| (or |pagegeom=...| with setting) instead
 %   of |pagegeomdefs=true|.
 % \end{pkgoptions}
+%
 % \changed[chg-pagegeom-pkgoption-onoff]{v3.0}{2018/10/16}{Changed how to turn
 % on/off the page geometry settings by improving the \phfverb{pagegeom} package
 % options, deprecated \phfverb{pagegeomdefs} option}
-% 
+%
+% \changed[chg-pagegeom-xwide]{v3.0}{2018/11/30}{Changed the \texttt{xwide} page
+% geometry for tighter vertical margin for single-column text (use
+% \texttt{pagegeom=xwidev1} instead for old behavior)}
+%
 %
 % \subsection{Section Headers Styling}
 % \label{sec:secfmt}
 %
-% The \pkgname{phfnote} package provides some limited styling of section headers.  The
-% font, size and ``compactness'' of the headers can be adjusted with title options.
-% But really, these options are quite basic.  You should use \pkgname{titlesec} or
-% \pkgname{sectsty} directly if you want anything serious.
+% The \pkgname{phfnote} package provides some limited styling of section
+% headers.  The font, size and ``compactness'' of the headers can be adjusted
+% with title options.  But really, these options are quite basic.  You should
+% use \pkgname{titlesec} or \pkgname{sectsty} directly if you want anything
+% serious.
 %
 % The section headings are customized using the \pkgname{sectsty} package.  If
 % this conflicts in your document, then use the |nosecfmt| package option to
@@ -2543,8 +2548,24 @@
 % 
 % \begin{macro}{\phfnote@pagegeomstyle@xwide}
 %   Extra wide.
+%
+%   \changedreftext{chg-pagegeom-xwide}
 %    \begin{macrocode}
 \def\phfnote@pagegeomstyle@xwide{
+  \if@twocolumn
+    \PassOptionsToPackage{hmargin=0.5in,vmargin=0.5in,includeheadfoot}{geometry}%
+  \else
+    % fix the margins a bit to make text wider
+    \ifcase\@ptsize% mods for 10 pt
+      \PassOptionsToPackage{hmargin=1in,vmargin=1in}{geometry}%
+    \or% mods for 11 pt
+      \PassOptionsToPackage{hmargin=1in,vmargin=1in}{geometry}%
+    \or% mods for 12 pt
+      \PassOptionsToPackage{hmargin=0.75in,vmargin=1in}{geometry}%
+    \fi%
+  \fi
+}
+\csdef{phfnote@pagegeomstyle@xwidev1}{
   \if@twocolumn
     \PassOptionsToPackage{hmargin=0.5in,vmargin=0.5in,includeheadfoot}{geometry}%
   \else
@@ -2560,6 +2581,7 @@
 }
 %    \end{macrocode}
 % \end{macro}
+%
 %
 % \begin{macro}{\phfnote@pagegeomstyle@bigmargin}
 %   |bigmargin| style.
@@ -3874,7 +3896,7 @@
 % Add definitions to adjust spacing of lines and words. \marginpar{\raggedleft
 % \phfverb{[spacingdefs=...]}}  See \autoref{sec:spacingdefs}.
 %    \begin{macrocode}
-\DeclareStringOption[true]{spacingdefs}
+\DeclareStringOption[true]{spacingdefs}[true]
 \DeclareVoidOption{nospacingdefs}{\def\phfnote@opt@spacingdefs{false}}
 %    \end{macrocode}
 %
@@ -3882,14 +3904,14 @@
 % Do some adjustments to the fonts. \marginpar{\raggedleft
 % \phfverb{[fontdefs=...]}} See \autoref{sec:fontdefs}.
 %    \begin{macrocode}
-\DeclareStringOption[true]{fontdefs}
+\DeclareStringOption[true]{fontdefs}[true]
 \DeclareVoidOption{nofontdefs}{\def\phfnote@opt@fontdefs{false}}
 %    \end{macrocode}
 %
 % Adjustments for footnotes. \marginpar{\raggedleft
 % \phfverb{[footnotedefs=...]}}  See \autoref{sec:footnotedefs}.
 %    \begin{macrocode}
-\DeclareStringOption[true]{footnotedefs}
+\DeclareStringOption[true]{footnotedefs}[true]
 \DeclareVoidOption{nofootnotedefs}{\def\phfnote@opt@footnotedefs{false}}
 %    \end{macrocode}
 %
@@ -3903,7 +3925,7 @@
 % Adjustments for bibliography, including default style. \marginpar{\raggedleft
 % \phfverb{[bibliographydefs=...]}} See \autoref{sec:bibliographydefs}.
 %    \begin{macrocode}
-\DeclareStringOption[true]{bibliographydefs}
+\DeclareStringOption[true]{bibliographydefs}[true]
 \DeclareVoidOption{nobibliographydefs}{\def\phfnote@opt@bibliographydefs{false}}
 %    \end{macrocode}
 % 
