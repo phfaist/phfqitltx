@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfnote}
 %<*package>
-    [2018/11/14 v3.0 phfnote package]
+    [2018/11/30 v3.0 phfnote package]
 %</package>
 %
 %<*driver>
@@ -69,6 +69,10 @@
   %%\par%
   \endgroup%
 }
+
+\def\eqsign@{=}
+\def\eqsign{\protect\eqsign@}
+\robustify\eqsign
 \makeatother
 
 \def\RevTeX{{\small R\raise-0.2ex\hbox{\textsc{ev}}}\TeX}
@@ -355,7 +359,8 @@
 %   \changed[chg-title-default-spacing]{v3.0}{2018/10/25}{The default title
 %   style was redesigned to improved spacing of the elements in all cases
 %   including multiline titles, author and/or date not specified, and presence
-%   or absence of thanks notes}
+%   or absence of thanks notes.  Use \texttt{title\eqsign defaultv1}
+%   for old behavior}
 %
 %   If you would like your document to appear exactly as with \pkgname{phfnote}
 %   version 1.0, then you can set the special title style |title=defaultv1|.
@@ -399,7 +404,8 @@
 %   \changed[chg-title-article-spacing]{v3.0}{2018/10/26}{The \phfverb{article}
 %   title style was redesigned to use our new title engine, with improved
 %   spacing of the elements in all cases including multiline titles, author
-%   and/or date not specified, and presence or absence of thanks notes}
+%   and/or date not specified, and presence or absence of thanks notes.
+%   Use \texttt{title\eqsign articlev1} for old behavior}
 %
 %   If you would like your document to appear exactly as with \pkgname{phfnote}
 %   version 1.0, then you can set the special title style |title=articlev1|.
@@ -784,7 +790,7 @@
 %
 % \changed[chg-pagegeom-xwide]{v3.0}{2018/11/30}{Changed the \texttt{xwide} page
 % geometry for tighter vertical margin for single-column text (use
-% \texttt{pagegeom=xwidev1} instead for old behavior)}
+% \texttt{pagegeom\eqsign xwidev1} instead for old behavior)}
 %
 %
 % \subsection{Section Headers Styling}

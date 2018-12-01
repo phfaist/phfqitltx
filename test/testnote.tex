@@ -136,12 +136,12 @@
   %   {\color{red!35!green}\hrule height 1ex}}
 \fi
 
-  \iffalse%\iftrue
-    \def\notetitlewidth{1.2\textwidth}
-  \fi
+\iffalse%\iftrue
+  \def\notetitlewidth{1.2\textwidth}
+\fi
 
 
-\iffalse%\iftrue  % swap true/false with META-T
+\iftrue%\iffalse  % swap true/false with META-T
 \title{Notes on Lambda-Majorization\thanks[9]{... a generalization of majorization}%
 %,  and many many many many many many many
 %
@@ -182,7 +182,7 @@
   mixed ancilla, performing a unitary, and removing the ancilla. Previous work
   has demonstrated the relation between these operations and the mathematical
   notion of majorization.
-  \iffalse % test longer/shorter abstract
+  \iffalse%\iftrue % test longer/shorter abstract
   Using Landauer's Principle, we reduce the characterization of work cost or
   extraction to the consideration of absorbtion or generation during noisy
   operations of randomness stored in ancillas, similar to the notion of
