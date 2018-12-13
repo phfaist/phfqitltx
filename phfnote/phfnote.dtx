@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfnote}
 %<*package>
-    [2018/11/30 v3.0 phfnote package]
+    [2018/12/13 v3.0 phfnote package]
 %</package>
 %
 %<*driver>
@@ -1325,6 +1325,12 @@
 % \begin{verbatim}
 % \colorlet{AlErmcolor}{gray}
 % \end{verbatim}
+%
+% \DescribeMacro{\phfDisableCommentingCommands}
+% The command |\phfDisableCommentingCommands| disables all commenting commands,
+% and causes them to emit an error.  Use this command when approaching the final
+% version of a long document to ensure that no commenting commands are left in
+% the document.
 %
 % \changed[chg-inline-commenting]{v3.0}{2018/10/03}{Added support for inline
 % commenting using \phfverb\phfMakeCommentingCommand}
@@ -3408,13 +3414,19 @@
   \ifcsname phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur @\roman{page}\endcsname
     % already displayed on this page, don't repeat
   \else
-    \csgdef{phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur @\roman{page}}{}%
-    \edef\phf@cc@tmpxzxxw{\unexpanded{\strut\color}{\phf@cc@val@cur color}%
-      \unexpanded{\fboxsep=1pt\relax\fbox{\normalfont\sffamily\footnotesize #1}}}%
-    \edef\phf@cc@tmpzxxxw{%
-      \noexpand\marginpar[{\noexpand\raggedleft\expandonce\phf@cc@tmpxzxxw}]%
-      {\noexpand\raggedright\expandonce\phf@cc@tmpxzxxw}}%
-    \phf@cc@tmpzxxxw%
+    \ifinner% see latex.ltx, \marginpar definition
+      \PackageWarning{phfnote}{Can't create \string\marginpar\space inside math
+        environments or other inner boxes (\string\parbox, etc.), comment's label
+        with initials will not be emitted at this time.}
+    \else
+      \csgdef{phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur @\roman{page}}{}%
+      \edef\phf@cc@tmpxzxxw{\unexpanded{\strut\color}{\phf@cc@val@cur color}%
+        \unexpanded{\fboxsep=1pt\relax\fbox{\normalfont\sffamily\footnotesize #1}}}%
+      \edef\phf@cc@tmpzxxxw{%
+        \noexpand\marginpar[{\noexpand\raggedleft\expandonce\phf@cc@tmpxzxxw}]%
+        {\noexpand\raggedright\expandonce\phf@cc@tmpxzxxw}}%
+      \phf@cc@tmpzxxxw%
+    \fi
   \fi
 }
 \robustify\phf@cc@formatinitialsstyle@margin
@@ -3481,6 +3493,18 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\phfDisableCommentingCommands}
+%   This command causes any commenting command declared with
+%   |\phfMakeCommentingCommand| to emit an error.
+%    \begin{macrocode}
+\newif\ifphf@cc@disabled
+\phf@cc@disabledfalse
+\def\phfDisableCommentingCommands{%
+  \phf@cc@disabledtrue
+}
+%    \end{macrocode}
+% \end{macro}
+%
 % Overall, the implementation of a commenting command goes as follows.  First,
 % gather all the info about the command invocation (e.g., important? starred?
 % comment?) and then ultimately call |\phf@cc@begin| and |\phf@cc@end| which
@@ -3536,12 +3560,22 @@
 % \end{macro}
 %
 % \begin{macro}{\phf@cc@do}
-% The user-instantiated commenting commands are an alias of this command,
-% with the user macro name as first argument.
-%
-% First, we open the \TeX\ group. Then we start parsing the invocation syntax.
+%   The user-instantiated commenting commands are an alias of this command, with
+%   the user macro name as first argument.  Here's were everything starts.
 %    \begin{macrocode}
 \def\phf@cc@do#1{%
+%    \end{macrocode}
+%   First, we need to check if commenting commands were disabled with
+%   |\phfDisableCommentingCommands|.  If this is the case, generate an error.
+%    \begin{macrocode}
+  \ifphf@cc@disabled
+    \PackageError{phfnote}{Commenting commands have been disabled
+      with \string\phfDisableCommentingCommands.}{}%
+  \fi
+%    \end{macrocode}
+%   Now we start for real.  First, we open the \TeX\ group. Then we start
+%   parsing the invocation syntax.
+%    \begin{macrocode}
   \leavevmode\begingroup%
   \edef\phf@cc@val@cur{#1}%
   \@ifstar\phf@cc@star\phf@cc@nostar% star?
