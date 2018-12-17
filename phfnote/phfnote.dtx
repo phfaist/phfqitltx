@@ -3343,8 +3343,11 @@
 %
 % \begin{macro}{\phfCommentingDefault*}
 % Provide sensible defaults for commenting formatting.
+%
+% Bold or semibold CFont sounds like a good idea, but comments would seem more
+% aggressive like that, so keep them normal by default.
 %    \begin{macrocode}
-\def\phfCommentingDefaultCFont{\sffamily\fontseries{sb}\selectfont}
+\def\phfCommentingDefaultCFont{\sffamily}
 \def\phfCommentingDefaultCSpacing{0.2em}
 \def\phfCommentingDefaultCBegin{[\,}
 \def\phfCommentingDefaultCEnd{\,]}
