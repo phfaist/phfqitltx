@@ -1027,10 +1027,13 @@
 %
 % \item[nohyperrefdefs] Do not load the \pkgname{hyperref} package.  Do not set
 %   any settings.  Do not care to provide |\email| or |\url|.  Same as
-%   |hyperrefdefs=false|.  Depending on the situation, you might prefer to
-%   specify |hyperrefdefs=defer| or |hyperrefdefs=noload|, see below.
+%   |hyperrefdefs=false|.
 %
-% \item[hyperrefdefs=defer] Prepare the document for hyperlinks,
+%   Depending on the situation, you might prefer to specify |hyperrefdefs=defer|
+%   or |hyperrefdefs=noload|, so that some basic setup (e.g. |\url|/|\email|
+%   commands) can still be provided.  See below.
+%
+% \item[hyperrefdefs=\pkgoptattrib{defer}] Prepare the document for hyperlinks,
 %   schedule settings for \pkgname{hyperref}, but do not actually load the
 %   \pkgname{hyperref} package.
 %
@@ -1038,7 +1041,7 @@
 %   loaded before loading \pkgname{hyperref}.  A lot of packages need to be
 %   loaded before \pkgname{hyperref} so if you load several other packages,
 %   you're probably better off using this option and calling
-%   |\usepackage{hyperref}| at the end of your preamble (before
+%   |\usepackage{hyperref}| at the end of your preamble, i.e.\@ right before
 %   |\begin{document}|, rather than chasing mysterious errors.
 %     \iffalse \end{document} -- [...emacs indentation gets fooled easily...] \fi
 %   
@@ -1046,7 +1049,7 @@
 %   package with |\usepackage{hyperref}| somewhere in the preamble.  You will
 %   get an error if you don't do this.
 %
-% \item[hyperrefdefs=noemail] Do not override any existing
+% \item[hyperrefdefs=\pkgoptattrib{noemail}] Do not override any existing
 %   |\email| command.  Use this for instance in Rev\TeX{}, where our
 %   implementation of |\email| clashes with Rev\TeX{}'s |\email| command which
 %   is used to specify e-mail addresses for authors.
@@ -1054,16 +1057,16 @@
 %   The version of this command by \pkgname{phfnote} is still available as
 %   |\phfnoteEmail|.
 %
-% \item[hyperrefdefs=noload] Do not load the \pkgname{hyperref}
+% \item[hyperrefdefs=\pkgoptattrib{noload}] Do not load the \pkgname{hyperref}
 %   package, and don't bother to set any related settings.  However,
 %   \pkgname{url} package is loaded, and the commands |\url| and |\email| are
 %   provided (they output the same visual text but don't produce a clickable
 %   color link).
 %
-% \item[hyperrefdefs=clearoptions] Do not attempt to set any options via
-%   |\hypersetup| (and don't schedule setting any such options later).  You'll
-%   get \pkgname{hyperref}'s default settings, so it's up to you to call
-%   |\hypersetup| with however you'd like to see your links look like.
+% \item[hyperrefdefs=\pkgoptattrib{clearoptions}] Do not attempt to set any
+%   options via |\hypersetup| (and don't schedule setting any such options
+%   later).  You'll get \pkgname{hyperref}'s default settings, so it's up to you
+%   to call |\hypersetup| with however you'd like to see your links look like.
 %
 % \end{pkgoptions}
 %
@@ -1247,9 +1250,9 @@
 % |{AlE}|), and not as a macro.  They key-value pairs may be one of the following:
 %
 %
-% \phfMakeCommentingCommand[color=blue,initials={PhF},formatinitials=box]{phfbox}
-% \phfMakeCommentingCommand[color=blue,initials={PhF},formatinitials=nobox]{phfnobox}
-% \phfMakeCommentingCommand[color=blue,initials={PhF},formatinitials=hide]{phfhideinitials}
+% \phfMakeCommentingCommand[color=phfcolor,initials={PhF},formatinitials=box]{phfbox}
+% \phfMakeCommentingCommand[color=phfcolor,initials={PhF},formatinitials=nobox]{phfnobox}
+% \phfMakeCommentingCommand[color=phfcolor,initials={PhF},formatinitials=hide]{phfhideinitials}
 % \phfMakeCommentingCommand[color=green!50!blue,initials={Philippe Faist},formatinitials=footnote]{phffootnote}
 %
 % \begin{cmdoptions}
@@ -1258,35 +1261,39 @@
 %   each new commenting command defined.
 %
 %   The color specification may be a name such as |red|, |green|, etc., but also
-%   a mixture like |red!30!black| (\textcolor{red!30!black}{which stands for red
-%   30\%, black 70\%}).  You can specify any argument you could specify to
-%   |\colorlet| from the \pkgname{xcolor} package. (NOTE: the \pkgname{xcolor}
-%   package must be loaded, which is the default except if you loaded the older
-%   |color| package or you have |pkgset=none|.)
-% \item[initials=\marg{your initials}] The initials to typeset at the beginning
-%   of a comment.  By default, the initials are set to the name of the command
-%   itself.
+%   a mixture like |blue!40!green| (\textcolor{blue!40!green}{which stands for
+%   40\% of blue and 60\% of green}).  You can specify any argument you could
+%   specify to |\colorlet| from the \pkgname{xcolor} package. (NOTE: the
+%   \pkgname{xcolor} package must be loaded, which is the default except if you
+%   loaded the older |color| package or you have |pkgset=none|.)
+%
+% \item[initials=\marg{your initials}] Your name initials, which will by typeset
+%   at the beginning of a comment (typically in a small box in the margin),
+%   allowing to identify different comment colors with different people.  By
+%   default, the initials are set to the name of the command itself.
 %
 % \item[formatinitials=\meta{keyword or command}] The command that will be used
 %   to format the initials.  By default (|formatinitials=default| or
 %   |formatinitials=margin|), the initials are displayed on the margin of the
-%   paragraph the first time the change occurs on a given page, like in the
-%   examples above.  You may also specify |formatinitials=box| to typeset the
-%   initials in smaller sans serif font in a small frame \phfbox[like this].
-%   Specify |formatinitials=nobox| to remove the frame \phfnobox[like this].  Or
-%   specify |formatinitials=hide| to hide the initials altogether,
-%   \phfhideinitials[like this].  You can also specify |formatinitials=footnote|
-%   to hide the initials at the point of text but with a footnote to associate
-%   colored comments with the name (for this to work more nicely, specify your
-%   full name with |initials={...}|) \phffootnote[Here is an example].  [In the
-%   latter case, you may redefine |\phfCCChangesBy|, e.g., \relax%
+%   paragraph the first time the change occurs on a given page \phf[like this
+%   and like in the examples above].  You may also specify |formatinitials=box|
+%   to typeset the initials inline immediately before your annotation
+%   \phfbox[like this].  Specify |formatinitials=nobox| to remove the frame
+%   \phfnobox[like this].  Or specify |formatinitials=hide| to hide the initials
+%   altogether \phfhideinitials[like this].  You can also specify
+%   |formatinitials=footnote| to hide the initials at the point of text but with
+%   a footnote to associate colored comments with the name (for this to work
+%   more nicely, specify your full name as argument to |initials={...}|)
+%   \phffootnote[Here is an example].  [In the latter case, you may redefine
+%   |\phfCCChangesBy|, e.g., \relax%
 %   |\renewcommand{\phfCCChangesBy}{Changes in this color are by\ }| to change
 %   the text in the footnote.]
 %
 %   You may also specify any \LaTeX{} command, which will then be used to format
 %   the initials.
 % \item[cfont=\marg{LaTeX commands}] The font commands to invoke when
-%   typesetting comment. By default, use the default sans serif typeface.
+%   typesetting comment. By default, use \phf[the default sans serif typeface,
+%   like this].
 % \item[cspacing=\meta{length}] Spacing to add around comments. This amount of
 %   horizontal space is added before and after the comment.
 % \item[cbegin=\marg{LaTeX text and/or commands}] Stuff to typeset at
@@ -1477,9 +1484,9 @@
 %   These may be redefined to adapt the font of the title, author and date.
 %
 %    \begin{macrocode}
-\newcommand{\notetitlefont}{\sffamily\bfseries}
-\newcommand{\notetitleauthorfont}{}
-\newcommand{\notetitledatefont}{\footnotesize}
+\newcommand{\notetitlefont}[1]{\sffamily\bfseries #1}
+\newcommand{\notetitleauthorfont}[1]{#1}
+\newcommand{\notetitledatefont}[1]{\footnotesize #1}
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
@@ -1784,17 +1791,17 @@
   {\par
     \let\phfnote@old@par\par
     \notetitle@titledefault@preparetitle
-    \notetitlefontparsetup{%
+    \expandafter\notetitlefontparsetup\expandafter{%
       \expandafter\notetitlefont\expandafter{\@title}}%
     \phfnote@old@par
     \notetitleaftertitleskip
   }%
   \if\relax\detokenize\expandafter{\@author}\relax\else
-    \notetitleauthorfontparsetup{%
+    \expandafter\notetitleauthorfontparsetup\expandafter{%
       \expandafter\notetitleauthorfont\expandafter{\@author}}\par
   \fi
   \if\relax\detokenize\expandafter{\@date}\relax\else
-    \notetitledatefontparsetup{%
+    \expandafter\notetitledatefontparsetup\expandafter{%
       \expandafter\notetitledatefont\expandafter{\@date}}\par
   \fi
   \notetitlemakecontentsbottom
@@ -2252,14 +2259,14 @@
   \def\notetitlefont{}
   \def\notetitlefontparsetup{%
     \LARGE\centering}
-  \def\notetitleauthorfontparsetup##1{%
+  \long\def\notetitleauthorfontparsetup##1{%
     \notetitledonextvskip%
     {\large\centering
     \lineskip .5em\relax%
     \begin{tabular}[t]{c}%
       ##1%
     \end{tabular}\par}}
-  \def\notetitleauthorfont{\large}
+  \long\def\notetitleauthorfont##1{\large ##1}
   \def\notetitledatefontparsetup{%
     \notetitledonextvskip
     \centering}
@@ -3004,19 +3011,19 @@
 % \autoref{sec:hyperrefdefs}.
 %
 %    \begin{macrocode}
-\def\phfnote@do@hyperrefdefs@true{}% for explicit value "hyperrefdefs=true"
-\def\phfnote@do@hyperrefdefs@defer{
+\def\phfnote@do@hyperrefdefs@attr@true{}% for explicit value "hyperrefdefs=true"
+\def\phfnote@do@hyperrefdefs@attr@defer{
   \def\phfnote@hyperrefdefs@loadhyperref{%
     \phfnote@hyperrefdefs@dopkgoptions
     \let\hypersetup\phfnote@hyperrefdefs@deferredhypersetup}
 }
-\def\phfnote@do@hyperrefdefs@clearoptions{
+\def\phfnote@do@hyperrefdefs@attr@clearoptions{
   \def\phfnote@hyperrefdefs@val@options{}
 }
-\def\phfnote@do@hyperrefdefs@noemail{
+\def\phfnote@do@hyperrefdefs@attr@noemail{
   \def\phfnote@hyperrefdefs@provideemail{}
 }
-\def\phfnote@do@hyperrefdefs@noload{
+\def\phfnote@do@hyperrefdefs@attr@noload{
   \def\phfnote@hyperrefdefs@loadhyperref{}
   \let\hypersetup\@gobble
 }
@@ -3049,7 +3056,8 @@
 %
 % Set up everything according to the user's selected attributes.
 %    \begin{macrocode}
-    \phfnote@internal@execattribs{phfnote@do@hyperrefdefs@}{phfnote hyperref-related option}{#1}%
+    \phfnote@internal@execattribs{phfnote@do@hyperrefdefs@attr@}{%
+      phfnote hyperref-related option}{#1}%
 %    \end{macrocode}
 %
 % And now, load the hyperref package (or don't, if it's deferred), and set some
@@ -3077,8 +3085,8 @@
   \@ifpackageloaded{xcolor}{%
     \colorlet{docnotelinkcolor}{#1}%
   }{% else:
-    \PackageWarning{phfnote}{\protect\phfnotePdfLinkColor may only be
-      used if the package xcolor is loaded.}%
+    \PackageError{phfnote}{\protect\phfnotePdfLinkColor may only be
+      used if the package xcolor is loaded.}{}%
   }%
 }
 %    \end{macrocode}
@@ -3120,8 +3128,9 @@
 %
 % 
 % \begin{macro}{\phfnote@requirecolorpackage}
-%   And finally define an internal utility to make sure that a color package (either
-%   \pkgname{color} or \pkgname{xcolor}) is loaded.  If none are loaded, the \pkgname{xcolor} package is loaded.
+% And finally define an internal utility to make sure that a color package
+% (either \pkgname{color} or \pkgname{xcolor}) is loaded.  If none are loaded,
+% the \pkgname{xcolor} package is loaded.
 %    \begin{macrocode}
 \def\phfnote@requirecolorpackage{%
   \@ifpackageloaded{color}{%

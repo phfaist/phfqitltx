@@ -161,7 +161,8 @@ $(PKGZIP):  #$(PKGTDSZIP)
 	mkdir -p $(DISTTMPDIR)/$(PKG)
 #	 cp $(PKGTDSZIP) $(DISTTMPDIR)
 	cp $(PKGDTX) $(PKGINS) $(PKGPDF) $(PKGREADME) Makefile pkg.mk $(DIST_ADDITIONAL_FILES) $(DISTTMPDIR)/$(PKG)
-	cd $(DISTTMPDIR) && zip -r $(CURDIR)/$(PKGZIP) $(PKG) #$(PKGTDSZIP)
+#	cd $(DISTTMPDIR) && zip -r $(CURDIR)/$(PKGZIP) $(PKG) $(PKGTDSZIP)
+	cd $(DISTTMPDIR) && zip -r $(CURDIR)/$(PKGZIP) $(PKG)
 	rm -rf $(DISTTMPDIR)
 
 cleandist:
