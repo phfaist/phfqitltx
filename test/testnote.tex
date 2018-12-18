@@ -141,14 +141,16 @@
 \fi
 
 
+%\renewcommand\notetitleauthorfont[1]{\bfseries #1}
+
 \iftrue%\iffalse  % swap true/false with META-T
 \title{Notes on Lambda-Majorization\thanks[9]{... a generalization of majorization}%
 %,  and many many many many many many many
 %
 %  other useless things.
 }
-%\author{Ph. F.\thanks{\itshape Inst.\@ for Theo.\@ Phys., ETH Z\"urich, \texttt{philippe{.}faist{@}{}b{}l{}u{}e{}win.ch}}}
-\author{Ph.\thanksmark[9]~~~F.\thanks{\texttt{philippe{.}faist{@}{}b{}l{}u{}e{}win.ch}}}
+\author{Ph. F.\thanks{\itshape Inst.\@ for Theo.\@ Phys., ETH Z\"urich, \texttt{philippe{.}faist{@}{}b{}l{}u{}e{}win.ch}}}
+%\author{Ph.\thanksmark[9]~~~F.\thanks{\texttt{philippe{.}faist{@}{}b{}l{}u{}e{}win.ch}}}
 %\date{}
 \date{\today\thanks{and not tomorrow, really really really today.}}
 
@@ -158,12 +160,15 @@
 %\renewcommand\notetitlesmallauthordatesep{\hspace*{.5em}\cdot\hspace*{.5em}}
 %\csdef{phfnote@fmt@titlefootnotes}{\itshape}
 %\title{A title goes like this}
-\title{A two-part title can be set\par With a \string\par\ command}
-%\title{A very long title would go like this: Lorem ipsum dolor amet stuff with excelsior borat et solus}
-\author{Mister Me}
-%\author{Mister Me\thanks{Thanks to someone.}}
+%\title{A two-part title can be set\par With a \string\par\ command}
+\title{A very long title would go like this: Lorem ipsum dolor amet stuff with excelsior borat et solus}
+%\author{Mister Me}
+\author{Mister Me\thanks{Thanks to someone.}}
+%\author{Author One$^{1}$ and Second Author$^2$\\[1ex]
+% \emph{$^1$First institution}\\
+% \emph{$^2$Another institution}}
 %\date{}
-%\date{\today}
+\date{\today}
 
 \fi
 
@@ -242,13 +247,13 @@ This is some text, {\notesmaller[1.2] this text is bigger, {\notesmaller[0.8] an
         {\notesmaller and smaller {\notesmaller and smaller \ldots}}}}}}
 
 \cceight{Some previous work has attempted to justify Landauer's Principle and generalizations}
-\ccnine{through explicit} \ccten{models such as Szilard
+through explicit \ccnine{models such as Szilard
 boxes}~\cite{Szilard1929ZeitschriftFuerPhysik,Dahlsten2011NJP_inadequacy}, or explicit
 Hamiltonian models~\cite{Alicki2004_hamiltonian}, all of which are NOT depicted in
 \figurename~\ref{fig:test}. We will follow a different approach by assuming Landauer's
 Principle as being valid, much like one generally accepts the second law of thermodynamics
 as being valid. This allows us to {\em define} a notion of work in our quantum setting by
-characterizing how much randomness can be absorbed or is generated during a noisy
+characterizing how much \ccten{randomness can be absorbed or is generated} during a noisy
 operation.\footnote{This is how a footnote looks like.} Yes.\footnote{Another footnote.}
 
 This notion is closely related to the notion of {\em themomajorization} introduced by

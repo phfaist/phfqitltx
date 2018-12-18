@@ -456,10 +456,17 @@
 % default main font title, author text and date text.  You may override these
 % settings with, for instance:
 % \begin{verbatim}
-% \renewcommand{\notetitlefont}{\sffamily\bfseries}
-% \renewcommand{\notetitleauthorfont}{\itshape}
-% \renewcommand{\notetitledatefont}{\footnotesize}
+% \renewcommand{\notetitlefont}[1]{\sffamily\bfseries #1}
+% \renewcommand{\notetitleauthorfont}[1]{\itshape #1}
+% \renewcommand{\notetitledatefont}[1]{\footnotesize #1}
 % \end{verbatim}
+% In these macros, the parameter is expanded to the value provided by |\title|,
+% |\author|, and |\date|, respectively.\footnote{While you can normally define
+% \string\notetitlefont, \string\notetitleauthorfont\space and
+% \string\notetitledatefont\space without an explicit parameter, this might
+% produce some unexpected errors in some cases since some title styles (for
+% technical details see implementation of the \texttt{article} title style).}
+%
 % The spacing of the title may be adjusted with the macros
 % \DescribeMacro{\notetitlebelowspace} |\notetitlebelowspace| and
 % \DescribeMacro{\notetitletopspace} |\notetitletopspace|.  Override these with
@@ -2083,7 +2090,7 @@
 %    \begin{macrocode}
 \def\notetitle@stylesetup@pretty{%
   \RequirePackage{xcolor}
-  \def\notetitlefont{\bfseries}
+  \long\def\notetitlefont##1{\bfseries ##1}
   \def\notetitlefontparsetup{%
     \color{notetitleprettytextcolor}\centering}
   \def\notetitleauthorfontparsetup{%
@@ -2093,14 +2100,14 @@
     \notetitledonextvskip
     \color{notetitleprettytextcolor}\centering}
   \def\phfnote@mpfootnotes@fontparsetup{\color{notetitleprettytextcolor}}
-
+  %
   \def\notetitlewidth{\dimexpr\textwidth
     -\notetitleprettylsiderulewidth
     -\notetitleprettyrsiderulewidth
     -\notetitleprettylsidespacewidth
     -\notetitleprettyrsidespacewidth\relax}
   \let\notetitleusemainbox\notetitle@pretty@usemainbox
-
+  %
   \def\notetitleprettylsiderulewidth{10pt}
   \def\notetitleprettylsidespacewidth{10pt}
   \def\notetitleprettyrsiderulewidth{10pt}
@@ -2109,7 +2116,7 @@
   \def\notetitleprettybottomspace{10pt}
   \def\notetitleprettytophrulewidth{0pt}
   \def\notetitleprettybottomhrulewidth{0pt}
-
+  %
   \definecolor{notetitleprettylsiderulecolor}{RGB}{0,68,126}
   \colorlet{notetitleprettyrsiderulecolor}{notetitleprettylsiderulecolor}
   \colorlet{notetitleprettytophrulecolor}{notetitleprettylsiderulecolor}
@@ -2119,7 +2126,6 @@
 }
 \newlength\notetitle@pretty@tmplenht
 \newlength\notetitle@pretty@tmplendp
-
 \def\notetitle@pretty@usemainbox#1{%
   \parskip=\z@\relax
   \parindent=\z@\relax
@@ -2166,14 +2172,14 @@
 %    \begin{macrocode}
 \csdef{notetitle@stylesetup@pretty2}{%
   \notetitle@stylesetup@pretty
-
+  %
   \definecolor{notetitleprettylsiderulecolor}{RGB}{0,68,126}
   \colorlet{notetitleprettyrsiderulecolor}{notetitleprettylsiderulecolor}
   \colorlet{notetitleprettytophrulecolor}{notetitleprettylsiderulecolor}
   \colorlet{notetitleprettybottomhrulecolor}{notetitleprettylsiderulecolor}
   \colorlet{notetitleprettytextcolor}{notetitleprettylsiderulecolor!50!black}
   \colorlet{notetitleprettybgcolor}{white!95!notetitleprettytextcolor}
-
+  %
   \def\notetitleprettytophrulewidth{.4pt}
   \def\notetitleprettybottomhrulewidth{.4pt}
 }
@@ -2192,7 +2198,7 @@
 \let\notetitle@style@small\notetitle@style@default
 \newcommand\notetitle@stylesetup@small{%
   \notetitleusempfootnotesfalse
-
+  %
   \def\notetitlemakecontents{%
     {\expandafter\notetitlefont\expandafter{\@title}}%
     \hfill\makebox{\fontsize{9pt}{10pt}\selectfont
@@ -2217,7 +2223,7 @@
     }{% only date
       {\emph{\expandafter\notetitledatefont\expandafter{\@date}}}%
     }}
-
+  %
   \def\notetitleinnervsep{1mm}
   \def\notetitlesmallauthordatesep{\hspace*{2mm}--\hspace*{2mm}}
 }
@@ -2250,6 +2256,12 @@
 %
 % \begin{macro}{\notetitle@style@article}
 % \begin{macro}{\notetitle@stylesetup@article}
+%   Technical note. Here, by using a |tabular| environment for authors, we need
+%   to assume that the macro |\notetitleauthorfont| takes one argument and does
+%   not leave the author contents surrounded with full braces.  This would cause
+%   `|\\|' tokens enclosed in the protective braces to cause errors in the
+%   tabular environment.
+%
 %    \begin{macrocode}
 \let\notetitle@style@article\notetitle@style@default
 \newcommand{\notetitle@stylesetup@article}{
@@ -2278,7 +2290,7 @@
   \appto\notetitle@default@setup{%
     %\def\singlespace{}%
   }
-
+  %
   \notetitleusempfootnotesfalse
 }
 %    \end{macrocode}
