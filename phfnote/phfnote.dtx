@@ -3488,12 +3488,7 @@
         environments or other inner boxes (\string\parbox, etc.), comment's label
         with initials will not be emitted at this time.}
     \else
-      \ifdefined\@captype
-        % not inside a figure caption. Not sure why this produces very weird problems
-        \PackageWarning{phfnote}{Not creating a \string\marginpar\space inside figure
-          captions, as this can produce weird errors; comment's label
-          with initials will not be emitted at this time.}
-      \else
+      \ifx\@captype\relax
         \csgdef{phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur @\roman{page}}{}%
         \edef\phf@cc@tmpxzxxw{\unexpanded{\strut\color}{\phf@cc@val@cur color}%
           \unexpanded{\fboxsep=1pt\relax\fbox{\normalfont\sffamily\footnotesize #1}}}%
@@ -3501,6 +3496,11 @@
           \noexpand\marginpar[{\noexpand\raggedleft\expandonce\phf@cc@tmpxzxxw}]%
           {\noexpand\raggedright\expandonce\phf@cc@tmpxzxxw}}%
         \phf@cc@tmpzxxxw%
+      \else
+        % not inside a figure caption. Not sure why this produces very weird problems
+        \PackageWarning{phfnote}{Not creating a \string\marginpar\space inside figure
+          captions, as this can produce weird errors; comment's label
+          with initials will not be emitted at this time.}
       \fi
     \fi
   \fi
