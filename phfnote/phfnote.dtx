@@ -3486,9 +3486,9 @@
     \ifinner% see latex.ltx, \marginpar definition
       \PackageWarning{phfnote}{Can't create \string\marginpar\space inside math
         environments or other inner boxes (\string\parbox, etc.), comment's label
-        with initials will not be emitted at this time.}
+        with initials will not be emitted at this time.}%
     \else
-      \ifx\@captype\relax
+      \ifx\@captype\@undefined
         \csgdef{phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur @\roman{page}}{}%
         \edef\phf@cc@tmpxzxxw{\unexpanded{\strut\color}{\phf@cc@val@cur color}%
           \unexpanded{\fboxsep=1pt\relax\fbox{\normalfont\sffamily\footnotesize #1}}}%
@@ -3500,7 +3500,7 @@
         % not inside a figure caption. Not sure why this produces very weird problems
         \PackageWarning{phfnote}{Not creating a \string\marginpar\space inside figure
           captions, as this can produce weird errors; comment's label
-          with initials will not be emitted at this time.}
+          with initials will not be emitted at this time.}%
       \fi
     \fi
   \fi
