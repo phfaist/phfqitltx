@@ -3489,6 +3489,7 @@
         with initials will not be emitted at this time.}%
     \else
       \ifx\@captype\@undefined
+        \def\@captype{}\def\ftype@{}% fix for revtex (?!?)
         \csgdef{phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur @\roman{page}}{}%
         \edef\phf@cc@tmpxzxxw{\unexpanded{\strut\color}{\phf@cc@val@cur color}%
           \unexpanded{\fboxsep=1pt\relax\fbox{\normalfont\sffamily\footnotesize #1}}}%
