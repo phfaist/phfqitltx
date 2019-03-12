@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfthm}
 %<*package>
-    [2018/02/08 v1.0 phfthm package]
+    [2019/03/12 v1.1 phfthm package]
 %</package>
 %
 %<*driver>
@@ -31,6 +31,9 @@
 \usepackage{phfthm}
 \usepackage[preset=xpkgdoc]{phfnote}
 \usepackage{needspace}
+\expandafter\def\csname eqsign@\endcsname{=}
+\def\eqsign{\expandafter\protect\csname eqsign@\endcsname}
+\robustify\eqsign
 \EnableCrossrefs         
 \CodelineIndex
 \RecordChanges
@@ -150,7 +153,7 @@
 % style adjustments; this allows you to enable features individually and
 % selectively:
 % \begin{verbatim}
-% \usepackage[resetstyle,prooftitleitbf=true]{../phfthm}
+% \usepackage[resetstyle,prooftitleitbf=true]{phfthm}
 % \end{verbatim}
 % 
 %
@@ -2315,12 +2318,11 @@
 %    \end{macrocode}
 % 
 %
-% The \pkgoptionfmt{proofref} option.  The proof-ref is off initially by
-% default.
+% The \pkgoptionfmt{proofref} option.  The proof-ref is on initially by default.
 %    \begin{macrocode}
 \newif\ifKV@phfthmpkg@proofref
-\KV@phfthmpkg@proofreffalse
-\def\cmdKV@phfthmpkg@proofref@style{}
+\KV@phfthmpkg@proofreftrue
+\def\cmdKV@phfthmpkg@proofref@style{default}
 %    \end{macrocode}
 % Actually define the option itself.  Here we do some customized parsing of the
 % value of the |proofref=...| option, to treat the cases |proofref=| (empty
@@ -2478,6 +2480,16 @@
   \def\x{%
     \phfthm@internal@execattribs{phfthm@proofref@style@}{ProofRef Style}}
   \expandafter\x\expandafter{\cmdKV@phfthmpkg@proofref@style}
+%    \end{macrocode}
+% 
+% Prepare the proof-ref option in case we don't want any proof reference
+% mechanism on.
+%
+% \changed[chg-bugfix-pkgopt-proofreffalse]{v1.1}{2019/03/12}{Bug fix: package
+% option \texttt{proofref\eqsign false} didn't have any effect}
+%    \begin{macrocode}
+\else
+  \def\phfthm@val@mkthmopt@proofrefstyle{proofref=false}
 \fi
 %    \end{macrocode}
 % 
@@ -2527,19 +2539,19 @@
   \fi
 }
 \ifKV@phfthmpkg@smallproofs
-  \phfthm@pkgopterr@require@proofenv{smallproofs}
+  %\phfthm@pkgopterr@require@proofenv{smallproofs}
   \apptocmd\phfthm@hookproof@startcommon{%
     \def\baselinestretch{1.2}\footnotesize}{}{%
     Failed to change command \string\phfthm@hook@start@proof}
 \fi
 \ifKV@phfthmpkg@qedsymbolblacksquare
-  \phfthm@pkgopterr@require@proofenv{qedsymbolblacksquare}
+  %\phfthm@pkgopterr@require@proofenv{qedsymbolblacksquare}
   \RequirePackage{amssymb}
   \providecommand\filledsquare{\ensuremath{\blacksquare}}
   \renewcommand\qedsymbol{\text{\tiny\ensuremath{\filledsquare}}}
 \fi
 \ifKV@phfthmpkg@prooftitleitbf
-  \phfthm@pkgopterr@require@proofenv{prooftitleitbf}
+  %\phfthm@pkgopterr@require@proofenv{prooftitleitbf}
   \def\phfthm@ProofTitleFmt#1{{\itshape\bfseries#1.}}
 \fi
 %    \end{macrocode}
