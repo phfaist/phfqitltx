@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfnote}
 %<*package>
-    [2019/01/07 v3.0 phfnote package]
+    [2020/01/24 v3.0 phfnote package]
 %</package>
 %
 %<*driver>
@@ -1187,7 +1187,7 @@
 % \begin{verbatim}
 % Quantum mechanics developed quickly in the 1920's thanks to the
 % works of Schr\"odinger, Heisenberg, and Dirac, who drew inspiration
-% from earlier ideas by Planck \AlE{and Einsten} \AlE[@JB, you forgot
+% from earlier ideas by Planck \AlE{and Einstein} \AlE[@JB, you forgot
 % about me!].  Quantum mechanics appears to allow spooky action at a
 % distance via some strange thing called ``entanglement,'' \JB*{but
 % this can be explained by hidden variables}\JB{which has revolutionized
@@ -1199,7 +1199,7 @@
 % {\itshape%
 % Quantum mechanics developed quickly in the 1920's thanks to the
 % works of Schr\"odinger, Heisenberg, and Dirac, who drew inspiration
-% from earlier ideas by Planck \AlE{and Einsten} \AlE[@JB, you forgot
+% from earlier ideas by Planck \AlE{and Einstein} \AlE[@JB, you forgot
 % about me!].  Quantum mechanics appears to allow spooky action at a
 % distance via some strange thing called ``entanglement,'' \JB*{but
 % this can be explained by hidden variables}\JB{which has revolutionized
@@ -2916,6 +2916,12 @@
 
 }
 
+
+\def\phfnote@internal@setifxeorlua#1#2{%
+  \ifXeTeX\let#1#2\fi
+  \ifLuaTeX\let#1#2\fi
+}
+
 \def\phfnote@do@pkgset@rich{
 
   \phfnote@do@pkgset@minimal
@@ -2933,7 +2939,8 @@
 %    \end{macrocode}
 % For this bit, use the \pkgname{iftex} package to determine if we're running
 % XeTeX or LuaTeX; if that's the case then we inhibit the loading of
-% \pkgname{inputenc} and \pkgname{fontenc}.
+% \pkgname{inputenc} and \pkgname{fontenc}.  The |\IfFileExists| is to ensure
+% the package runs on older LaTeX distributions without \pkgname{iftex}.
 %
 % Plus, load \pkgname{inputenc}, resp. \pkgname{fontenc}, only if it isn't
 % already loaded.
@@ -2950,9 +2957,10 @@
       \RequirePackage{inputenc}
     }
   }
-  \RequirePackage{iftex}
-  \ifXeTeX\let\phfnote@tmp@requireinputencfontenc\relax\fi
-  \ifLuaTeX\let\phfnote@tmp@requireinputencfontenc\relax\fi
+  \IfFileExists{iftex.sty}{
+    \RequirePackage{iftex}
+    \phfnote@internal@setifxeorlua\phfnote@tmp@requireinputencfontenc\relax
+  }{}
   \phfnote@tmp@requireinputencfontenc
 }
 
@@ -3169,10 +3177,11 @@
 %    \begin{macrocode}
 \def\phfnote@do@fontdefs#1{
   \ifstrequal{#1}{false}{}{%
-    \RequirePackage{iftex}
     \let\phfnote@tmp@do\@firstofone
-    \ifXeTeX \let\phfnote@tmp@do\@gobble \fi
-    \ifLuaTeX \let\phfnote@tmp@do\@gobble \fi
+    \IfFileExists{iftex.sty}{%
+      \RequirePackage{iftex}%
+      \phfnote@internal@setifxeorlua\phfnote@tmp@do\@gobble
+    }{}
     \phfnote@tmp@do{
       \PassOptionsToPackage{T1}{fontenc}
       \RequirePackage{fontenc}
@@ -3732,8 +3741,11 @@
 %
 % If the argument is a comment, set up the comment font, begin/end
 % chars, and go.
+%
+% \changed[chg:phf-comment-accepts-long-comment-arg]{v3.0}{2020/01/24}{Comment
+% command now accepts long argument when used in the form \phfverb{\phf}[...]}
 %    \begin{macrocode}
-\NewDocumentCommand\phf@cc@comment{O{}}{%
+\NewDocumentCommand\phf@cc@comment{+O{}}{%
   \normalfont%
   \csname phf@cc@val@\phf@cc@val@cur @cfont\endcsname%
   \preto\phf@cc@val@grpcmds{%
