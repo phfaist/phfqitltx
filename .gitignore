@@ -33,6 +33,7 @@ phfqit/phfqit.zip
 phfquotetext/phfquotetext.zip
 phfsvnwatermark/phfsvnwatermark.zip
 phfthm/phfthm.zip
+phfcc/phfcc.zip
 
 # pkg.mk
 phffullpagefigure/pkg.mk
@@ -42,3 +43,4 @@ phfqit/pkg.mk
 phfquotetext/pkg.mk
 phfsvnwatermark/pkg.mk
 phfthm/pkg.mk
+phfcc/pkg.mk

@@ -1,0 +1,772 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2019 by Philippe Faist, philippe.faist@bluewin.ch
+% -------------------------------------------------------
+% 
+% This file may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in:
+%
+%    http://www.latex-project.org/lppl.txt
+%
+% and version 1.3 or later is part of all distributions of LaTeX 
+% version 2005/12/01 or later.
+%
+% \fi
+%
+% \iffalse
+%<*driver>
+\ProvidesFile{phfcc.dtx}
+%</driver>
+%<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
+%<package>\ProvidesPackage{phfcc}
+%<*package>
+    [2020/04/02 v1.0 phfcc package]
+%</package>
+%
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{xcolor}
+\usepackage{lipsum}
+\usepackage[preset=xpkgdoc]{phfnote}
+
+\usepackage{needspace}
+
+
+\def\eqsign@{=}
+\def\eqsign{\protect\eqsign@}
+\robustify\eqsign
+\makeatother
+
+\def\RevTeX{{\small R\raise-0.2ex\hbox{\textsc{ev}}}\TeX}
+
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+
+\begin{document}
+  \DocInput{phfcc.dtx}
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+%
+% \changes{v1.0}{2020/04/02}{Initial version}
+%
+% \GetFileInfo{phfcc.dtx}
+%
+% \iffalse Bypass indexing for following commands: \fi
+% \DoNotIndex{\newcommand,\newenvironment,\renewcommand,\long,\def,\edef,\gdef,\xdef,\if,\else,\fi,\par,\relax,\vspace,\vskip,\hspace,\hskip,\vbox,\hbox}
+% 
+% \title{\phfqitltxPkgTitle{phfcc}}
+% \author{Philippe Faist\quad\email{philippe.faist@bluewin.ch}}
+% \date{\pkgfmtdate\filedate}
+% \maketitle
+%
+% \begin{abstract}
+%   \pkgname{phfcc}---A handy \LaTeX{} package for inline commenting in
+%   collaborative LaTeX documents.
+% \end{abstract}
+%
+% \phantomsection\label{sec:toc}
+% \inlinetoc
+%
+% \section{Introduction}
+%
+% When elaborating documents, it is useful to leave inline comments and be able
+% to mark text changes, especially when collaborating with a team.  Often in
+% practice a simple macro definition will do, like this:
+% \begin{verbatim}
+%   \newcommand{\phf}[1]{{\color{blue}#1}} % Philippe Faist
+% \end{verbatim}
+% But because I kinda like more fancy stuff, and I definitely didn't have time
+% to spare but still got distracted into programming \LaTeX{} macros, here is a
+% way of defining a custom command such as |\phf| above, but that allows several
+% syntax options that format the command differently.
+% \DescribeMacro{\phfMakeCommentingCommand} This is done using the
+% |\phfMakeCommentingCommand| macro.
+%
+% \phfMakeCommentingCommand[initials={AE}]{AlE}%
+% \phfMakeCommentingCommand[initials={JB}]{JB}%
+% \phfMakeCommentingCommand[initials={PhF}]{phf}%
+% Let's start with a simple example. Suppose two authors, Albert Einstein and
+% John Bell, are commenting on the same document. They might define the
+% commenting commands |\AlE| and |\JB|:
+% \begin{verbatim}
+% \phfMakeCommentingCommand[initials={AE}]{AlE}
+% \phfMakeCommentingCommand[initials={JB}]{JB}
+% \end{verbatim}
+% They can then comment on text like this:
+% \begin{verbatim}
+% Quantum mechanics developed quickly in the 1920's thanks to the
+% works of Schr\"odinger, Heisenberg, and Dirac, who drew inspiration
+% from earlier ideas by Planck \AlE{and Einstein} \AlE[@JB, you forgot
+% about me!].  Quantum mechanics appears to allow spooky action at a
+% distance via some strange thing called ``entanglement,'' \JB*{but
+% this can be explained by hidden variables}\JB{which has revolutionized
+% our understanding of local realism.} \JB[@Albert, we talked about
+% this...]
+% \end{verbatim}
+% which gives:
+%
+% {\itshape%
+% Quantum mechanics developed quickly in the 1920's thanks to the
+% works of Schr\"odinger, Heisenberg, and Dirac, who drew inspiration
+% from earlier ideas by Planck \AlE{and Einstein} \AlE[@JB, you forgot
+% about me!].  Quantum mechanics appears to allow spooky action at a
+% distance via some strange thing called ``entanglement,'' \JB*{but
+% this can be explained by hidden variables}\JB{which has revolutionized
+% our understanding of local realism.} \JB[@Albert, we talked about
+% this...]%
+% }
+%
+%
+% \section{Syntax of commenting commands}
+%
+% Here is the full syntax of the commenting commands generated with
+% |\phfMakeCommentingCommand|.  You can write:
+%
+%
+% |\AlE{some text here}| --- \AlE{some text here} --- typeset the
+% given text in color, perhaps to mark an addition by author |AlE| to
+% the document.
+%
+% |\AlE[please revise this]| --- \AlE[please revise this] --- typeset an inline
+% comment in a different font.  This is meant for comments that are not a
+% portion of document text itself but rather an inline remark that refers to the
+% text around it.
+%
+% |\AlE*{text to be removed}| --- \AlE*{text to be removed} --- typeset the
+% given text in a way to indicate that the text should be suppressed.
+%
+% |\AlE!{important piece of text}| --- \AlE!{important piece of text}
+% --- typeset the given text marking it as important.
+%
+% |\AlE![a really important comment]| --- \AlE![a really important comment] ---
+% typeset the given comment and mark it as important.
+%
+% In each of these cases (except for comments in square brackets),
+% you can use the syntax |\AlE .... \endAlE| instead of specifying the
+% argument using curly brackets:\\
+% |\AlE text here\endAlE| --- \AlE text here\endAlE \\
+% |\AlE! important\endAlE| --- \AlE! important\endAlE \\
+% |\AlE* remove\endAlE| --- \AlE* remove\endAlE
+%
+% For simple text, you can also use the |\begin|/|\end| syntax:\\
+% |\begin{AlE} text here\end{AlE}| --- \begin{AlE} text here\end{AlE}
+%
+% \begin{pkgtip}
+% Note that in contrast to optional
+% arguments in most LaTeX macros, the argument is allowed to contain matching
+% square brackets, for instance \relax%
+% |\AlE[this works [as you'd expect]]| \AlE[this works [as you'd expect]]
+%
+% In any case you can protect the argument as usual with curly braces:
+% |\AlE[{this is [weird}]| \AlE[{this is [weird}]
+% \end{pkgtip}
+%
+% \section{Defining your commenting command}
+%
+% Now let's see exactly how to define your customized |\AlE| command.
+% \DescribeMacro{\phfMakeCommentingCommand} The command
+% |\phfMakeCommentingCommand| takes the following syntax:
+%
+% |\phfMakeCommentingCommand|\oarg{key=value,key2=value2,...}\marg{cmd name}
+%
+% The \marg{command name} should be given as a text name (e.g.,
+% |{AlE}|), and not as a macro.  They key-value pairs may be one of the following:
+%
+%
+% \phfMakeCommentingCommand[color=phfcolor,initials={PhF},formatinitials=box]{phfbox}
+% \phfMakeCommentingCommand[color=phfcolor,initials={PhF},formatinitials=nobox]{phfnobox}
+% \phfMakeCommentingCommand[color=phfcolor,initials={PhF},formatinitials=hide]{phfhideinitials}
+% \phfMakeCommentingCommand[color=green!50!blue,initials={Philippe Faist},formatinitials=footnote]{phffootnote}
+%
+% \begin{cmdoptions}
+% \item[color=\marg{color specification}] The color of the comments generated by
+%   the new commenting command.  By default, a new suitable color is chosen for
+%   each new commenting command defined.
+%
+%   The color specification may be a name such as |red|, |green|, etc., but also
+%   a mixture like |blue!40!green| (\textcolor{blue!40!green}{which stands for
+%   40\% of blue and 60\% of green}).  You can specify any argument you could
+%   specify to |\colorlet| from the \pkgname{xcolor} package.  (The
+%   \pkgname{xcolor} package is automatically loaded.)
+%
+% \item[initials=\marg{your initials}] Your name initials, which will by typeset
+%   at the beginning of a comment (typically in a small box in the margin),
+%   allowing to identify different comment colors with different people.  By
+%   default, the initials are set to the name of the command itself.
+%
+% \item[formatinitials=\meta{keyword or command}] The command that will be used
+%   to format the initials.  By default (|formatinitials=default| or
+%   |formatinitials=margin|), the initials are displayed on the margin of the
+%   paragraph the first time the change occurs on a given page \phf[like this
+%   and like in the examples above].  You may also specify |formatinitials=box|
+%   to typeset the initials inline immediately before your annotation
+%   \phfbox[like this].  Specify |formatinitials=nobox| to remove the frame
+%   \phfnobox[like this].  Or specify |formatinitials=hide| to hide the initials
+%   altogether \phfhideinitials[like this].  You can also specify
+%   |formatinitials=footnote| to hide the initials at the point of text but with
+%   a footnote to associate colored comments with the name (for this to work
+%   more nicely, specify your full name as argument to |initials={...}|)
+%   \phffootnote[Here is an example].  [In the latter case, you may redefine
+%   |\phfCCChangesBy|, e.g., \relax%
+%   |\renewcommand{\phfCCChangesBy}{Changes in this color are by\ }| to change
+%   the text in the footnote.]
+%
+%   You may also specify any \LaTeX{} command, which will then be used to format
+%   the initials.
+% \item[cfont=\marg{LaTeX commands}] The font commands to invoke when
+%   typesetting comment. By default, use \phf[the default sans serif typeface,
+%   like this].
+% \item[cspacing=\meta{length}] Spacing to add around comments. This amount of
+%   horizontal space is added before and after the comment.
+% \item[cbegin=\marg{LaTeX text and/or commands}] Stuff to typeset at
+%   the beginning of a commment.  By default, an opening square
+%   bracket (with some spacing adjustments).
+% \item[cend=\marg{LaTeX text and/or commands}] Stuff to typeset at
+%   the end of a commment.  By default, a closing square bracket (with
+%   some spacing adjustments).
+% \item[rmfont=\marg{LaTeX commands}] The font commands to issue when
+%   typesetting text that is to be removed. \phf*{By default, the text
+%   is in italics like this}
+% \item[rmspacing=\meta{length}] Spacing to add around text that is marked to be
+%   removed. This amount of horizontal space is added before and after.
+% \item[rmbegin=\marg{LaTeX text and/or commands}] Stuff to typeset at
+%   the beginning of a piece of text to be removed.  By default, three
+%   crosses.
+% \item[rmend=\marg{LaTeX text and/or commands}] Stuff to typeset at
+%   the end of a piece of text to be removed.  By default, three
+%   crosses.
+% \item[ifont=\marg{LaTeX commands}] The font commands to issue when
+%   typesetting important text. \phf!{By default, the text is in
+%   larger boldface format like this}
+% \item[ispacing=\meta{length}] Spacing to add around important text. This
+%   amount of horizontal space is added before and after.
+% \item[ibegin=\marg{LaTeX text and/or commands}] Stuff to typeset at
+%   the beginning of a piece of important text.  By default, three
+%   exclamation marks.
+% \item[iend=\marg{LaTeX text and/or commands}] Stuff to typeset at
+%   the end of a piece of important text.  By default, three
+%   exclamation marks.
+% \end{cmdoptions}
+% 
+% After invoking |\phfMakeCommentingCommand|, the colors |xxxcolor|,
+% |xxxrmcolor| and |xxxrmcolorlink| are automatically defined (where |xxx| is to
+% be replaced by your commenting macro name).  These are used respectively for
+% a usual comment color, text to be removed, and for links in text to be
+% removed.  You may redefine these colors afterwards with |\colorlet| if you
+% wish:
+% \begin{verbatim}
+% \colorlet{AlErmcolor}{gray}
+% \end{verbatim}
+%
+% \DescribeMacro{\phfDisableCommentingCommands}
+% The command |\phfDisableCommentingCommands| disables all commenting commands,
+% and causes them to emit an error.  Use this command when approaching the final
+% version of a long document to ensure that no commenting commands are left in
+% the document.
+%
+%
+% \StopEventually{\PrintChangesAndIndex}
+%
+% \section{Implementation}
+%
+% Load these internally required packages.
+%
+%    \begin{macrocode}
+\RequirePackage{xkeyval}
+\RequirePackage{kvoptions}
+\RequirePackage{etoolbox}
+\RequirePackage{xparse}
+%    \end{macrocode}
+%
+% Ensure we have the \pkgname{xcolor} package to manage text colors.  We need
+% \pkgname{xcolor} and not \pkgname{color} because we use |\colorlet|.
+%    \begin{macrocode}
+\RequirePackage{xcolor}
+%    \end{macrocode}
+% 
+% \begin{macro}{\phfCommentingDefault*}
+% Provide sensible defaults for commenting formatting.
+%
+% Bold or semibold CFont sounds like a good idea, but comments would seem more
+% aggressive like that, so keep them normal by default.
+%    \begin{macrocode}
+\def\phfCommentingDefaultCFont{\sffamily}
+\def\phfCommentingDefaultCSpacing{0.2em}
+\def\phfCommentingDefaultCBegin{[\,}
+\def\phfCommentingDefaultCEnd{\,]}
+\def\phfCommentingDefaultRmFont{\small\itshape}%\itshape\notesmaller[0.9]}
+\def\phfCommentingDefaultRmSpacing{1em}
+\def\phfCommentingDefaultRmBegin{\ensuremath{{\times}\!{\times}}~}
+\def\phfCommentingDefaultRmEnd{~\ensuremath{{\times}\!{\times}}}
+\def\phfCommentingDefaultIFont{\large\bfseries}
+\def\phfCommentingDefaultISpacing{0.25em}
+\def\phfCommentingDefaultIBegin{!\hspace*{0.1em}!\hspace*{0.1em}!~}
+\def\phfCommentingDefaultIEnd{~!\hspace*{0.1em}!\hspace*{0.1em}!}
+%    \end{macrocode}
+% \end{macro}
+%
+% A default list of colors for commenting, and a minimal tool to select the next
+% available color.  The macro |\phf@cc@usedcolors| stores a
+% vertical-bar-separated list of color names that have been already used and
+% which should not be used again.
+%    \begin{macrocode}
+\csdef{phf@cc@presetcolor@0}{red!25!orange}
+\csdef{phf@cc@presetcolor@1}{blue}
+\csdef{phf@cc@presetcolor@2}{purple}
+\csdef{phf@cc@presetcolor@3}{blue!50!green}
+\csdef{phf@cc@presetcolor@4}{violet}
+\csdef{phf@cc@presetcolor@5}{green!60!black}
+\csdef{phf@cc@presetcolor@6}{red}
+\csdef{phf@cc@presetcolor@7}{orange!70!yellow}
+\def\phf@cc@usedcolors{|}
+\def\phf@cc@nextcolor@#1{%
+  \ifcsname phf@cc@presetcolor@#1\endcsname% try preset
+    \edef\phf@tmp@testxx{%
+      \noexpand\in@{|\csname phf@cc@presetcolor@#1\endcsname|}{\phf@cc@usedcolors}}%
+    \phf@tmp@testxx
+    \ifin@% color already used, try next
+      \expandafter\phf@cc@nextcolor@\expandafter{\the\numexpr#1+1\relax}%
+    \else
+      \def\phf@cc@thecolor{\csname phf@cc@presetcolor@#1\endcsname}% good, use
+    \fi
+  \else% out of colors, fallback to red
+    \def\phf@cc@thecolor{red}%
+  \fi
+}
+%    \end{macrocode}
+% Read the argument.  If non-empty, set |\phf@cc@thecolor| to the argument
+% value.  If empty, choose the next available preset color and set
+% |\phf@cc@thecolor| to that.
+%    \begin{macrocode}
+\def\phf@cc@getcolor#1{%
+  \edef\phf@tmp@xyz{#1}%
+  \if\relax\detokenize\expandafter{\phf@tmp@xyz}\relax
+    \phf@cc@nextcolor@{0}%
+  \else
+    \edef\phf@cc@thecolor{#1}%
+  \fi}
+%    \end{macrocode}
+%
+%
+% Define the keys for |\setkeys| with \pkgname{xkeyval} package, and set the
+% overall defaults.
+%    \begin{macrocode}
+\define@cmdkey{phfmkcc}{color}{}
+\define@cmdkey{phfmkcc}{initials}{}
+\define@cmdkey{phfmkcc}{formatinitials}{}
+\define@cmdkey{phfmkcc}{cfont}{}
+\define@cmdkey{phfmkcc}{cspacing}{}
+\define@cmdkey{phfmkcc}{cbegin}{}
+\define@cmdkey{phfmkcc}{cend}{}
+\define@cmdkey{phfmkcc}{rmfont}{}
+\define@cmdkey{phfmkcc}{rmspacing}{}
+\define@cmdkey{phfmkcc}{rmbegin}{}
+\define@cmdkey{phfmkcc}{rmend}{}
+\define@cmdkey{phfmkcc}{ifont}{}
+\define@cmdkey{phfmkcc}{ispacing}{}
+\define@cmdkey{phfmkcc}{ibegin}{}
+\define@cmdkey{phfmkcc}{iend}{}
+\presetkeys{phfmkcc}{%
+  color={},%
+  initials={},%
+  formatinitials={default},%
+  cfont={\phfCommentingDefaultCFont},%
+  cspacing={\phfCommentingDefaultCSpacing},%
+  cbegin={\phfCommentingDefaultCBegin},%
+  cend={\phfCommentingDefaultCEnd},%
+  rmfont={\phfCommentingDefaultRmFont},%
+  rmspacing={\phfCommentingDefaultRmSpacing},%
+  rmbegin={\phfCommentingDefaultRmBegin},%
+  rmend={\phfCommentingDefaultRmEnd},%
+  ifont={\phfCommentingDefaultIFont},%
+  ispacing={\phfCommentingDefaultISpacing},%
+  ibegin={\phfCommentingDefaultIBegin},%
+  iend={\phfCommentingDefaultIEnd}%
+}{}
+%    \end{macrocode}
+%
+% In the series of defaults, we also have the predefined initials formatting.
+% Define the |hide|, |box|, and |nobox| styles first.
+%    \begin{macrocode}
+\def\phf@cc@formatinitialsstyle@box#1{%
+  \hspace{0.25em}\relax
+  \raisebox{1pt}{{\fboxsep=1pt\relax\fbox{\normalfont\sffamily\tiny#1}}}%
+  \hspace{0.25em}}
+\def\phf@cc@formatinitialsstyle@nobox#1{%
+  \hspace{0.25em}\relax
+  {\normalfont\sffamily\tiny#1}%
+  \hspace{0.25em}}
+\def\phf@cc@formatinitialsstyle@hide#1{}
+%    \end{macrocode}
+%
+% Define the |margin| style now.  Define an auxiliary global macro to remember
+% whenever we've already displayed the margin note on a given page.
+%
+% Strategy: use |\marginpar| in normal text so that labels don't overlap if two
+% comments appear on the same line, but use |\marginnote| (from the
+% \pkgname{marginnote} package) in figure captions, equations, footnotes, etc.,
+% where |\marginpar| does not work.  [\#\#\# FIXME: package option to disable
+% loading the \pkgname{marginnote} package and fallback to not producing a label
+% in those delicate cases.]
+%    \begin{macrocode}
+\def\phf@cc@formatinitialsstyle@margin#1{%
+%    \end{macrocode}
+% 
+% If the label was already displayed on this page (as witnessed by the following
+% test macro being defined), don't repeat the label display and skip altogether.
+%    \begin{macrocode}
+  \ifcsname phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur @\roman{page}\endcsname
+  \else
+%    \end{macrocode}
+%
+% Now we prepare the arguments to |\marginnote|/|\marginpar|, whichever we'll
+% end up using.  In the ``argument tokens'' (but not in the actual arguments to
+% |\marginpar|) we also include the command to register that we've displayed the
+% label on this page.  Don't do it right away, because we might still abort
+% displaying the label at this time (e.g. if in a figure caption and the user
+% doesn't want to use |\marginnote|).
+%    \begin{macrocode}
+    \def\@captype{}\def\ftype@{}% fix for revtex (?!?) -- we're inside a group anyway
+    \edef\phf@cc@tmpxzxxwa{\unexpanded{\strut\color}{\phf@cc@val@cur color}%
+      \unexpanded{\fboxsep=1pt\relax\fbox{\normalfont\sffamily\footnotesize #1}}}%
+    \edef\phf@cc@tmp@marginparargtoks{%
+      [{\noexpand\raggedleft\expandonce\phf@cc@tmpxzxxwa}]%
+      {\noexpand\raggedright\expandonce\phf@cc@tmpxzxxwa}%
+      \noexpand\csgdef{phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur @\roman{page}}{1}%
+    }%
+    % 
+%    \end{macrocode}
+% Decide whether to use |\marginpar| or |\marginnote|.  For |\marginnote|, call
+% our helper wrapper so that we can fall back to some more primitive behavior
+% (no display and emit a warning) if requested.
+%    \begin{macrocode}
+    \ifinner% see latex.ltx, \marginpar definition
+\message{*** WE'RE INNER !!!!! ***}%
+        \phf@cc@domarginnote\phf@cc@tmp@marginparargtoks%
+    \else
+      \if\relax\detokenize\expandafter{\@captype}\relax% not in a (figure?) caption
+        \expandafter\marginpar\phf@cc@tmp@marginparargtoks%
+      \else
+      \message{*** WE'RE IN A CAPTION [\detokenize\expandafter{\@captype}] !!!!! ***}%
+        \phf@cc@domarginnote\phf@cc@tmp@marginparargtoks%
+      \fi
+    \fi
+  \fi
+}
+\robustify\phf@cc@formatinitialsstyle@margin
+\def\phf@cc@domarginnote#1{%
+  \edef\x{\noexpand\protect\noexpand\marginnote\expandonce#1}%
+  \x
+}
+%    \end{macrocode}
+%
+% Define the |margin| initials style as the default:
+%    \begin{macrocode}
+\let\phf@cc@formatinitialsstyle@default\phf@cc@formatinitialsstyle@margin
+%    \end{macrocode}
+%
+% Define the |footnote| style. Works very similarly to the |footnote| style.
+% Note you can redefine |\phfCCChangesBy| to whatever you please, and it can
+% even take the name as |#1| argument.
+%    \begin{macrocode}
+\def\phf@cc@formatinitialsstyle@footnote#1{%
+  \ifcsname phf@cc@valfmtinitialsfootnote@intlspage@\phf@cc@val@cur @\roman{page}\endcsname
+    % already displayed on this page, don't repeat
+  \else
+    \csgdef{phf@cc@valfmtinitialsfootnote@intlspage@\phf@cc@val@cur @\roman{page}}{}%
+    \def\phf@cc@tmp@zz{\gdef\@thefnmark{}\@footnotetext}%
+    \expandafter\phf@cc@tmp@zz\expandafter{\expandafter{%
+        \expandafter\color\expandafter{\phf@cc@val@cur color}\phfCCChangesBy{#1}}}%
+  \fi
+}
+\robustify\phf@cc@formatinitialsstyle@footnote
+\def\phfCCChangesBy{Changes by\ }
+%    \end{macrocode}
+%
+% \begin{macro}{\phfMakeCommentingCommand}
+% Implementation of |\phfMakeCommentingCommand|.  See \autoref{sec:inline-commenting}
+% for usage details. The inner command definitions are kinda tricky because of all the
+% possible syntax options.
+% |\phfMakeCommentingCommand|\oarg{color=blue,...}\marg{cmdname}
+%    \begin{macrocode}
+\newcommand\phfMakeCommentingCommand[2][]{%
+  \setkeys{phfmkcc}{#1}%
+  \phf@cc@getcolor{\cmdKV@phfmkcc@color}%
+  \colorlet{#2color}{\phf@cc@thecolor}%
+  \edef\phf@tmp@xxappcmd{\noexpand\appto\noexpand\phf@cc@usedcolors{\phf@cc@thecolor|}}%
+  \phf@tmp@xxappcmd
+  \colorlet{#2rmcolor}{#2color!70!gray!55!white}%
+  \colorlet{#2rmcolorlink}{blue!40!#2rmcolor}%
+  \edef\phf@tmp@xxx{\cmdKV@phfmkcc@initials}%
+  \if\relax\detokenize\expandafter{\phf@tmp@xxx}\relax
+    \csedef{phf@cc@val@#2@initials}{#2}%
+  \else
+    \csedef{phf@cc@val@#2@initials}{\cmdKV@phfmkcc@initials}%
+  \fi
+  \ifcsname phf@cc@formatinitialsstyle@%
+      \detokenize\expandafter{\cmdKV@phfmkcc@formatinitials}\endcsname%
+    \expandafter\def\expandafter\phf@cc@tmp@xzx\expandafter{%
+      \csname phf@cc@formatinitialsstyle@%
+          \detokenize\expandafter{\cmdKV@phfmkcc@formatinitials}\endcsname}%
+    \csedef{phf@cc@val@#2@formatinitials}{\expandonce\phf@cc@tmp@xzx}%
+  \else
+    \csedef{phf@cc@val@#2@formatinitials}{\expandonce\cmdKV@phfmkcc@formatinitials}%
+  \fi
+  \csedef{phf@cc@val@#2@cfont}{\expandonce\cmdKV@phfmkcc@cfont}%
+  \csedef{phf@cc@val@#2@cspacing}{\expandonce\cmdKV@phfmkcc@cspacing}%
+  \csedef{phf@cc@val@#2@cbegin}{\expandonce\cmdKV@phfmkcc@cbegin}%
+  \csedef{phf@cc@val@#2@cend}{\expandonce\cmdKV@phfmkcc@cend}%
+  \csedef{phf@cc@val@#2@rmfont}{\expandonce\cmdKV@phfmkcc@rmfont}%
+  \csedef{phf@cc@val@#2@rmspacing}{\expandonce\cmdKV@phfmkcc@rmspacing}%
+  \csedef{phf@cc@val@#2@rmbegin}{\expandonce\cmdKV@phfmkcc@rmbegin}%
+  \csedef{phf@cc@val@#2@rmend}{\expandonce\cmdKV@phfmkcc@rmend}%
+  \csedef{phf@cc@val@#2@ifont}{\expandonce\cmdKV@phfmkcc@ifont}%
+  \csedef{phf@cc@val@#2@ispacing}{\expandonce\cmdKV@phfmkcc@ispacing}%
+  \csedef{phf@cc@val@#2@ibegin}{\expandonce\cmdKV@phfmkcc@ibegin}%
+  \csedef{phf@cc@val@#2@iend}{\expandonce\cmdKV@phfmkcc@iend}%
+%    \end{macrocode}
+%
+% Once all the information was gathered and stored, define the commenting command
+% itself (as well as its |\end*| counterpart).  Make them robust.
+%    \begin{macrocode}
+  \csdef{#2}{\phf@cc@do{#2}}%
+  \expandafter\robustify\csname #2\endcsname%
+  \csdef{end#2}{\phf@cc@end}%
+  \expandafter\robustify\csname end#2\endcsname%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\phfDisableCommentingCommands}
+%   This command causes any commenting command declared with
+%   |\phfMakeCommentingCommand| to emit an error.
+%    \begin{macrocode}
+\newif\ifphf@cc@disabled
+\phf@cc@disabledfalse
+\def\phfDisableCommentingCommands{%
+  \phf@cc@disabledtrue
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% Overall, the implementation of a commenting command goes as follows.  First,
+% gather all the info about the command invocation (e.g., important? starred?
+% comment?) and then ultimately call |\phf@cc@begin| and |\phf@cc@end| which
+% execute the formatting options.
+%
+% Everything happens within |\begingroup|\ldots|\endgroup|.  The group is opened
+% at |\phf@cc@do| (the commenting command itself), and is closed by |\phf@cc@end|.
+%
+% The macros |\phf@cc@val@grp*cmds| store the commands to be executed in
+% |\phf@cc@begin| and |\phf@cc@end|.  By default, they are empty.  They are
+% filled by relevant code when parsing the command invocation.
+%    \begin{macrocode}
+\def\phf@cc@val@grpcmds{}% by default no commands at group begin
+\def\phf@cc@val@grpendcmds{}% by default no commands at group end
+\def\phf@cc@val@spacing{0pt}% no spacing by default
+%    \end{macrocode}
+%
+% \begin{macro}{\phf@cc@begin}
+% Here we set the comment color and execute other opening commands stored
+% earlier in the parsing stage. Observe that |\begingroup| \textbf{has already
+% been issued} by |\phf@cc@do|.
+%    \begin{macrocode}
+\def\phf@cc@begin{%
+  \color{\phf@cc@val@cur color}%
+  \hspace{\phf@cc@val@spacing}%
+  \phf@cc@showinitials%
+  \phf@cc@val@grpcmds}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\phf@cc@end}
+% Here we execute closing commands and close the group. |\phf@cc@end| is the
+% last macro executed when the user invokes a comment, in any case.
+%    \begin{macrocode}
+\def\phf@cc@end{%
+  \phf@cc@val@grpendcmds
+  \hspace{\phf@cc@val@spacing}%
+  \endgroup
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\phf@cc@showinitials}
+% This helper macro prints out the initials, if any.
+%    \begin{macrocode}
+\def\phf@cc@showinitials{%
+  \edef\phf@cc@tmpx{%
+    \expandafter\expandonce\csname phf@cc@val@\phf@cc@val@cur @initials\endcsname}%
+  \expandafter\notblank\expandafter{\phf@cc@tmpx}{%
+    \csname phf@cc@val@\phf@cc@val@cur @formatinitials%
+        \expandafter\endcsname\expandafter{\phf@cc@tmpx}}{}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\phf@cc@do}
+%   The user-instantiated commenting commands are an alias of this command, with
+%   the user macro name as first argument.  Here's were everything starts.
+%    \begin{macrocode}
+\def\phf@cc@do#1{%
+%    \end{macrocode}
+%   First, we need to check if commenting commands were disabled with
+%   |\phfDisableCommentingCommands|.  If this is the case, generate an error.
+%    \begin{macrocode}
+  \ifphf@cc@disabled
+    \PackageError{phfnote}{Commenting commands have been disabled
+      with \string\phfDisableCommentingCommands.}{}%
+  \fi
+%    \end{macrocode}
+%   Now we start for real.  First, we open the \TeX\ group. Then we start
+%   parsing the invocation syntax.
+%    \begin{macrocode}
+  \leavevmode\begingroup%
+  \edef\phf@cc@val@cur{#1}%
+  \@ifstar\phf@cc@star\phf@cc@nostar% star?
+}
+\def\phf@cc@nostar{\@ifnextchar!\phf@cc@important\phf@cc@grp}
+%    \end{macrocode}
+% At this point, we have determined whether the invocation is starred or important.
+% The next execution points are |\phf@cc@star|, |\phf@cc@important|, or |\phf@cc@grp|.
+%
+% If starred or if important, set up the inner group execution commands to the
+% corresponding settings, and defer to |\phf@cc@grp|.
+%    \begin{macrocode}
+\long\def\phf@cc@star{%
+  \csname phf@cc@val@\phf@cc@val@cur @rmfont\endcsname%
+  \color{\phf@cc@val@cur rmcolor}%
+  \def\phf@cc@val@grpcmds{%
+    \color{\phf@cc@val@cur rmcolor}%
+    \colorlet{docnotelinkcolor}{\phf@cc@val@cur rmcolorlink}%
+    \csname phf@cc@val@\phf@cc@val@cur @rmbegin\endcsname%
+  }%
+  \def\phf@cc@val@grpendcmds{%
+    \csname phf@cc@val@\phf@cc@val@cur @rmend\endcsname%
+  }%
+  \def\phf@cc@val@spacing{%
+    \csname phf@cc@val@\phf@cc@val@cur @rmspacing\endcsname%
+  }%
+  \phf@cc@grp}
+\long\def\phf@cc@important!{%
+  \csname phf@cc@val@\phf@cc@val@cur @ifont\endcsname%
+%    \end{macrocode}
+% Here we need a little hack, we want the important font to take precedence
+% over any comment font.
+%    \begin{macrocode}
+  \appto\phfCommentingDefaultCFont{%
+    \csname phf@cc@val@\phf@cc@val@cur @ifont\endcsname%
+  }%
+  \def\phf@cc@val@grpcmds{%
+    \csname phf@cc@val@\phf@cc@val@cur @ibegin\endcsname%
+  }%
+  \def\phf@cc@val@grpendcmds{%
+    \csname phf@cc@val@\phf@cc@val@cur @iend\endcsname%
+  }%
+  \def\phf@cc@val@spacing{%
+    \csname phf@cc@val@\phf@cc@val@cur @ispacing\endcsname%
+  }%
+  \phf@cc@grp}
+%    \end{macrocode}
+% 
+% The command |\phf@cc@grp| parses how the argument content is given. Is it
+% a comment (``|[ ... ]|''), a single \LaTeX{} argument group (``|{ ... }|''),
+% or should we expect it to end with |\end*|?
+%    \begin{macrocode}
+\def\phf@cc@grp{%
+  \@ifnextchar[\phf@cc@comment\phf@cc@grpnocomment%]
+}
+\def\phf@cc@grpnocomment{%
+  \@ifnextchar\bgroup{\phf@cc@grpwarg}{\phf@cc@begin}}
+%    \end{macrocode}
+%
+% Now we determined how the argument is given, and we are calling one
+% of |\phf@cc@comment|, |\phf@cc@grpwarg| (with argument), or
+% |\phf@cc@begin| directly.
+%    \begin{macrocode}
+\long\def\phf@cc@grpwarg#1{\phf@cc@begin #1\phf@cc@end}
+%    \end{macrocode}
+%
+% If the argument is a comment, set up the comment font, begin/end
+% chars, and go.
+%
+% \changed[chg:phf-comment-accepts-long-comment-arg]{v3.0}{2020/01/24}{Comment
+% command now accepts long argument when used in the form \phfverb{\phf}[...]}
+%    \begin{macrocode}
+\NewDocumentCommand\phf@cc@comment{+O{}}{%
+  \normalfont%
+  \csname phf@cc@val@\phf@cc@val@cur @cfont\endcsname%
+  \preto\phf@cc@val@grpcmds{%
+    \csname phf@cc@val@\phf@cc@val@cur @cbegin\endcsname%
+  }%
+  \appto\phf@cc@val@grpendcmds{%
+    \csname phf@cc@val@\phf@cc@val@cur @cend\endcsname%
+  }%
+  \def\phf@cc@val@spacing{%
+    \csname phf@cc@val@\phf@cc@val@cur @cspacing\endcsname%
+  }%
+  \phf@cc@begin%
+  %\phf@cc@showinitials%
+  #1%
+  \phf@cc@end%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \subsection{Handle package options}
+%
+% Initialization code for \pkgname{kvoptions} for our package options.
+%    \begin{macrocode}
+\SetupKeyvalOptions{
+   family=phfcc,
+   prefix=phfcc@opt@
+}
+\DeclareBoolOption[true]{usemarginnote}
+\DeclareBoolOption[false]{nopatchfootnote}
+%    \end{macrocode}
+% 
+% Process package options.
+%    \begin{macrocode}
+\ProcessKeyvalOptions*
+%    \end{macrocode}
+%
+% Load the \pkkgname{marginnote} unless requested not to.
+%    \begin{macrocode}
+\ifphfcc@opt@usemarginnote
+  \RequirePackage{marginnote}
+\else
+  \def\phf@cc@domarginnote#1{%
+    \PackageWarning{phfnote}{Can't create \string\marginpar\space inside math
+      environments, figure captions, footnotes, \string\parbox, etc. I would
+      have used \string\marginnote\space instead, but I was instructed not to
+      via a package option.  So the comment's label with initials will not be
+      emitted at this time.}%
+  }
+\fi
+%    \end{macrocode}
+% 
+%\Finale
+\endinput

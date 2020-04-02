@@ -16,29 +16,32 @@ independently to CTAN.
 
 # List of Packages
 
-- `phfnote` - format documents for short notes.  Nicer title, saves more space
+- `phfnote` — format documents for short notes.  Nicer title, saves more space
   on paper, and provides some handy definitions.  Choose between several presets
   to get your preferred document appearance.
 
-- `phffullpagefigure` - as the package name suggests, place figures on full pages.
+- `phffullpagefigure` — as the package name suggests, place figures on full pages.
   The caption e.g. reads "Figure 1 (on next page): blah blah" and the figure
   may occupy the full next page.
 
-- `phfquotetext` - quote verbatim text, from e.g. an email, without worrying
+- `phfquotetext` — quote verbatim text, from e.g. an email, without worrying
   about LaTeX special characters.  Differs from
   `\begin{verbatim}...\end{verbatim}` environment in that whitespace is not
   preformatted.
 
-- `phfsvnwatermark` - add a watermark to your documents with the SVN ID, so that
+- `phfsvnwatermark` — add a watermark to your documents with the SVN ID, so that
   you know which document is which version
 
-- `phfthm` - goodies for theorems and proofs.
+- `phfthm` — goodies for theorems and proofs.
 
-- `phfparen` - cool definitions for mathematical parenthetic expressions.  Easy
+- `phfparen` — cool definitions for mathematical parenthetic expressions.  Easy
   to resize, short code which is still readable.
 
-- `phfqit` - some useful definitions for LaTeXing stuff in quantum information
+- `phfqit` — some useful definitions for LaTeXing stuff in quantum information
   theory, which I use often
+
+- `phfcc` — inline commenting in collaborative documents
+
 
 
 # Installation

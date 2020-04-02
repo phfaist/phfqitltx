@@ -6,7 +6,7 @@ DEFAULT_PREFIX := $(shell kpsewhich -var-value TEXMFHOME)
 PREFIX ?= $(DEFAULT_PREFIX)
 
 # phfnote must go first (all docs need phfnote.sty)
-ALLPKGS = phfnote phffullpagefigure phfqit phfquotetext phfparen phfsvnwatermark phfthm
+ALLPKGS = phfnote phffullpagefigure phfqit phfquotetext phfparen phfsvnwatermark phfthm phfcc
 
 .PHONY: help clean cleanall sty cleansty pdf cleanpdf cleanaux install tdszip cleantdszip dist versionlist cleandist
 
@@ -143,10 +143,6 @@ versionlist:
 	@echo
 	@echo "================================================================================"
 	@echo
-#	@echo "Please make sure that the version numbers are correct:"
-#	@echo
-#	@echo "In $(README): "
-#	@grep -i 'Bundle Version:' $(README)
 	@echo "Individual package versions: "
 	@egrep -h '\[.* phf\w+ package\]' $(ALLDTX)
 	@echo
