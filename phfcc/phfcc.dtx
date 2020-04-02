@@ -30,6 +30,7 @@
 \usepackage{xcolor}
 \usepackage{lipsum}
 \usepackage[preset=xpkgdoc]{phfnote}
+\usepackage{phfcc}
 
 \usepackage{needspace}
 
@@ -240,8 +241,7 @@
 %   The default initials formatting style (|formatinitials=margin|) requires the
 %   \pkgname{marginnote} package, which is loaded automatically.  If you do not
 %   want to load the \pkgname{marginnote} package, specify the package option
-%   |usemarginnote=false| and set a different |formatinitials=...|
-%   style.
+%   |usemarginnote=false| and set a different |formatinitials=...| style.
 % \item[cfont=\marg{LaTeX commands}] The font commands to invoke when
 %   typesetting comment. By default, use \phf[the default sans serif typeface,
 %   like this].
@@ -771,8 +771,8 @@
 \ProcessKeyvalOptions*
 %    \end{macrocode}
 %
-% Load the \pkgname{marginnote} unless requested not to.  This package is
-% required for the |margin| initials style.
+% Load the \pkgname{marginnote} package unless requested not to.  This package
+% is required for the |margin| initials style.
 %    \begin{macrocode}
 \ifphfcc@opt@usemarginnote
   \RequirePackage{marginnote}
