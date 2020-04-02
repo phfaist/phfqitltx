@@ -236,6 +236,12 @@
 %
 %   You may also specify any \LaTeX{} command, which will then be used to format
 %   the initials.
+%
+%   The default initials formatting style (|formatinitials=margin|) requires the
+%   \pkgname{marginnote} package, which is loaded automatically.  If you do not
+%   want to load the \pkgname{marginnote} package, specify the package option
+%   |usemarginnote=false| and set a different |formatinitials=...|
+%   style.
 % \item[cfont=\marg{LaTeX commands}] The font commands to invoke when
 %   typesetting comment. By default, use \phf[the default sans serif typeface,
 %   like this].
@@ -286,6 +292,27 @@
 % and causes them to emit an error.  Use this command when approaching the final
 % version of a long document to ensure that no commenting commands are left in
 % the document.
+%
+% \section{Package Options}
+%
+% This package requires the \pkgname{marginnote} package to generate initials
+% labels when using the |margin| initials style (the default style).  If you do
+% not want to load the \pkgname{marginnote} package, you may use the package
+% option |usemarginnote=false| (but then you cannot use the |margin| initials
+% style):
+% \begin{verbatim}
+% \usepackage[usemarginnote=false]{phfcc}
+% \end{verbatim}
+%
+% \section{Known limitations}
+%
+% If you place a comment inside a contruct that is typeset twice (e.g., an AMS
+% equation, or a figure caption when using e.g. the \pkgname{caption} package,
+% etc.), then the margin initials will not appear even if the comment is the
+% first of the page.  This is because the margin label is produced the first
+% time they are typeset, per page.  There's not much I can do about this, and
+% unless there is a quick \& easy fix I don't intend to spend too much effort
+% into trying to hack around this.
 %
 %
 % \StopEventually{\PrintChangesAndIndex}
@@ -425,12 +452,12 @@
 % Define the |margin| style now.  Define an auxiliary global macro to remember
 % whenever we've already displayed the margin note on a given page.
 %
-% Strategy: use |\marginpar| in normal text so that labels don't overlap if two
-% comments appear on the same line, but use |\marginnote| (from the
-% \pkgname{marginnote} package) in figure captions, equations, footnotes, etc.,
-% where |\marginpar| does not work.  [\#\#\# FIXME: package option to disable
-% loading the \pkgname{marginnote} package and fallback to not producing a label
-% in those delicate cases.]
+% Strategy: use |\marginnote| all the time.  It would be nice to use
+% |\marginpar| in normal paragraph text so that label don't overlap etc.,
+% because we can't detect all cases where |\marginpar| is
+% problematic. (|\ifinner| detects minipages/equations, value of |\@captype|
+% detects figure captions, but I just can't detect footnotes, and I anticipate
+% other problematic situations coming up).
 %    \begin{macrocode}
 \def\phf@cc@formatinitialsstyle@margin#1{%
 %    \end{macrocode}
@@ -449,31 +476,25 @@
 % displaying the label at this time (e.g. if in a figure caption and the user
 % doesn't want to use |\marginnote|).
 %    \begin{macrocode}
-    \def\@captype{}\def\ftype@{}% fix for revtex (?!?) -- we're inside a group anyway
+    %%\def\@captype{}\def\ftype@{}% fix for revtex (?!?)
     \edef\phf@cc@tmpxzxxwa{\unexpanded{\strut\color}{\phf@cc@val@cur color}%
       \unexpanded{\fboxsep=1pt\relax\fbox{\normalfont\sffamily\footnotesize #1}}}%
     \edef\phf@cc@tmp@marginparargtoks{%
       [{\noexpand\raggedleft\expandonce\phf@cc@tmpxzxxwa}]%
       {\noexpand\raggedright\expandonce\phf@cc@tmpxzxxwa}%
-      \noexpand\csgdef{phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur @\roman{page}}{1}%
+      \noexpand\csgdef{phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur%
+                       @\roman{page}}{1}%
     }%
     % 
 %    \end{macrocode}
-% Decide whether to use |\marginpar| or |\marginnote|.  For |\marginnote|, call
-% our helper wrapper so that we can fall back to some more primitive behavior
-% (no display and emit a warning) if requested.
+% Decide whether to use |\marginpar| or |\marginnote|.  We could have some
+% complex decision process, but only if we can find a really reliable algorithm
+% that won't generate LaTeX errors when collaborators want to comment on a
+% document in a final hours before a deadline.  So for now, universally use
+% |\marginnote|.  If you don't want to load |\marginnote|, use a different
+% initials label style.
 %    \begin{macrocode}
-    \ifinner% see latex.ltx, \marginpar definition
-\message{*** WE'RE INNER !!!!! ***}%
-        \phf@cc@domarginnote\phf@cc@tmp@marginparargtoks%
-    \else
-      \if\relax\detokenize\expandafter{\@captype}\relax% not in a (figure?) caption
-        \expandafter\marginpar\phf@cc@tmp@marginparargtoks%
-      \else
-      \message{*** WE'RE IN A CAPTION [\detokenize\expandafter{\@captype}] !!!!! ***}%
-        \phf@cc@domarginnote\phf@cc@tmp@marginparargtoks%
-      \fi
-    \fi
+    \phf@cc@domarginnote\phf@cc@tmp@marginparargtoks%
   \fi
 }
 \robustify\phf@cc@formatinitialsstyle@margin
@@ -496,7 +517,7 @@
   \ifcsname phf@cc@valfmtinitialsfootnote@intlspage@\phf@cc@val@cur @\roman{page}\endcsname
     % already displayed on this page, don't repeat
   \else
-    \csgdef{phf@cc@valfmtinitialsfootnote@intlspage@\phf@cc@val@cur @\roman{page}}{}%
+    \csgdef{phf@cc@valfmtinitialsfootnote@intlspage@\phf@cc@val@cur @\roman{page}}{1}%
     \def\phf@cc@tmp@zz{\gdef\@thefnmark{}\@footnotetext}%
     \expandafter\phf@cc@tmp@zz\expandafter{\expandafter{%
         \expandafter\color\expandafter{\phf@cc@val@cur color}\phfCCChangesBy{#1}}}%
@@ -507,10 +528,10 @@
 %    \end{macrocode}
 %
 % \begin{macro}{\phfMakeCommentingCommand}
-% Implementation of |\phfMakeCommentingCommand|.  See \autoref{sec:inline-commenting}
-% for usage details. The inner command definitions are kinda tricky because of all the
-% possible syntax options.
-% |\phfMakeCommentingCommand|\oarg{color=blue,...}\marg{cmdname}
+%   Implementation of |\phfMakeCommentingCommand|.  See main package
+%   documentation for usage details. The inner command definitions are kinda
+%   tricky because of all the possible syntax options.
+%   |\phfMakeCommentingCommand|\oarg{color=blue,...}\marg{cmdname}
 %    \begin{macrocode}
 \newcommand\phfMakeCommentingCommand[2][]{%
   \setkeys{phfmkcc}{#1}%
@@ -736,8 +757,6 @@
 % \end{macro}
 %
 %
-% \subsection{Handle package options}
-%
 % Initialization code for \pkgname{kvoptions} for our package options.
 %    \begin{macrocode}
 \SetupKeyvalOptions{
@@ -745,7 +764,6 @@
    prefix=phfcc@opt@
 }
 \DeclareBoolOption[true]{usemarginnote}
-\DeclareBoolOption[false]{nopatchfootnote}
 %    \end{macrocode}
 % 
 % Process package options.
@@ -753,18 +771,11 @@
 \ProcessKeyvalOptions*
 %    \end{macrocode}
 %
-% Load the \pkkgname{marginnote} unless requested not to.
+% Load the \pkgname{marginnote} unless requested not to.  This package is
+% required for the |margin| initials style.
 %    \begin{macrocode}
 \ifphfcc@opt@usemarginnote
   \RequirePackage{marginnote}
-\else
-  \def\phf@cc@domarginnote#1{%
-    \PackageWarning{phfnote}{Can't create \string\marginpar\space inside math
-      environments, figure captions, footnotes, \string\parbox, etc. I would
-      have used \string\marginnote\space instead, but I was instructed not to
-      via a package option.  So the comment's label with initials will not be
-      emitted at this time.}%
-  }
 \fi
 %    \end{macrocode}
 % 

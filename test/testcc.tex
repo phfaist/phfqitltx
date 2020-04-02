@@ -1,5 +1,5 @@
-\documentclass[11pt,a4paper]{article}
-%\documentclass[10pt,a4paper,aps,reprint,notitlepage]{revtex4-1}
+%\documentclass[11pt,a4paper]{article}
+\documentclass[10pt,a4paper,aps,reprint,notitlepage]{revtex4-1}
 
 \usepackage{graphicx}
 \usepackage{enumitem}
@@ -97,10 +97,10 @@ that's it! \endphf
 \clearpage
 Let's now start a new page to test a few things.
 
-First, about footnotes. Let's check this out.%\footnote{\ifinner INNER\fi This: \ccnine{I wanna check if comments work in footnotes.}}  And minipages:
+First, about footnotes. Let's check this out.\footnote{\ifinner INNER\fi This: \ccnine{I wanna check if comments work in footnotes.}}  And minipages:
 \\
 \fbox{\begin{minipage}{4cm}
-  We could try to {comment} in a \marginnote{footnote} %\footnote{\ccseven[like this!] :-)}
+  We could try to \cceight{comment} in a footnote\footnote{\ccseven[like this!] :-)}
  to see what happens.  Hopefully everything won't immediately break
   down.  You might really need \texttt{\textbackslash marginnote} here, though.
 \end{minipage}}\\
