@@ -2751,8 +2751,6 @@
   \RequirePackage{setspace}
   \RequirePackage{caption}
 
-  \RequirePackage{microtype}
-
   \PassOptionsToPackage{shortlabels}{enumitem}
   \RequirePackage{enumitem}
 
@@ -2784,6 +2782,12 @@
     \phfnote@internal@setifxeorlua\phfnote@tmp@requireinputencfontenc\relax
   }{}
   \phfnote@tmp@requireinputencfontenc
+
+%    \end{macrocode}
+% 
+% Load \pkgname{microtype} after \pkgname{fontenc} (just in case).
+%    \begin{macrocode}
+  \RequirePackage{microtype}
 }
 
 \def\phfnote@do@pkgset@extended{
