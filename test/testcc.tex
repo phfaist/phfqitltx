@@ -1,5 +1,5 @@
 %\documentclass[11pt,a4paper]{article}
-\documentclass[10pt,a4paper,aps,reprint,notitlepage]{revtex4-1}
+\documentclass[10pt,a4paper,aps,reprint,notitlepage,nofootinbib]{revtex4-1}
 
 \usepackage{graphicx}
 \usepackage{enumitem}
@@ -48,12 +48,12 @@ demon via information theory (see eg.~\cite{Bennett2003_NotesLP}), and
 generalizations to \AlE{quantum settings such as characterization of
   entanglement} through thermodynamical
 considerations~\cite{Oppenheim2002PRL_thermodynamical}, \ccfour{or the
-  determination of the single} shot work cost \ccfive{of the erasure of a
-  quantum} \ccsix{system with quantum} side
-\ccseven{information}~\cite{delRio2011Nature}.
+  determination of the single} shot work cost \ccfive{of the erasure} \ccsix{of a
+  quantum} \ccseven{system with quantum} side
+\cceight{information}~\cite{delRio2011Nature}.
 
-\cceight{Some previous work has attempted to justify Landauer's Principle and
-  generalizations} through explicit \ccnine{models such as Szilard
+\ccnine{Some previous work has attempted to justify Landauer's Principle and
+  generalizations} through explicit \ccten{models such as Szilard
   boxes}~\cite{Szilard1929ZeitschriftFuerPhysik,Dahlsten2011NJP_inadequacy}, or
 explicit Hamiltonian models~\cite{Alicki2004_hamiltonian}, all of which are NOT
 depicted in \figurename~\ref{fig:test}. We will follow a different approach by
@@ -95,6 +95,7 @@ and even equations:
 that's it! \endphf
 
 \clearpage
+\onecolumngrid
 Let's now start a new page to test a few things.
 
 First, about footnotes. Let's check this out.\footnote{\ifinner INNER\fi This: \ccnine{I wanna check if comments work in footnotes.}}  And minipages:
@@ -123,6 +124,17 @@ Now let's just check out Fig.~\ref{fig:test}.
   \label{fig:test}
 \end{figure}
 
+We'd \ccsix{like to see} \ccfive{if} we can manage to avoid [bla bla bla fill the remainder of this line bla bla bla bla bla bla bla] having labels
+\ccfour{overlap} in the margin of a paragraph because of the behavior of LaTeX
+package \texttt{marginnote}.
+
+% \newcount\xcountx%
+% \xcountx=0%
+% TEST: Counter is \the\xcountx, \advance\xcountx1\relax now it is
+% \the\xcountx. %
+% \vadjust{\def\mymarginnote{Hello!}} On the next line I'd hope
+% that it is advanced by ten. [bla bla fill the remainder of this line bla bla bla
+% bla bla bla bla] Now the counter is in the margin note$\to$\marginpar[\mymarginnote]{\mymarginnote}.% problem!
 
 
 \bibliographystyle{unsrt}

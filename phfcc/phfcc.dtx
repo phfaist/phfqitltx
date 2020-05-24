@@ -452,12 +452,6 @@
 % Define the |margin| style now.  Define an auxiliary global macro to remember
 % whenever we've already displayed the margin note on a given page.
 %
-% Strategy: use |\marginnote| all the time.  It would be nice to use
-% |\marginpar| in normal paragraph text so that label don't overlap etc.,
-% because we can't detect all cases where |\marginpar| is
-% problematic. (|\ifinner| detects minipages/equations, value of |\@captype|
-% detects figure captions, but I just can't detect footnotes, and I anticipate
-% other problematic situations coming up).
 %    \begin{macrocode}
 \def\phf@cc@formatinitialsstyle@margin#1{%
 %    \end{macrocode}
@@ -468,42 +462,208 @@
   \ifcsname phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur @\roman{page}\endcsname
   \else
 %    \end{macrocode}
-%
-% Now we prepare the arguments to |\marginnote|/|\marginpar|, whichever we'll
-% end up using.  In the ``argument tokens'' (but not in the actual arguments to
-% |\marginpar|) we also include the command to register that we've displayed the
-% label on this page.  Don't do it right away, because we might still abort
-% displaying the label at this time (e.g. if in a figure caption and the user
-% doesn't want to use |\marginnote|).
+% 
+% Check for any other reasons why we shouldn't emit a margin note (e.g. for some
+% known two-pass environments); this is done by |\phf@cc@margin@ifchecks|.  Then
+% actually create the margin note with |\phf@cc@margin@emit|.
 %    \begin{macrocode}
-    %%\def\@captype{}\def\ftype@{}% fix for revtex (?!?)
-    \edef\phf@cc@tmpxzxxwa{\unexpanded{\strut\color}{\phf@cc@val@cur color}%
-      \unexpanded{\fboxsep=1pt\relax\fbox{\normalfont\sffamily\footnotesize #1}}}%
-    \edef\phf@cc@tmp@marginparargtoks{%
-      [{\noexpand\raggedleft\expandonce\phf@cc@tmpxzxxwa}]%
-      {\noexpand\raggedright\expandonce\phf@cc@tmpxzxxwa}%
-      \noexpand\csgdef{phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur%
-                       @\roman{page}}{1}%
+    \phf@cc@margin@ifchecks{%
+      \phf@cc@margin@emit{#1}%
     }%
-    % 
-%    \end{macrocode}
-% Decide whether to use |\marginpar| or |\marginnote|.  We could have some
-% complex decision process, but only if we can find a really reliable algorithm
-% that won't generate LaTeX errors when collaborators want to comment on a
-% document in a final hours before a deadline.  So for now, universally use
-% |\marginnote|.  If you don't want to load |\marginnote|, use a different
-% initials label style.
-%    \begin{macrocode}
-    \phf@cc@domarginnote\phf@cc@tmp@marginparargtoks%
   \fi
 }
 \robustify\phf@cc@formatinitialsstyle@margin
-\def\phf@cc@domarginnote#1{%
-  \edef\x{\noexpand\protect\noexpand\marginnote\expandonce#1}%
+%    \end{macrocode}
+% Helper macros for this margin initials style.  Detects if we're in a first
+% pass in an AMS equation, for instance, to only emit the label in the second
+% pass (actual typesetting).
+%    \begin{macrocode}
+\def\phf@cc@margin@ifchecks#1{%
+  \phf@cc@ififexists{ifmeasuring@}{%
+    \message{Detected first pass in environment, not emitting margin
+      initials label this time.}%
+  }{%
+    #1%
+  }%
+}
+\def\phf@cc@ififexists#1#2#3{%
+  \ifcsname #1\endcsname
+    \def\x{\phf@cc@ififexists@{#1}{#2}{#3}}%
+  \else
+    \def\x{#3}%
+  \fi
   \x
 }
+\def\phf@cc@ififexists@#1#2#3{%
+  \csname #1\endcsname
+    #2%
+  \else
+    #3%
+  \fi
+}
 %    \end{macrocode}
+% 
+% {\itshape About |\marginnote| vs |\marginpar|:} The strategy is use
+% |\marginnote| all the time.  Originally I used |\marginpar|, but it doesn't
+% work in footnotes and figure captions, where one often wants to comment
+% things.  It's really hard to detect all cases where |\marginpar| is
+% problematic. (|\ifinner| detects minipages/equations, value of |\@captype|
+% detects figure captions, but I just can't detect footnotes, and I anticipate
+% other problematic situations coming up).
 %
+% So I use \pkgname{marginnote} instead, which is more reliable.  We could have
+% some complex process to decide whether to use |\marginpar| or |\marginnote|,
+% but only if we can find a really reliable algorithm that won't generate
+% obscure LaTeX errors when collaborators want to comment on a document in a
+% final hours before a deadline.  So for now, universally use |\marginnote|.  If
+% you don't want to load |\marginnote|, use a different initials label style.
+%
+% This is the macro that actually creates the margin note.
+%    \begin{macrocode}
+\newbox\phf@cc@margin@labelbox
+\newdimen\phf@cc@margin@labelboxhgt
+\def\phf@cc@margin@emit#1{%
+  \setbox\phf@cc@margin@labelbox=\hbox{\strut
+    \expandafter\color\expandafter{\phf@cc@val@cur color}%
+    \fboxsep=1pt\relax
+    \phfccformatmargininitials{#1}}%
+  \phf@cc@margin@labelboxhgt=\ht\phf@cc@margin@labelbox
+  \phf@cc@createmarginnote
+  \csgdef{phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur%
+    @\roman{page}}{1}%
+}%
+%    \end{macrocode}
+% The |\phfccformatmargininitials|\marg{initials} can be redefined to change the
+% appearance of the margin intials box.
+%    \begin{macrocode}
+\def\phfccformatmargininitials#1{%
+  \fbox{\normalfont\sffamily\footnotesize #1}%
+}
+%    \end{macrocode}
+% The tricky thing with |marginnote| is that labels will overlap if they are
+% emitted on the same line.  Here we use a workaround: We check |\pdflastypos|
+% and add some vertical spacing if we are too close to the last note's y
+% position on the same page.  But the issue is that |\pdfsavepos| and
+% |\pdflatexypos| only work while shipping out, so basically all we can do is
+% write the values to the AUX file and use them next time latex is run. Here we
+% use the same mechanism as \pkgname{marginnote}: define a new \LaTeX\space
+% label printing a |\newphfccmarginnote| in the AUX file with the relevant
+% meta-info.  We use the internal counters |\@mn@thispage| (current absolute
+% page number) and |\@mn@atthispage| (number of note on current page) because we
+% also need to track which notes are on which page, and there's no use
+% duplicating all that code (I do hope those counters don't change, though).  We
+% also recycle \pkgname{marginnote}'s detected command names to use for PDF
+% position read-out (prefix |\mn@mode@prefix|).
+%
+% The label |\csname phfccmn@\@mn@thispage.\@mn@atthispage\endcsname| expands to
+% |\marg{pdf y-pos of the point in text}\marg{label box
+% height}|}||{|\marg{requried vertical shift to adjust this note}|}|.  The first
+% group of fields are as specified in the arguments to the |\newphfccmarginnote|
+% written to the AUX file, and the second group contains the values (only one
+% currently) computed when calling |\newphfccmarginnote|.
+%    \begin{macrocode}
+\def\phf@cc@createmarginnote{%
+  \marginnote[{\copy\phf@cc@margin@labelbox}]{\copy\phf@cc@margin@labelbox}[%
+    \phf@cc@marginextractvshift]%
+  \pdfsavepos
+  \protected@write\@auxout{}{%
+    \string\newphfccmarginnote{%
+      {\@mn@thispage}%
+      {\@mn@atthispage}%
+      {\noexpand\number\@nameuse{\@mn@mode@prefix lastypos}sp}%
+      {\number\phf@cc@margin@labelboxhgt sp}%
+    }%
+  }%
+}
+%    \end{macrocode}
+% Used as |\marginnote|'s vertical shift length.  Expands to the vertical shift
+% needed to correct the current note.  Remember: no assignments in here, this
+% command must be fully expandable.
+%    \begin{macrocode}
+\def\phf@cc@marginextractvshift{%
+  \ifcsname phfccmn@\@mn@thispage.\@mn@atthispage\endcsname
+    \expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\@firstofone
+      \expandafter\expandafter\expandafter\@secondoftwo\csname phfccmn@\@mn@thispage.\@mn@atthispage\endcsname
+  \else
+    \z@
+  \fi
+}
+%    \end{macrocode} 
+%
+% This command defines the margin label in the AUX file.  It's not meant as
+% public API, it's only written in the AUX file to be re-read on next run.  Here
+% is where all the calculations are done.
+%
+% In this macro we get the page number, y position, and box height of a margin
+% note written by the previous run of \LaTeX.  We need to compute the vertical
+% shift to avoid overlapping with other boxes.
+%
+% The algorithm is pretty dumb. For each margin note, we loop over all
+% already-processed margin notes on the same page.  If an overlap is detected,
+% we advance the y-position of the margin note according to the height of the
+% existing overlapping margin note, and re-start the loop.
+%    \begin{macrocode}
+\def\phf@cc@marginlastmarginnoteypos{}
+\newdimen\phf@cc@marginvshift
+\def\newphfccmarginnote#1{\newphfccmarginnote@#1}
+\def\newphfccmarginnote@#1#2#3#4{%
+  \phf@cc@marginvshift=\z@
+%    \end{macrocode}
+% ... there's more than one note on this page, we need to check for vertical
+% adjustments.
+%    \begin{macrocode}
+    \ifnum#2>0\relax
+      \phf@cc@margin@calculatevshift{#1}{#2}{#3}{#4}%
+    \else\fi
+  \csxdef{phfccmn@#1.#2}{%
+    {{#3}{#4}}{\number\phf@cc@marginvshift sp}%
+  }%
+}
+%    \end{macrocode}
+% Compute the vertical shift by looping through existing notes on the present
+% page.  Note: the reported y-position is from the *bottom*, not the top.
+%    \begin{macrocode}
+\newdimen\phfccmargininitialssep
+\phfccmargininitialssep=2\p@
+\newcount\phf@cc@tmp@cntiter
+\def\phf@cc@margin@calculatevshift#1#2#3#4{%
+  \phf@cc@marginvshift=\z@
+  \phf@cc@tmp@cntiter=0
+  \phf@cc@margin@calculatevshift@{#1}{#2}{#3}{#4}%
+}
+\def\phf@cc@margin@calculatevshift@#1#2#3#4{%
+  \ifnum\phf@cc@tmp@cntiter<#2\relax
+    \ifcsname phfccmn@#1.\the\phf@cc@tmp@cntiter\endcsname
+      \expandafter\let\expandafter\phf@cc@tmp\csname phfccmn@#1.\the\phf@cc@tmp@cntiter\endcsname
+      \edef\phf@cc@tmp@otherypos{%
+        \expandafter\expandafter\expandafter\@firstoftwo
+          \expandafter\@firstoftwo \phf@cc@tmp}%
+      \edef\phf@cc@tmp@otherhgt{%
+        \expandafter\expandafter\expandafter\@secondoftwo
+          \expandafter\@firstoftwo \phf@cc@tmp}%
+      \edef\phf@cc@tmp@othervshift{%
+        \expandafter\expandafter\expandafter\@firstofone
+          \expandafter\@secondoftwo \phf@cc@tmp}%
+      \ifdim\dimexpr\phf@cc@tmp@otherypos-\phf@cc@tmp@othervshift
+            >\dimexpr#3-#4-\phf@cc@marginvshift\relax
+        \ifdim\dimexpr\phf@cc@tmp@otherypos-\phf@cc@tmp@otherhgt-\phf@cc@tmp@othervshift
+              <\dimexpr#3-\phf@cc@marginvshift\relax
+          % overlap: advance & restart iteration
+          \advance\phf@cc@marginvshift \dimexpr
+              \phfccmargininitialssep
+              +(#3+\phf@cc@marginvshift)%
+              -(\phf@cc@tmp@otherypos-\phf@cc@tmp@otherhgt-\phf@cc@tmp@othervshift)%
+              \relax
+          \phf@cc@tmp@cntiter=\z@\relax
+        \else\fi
+      \else\fi
+    \else\fi
+    \advance\phf@cc@tmp@cntiter 1\relax
+    \phf@cc@margin@calculatevshift@{#1}{#2}{#3}{#4}%
+  \fi
+}    
+%    \end{macrocode}
+% 
 % Define the |margin| initials style as the default:
 %    \begin{macrocode}
 \let\phf@cc@formatinitialsstyle@default\phf@cc@formatinitialsstyle@margin
