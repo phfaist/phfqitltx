@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfcc}
 %<*package>
-    [2020/04/02 v1.0 phfcc package]
+    [2020/05/25 v1.0 phfcc package]
 %</package>
 %
 %<*driver>
@@ -106,15 +106,15 @@
 % \DescribeMacro{\phfMakeCommentingCommand} This is done using the
 % |\phfMakeCommentingCommand| macro.
 %
-% \phfMakeCommentingCommand[initials={AE}]{AlE}%
-% \phfMakeCommentingCommand[initials={JB}]{JB}%
+% \phfMakeCommentingCommand[initials={A.E.}]{AlE}%
+% \phfMakeCommentingCommand[initials={J.B.}]{JB}%
 % \phfMakeCommentingCommand[initials={PhF}]{phf}%
 % Let's start with a simple example. Suppose two authors, Albert Einstein and
 % John Bell, are commenting on the same document. They might define the
 % commenting commands |\AlE| and |\JB|:
 % \begin{verbatim}
-% \phfMakeCommentingCommand[initials={AE}]{AlE}
-% \phfMakeCommentingCommand[initials={JB}]{JB}
+% \phfMakeCommentingCommand[initials={A.E.}]{AlE}
+% \phfMakeCommentingCommand[initials={J.B.}]{JB}
 % \end{verbatim}
 % They can then comment on text like this:
 % \begin{verbatim}
@@ -123,9 +123,9 @@
 % from earlier ideas by Planck \AlE{and Einstein} \AlE[@JB, you forgot
 % about me!].  Quantum mechanics appears to allow spooky action at a
 % distance via some strange thing called ``entanglement,'' \JB*{but
-% this can be explained by hidden variables}\JB{which has revolutionized
-% our understanding of local realism.} \JB[@Albert, we talked about
-% this...]
+% this can be explained with hidden variables}\JB{which has
+% revolutionized our understanding of local realism.} \JB[@Albert,
+% we talked about this...]
 % \end{verbatim}
 % which gives:
 %
@@ -135,16 +135,23 @@
 % from earlier ideas by Planck \AlE{and Einstein} \AlE[@JB, you forgot
 % about me!].  Quantum mechanics appears to allow spooky action at a
 % distance via some strange thing called ``entanglement,'' \JB*{but
-% this can be explained by hidden variables}\JB{which has revolutionized
-% our understanding of local realism.} \JB[@Albert, we talked about
-% this...]%
+% this can be explained with hidden variables}\JB{which has
+% revolutionized our understanding of local realism.} \JB[@Albert,
+% we talked about this...]%
 % }
+%
+%   As an alternative to \pkgname{phfcc}, you can consider the package
+%   \pkgname{todonotes}\footnote{\url{https://ctan.org/pkg/todonotes}}.  The
+%   commands defined in this package are designed for minimal effort by the
+%   commenter (e.g., they only have to type |\phf{...}| or |\phf[...]|).  On the
+%   other hand \pkgname{todonotes} offers pretty boxes and more flexibility.
 %
 %
 % \section{Syntax of commenting commands}
 %
 % Here is the full syntax of the commenting commands generated with
-% |\phfMakeCommentingCommand|.  You can write:
+% |\phfMakeCommentingCommand|.  Suppose the command |\AlE| was defined by
+% issuing |\phfMakeCommentingCommand[initials={A.E.}]{AlE}|.  You can write:
 %
 %
 % |\AlE{some text here}| --- \AlE{some text here} --- typeset the
@@ -230,13 +237,14 @@
 %   |formatinitials=footnote| to hide the initials at the point of text but with
 %   a footnote to associate colored comments with the name (for this to work
 %   more nicely, specify your full name as argument to |initials={...}|)
-%   \phffootnote[Here is an example].  [In the latter case, you may redefine
-%   |\phfCCChangesBy|, e.g., \relax%
-%   |\renewcommand{\phfCCChangesBy}{Changes in this color are by\ }| to change
-%   the text in the footnote.]
+%   \phffootnote[Here is an example].  [See
+%   \autoref{sec:customize-initials-formatting} for customizing the formatting of
+%   the margin initials for the |margin| style or for changing the text in the
+%   footnote in the |footnote| style.]
 %
-%   You may also specify any \LaTeX{} command, which will then be used to format
-%   the initials.
+%   You may also specify as a value to the |formatinitials=| option any \LaTeX{}
+%   command, which will then be used to format the initials.  The macro should
+%   accept a single argument, the initials.
 %
 %   The default initials formatting style (|formatinitials=margin|) requires the
 %   \pkgname{marginnote} package, which is loaded automatically.  If you do not
@@ -293,6 +301,43 @@
 % version of a long document to ensure that no commenting commands are left in
 % the document.
 %
+% \subsection{Customizing the formatting of the initials label}
+% \label{sec:customize-initials-formatting}
+%
+% \paragraph{For the \phfverb{margin} style:}
+%
+% You can customize the appearance of the initials in the margin when using the
+% |margin| initials style by redefining the following macros.  Changes affect
+% all margin labels (i.e., changes affect all commenting commands using the
+% |margin| initials formatting style).
+%
+% \DescribeMacro{\phfccformatmargininitials} The |\phfccformatmargininitials| is
+% used to format the initials in the margin.  You can redefine it if you'd like
+% the initials to appear differently.  Adapt the following, which contains the
+% default definition, to your liking:
+% \begin{verbatim}
+% \renewcommand{\phfccformatmargininitials}[1]{%
+%   \fbox{\normalfont\sffamily\footnotesize #1}%
+% }
+% \end{verbatim}
+% (Technical note: the |\fboxsep| length has been set to |1pt| prior to calling
+% this macro.)
+%
+% \DescribeMacro{\phfccmargininitialssep} The |\phfccmargininitialssep| length
+% is the minimal vertical separation between two initials labels.  This is a
+% length, so you should change it with |\setlength|:
+% \begin{verbatim}
+% \setlength{\phfccmargininitialssep}{2pt}
+% \end{verbatim}
+% 
+% \paragraph{For the \phfverb{footnote} style:}
+%
+% \DescribeMacro{\phfCCChangesBy} When using the |footnote| initials formatting
+% style, you may redefine |\phfCCChangesBy| to change the text in the footnote:
+% \begin{verbatim}
+% \renewcommand{\phfCCChangesBy}[1]{Changes in this color are by #1}
+% \end{verbatim}
+% 
 % \section{Package Options}
 %
 % This package requires the \pkgname{marginnote} package to generate initials
@@ -306,15 +351,43 @@
 %
 % \section{Known limitations}
 %
-% If you place a comment inside a contruct that is typeset twice (e.g., an AMS
-% equation, or a figure caption when using e.g. the \pkgname{caption} package,
-% etc.), then the margin initials will not appear even if the comment is the
-% first of the page.  This is because the margin label is produced the first
-% time they are typeset, per page.  There's not much I can do about this, and
-% unless there is a quick \& easy fix I don't intend to spend too much effort
-% into trying to hack around this.
+% There are some cases where it's hard to get everything right. The
+% \pkgname{phfcc} commands do their best to get stuff right and to avoid
+% generating obscure \LaTeX{} errors, but there might be times where not
+% everything works as expected.
+%
+% \begin{itemize}
+% \item If you place a comment inside certain contructs that are processed twice
+%   by \LaTeX{} (e.g., a figure caption when using e.g. the \pkgname{caption}
+%   package, etc.) then the margin initials will not appear even if the comment
+%   is the first of the page.  This is because the margin label is produced the
+%   first time they are typeset, per page; if that happened to be in a temporary
+%   \TeX{} box that was then discarded, the margin note gets discarded along
+%   with it.
+%
+%   In the case of AMS equations, there's a hack that make the labels appear
+%   right.  Feel free to send pull requests to address other cases.
+%
+%   \phf[FIXME: A better solution might be to write to the AUX file at each
+%   comment, so that the information is written when the comment is actually
+%   typeset, and then process where to put margin labels on the second run of
+%   \LaTeX{}.
+%
+%   As a bonus, this would enable stuff like ``list of comments'' like the
+%   \pkgname{todonotes} package does.  Even though I don't think it's necessary
+%   for the standard use case of this package.]
+%
+% \item Initials in the margin might overlap in some edge cases.  See my
+%   comments and footnotes in the implementation documentation below.
+%
+% \item Initials in the margin might not appear if the comment immediately
+%   follows a page break, because the comment might have been processed while
+%   \LaTeX{} was on the previous page before deciding to start a new page.  See
+%   my comments and footnotes in the implementation doc below.
+% \end{itemize}
 %
 %
+% 
 % \StopEventually{\PrintChangesAndIndex}
 %
 % \section{Implementation}
@@ -334,6 +407,9 @@
 \RequirePackage{xcolor}
 %    \end{macrocode}
 % 
+%
+% \subsection{Set up default settings}
+%
 % \begin{macro}{\phfCommentingDefault...}
 % Provide sensible defaults for commenting formatting.
 %
@@ -435,7 +511,22 @@
 }{}
 %    \end{macrocode}
 %
-% In the series of defaults, we also have the predefined initials formatting.
+% \subsection{Define styles for initials formatting}
+%
+% Define the implementations for the different initials formatting.  These are
+% by default the small boxes that appear in the margin that match color to
+% comment owner.
+%
+% Define the |margin| initials style as the default:
+%    \begin{macrocode}
+\def\phf@cc@formatinitialsstyle@default{\phf@cc@formatinitialsstyle@margin}
+%    \end{macrocode}
+%
+% \subsubsection{Define styles \phfverb{hide}, \phfverb{box}, \phfverb{nobox}}
+%
+% \begin{macro}{\phf@cc@formatinitialsstyle@box}
+% \begin{macro}{\phf@cc@formatinitialsstyle@nobox}
+% \begin{macro}{\phf@cc@formatinitialsstyle@hide}
 % Define the |hide|, |box|, and |nobox| styles first.
 %    \begin{macrocode}
 \def\phf@cc@formatinitialsstyle@box#1{%
@@ -448,18 +539,49 @@
   \hspace{0.25em}}
 \def\phf@cc@formatinitialsstyle@hide#1{}
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
-% Define the |margin| style now.  Define an auxiliary global macro to remember
-% whenever we've already displayed the margin note on a given page.
+% \subsubsection{Define the style \phfverb{footnote}}
 %
+% Define the |footnote| style.  Note you can redefine |\phfCCChangesBy| to
+% whatever you please, and it can even take the name as |#1| argument.
+%    \begin{macrocode}
+\def\phf@cc@formatinitialsstyle@footnote#1{%
+  \ifcsname phf@cc@valfmtinitialsfootnote@intlspage@\phf@cc@val@cur @\roman{page}\endcsname
+    % already displayed on this page, don't repeat
+  \else
+    \csgdef{phf@cc@valfmtinitialsfootnote@intlspage@\phf@cc@val@cur @\roman{page}}{1}%
+    \def\phf@cc@tmp@zz{\gdef\@thefnmark{}\@footnotetext}%
+    \expandafter\phf@cc@tmp@zz\expandafter{\expandafter{%
+        \expandafter\color\expandafter{\phf@cc@val@cur color}\phfCCChangesBy{#1}}}%
+  \fi
+}
+\robustify\phf@cc@formatinitialsstyle@footnote
+\def\phfCCChangesBy{Changes by\ }
+%    \end{macrocode}
+%
+% \subsubsection{Define the style \phfverb{margin}}
+%
+% \begin{macro}{\phf@cc@formatinitialsstyle@margin}
+% Define the |margin| style now.  This one is a little tricky.
 %    \begin{macrocode}
 \def\phf@cc@formatinitialsstyle@margin#1{%
 %    \end{macrocode}
 % 
-% If the label was already displayed on this page (as witnessed by the following
-% test macro being defined), don't repeat the label display and skip altogether.
+% First thing, we define an auxiliary global macro to remember whenever we've
+% already displayed the margin note on a given page.  If the label was already
+% displayed on this page (as witnessed by the following test macro being
+% defined), don't repeat the label display and skip altogether.\footnote{There
+% are some edge cases here I'm not sure I want to spend the effort to fix.  For
+% instance, if the comment appears right after a page break, it might have been
+% processed by \TeX\space while on the previous page and this test might get the
+% page number wrong.  Oh well, the label was on last page already so you should
+% know whose comment this is.}
 %    \begin{macrocode}
-  \ifcsname phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur @\roman{page}\endcsname
+  \ifcsname phf@cc@valfmtinitialsmargin@intlspage@\phf@cc@val@cur
+    @\roman{page}\endcsname
   \else
 %    \end{macrocode}
 % 
@@ -474,9 +596,11 @@
 }
 \robustify\phf@cc@formatinitialsstyle@margin
 %    \end{macrocode}
-% Helper macros for this margin initials style.  Detects if we're in a first
-% pass in an AMS equation, for instance, to only emit the label in the second
-% pass (actual typesetting).
+% \end{macro}
+%
+% \begin{macro}{\phf@cc@margin@ifchecks}
+%   Detects if we're in a first pass in an AMS equation, for instance, to only
+%   emit the label in the second pass (actual typesetting).
 %    \begin{macrocode}
 \def\phf@cc@margin@ifchecks#1{%
   \phf@cc@ififexists{ifmeasuring@}{%
@@ -486,6 +610,17 @@
     #1%
   }%
 }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\phf@cc@ififexists}
+% A helper macro.  The |\phf@cc@ififexists|\marg{if-cs-name}\marg{commands if
+% true}\marg{commands if false} macro checks if the command |\ifXXXX| exists,
+% where the name |ifXXXX| is the first argument of |\phf@cc@ififexists|.  If it
+% exists, then it checks that ``if'' condition and executes \marg{commands if
+% true} or \marg{commands if false} as appropriate.  If the ``if'' macro doesn't
+% exist, then executes \marg{commands if false}.
+%    \begin{macrocode}
 \def\phf@cc@ififexists#1#2#3{%
   \ifcsname #1\endcsname
     \def\x{\phf@cc@ififexists@{#1}{#2}{#3}}%
@@ -502,23 +637,42 @@
   \fi
 }
 %    \end{macrocode}
+% \end{macro}
 % 
-% {\itshape About |\marginnote| vs |\marginpar|:} The strategy is use
-% |\marginnote| all the time.  Originally I used |\marginpar|, but it doesn't
-% work in footnotes and figure captions, where one often wants to comment
-% things.  It's really hard to detect all cases where |\marginpar| is
+% At this point, we are all set to display the initials in the margin.  It seems
+% like there should be nothing wrong with simply emitting a |\marginpar|, but
+% those don't work in footnotes and figure captions, where one would also like
+% to be able to introduce comments.  One could use the \pkgname{marginnote}
+% package instead, which is more reliable, but then we can get overlapping
+% margin labels which are not very nice.
+%
+% {\itshape On the subject of |\marginnote| vs |\marginpar|:} The strategy here
+% is use |\marginnote| all the time.  Originally I used |\marginpar|, but it
+% doesn't work in footnotes and figure captions, where one often wants to
+% comment things.  It's really hard to detect all cases where |\marginpar| is
 % problematic. (|\ifinner| detects minipages/equations, value of |\@captype|
-% detects figure captions, but I just can't detect footnotes, and I anticipate
-% other problematic situations coming up).
+% detects figure captions, but I didn't manage to detect footnotes reliably, and
+% I anticipate other problematic situations coming up).  So I use
+% \pkgname{marginnote} instead, which is more reliable.  We could have some
+% complex process to decide whether to use |\marginpar| or |\marginnote|, but
+% only if we can find a really reliable algorithm.  When collaborators are
+% commenting on a document in the final hours before a deadline, we really don't
+% want to generate obscure LaTeX errors because they happened to hit an edge
+% case by placing a comment somewhere I hadn't anticipated.  So for now,
+% universally use |\marginnote|.  If you don't want to load the
+% \pkgname{marginnote} package for whatever reason, use a different initials
+% label style and specify the |usemarginnote=false| package option.
 %
-% So I use \pkgname{marginnote} instead, which is more reliable.  We could have
-% some complex process to decide whether to use |\marginpar| or |\marginnote|,
-% but only if we can find a really reliable algorithm that won't generate
-% obscure LaTeX errors when collaborators want to comment on a document in a
-% final hours before a deadline.  So for now, universally use |\marginnote|.  If
-% you don't want to load |\marginnote|, use a different initials label style.
+% To avoid margin notes overlapping with \pkgname{marginnote}, we use custom
+% code with a simple algorithm to shift the margin notes vertically so that they
+% don't overlap.  The code is a bit ugly, but it seems to work and it doesn't
+% rely on too specific hacks, so it is hopefully not too prone to edge cases.
 %
-% This is the macro that actually creates the margin note.
+% \begin{macro}{\phf@cc@margin@emit}
+%   This is the macro that actually creates the margin note.  First we create a
+%   |\hbox| with the label so that we can measure its height.  Then we defer to
+%   |\phf@cc@createmarginnote| to produce the margin note with the formatted
+%   initials.
 %    \begin{macrocode}
 \newbox\phf@cc@margin@labelbox
 \newdimen\phf@cc@margin@labelboxhgt
@@ -533,6 +687,9 @@
     @\roman{page}}{1}%
 }%
 %    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\phfccformatmargininitials}
 % The |\phfccformatmargininitials|\marg{initials} can be redefined to change the
 % appearance of the margin intials box.
 %    \begin{macrocode}
@@ -540,27 +697,23 @@
   \fbox{\normalfont\sffamily\footnotesize #1}%
 }
 %    \end{macrocode}
-% The tricky thing with |marginnote| is that labels will overlap if they are
-% emitted on the same line.  Here we use a workaround: We check |\pdflastypos|
-% and add some vertical spacing if we are too close to the last note's y
-% position on the same page.  But the issue is that |\pdfsavepos| and
-% |\pdflatexypos| only work while shipping out, so basically all we can do is
-% write the values to the AUX file and use them next time latex is run. Here we
-% use the same mechanism as \pkgname{marginnote}: define a new \LaTeX\space
-% label printing a |\newphfccmarginnote| in the AUX file with the relevant
-% meta-info.  We use the internal counters |\@mn@thispage| (current absolute
-% page number) and |\@mn@atthispage| (number of note on current page) because we
-% also need to track which notes are on which page, and there's no use
-% duplicating all that code (I do hope those counters don't change, though).  We
-% also recycle \pkgname{marginnote}'s detected command names to use for PDF
-% position read-out (prefix |\mn@mode@prefix|).
+% \end{macro}
 %
-% The label |\csname phfccmn@\@mn@thispage.\@mn@atthispage\endcsname| expands to
-% |\marg{pdf y-pos of the point in text}\marg{label box
-% height}|}||{|\marg{requried vertical shift to adjust this note}|}|.  The first
-% group of fields are as specified in the arguments to the |\newphfccmarginnote|
-% written to the AUX file, and the second group contains the values (only one
-% currently) computed when calling |\newphfccmarginnote|.
+% \begin{macro}{\phf@cc@createmarginnote}
+%   The tricky thing with \pkgname{marginnote} is that labels will overlap if
+%   they are emitted on the same line.  Here we use a workaround: We check
+%   |\pdflastypos| and add some vertical spacing if we are too close to the last
+%   note's y position on the same page.  But the issue is that |\pdfsavepos| and
+%   |\pdflatexypos| only work while shipping out, so basically all we can do is
+%   write the values to the AUX file and use them next time latex is run. Here
+%   we use the same mechanism as \pkgname{marginnote}: define a new \LaTeX\space
+%   label printing a |\newphfccmarginnote| in the AUX file with the relevant
+%   meta-info.  We use the internal counters |\@mn@thispage| (current absolute
+%   page number) and |\@mn@atthispage| (number of note on current page) because
+%   we also need to track which notes are on which page, and there's no use
+%   duplicating all that code (I do hope those counters don't change, though).
+%   We also recycle \pkgname{marginnote}'s detected command names to use for PDF
+%   position read-out (prefix |\mn@mode@prefix|).
 %    \begin{macrocode}
 \def\phf@cc@createmarginnote{%
   \marginnote[{\copy\phf@cc@margin@labelbox}]{\copy\phf@cc@margin@labelbox}[%
@@ -576,42 +729,77 @@
   }%
 }
 %    \end{macrocode}
-% Used as |\marginnote|'s vertical shift length.  Expands to the vertical shift
-% needed to correct the current note.  Remember: no assignments in here, this
-% command must be fully expandable.
+% \end{macro}
+%
+% \begin{macro}{\phf@cc@marginextractvshift}
+%   The macro |\phf@cc@marginextractvshift| is responsible for extracting the
+%   required vertical shift from the corresponding label created from the
+%   information saved in the AUX file.  \emph{This macro is fully expandable,
+%   and is meant to be used as the value of the optional vertical-shift argument
+%   in \phfverb{\marginnote}.}  The current note is identified by the internal
+%   \pkgname{marginnote} counters |\@mn@thispage| (current absolute page number)
+%   and |\@mn@atthispage| (current note number on this page).
+%
+%   The label |\csname phfccmn@\@mn@thispage.\@mn@atthispage\endcsname|
+%   generated by |\newphfccmarginnote| expands to |{|\marg{pdf y-pos of the
+%   point in text}\marg{label box height}|}|\relax |{|\marg{requried vertical
+%   shift to adjust this note}|}|.  The first group of fields are the two last
+%   arguments specified to |\newphfccmarginnote| written to the AUX file (the
+%   two first are already in the label/macro name), and the second group
+%   contains the values (only one currently) computed when calling
+%   |\newphfccmarginnote|.
+%
+%   Used as |\marginnote|'s vertical shift length.  Expands to the vertical
+%   shift needed to correct the current note.  Remember: no assignments in here,
+%   this command must be fully expandable.
 %    \begin{macrocode}
 \def\phf@cc@marginextractvshift{%
   \ifcsname phfccmn@\@mn@thispage.\@mn@atthispage\endcsname
-    \expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\@firstofone
-      \expandafter\expandafter\expandafter\@secondoftwo\csname phfccmn@\@mn@thispage.\@mn@atthispage\endcsname
+    \expandafter\expandafter\expandafter\expandafter\expandafter
+    \expandafter\expandafter\@firstofone
+      \expandafter\expandafter\expandafter\@secondoftwo
+        \csname phfccmn@\@mn@thispage.\@mn@atthispage\endcsname
   \else
     \z@
   \fi
 }
 %    \end{macrocode} 
+% \end{macro}
 %
-% This command defines the margin label in the AUX file.  It's not meant as
-% public API, it's only written in the AUX file to be re-read on next run.  Here
-% is where all the calculations are done.
+% \begin{macro}{\newphfccmarginnote}
+%   The |\newphfccmarginnote| command defines the margin label in the AUX file.
+%   It's not meant as public API, it's only written in the AUX file to be
+%   re-read on next run.  Here is where all the calculations are done.
 %
-% In this macro we get the page number, y position, and box height of a margin
-% note written by the previous run of \LaTeX.  We need to compute the vertical
-% shift to avoid overlapping with other boxes.
+%   In this macro we get the page number, y position, and box height of a margin
+%   note written by the previous run of \LaTeX.  We need to compute the vertical
+%   shift to avoid overlapping with other boxes.
 %
-% The algorithm is pretty dumb. For each margin note, we loop over all
-% already-processed margin notes on the same page.  If an overlap is detected,
-% we advance the y-position of the margin note according to the height of the
-% existing overlapping margin note, and re-start the loop.
+%   The algorithm is pretty dumb. For each margin note, we loop over all
+%   already-processed margin notes on the same page.  If an overlap is detected,
+%   we advance the y-position of the margin note according to the height of the
+%   existing overlapping margin note, and re-start the loop.
+%
+%   This is also the main entry point into our vertical shift calculating
+%   algorithm.  Set the |\phf@cc@marginvshift| to zero, this is where the
+%   calculated total vertical shift will be stored.  Then call our algorithm
+%   main routine unless we're the first note on the page.\footnote{There's an
+%   edge case here that I haven't dealt with: In the case of footnotes or figure
+%   captions, the notes can appear out of order in the AUX file. Our algorithm
+%   only checks for overlap with note numbers that are less than the current
+%   note number.  So if note 1.1 appears in the AUX file after note 1.2, then
+%   first 1.2 is processed, no shift is added (it ignores the fact that 1.1
+%   doesn't exist yet), then 1.1 is processed and thinks it's the first note so
+%   doesn't add a shift either.  If this ends up really being a problem there
+%   are ways to fix this but now I don't feel it's worth the effort.  So you
+%   might have a note in a figure caption somehow overlapping with another note
+%   if they happen to be in different environments and yet on the same line.}
 %    \begin{macrocode}
 \def\phf@cc@marginlastmarginnoteypos{}
 \newdimen\phf@cc@marginvshift
 \def\newphfccmarginnote#1{\newphfccmarginnote@#1}
 \def\newphfccmarginnote@#1#2#3#4{%
   \phf@cc@marginvshift=\z@
-%    \end{macrocode}
-% ... there's more than one note on this page, we need to check for vertical
-% adjustments.
-%    \begin{macrocode}
     \ifnum#2>0\relax
       \phf@cc@margin@calculatevshift{#1}{#2}{#3}{#4}%
     \else\fi
@@ -620,11 +808,34 @@
   }%
 }
 %    \end{macrocode}
-% Compute the vertical shift by looping through existing notes on the present
-% page.  Note: the reported y-position is from the *bottom*, not the top.
+% \end{macro}
+%
+%
+% \begin{macro}{\phfccmargininitialssep}
+%   The dimension |\phfccmargininitialssep| is the minimum vertical separation
+%   between two margin notes initials.  Redefine this length to whatever you
+%   like (e.g., |\phfccmargininitialssep=1mm\relax| or
+%   |\setlength{\phfccmargininitialssep}{1mm}|).
 %    \begin{macrocode}
 \newdimen\phfccmargininitialssep
 \phfccmargininitialssep=2\p@
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\phf@cc@margin@calculatevshift}
+%   This is our note vertical-shifting algorithm.  Compute the vertical shift by
+%   looping through existing notes on the present page.  The temporary counter
+%   |\phf@cc@tmp@cntiter| is the iteration counter and iterates over the notes
+%   on the present page up to the current note.  (If a note with earlier note is
+%   undefined, skip it, this can happen if the note is in a footnote or figure
+%   caption; see earlier footnote.)
+%
+%   The total vertical shift that needs to be applied to the present note
+%   (positive shift = downwards shift) is stored in the dimen
+%   |\phf@cc@marginvshift|, to be picked up by |\newphfccmarginnote|.  Here
+%   |#1|=absolute page no., |#2|=current note no., |#3|=current note y position,
+%   |#4|=current note box height.
+%    \begin{macrocode}
 \newcount\phf@cc@tmp@cntiter
 \def\phf@cc@margin@calculatevshift#1#2#3#4{%
   \phf@cc@marginvshift=\z@
@@ -634,7 +845,8 @@
 \def\phf@cc@margin@calculatevshift@#1#2#3#4{%
   \ifnum\phf@cc@tmp@cntiter<#2\relax
     \ifcsname phfccmn@#1.\the\phf@cc@tmp@cntiter\endcsname
-      \expandafter\let\expandafter\phf@cc@tmp\csname phfccmn@#1.\the\phf@cc@tmp@cntiter\endcsname
+      \expandafter\let\expandafter
+          \phf@cc@tmp\csname phfccmn@#1.\the\phf@cc@tmp@cntiter\endcsname
       \edef\phf@cc@tmp@otherypos{%
         \expandafter\expandafter\expandafter\@firstoftwo
           \expandafter\@firstoftwo \phf@cc@tmp}%
@@ -648,12 +860,31 @@
             >\dimexpr#3-#4-\phf@cc@marginvshift\relax
         \ifdim\dimexpr\phf@cc@tmp@otherypos-\phf@cc@tmp@otherhgt-\phf@cc@tmp@othervshift
               <\dimexpr#3-\phf@cc@marginvshift\relax
-          % overlap: advance & restart iteration
-          \advance\phf@cc@marginvshift \dimexpr
+%    \end{macrocode}
+% At this point, an overlap is detected between the current note that we're
+% adjusting (note number |#2| on page |#1|) and an earlier processed note (note
+% number |\phf@cc@tmp@cntiter| on the same page).  So we shift the current note
+% so that it appears below the other note.  The vertical shift is accumulated in
+% the |\phf@cc@marginvshift| dimen, this will be stored into the label after
+% we're done computing.  Note: the y-position reported by |\pdflastypos| is from
+% the \emph{bottom}, not the top, so ``higher on the page than'' is ``|>|''; but
+% a positive margin vertical shift in \pkgname{marginnote} shifts the margin
+% note \emph{downwards}.
+%
+% Then reset the iteration counter to zero, so that we re-loop over all existing
+% notes on the same page to re-check (with the new vertical shift) that we
+% didn't generate an overlap with any earlier note (e.g., could happen on a
+% two-column page with comments in both columns).
+%    \begin{macrocode}
+          \@tempdima=\dimexpr
               \phfccmargininitialssep
-              +(#3+\phf@cc@marginvshift)%
+              +(#3-\phf@cc@marginvshift)%
               -(\phf@cc@tmp@otherypos-\phf@cc@tmp@otherhgt-\phf@cc@tmp@othervshift)%
               \relax
+          %\message{*** phfcc DEBUG: overlap detected of note #1.#2 with
+          %  note #1.\the\phf@cc@tmp@cntiter, increasing vshift of note
+          %  number #2 on page #1 by \the\@tempdima \space ***}%
+          \advance\phf@cc@marginvshift \@tempdima
           \phf@cc@tmp@cntiter=\z@\relax
         \else\fi
       \else\fi
@@ -663,29 +894,10 @@
   \fi
 }    
 %    \end{macrocode}
-% 
-% Define the |margin| initials style as the default:
-%    \begin{macrocode}
-\let\phf@cc@formatinitialsstyle@default\phf@cc@formatinitialsstyle@margin
-%    \end{macrocode}
+% \end{macro}
 %
-% Define the |footnote| style. Works very similarly to the |footnote| style.
-% Note you can redefine |\phfCCChangesBy| to whatever you please, and it can
-% even take the name as |#1| argument.
-%    \begin{macrocode}
-\def\phf@cc@formatinitialsstyle@footnote#1{%
-  \ifcsname phf@cc@valfmtinitialsfootnote@intlspage@\phf@cc@val@cur @\roman{page}\endcsname
-    % already displayed on this page, don't repeat
-  \else
-    \csgdef{phf@cc@valfmtinitialsfootnote@intlspage@\phf@cc@val@cur @\roman{page}}{1}%
-    \def\phf@cc@tmp@zz{\gdef\@thefnmark{}\@footnotetext}%
-    \expandafter\phf@cc@tmp@zz\expandafter{\expandafter{%
-        \expandafter\color\expandafter{\phf@cc@val@cur color}\phfCCChangesBy{#1}}}%
-  \fi
-}
-\robustify\phf@cc@formatinitialsstyle@footnote
-\def\phfCCChangesBy{Changes by\ }
-%    \end{macrocode}
+% 
+% \subsection{The main \phfverb{\phfMakeCommentingCommand} macro}
 %
 % \begin{macro}{\phfMakeCommentingCommand}
 %   Implementation of |\phfMakeCommentingCommand|.  See main package
@@ -753,6 +965,8 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \subsection{Implementation of the commenting commands}
+%
 % Overall, the implementation of a commenting command goes as follows.  First,
 % gather all the info about the command invocation (e.g., important? starred?
 % comment?) and then ultimately call |\phf@cc@begin| and |\phf@cc@end| which
@@ -771,9 +985,9 @@
 %    \end{macrocode}
 %
 % \begin{macro}{\phf@cc@begin}
-% Here we set the comment color and execute other opening commands stored
-% earlier in the parsing stage. Observe that |\begingroup| \textbf{has already
-% been issued} by |\phf@cc@do|.
+%   Here we set the comment color and execute other opening commands stored
+%   earlier in the parsing stage. {\itshape Observe that |\begingroup| has
+%   already been issued by |\phf@cc@do|.}
 %    \begin{macrocode}
 \def\phf@cc@begin{%
   \color{\phf@cc@val@cur color}%
@@ -808,8 +1022,11 @@
 % \end{macro}
 %
 % \begin{macro}{\phf@cc@do}
-%   The user-instantiated commenting commands are an alias of this command, with
-%   the user macro name as first argument.  Here's were everything starts.
+%   {\bfseries The macro |\phf@cc@do| is the main entry point of a commenting
+%   command.}  Actually, the user-instantiated commenting commands are an alias
+%   of this command, with the user macro name as first argument.  So the |\AlE|
+%   command defined in the main documentation of this package was in fact
+%   defined as an alias to |\phf@cc@do{AlE}|.  This is were everything starts.
 %    \begin{macrocode}
 \def\phf@cc@do#1{%
 %    \end{macrocode}
@@ -821,18 +1038,24 @@
       with \string\phfDisableCommentingCommands.}{}%
   \fi
 %    \end{macrocode}
-%   Now we start for real.  First, we open the \TeX\ group. Then we start
-%   parsing the invocation syntax.
+% Now we start for real.  First, we open the \TeX\ group. Then we start parsing
+% the invocation syntax.
+%
+% \phf[FIXME: why \phfverb\leavevmode? This adds vertical space if the command
+% is issued in vertical mode right before an equation.]
 %    \begin{macrocode}
   \leavevmode\begingroup%
   \edef\phf@cc@val@cur{#1}%
-  \@ifstar\phf@cc@star\phf@cc@nostar% star?
+  \@ifstar\phf@cc@star\phf@cc@nostar%
 }
 \def\phf@cc@nostar{\@ifnextchar!\phf@cc@important\phf@cc@grp}
 %    \end{macrocode}
 % At this point, we have determined whether the invocation is starred or important.
 % The next execution points are |\phf@cc@star|, |\phf@cc@important|, or |\phf@cc@grp|.
-%
+% \end{macro}
+% 
+% \begin{macro}{\phf@cc@star}
+% \begin{macro}{\phf@cc@important}
 % If starred or if important, set up the inner group execution commands to the
 % corresponding settings, and defer to |\phf@cc@grp|.
 %    \begin{macrocode}
@@ -854,8 +1077,9 @@
 \long\def\phf@cc@important!{%
   \csname phf@cc@val@\phf@cc@val@cur @ifont\endcsname%
 %    \end{macrocode}
-% Here we need a little hack, we want the important font to take precedence
-% over any comment font.
+% Here we need a little hack, we want the important font to take precedence over
+% any comment font.  Because this happens within a |\begingroup|, the global
+% definition of |\phfCommentingDefaultCFont| is not altered.
 %    \begin{macrocode}
   \appto\phfCommentingDefaultCFont{%
     \csname phf@cc@val@\phf@cc@val@cur @ifont\endcsname%
@@ -871,10 +1095,13 @@
   }%
   \phf@cc@grp}
 %    \end{macrocode}
-% 
-% The command |\phf@cc@grp| parses how the argument content is given. Is it
-% a comment (``|[ ... ]|''), a single \LaTeX{} argument group (``|{ ... }|''),
-% or should we expect it to end with |\end*|?
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\phf@cc@grp}
+%   The command |\phf@cc@grp| parses how the argument content is given. Is it a
+%   comment (``|[ ... ]|''), a single \LaTeX{} argument group (``|{ ... }|''),
+%   or should we expect it to end with |\endXXX|?
 %    \begin{macrocode}
 \def\phf@cc@grp{%
   \@ifnextchar[\phf@cc@comment\phf@cc@grpnocomment%]
@@ -882,19 +1109,28 @@
 \def\phf@cc@grpnocomment{%
   \@ifnextchar\bgroup{\phf@cc@grpwarg}{\phf@cc@begin}}
 %    \end{macrocode}
+% \end{macro}
+% 
+% The main commenting command has already defined the |\endXXX| command as an
+% alias of |\phf@cc@end|, so in the case of the syntax |\AlE ... \endAlE| we can
+% call |\phf@cc@begin| directly.
 %
-% Now we determined how the argument is given, and we are calling one
-% of |\phf@cc@comment|, |\phf@cc@grpwarg| (with argument), or
+% Now at this point we have determined how the argument is given, and we are
+% calling one of |\phf@cc@comment|, |\phf@cc@grpwarg| (with argument), or
 % |\phf@cc@begin| directly.
+%
+% \begin{macro}{\phf@cc@grpwarg}
+%   Format a simple comment specified as a normal \LaTeX{} block, i.e., provided
+%   as an argument to the commenting command.  (Like |\AlE{text here}| or
+%   |\AlE!{important text}| or |\AlE*{some stuff to remove}|.)
 %    \begin{macrocode}
 \long\def\phf@cc@grpwarg#1{\phf@cc@begin #1\phf@cc@end}
 %    \end{macrocode}
-%
-% If the argument is a comment, set up the comment font, begin/end
-% chars, and go.
-%
-% \changed[chg:phf-comment-accepts-long-comment-arg]{v3.0}{2020/01/24}{Comment
-% command now accepts long argument when used in the form \phfverb{\phf}[...]}
+% \end{macro}
+% 
+% \begin{macro}{\phf@cc@comment}
+%   If the argument is a comment, set up the comment font, begin/end chars, and
+%   go.
 %    \begin{macrocode}
 \NewDocumentCommand\phf@cc@comment{+O{}}{%
   \normalfont%
@@ -909,13 +1145,14 @@
     \csname phf@cc@val@\phf@cc@val@cur @cspacing\endcsname%
   }%
   \phf@cc@begin%
-  %\phf@cc@showinitials%
   #1%
   \phf@cc@end%
 }
 %    \end{macrocode}
 % \end{macro}
+% 
 %
+% \subsection{Process package options}
 %
 % Initialization code for \pkgname{kvoptions} for our package options.
 %    \begin{macrocode}

@@ -17,8 +17,16 @@
 \phfMakeCommentingCommand[initials={cc7}]{ccseven}
 \phfMakeCommentingCommand[initials={cc8}]{cceight}
 \phfMakeCommentingCommand{ccnine}
-\phfMakeCommentingCommand{ccten}
+\phfMakeCommentingCommand[color={green!30!black}]{ccten}
+\phfMakeCommentingCommand[color={red!80!blue}]{cceleven}
 
+% \usepackage{lua-ul}
+% \newunderlinetype\mystrikethrough{\leaders\hbox{\normalfont\bfseries/}}
+
+\renewcommand{\phfccformatmargininitials}[1]{%
+  \fbox{\normalfont\ttfamily\tiny #1}%
+}
+\setlength{\phfccmargininitialssep}{1mm}
 
 
 \begin{document}
@@ -64,11 +72,12 @@ a notion of work in our quantum setting by characterizing how much
 operation.\footnote{This is how a footnote looks like.} Yes.\footnote{Another
   footnote.} \ccsix![You might want to pay attention to this comment]
 
-This notion is closely related to the notion of {\em themomajorization} introduced by
-Horodecki et al.~\cite{Horodecki2013_ThermoMaj}. However, while their approach is to model
-the thermodynamics of physical systems with more realistic non-degenerate Hamiltonians, we
-adopt in contrast a purely information-theoretical point of view with degenerate
-Hamiltonians and unitary computations.
+This notion is closely related to the notion of {\em themomajorization}
+introduced by Horodecki et al.~\cite{Horodecki2013_ThermoMaj}. However, while
+their approach is to model the thermodynamics of physical systems with more
+realistic non-degenerate Hamiltonians, we adopt in contrast a purely
+information-theoretical point of view with degenerate Hamiltonians and unitary
+computations.
 
 \phf* You can comment entire chunks of text, like this:
 
@@ -93,6 +102,8 @@ and even equations:
   x = y^2\ .
 \end{equation}
 that's it! \endphf
+
+Hey, what about \cceleven{margin labels that could overlap from different columns}?
 
 \clearpage
 \onecolumngrid
