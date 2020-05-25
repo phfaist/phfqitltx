@@ -712,22 +712,33 @@
 %   page number) and |\@mn@atthispage| (number of note on current page) because
 %   we also need to track which notes are on which page, and there's no use
 %   duplicating all that code (I do hope those counters don't change, though).
-%   We also recycle \pkgname{marginnote}'s detected command names to use for PDF
-%   position read-out (prefix |\mn@mode@prefix|).
 %    \begin{macrocode}
 \def\phf@cc@createmarginnote{%
   \marginnote[{\copy\phf@cc@margin@labelbox}]{\copy\phf@cc@margin@labelbox}[%
     \phf@cc@marginextractvshift]%
-  \pdfsavepos
+  \phf@cc@savepos
   \protected@write\@auxout{}{%
     \string\newphfccmarginnote{%
       {\@mn@thispage}%
       {\@mn@atthispage}%
-      {\noexpand\number\@nameuse{\@mn@mode@prefix lastypos}sp}%
+      {\noexpand\number\phf@cc@lastypos sp}%
       {\number\phf@cc@margin@labelboxhgt sp}%
     }%
   }%
 }
+\ifcsname pdfsavepos\endcsname
+  \let\phf@cc@savepos\pdfsavepos
+  \let\phf@cc@lastypos\pdflastypos
+\else
+  \ifcsname savepos\endcsname
+    \let\phf@cc@savepos\savepos
+    \let\phf@cc@lastypos\lastypos
+  \else
+    \PackageError{phfcc}{Cannot find appropriate \string\pdfsavepos\space
+      command, neither \string\pdfsavepos\space nor\string\savepos\space
+      are defined.}{}
+  \fi
+\fi
 %    \end{macrocode}
 % \end{macro}
 %
