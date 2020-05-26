@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfnote}
 %<*package>
-    [2020/01/24 v3.0 phfnote package]
+    [2020/05/25 v3.1 phfnote package]
 %</package>
 %
 %<*driver>
@@ -214,7 +214,7 @@
 % \item[preset=sfssnote] {\fontfamily{cmss}\selectfont Format the note in
 %   \LaTeX' default sans-serif font.  A very nice sans serif font.  It might
 %   look heavy though, depending on your taste.}
-% \item[preset=opensansnote] {\fontfamily{fosj}\selectfont Format the note
+% \item[preset=opensansnote] {\opensans Format the note
 %   in Open Sans font (using the `\pkgname{opensans}' package with some
 %   default options).  A very beautiful and readable sans serif font.}
 % \item[preset=utopianote] {\fontfamily{futs}\selectfont Format the note in
@@ -3698,6 +3698,9 @@
 % font.  Override |\phfnote@pkgdoc@setupfont| to adjust the whole font
 % set-up, or |\phfnote@pkgdoc@setupmainfont| to adjust only the main
 % document font.
+%
+% \changed[chg-opensans-fosj]{v3.1}{2020/05/25}{Fixes for more recent
+% versions of the \pkgname{opensans} package.}
 %    \begin{macrocode}
 \providecommand\phfnote@pkgdoc@setupfont{
   \PassOptionsToPackage{T1}{fontenc}
@@ -3708,8 +3711,8 @@
   \IfFileExists{opensans.sty}{}{\PackageError{phfnote}{Font OpenSans is not
       available (need `opensans' package)}{Please install the opensans
       package, which provides the OpenSans font.}}
-  \def\opensans@scale{s*[0.85]}
-  \renewcommand{\sfdefault}{fosj}
+  \PassOptionsToPackage{scale=0.85,defaultsans}{opensans}
+  \RequirePackage{opensans}
 }
 \providecommand\phfnote@pkgdoc@setupmainfont{\RequirePackage{fourier}}
 %    \end{macrocode}
