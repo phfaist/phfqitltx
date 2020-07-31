@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfqit}
 %<*package>
-    [2018/02/28 v2.0 phfqit package]
+    [2020/07/31 v3.0 phfqit package]
 %</package>
 %
 %<*driver>
@@ -267,16 +267,37 @@
 % \needspace{7\baselineskip}
 % \DescribeMacro{\uu(N)} \DescribeMacro{\UU(N)} \DescribeMacro{\su(N)}
 % \DescribeMacro{\SU(N)} \DescribeMacro{\so(N)} \DescribeMacro{\SO(N)}
+% \DescribeMacro{\slalg(N)} \DescribeMacro{\SL(N)}
 % \DescribeMacro{\GL(N)} \DescribeMacro{\SN(N)}
-% Format some common Lie groups and algebras.
+% Format some common Lie groups and algebras.  Note the use of |\slalg| instead
+% of |\sl| because of name conflict with \TeX's font command {\sl producing
+% slanted text}.
 %
 % |\SN(N)| is the symmetric group of $N$ items, and formats by default as
 % $\SN(N)$.
 %
+% \DescribeMacro{\phfqitLieGroup} \DescribeMacro{\phfqitLieAlgebra}
+% \DescribeMacro{\phfqitDiscreteGroup}
+% The macros |\phfqitLieGroup|, |\phfqitLieAlgebra|, and |\phfqitDiscreteGroup|
+% format the name for a standard Lie group, Lie algebra or discrete group along
+% with its argument.  Redefine these macros with |\renewcommand| to change the
+% formatting font for Lie groups and algebras for instance.  For instance, to
+% format standard Lie groups/algebras and the permutation group with simple
+% italic letters, you can use:
+% \begin{verbatim}
+% \renewcommand\phfqitLieAlgebra[2]{\mathit{#1}({#2})}
+% \renewcommand\phfqitLieGroup[2]{\mathit{#1}({#2})}
+% \renewcommand\phfqitDiscreteGroup[2]{\mathit{#1}_{#2}}
+% \end{verbatim}
+% 
 % \verbdef\GLNverbatim=\GL(N)=
 % \changed[v2.0]{v2.0}{2018/02/28}{Added the macro \GLNverbatim}
+% \verbdef\SLNverbatim=\slalg(n),\SL(N)=
+% \changed[v3.0]{v3.0}{2020/07/31}{Added the macros \SLNverbatim, as well
+%     as \phfverb{\phfqitLieAlgebra}, \phfverb{\phfqitLieGroup}, and
+%     \phfverb{\phfqitDiscreteGroup}}
 %
-% \vspace{3\baselineskip}
+% \iffalse \vspace{3\baselineskip}  <-- space for all the \SU(xx) listings in margin \fi
 %
 % \section{Bra-Ket Notation and Delimited Expressions}
 % \label{sec:bra-ket} \label{sec:delimited}
@@ -853,6 +874,7 @@
 \RequirePackage{calc}
 \RequirePackage{etoolbox}
 \RequirePackage{amsmath}
+\RequirePackage{amssymb}
 \RequirePackage{dsfont}
 \RequirePackage{mathrsfs}
 \RequirePackage{mathtools}
@@ -1090,19 +1112,25 @@
 % \begin{macro}{\SU(N)}
 % \begin{macro}{\so(N)}
 % \begin{macro}{\SO(N)}
+% \begin{macro}{\slalg(N)}
+% \begin{macro}{\SL(N)}
 % \begin{macro}{\GL(N)}
 % \begin{macro}{\SN(N)}
 %   Some Lie Groups \& Algebras.  See \autoref{sec:Lie-groups-algebras}
 %    \begin{macrocode}
-\def\uu(#1){\phfqit@fmtLieAlgebra{u}(#1)}
-\def\UU(#1){\phfqit@fmtGroup{U}(#1)}
-\def\su(#1){\phfqit@fmtLieAlgebra{su}(#1)}
-\def\SU(#1){\phfqit@fmtGroup{SU}(#1)}
-\def\so(#1){\phfqit@fmtLieAlgebra{so}(#1)}
-\def\SO(#1){\phfqit@fmtGroup{SO}(#1)}
-\def\GL(#1){\phfqit@fmtGroup{GL}(#1)}
-\def\SN(#1){\mathrm{S}_{#1}}
+\def\uu(#1){\phfqitLieAlgebra{u}{#1}}
+\def\UU(#1){\phfqitLieGroup{U}{#1}}
+\def\su(#1){\phfqitLieAlgebra{su}{#1}}
+\def\SU(#1){\phfqitLieGroup{SU}{#1}}
+\def\so(#1){\phfqitLieAlgebra{so}{#1}}
+\def\SO(#1){\phfqitLieGroup{SO}{#1}}
+\def\slalg(#1){\phfqitLieAlgebra{sl}{#1}} % \sl is "slanted font" in TeX
+\def\SL(#1){\phfqitLieGroup{SL}{#1}}
+\def\GL(#1){\phfqitLieGroup{GL}{#1}}
+\def\SN(#1){\phfqitDiscreteGroup{S}{#1}}
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 % \end{macro}
@@ -1112,14 +1140,18 @@
 % \end{macro}
 % \end{macro}
 % 
-% \begin{macro}{\phfqit@fmtLieAlgebra}
-% \begin{macro}{\phfqit@fmtLieGroup}
-%   Override these to change the appearance of the group names or algebra names.  The
-%   argument is the name of the group or algebra (e.g. |su| or |SU|).
+% \begin{macro}{\phfqitLieAlgebra}
+% \begin{macro}{\phfqitLieGroup}
+% \begin{macro}{\phfqitDiscreteGroup}
+%   Override these to change the appearance of the group names or algebra names.
+%   The first argument is the name of the group or algebra (e.g. |su| or |SU|),
+%   and the second argument is the parenthesized argument e.g. ``N''.
 %    \begin{macrocode}
-\def\phfqit@fmtLieAlgebra#1{\mathrm{#1}}
-\def\phfqit@fmtGroup#1{\mathrm{#1}}
+\newcommand\phfqitLieAlgebra[2]{\mathfrak{#1}({#2})}
+\newcommand\phfqitLieGroup[2]{\mathrm{#1}({#2})}
+\newcommand\phfqitDiscreteGroup[2]{\mathrm{#1}_{#2}}
 %    \end{macrocode}
+% \end{macro}
 % \end{macro}
 % \end{macro}
 %
