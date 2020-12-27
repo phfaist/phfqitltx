@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% Copyright (C) 2019 by Philippe Faist, philippe.faist@bluewin.ch
+% Copyright (C) 2020 by Philippe Faist, philippe.faist@bluewin.ch
 % -------------------------------------------------------
 % 
 % This file may be distributed and/or modified under the
@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfcc}
 %<*package>
-    [2020/05/25 v1.0 phfcc package]
+    [2020/12/14 v1.0 phfcc package]
 %</package>
 %
 %<*driver>
@@ -607,7 +607,12 @@
     \message{Detected first pass in environment, not emitting margin
       initials label this time.}%
   }{%
-    #1%
+    \phf@cc@ififexists{if@inlabel}{%
+      \message{Detected comment in latex item label, not emitting margin
+        initials at this time to avoid messing up everything.}%
+    }{%
+      #1%
+    }%
   }%
 }
 %    \end{macrocode}
@@ -986,15 +991,6 @@
 % Everything happens within |\begingroup|\ldots|\endgroup|.  The group is opened
 % at |\phf@cc@do| (the commenting command itself), and is closed by |\phf@cc@end|.
 %
-% The macros |\phf@cc@val@grp*cmds| store the commands to be executed in
-% |\phf@cc@begin| and |\phf@cc@end|.  By default, they are empty.  They are
-% filled by relevant code when parsing the command invocation.
-%    \begin{macrocode}
-\def\phf@cc@val@grpcmds{}% by default no commands at group begin
-\def\phf@cc@val@grpendcmds{}% by default no commands at group end
-\def\phf@cc@val@spacing{0pt}% no spacing by default
-%    \end{macrocode}
-%
 % \begin{macro}{\phf@cc@begin}
 %   Here we set the comment color and execute other opening commands stored
 %   earlier in the parsing stage. {\itshape Observe that |\begingroup| has
@@ -1052,10 +1048,20 @@
 % Now we start for real.  First, we open the \TeX\ group. Then we start parsing
 % the invocation syntax.
 %
-% \phf[FIXME: why \phfverb\leavevmode? This adds vertical space if the command
-% is issued in vertical mode right before an equation.]
+% The macros |\phf@cc@val@grp*cmds| store the commands to be executed in
+% |\phf@cc@begin| and |\phf@cc@end|.  By default, they are empty.  They are
+% filled by relevant code when parsing the command invocation. 
 %    \begin{macrocode}
-  \leavevmode\begingroup%
+  \def\phf@cc@val@grpcmds{}% by default no commands at group begin
+  \def\phf@cc@val@grpendcmds{}% by default no commands at group end
+  \def\phf@cc@val@spacing{0pt}% no spacing by default
+%    \end{macrocode}
+%
+% \phf[FIXME: why \phfverb\leavevmode? This adds vertical space if the command
+% is issued in vertical mode right before an equation or theorem.]
+%    \begin{macrocode}
+  %%\leavevmode
+  \begingroup
   \edef\phf@cc@val@cur{#1}%
   \@ifstar\phf@cc@star\phf@cc@nostar%
 }

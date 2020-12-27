@@ -4,6 +4,9 @@
 \usepackage{graphicx}
 \usepackage{enumitem}
 \usepackage{amsmath}
+\usepackage{amsthm}
+
+\newtheorem{theorem}{Theorem}
 
 \usepackage{phfcc}
 %\usepackage[usemarginnote=false]{phfcc}
@@ -82,9 +85,9 @@ computations.
 \phf* You can comment entire chunks of text, like this:
 
 Consider a quantum mechanical system $X$ in an inital state described by the
-density operator $\sigma$.  Our task is to bring the system $X$ to another state
-$\rho$, while attempting to maximize some kind of notion of ``extracted'' work
-in the process.
+density operator $\sigma$.  \ccsix{Comment within removed text.} Our task is to
+bring the system $X$ to another state $\rho$, while attempting to maximize some
+kind of notion of ``extracted'' work in the process.
 
 The allowed operations are:
 \begin{enumerate}[label=(\alph*)]
@@ -104,6 +107,16 @@ and even equations:
 that's it! \endphf
 
 Hey, what about \cceleven{margin labels that could overlap from different columns}?
+
+
+
+
+\clearpage
+Let me try something on a page on its own:
+\begin{theorem}[\phf{Test in theorem heading}]
+  Let there be a theorem.
+\end{theorem}
+
 
 \clearpage
 \onecolumngrid
