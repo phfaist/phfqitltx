@@ -1065,10 +1065,13 @@
   \def\phf@cc@val@spacing{0pt}% no spacing by default
 %    \end{macrocode}
 %
-% \phf[FIXME: why \phfverb\leavevmode? This adds vertical space if the command
-% is issued in vertical mode right before an equation or theorem.]
+% Issuing \phfverb\leavevmode\ here is annoying because it adds vertical space
+% if the command is issued in vertical mode right before an equation or theorem;
+% but it is needed immediately after section and paragraph headings so that the
+% comment style (eg sans font along with color etc.) is not applied to the
+% section/paragraph heading itself.
 %    \begin{macrocode}
-  %%\leavevmode
+  \leavevmode% beurk
   \begingroup
   \edef\phf@cc@val@cur{#1}%
   \@ifstar\phf@cc@star\phf@cc@nostar%
