@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfthm}
 %<*package>
-    [2019/03/12 v1.1 phfthm package]
+    [2021/03/01 v1.2 phfthm package]
 %</package>
 %
 %<*driver>
@@ -224,6 +224,11 @@
 %   \pkgoptionfmt{thmset} package option will use a separate counter if this
 %   option is set; otherwise (the default), there is a single counter which is
 %   shared by all those theorem environments.
+% \item[parentcounter=\meta{counter name}] Theorem counters will reset each time
+%   the parent counter is increased.  Use this option for per-chapter or
+%   per-section numbering (use parent counter |parentcounter=chapter| or
+%   |parentcounter=section|).  See also the \pkgoptionfmt{countpersection}
+%   package option.
 % \end{pkgoptions}
 %
 % The \pkgoptionfmt{proofref} package option allows to specify a comma-separated
@@ -457,8 +462,8 @@
 % |\phfLoadThmSet| is:
 %
 % \noindent |\phfLoadThmSet|\hspace{0pt}\marg{options to
-% \phfverb{\phfLoadThmSet} for theorem-like
-% environments}\hspace{0pt}\marg{options to \phfverb{\phfLoadThmSet} for
+% \phfverb{\phfMakeTheorem} for theorem-like
+% environments}\hspace{0pt}\marg{options to \phfverb{\phfMakeTheorem} for
 % definition-like environments}\hspace{0pt}\marg{name of theorem set to load}
 %
 % The first and second argument to this macro are tokens to expand in front of
@@ -500,9 +505,9 @@
 % the relevant names to the corresponding |\captions|\meta{language name} macro,
 % for example:
 % \begin{verbatim}
-% \usepackage[francais,...]{babel}
+% \usepackage[french,...]{babel}
 % ...
-% \addto\captionsfrancais{%
+% \addto\captionsfrench{%
 %   \def\theoremname{Th\'eor\`eme}%
 %   \def\propositionname{Proposition}%
 %   \def\lemmaname{Lemme}%
@@ -515,7 +520,7 @@
 %   \def\claimname{Affirmation}%
 %   \def\problemname{Probl\`eme}%
 % }
-% ... \selectlanguage{francais} ...
+% ... \selectlanguage{french} ...
 % \end{verbatim}
 %
 % 
@@ -693,12 +698,16 @@
 % \newcommand\proofofname[1]{\proofname{} of #1}
 % \end{verbatim}
 % You may override this to obtain something fancier, of you wish to display the
-% document in a different language:
+% document in a different language.  For instance, you might want to display
+% (``D\'emonstration (Th\'eor\`eme 5)'' in french:
 % \begin{verbatim}
-% \def\proofofnamefrancais#1{\proofname{} (#1)}
-% \addto\captionsfrancais{\let\proofofname\proofofnamefrancais}
+% \def\proofofnameinparentheses#1{\proofname\ (#1)}
+% \addto\captionsfrench{%
+%   \def\proofname{D\'emonstration}%
+%   \let\proofofname\proofofnameinparentheses%
+% }
 % ...
-% \selectlanguage{francais} ...
+% \selectlanguage{french} ...
 % \end{verbatim}
 %
 %
@@ -1097,6 +1106,7 @@
 \define@boolkey{phfmkthm}{defnostar}[true]{}
 \define@boolkey{phfmkthm}{defstar}[true]{}
 \define@boolkey{phfmkthm}{proofref}[true]{}
+\define@cmdkey{phfmkthm}{parentcounter}{}
 \define@cmdkey{phfmkthm}{proofrefstyle}{}
 %    \end{macrocode}
 % 
@@ -1116,6 +1126,7 @@
   \KV@phfmkthm@defnostartrue%
   \KV@phfmkthm@defstartrue%
   \KV@phfmkthm@proofreftrue%
+  \def\cmdKV@phfmkthm@parentcounter{}%
   \def\cmdKV@phfmkthm@proofrefstyle{default}%
   \setkeys{phfmkthm}{#1}%
 %    \end{macrocode}
@@ -1145,9 +1156,16 @@
   \ifKV@phfmkthm@defnostar%
     \if\relax\detokenize\expandafter{\cmdKV@phfmkthm@counter}\relax%
 %    \end{macrocode}
-% ---in case we use a separate given counter (if \cmdoptionfmt{counter=}):
+% ---in case we use a separate given counter (if \cmdoptionfmt{counter=} is
+% given empty or not specified). Also check if we want a parent counter
+% (per-section or per-chapter numbering) and take that into account:
 %    \begin{macrocode}
-      \newtheorem{phfthm@#2}{#3}%
+      \if\relax\detokenize\expandafter{\cmdKV@phfmkthm@parentcounter}\relax%
+        \edef\x{\noexpand\newtheorem{phfthm@#2}{#3}}%
+      \else
+        \edef\x{\noexpand\newtheorem{phfthm@#2}{#3}[\expandonce\cmdKV@phfmkthm@parentcounter]}%
+      \fi
+      \x
       \csdef{phfthm@#2autorefname}{#3}%
     \else%
       \ifKV@phfmkthm@aliascounter%
@@ -2364,6 +2382,7 @@
   \KV@phfthmpkg@qedsymbolblacksquarefalse%
   \KV@phfthmpkg@prooftitleitbffalse%
   \KV@phfthmpkg@sepcountersfalse%
+  \KV@phfthmpkg@countpersectionfalse%
   \KV@phfthmpkg@proofreffalse%
   \if\relax\detokenize{#1}\relax\else%
     \PackageError{phfthm}{'resetstyle' does not take any argument.}{You
@@ -2383,6 +2402,12 @@
 %    \begin{macrocode}
 \define@boolkey{phfthmpkg}{sepcounters}[true]{}
 \KV@phfthmpkg@sepcountersfalse
+%    \end{macrocode}
+% 
+% The \pkgoptionfmt{countpersection} option, off by default.
+%    \begin{macrocode}
+\define@boolkey{phfthmpkg}{countpersection}[true]{}
+\KV@phfthmpkg@countpersectionfalse
 %    \end{macrocode}
 % 
 %
@@ -2572,12 +2597,28 @@
 %    \end{macrocode}
 % 
 % Prepare an argument to |\phfMakeTheorem| according to the
-% \pkgoptionfmt{sepcounters} option.
+% \pkgoptionfmt{countpersection} and \pkgoptionfmt{sepcounters} options.  First
+% determine the parent counter in case \pkgoptionfmt{countpersection} is set
+% (|chapter| if |chapter| counter exists, else |section|).
 %    \begin{macrocode}
+\ifKV@phfthmpkg@countpersection
+  \ifcsname c@chapter\endcsname
+    \def\phfthm@tmp@parentcountername{chapter}
+  \else
+    \def\phfthm@tmp@parentcountername{section}
+  \fi
+\fi
 \ifKV@phfthmpkg@sepcounters
-  \def\phfthm@val@mkthmopt@counteropts{}
+  \ifKV@phfthmpkg@countpersection
+    \edef\phfthm@val@mkthmopt@counteropts{parentcounter=\phfthm@tmp@parentcountername}
+  \else
+    \def\phfthm@val@mkthmopt@counteropts{}
+  \fi
 \else
   \def\phfthm@val@mkthmopt@counteropts{counter=phfthmcounter}
+  \ifKV@phfthmpkg@countpersection
+    \numberwithin{phfthmcounter}{\phfthm@tmp@parentcountername}
+  \fi
 \fi
 %    \end{macrocode}
 % 

@@ -1,6 +1,8 @@
 \documentclass[12pt,a5paper]{article}
 
-\usepackage[thmset=rich,sepcounters,proofref={margin,always},prooftitleitbf]{phfthm}
+%\usepackage[thmset=rich,sepcounters,proofref={margin,always},prooftitleitbf]{phfthm}
+%\usepackage[thmset=rich,sepcounters,countpersection,proofref={margin,always},prooftitleitbf]{phfthm}
+\usepackage[thmset=rich,countpersection,proofref={margin,always},prooftitleitbf]{phfthm}
 %\usepackage[theoremstyle=definition,definitionstyle=remark,thmset=rich,proofref={margin,longref}]{phfthm}
 %\usepackage[sepcounters,proofref,thmset=rich]{phfthm}
 %\usepackage[proofref=off]{phfthm}
@@ -16,6 +18,8 @@
 
 \begin{document}
 
+
+\section{Test section 1}
 
 \begin{lemma}
 \label{lem:1}
@@ -82,7 +86,7 @@ Another proposition here, with no numbering.
 See also \autoref{prop:1}, \autoref{thm:1} and \autoref{lem:1}
 
 \cleardoublepage
-x
+xxxx
 \begin{proof}[*thm:1]
   ....... and this is yet yet another proof.  This proof is only on the next page of the
   theorem, so it should not necessary display the reference there.
@@ -109,6 +113,8 @@ x
 \end{theorem}
 
 \cleardoublepage
+
+\section{Test section 2}
 
 \begin{proof}[*lem:1]
   this is another proof.
