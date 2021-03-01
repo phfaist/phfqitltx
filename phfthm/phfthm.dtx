@@ -802,9 +802,9 @@
 %   \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
 %     \textbf{Theorem 17} (Gauss). For a closed surface $S$ enclosing a
 %     volume $V$, we have
-%     \setcounter{equation}{41}
 %     \begin{equation}
 %       \oint_S\vec u\cdot d\vec S = \int_V(\vec\nabla\cdot\vec u)\,dV\ .
+%       \tag*{(41)}
 %     \end{equation}
 %     \hfill{\small\itshape (Proof on page XXX.)}\hfilneg
 %     {\par\vspace{1ex}\relax
@@ -812,6 +812,41 @@
 %     \par\textit{Proof of Theorem 17.}\hspace{2em}\ldots
 %   \end{minipage}
 % }\endgroup
+%
+% A positive side-effect is that in your LaTeX source, if you consistently
+% label your proofs then you always know what theorem a proof refers to.  If
+% you would like to simply output ``Proof.'' instead of ``Proof of Theorem
+% X.'', for instance, because the proof immediately succeeds the theorem in
+% question, you may use the syntax |[**thm:label]| instead.  In this case, the
+% proof-reference mechanism will know that this is the proof of the theorem
+% labeled |thm:label| and will avoid undefined references.  For example,
+% the following code:
+% \begin{verbatim}
+% \begin{theorem}[Gauss]
+%   \label{thm:Gauss}
+%   For a closed surface $S$ enclosing a volume $V$, we have
+%   \begin{equation}
+%     \oint_S\vec u\cdot d\vec S = \int_V(\vec\nabla\cdot\vec u)\,dV\ .
+%   \end{equation}
+% \end{theorem}
+% \begin{proof}[**thm:Gauss]
+%   ...
+% \end{proof}
+% \end{verbatim}
+% might output:
+% \begingroup\setlength{\fboxsep}{1em}
+% \par\noindent\fbox{%
+%   \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
+%     \textbf{Theorem 17} (Gauss). For a closed surface $S$ enclosing a
+%     volume $V$, we have
+%     \begin{equation}
+%       \oint_S\vec u\cdot d\vec S = \int_V(\vec\nabla\cdot\vec u)\,dV\ .
+%       \tag*{(41)}
+%     \end{equation}
+%     \par\textit{Proof.}\hspace{2em}\ldots
+%   \end{minipage}
+% }\endgroup
+%
 %
 % \subsection{On the theorem side}
 %
@@ -878,6 +913,17 @@
 % \ldots},'' where the page number corresponds to the page on which this proof
 % is located.
 %
+% You may also use the syntax |\begin{proof}[**|\meta{label}|]|, which has the
+% effect of producing the simple output ``Proof.'' (this is desirable e.g.\@
+% if the proof immediately follows the theorem statement) but which still
+% informs the proof-reference mechanism that this proof is associated with the
+% given theorem labeled by \meta{label}.  This can avoid undefined references,
+% and can simplify your job if you want to move proofs around in your document.
+%
+% (It would be nice, of course, to have the package automatically output
+% ``Proof'' only if the proof immediately follows the theorem and output ``Proof
+% of XXX'' if the proof is further away.  Unfortunately this is hard to detect
+% in \LaTeX\ and I currently have no plans to try to implement this.)
 %
 % \subsection{Customizing appearance of the proof reference text}
 % \label{sec:proof-ref-customize-appearance}
@@ -1099,7 +1145,7 @@
   \ifKV@phfmkthm@defnostar%
     \if\relax\detokenize\expandafter{\cmdKV@phfmkthm@counter}\relax%
 %    \end{macrocode}
-% ---in case we use a separate counter (if \cmdoptionfmt{counter=}):
+% ---in case we use a separate given counter (if \cmdoptionfmt{counter=}):
 %    \begin{macrocode}
       \newtheorem{phfthm@#2}{#3}%
       \csdef{phfthm@#2autorefname}{#3}%
@@ -1114,7 +1160,8 @@
         \csdef{#2autorefname}{#3}%
       \else%
 %    \end{macrocode}
-% ---in case we directly instruct |\newtheorem| to use the other counter (does not work with |\autoref|):
+% ---in case we directly instruct |\newtheorem| to use the other counter (does
+% not work with |\autoref|):
 %    \begin{macrocode}
         \newtheorem{phfthm@#2}[\cmdKV@phfmkthm@counter]{#3}%
       \fi%
@@ -1433,10 +1480,15 @@
     \else
       \noexpand\phfthm@proof@noparselabel{##1}%
     \fi
-    \noexpand\def\noexpand\phfthm@val@displayargs{[{%
-        \expandafter\noexpand\csname phfthm@prfenv@#2@val@proofofname\endcsname
-        {\noexpand\phfthm@val@prooftitle}%
-      }]}%
+    \noexpand\if\noexpand\relax\noexpand\detokenize%
+            \noexpand\expandafter{\noexpand\phfthm@val@prooftitle}\noexpand\relax
+      \noexpand\def\noexpand\phfthm@val@displayargs{}
+    \noexpand\else
+      \noexpand\def\noexpand\phfthm@val@displayargs{[{%
+          \expandafter\noexpand\csname phfthm@prfenv@#2@val@proofofname\endcsname
+          {\noexpand\phfthm@val@prooftitle}%
+        }]}%
+    \noexpand\fi
   }
 %    \end{macrocode}
 % 
@@ -1648,15 +1700,29 @@
 \def\phfthm@proof@parselabel#1{%
   \phfthm@proof@parselabel@maybelabel#1\phfthm@proof@parselabel@END%
 }
+%    \end{macrocode}
+% If the argument is |[*thm-label]| we want ``Proof of \meta{ref to
+% thm-label}.''.  If the argument is |[**thm-label]| we want ``Proof.'' but
+% we're informing the proofref-system that this is the proof of \meta{thm-label}
+% (e.g., to avoid undefined references to proofs).  Otherwise if we get %
+% |[Some Custom Theorem]| then we want ``Proof of Some Custom Theorem.''.
+%    \begin{macrocode}
 \def\phfthm@proof@parselabel@maybelabel{%
   \@ifnextchar*\phfthm@proof@parselabel@label\phfthm@proof@parselabel@title%
 }
-\def\phfthm@proof@parselabel@label*#1\phfthm@proof@parselabel@END{%
+\def\phfthm@proof@parselabel@label*{%
+  \@ifnextchar*\phfthm@proof@parselabel@labelsilent\phfthm@proof@parselabel@labelnormal%
+}
+\def\phfthm@proof@parselabel@labelsilent*#1\phfthm@proof@parselabel@END{%
 %    \end{macrocode}
 % The use of |\detokenize| here is a trick to make sure that all chars in the
 % label text have a non-active category (e.g.\@ we would have problems, e.g., if
 % in the label ``|thm:gauss|'' the ``|:|'' is an active char---such as in French):
 %    \begin{macrocode}
+  \edef\phfthm@val@proofoflabel{\detokenize{#1}}%
+  \def\phfthm@val@prooftitle{}% 
+}
+\def\phfthm@proof@parselabel@labelnormal#1\phfthm@proof@parselabel@END{%
   \edef\phfthm@val@proofoflabel{\detokenize{#1}}%
   \def\phfthm@val@prooftitle{\phfthm@autoref{#1}}%
 }
@@ -1682,12 +1748,14 @@
 % 
 %
 % In order to look up what we are a proof of, we use |\autoref| provided by the
-% \pkgname{hyperref} package.  If it is not available, fall back to the regular
-% |\ref| command.
+% \pkgname{hyperref} package.  Crucially, it is NOT the job of \pkgname{phfthm}
+% to load this package, and we should only use them if they are available (we
+% don't want to depend on it).  If it is not available, then we fall back to the
+% regular |\ref| command.
 %    \begin{macrocode}
 \def\phfthm@autoref{\ref}
 \AtBeginDocument{%
-  \@ifpackageloaded{hyperref}{\def\phfthm@autoref{\autoref}}{}
+  \@ifpackageloaded{hyperref}{\def\phfthm@autoref{\autoref}}{}%
 }
 %    \end{macrocode}
 % 

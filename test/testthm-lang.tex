@@ -1,7 +1,7 @@
 \documentclass[12pt,a5paper]{article}
 
-\usepackage[francais,english]{babel}
-\selectlanguage{francais}
+\usepackage[french,english]{babel}
+\selectlanguage{french}
 
 \usepackage[thmset=default,sepcounters,proofref={margin,always},prooftitleitbf]{phfthm}
 %\usepackage[theoremstyle=definition,definitionstyle=remark,thmset=rich,proofref={margin,longref}]{phfthm}
@@ -27,8 +27,8 @@
   \def\algorithmname{Algorithm}%
   \let\proofofname\proofofnameenglish
 }
-\def\proofofnamefrancais#1{\proofname\space (#1)}
-\addto\captionsfrancais{%
+\def\proofofnamefrench#1{\proofname\space (#1)}
+\addto\captionsfrench{%
   \def\theoremname{Th\'eor\`eme}%
   \def\propositionname{Proposition}%
   \def\lemmaname{Lemme}%
@@ -40,7 +40,7 @@
   \def\questionname{Question}%
   \def\problemname{Probl\`eme}%
   \def\algorithmname{Algorithme}%
-  \let\proofofname\proofofnamefrancais
+  \let\proofofname\proofofnamefrench
 }
 
 
@@ -90,7 +90,7 @@ And a theorem
 \end{theorem}
 
 
-\selectlanguage{francais}
+\selectlanguage{french}
 
 \begin{theorem}
 \noproofref
@@ -108,6 +108,15 @@ Voici une autre proposition, sans chiffre.
 \end{proposition*}
 \begin{proof}
   et voil\`a une preuve qui suit directement la proposition.
+\end{proof}
+
+
+\begin{proposition}
+  \label{prop:dsakfdksanfl}
+  Voici encore une autre proposition!
+\end{proposition}
+\begin{proof}[**prop:dsakfdksanfl]
+  .... dont voil\`a la preuve.
 \end{proof}
 
 \begin{theorem}

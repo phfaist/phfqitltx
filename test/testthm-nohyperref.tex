@@ -12,6 +12,11 @@
   \label{prop:1}
   Proposition here.
 \end{prop}
+% There's no way to produce "Proof of Proposition 1", so we get "Proof of 1."
+% instead because we don't have \autoref without the hyperref package.  The only
+% use for the proof-ref mechanism here would be to redefine \phfthm@autoref to
+% do something useful or to only use [**label] syntax and page references for
+% proofs. (TODO: CHECK THIS)
 \begin{proof}[*prop:1]
   this is a proof.
 \end{proof}
@@ -50,7 +55,7 @@ Another proposition here, with no numbering.
 \label{thm:1}
 And a theorem
 \end{thm}
-\begin{proof}[*thm:1]
+\begin{proof}[**thm:1]
   ....... and  this is yet yet another proof.
 \end{proof}
 

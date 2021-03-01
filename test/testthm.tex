@@ -2,7 +2,7 @@
 
 \usepackage[thmset=rich,sepcounters,proofref={margin,always},prooftitleitbf]{phfthm}
 %\usepackage[theoremstyle=definition,definitionstyle=remark,thmset=rich,proofref={margin,longref}]{phfthm}
-%\usepackage[sepcounters,proofref]{phfthm}
+%\usepackage[sepcounters,proofref,thmset=rich]{phfthm}
 %\usepackage[proofref=off]{phfthm}
 %\usepackage{phfthm}
 %\usepackage[resetstyle,prooftitleitbf=true]{phfthm}
@@ -41,10 +41,11 @@ You might also like the defintion of the \ref{thmheading:trace-dist} on \autopag
 
 \begin{proposition}
   \noproofref
-  Another proposition here.
+  Another proposition here.  This proposition has no proof ref.
 \end{proposition}
+
 \begin{proof}
-  this is yet another proof.
+  This is yet another proof.  This proof has no associated theorem.
 \end{proof}
 
 
@@ -140,7 +141,19 @@ x
 
 \begin{claim}
   I claim this and that.
+  % should generate warning of missing label
 \end{claim}
+
+\cleardoublepage
+
+\begin{theorem}
+  \label{thm:blablabla}
+  A theorem with a proof that follows immediately.
+\end{theorem}
+\begin{proof}[**thm:blablabla]
+  Proof of the immediately preceding theorem.
+\end{proof}
+
 
 \end{document}
 
