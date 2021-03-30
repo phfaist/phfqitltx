@@ -184,14 +184,17 @@
 %   environments |theorem|, |proposition|, |lemma|, |corollary|, |conjecture|,
 %   |remark| as theorem-like environments, and |definition| as a definition-like
 %   environment.
-% \item[thmset=shortnames] For if you like typing less: the same environments
+% \item[thmset=shortnames] \iffalse\DescribeEnv{thm}\DescribeEnv{prop}
+%   \DescribeEnv{lem}\DescribeEnv{cor}\DescribeEnv{conj}\DescribeEnv{rem}
+%   \DescribeEnv{defn}\fi In case you prefer to type less: the same environments
 %   are defined as the default set, but with shorter names.  Define the
 %   environments |thm|, |prop|, |lem|, |cor|, |conj|, |rem| as theorem-like
 %   environments, and |defn| as a definition-like environment.
 % \item[thmset=rich] \DescribeEnv{idea} \DescribeEnv{question}
-%   \DescribeEnv{claim} \DescribeEnv{problem} Provides the same environments as
-%   the |default| theorem set, as well as in addition: |idea|, |question|,
-%   |claim|, and |problem| as theorem-like environments.
+%   \DescribeEnv{claim} \DescribeEnv{observation} \DescribeEnv{problem} Provides
+%   the same environments as the |default| theorem set, as well as in addition:
+%   |idea|, |question|, |claim|, |observation|, and |problem| as theorem-like
+%   environments.
 % \end{pkgoptions}
 %
 % You may also load a theorem set at a later
@@ -2082,6 +2085,46 @@
 % These styles simply use the same mechanism as the default style, but plug in
 % different sub-callbacks.
 %
+% Here's a command that actually places the marginpar:
+% \begin{macro}{\phfthmproofref@placemarginpar}
+%    \begin{macrocode}
+\newcommand\phfthmproofref@placemarginpar[2]{%
+  \marginpar[%
+    \raggedleft #1%
+  ]{%
+    \raggedright #2%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\phfthmproofref@placephantommarginpar}
+%   In the |marginbottom| proof-ref style, we place an invisible |\marginpar| at
+%   the top of the proof so that the proof-ref margin note will not be shifted
+%   too high when we try to align it to the bottom of the theorem statement.  To
+%   work around a weird bug in Rev\TeX, where I get the error message `command
+%   sequence undefined: |\@captype|', I have found that a fix is to override
+%   this local invisible |\marginpar| to locally make sure the |\@captype| is
+%   defined.  The wild fix I've found---no guarantees, there are dark magic
+%   forces at work here---is the following, which you can include in your
+%   document preamble if you're banging your head against this problem and
+%   you're desperate:
+% \begin{verbatim}
+%   \makeatletter
+%   \renewcommand\phfthmproofref@placephantommarginpar{%
+%     \begingroup\csdef{@captype}{figure}\marginpar{%
+%       \vspace{-\baselineskip}\rule{0pt}{0pt}}\endgroup%
+%   }
+%   \makeatother
+% \end{verbatim}
+%    \begin{macrocode}
+\newcommand\phfthmproofref@placephantommarginpar{%
+    \leavevmode\marginpar{\vspace{-\baselineskip}\rule{\z@}{\z@}}%
+}%
+%    \end{macrocode}
+% \end{macro}
+%
+%
 % \paragraph{The \phfverb{margin} style}
 %
 % \begin{macro}{\phfthm@proofrefstyle@margin@setup}
@@ -2107,7 +2150,11 @@
 % \url{http://tex.stackexchange.com/a/16161/32188}}
 %    \begin{macrocode}
   \def\phfthm@proofref@impl@fmt##1##2{%
-    \leavevmode\marginpar{\proofrefsize{\proofonname{##1}{##2}}}%
+    \leavevmode\phfthmproofref@placemarginpar{%
+      \proofrefsize{\proofonname{##1}{##2}}%
+    }{%
+      \proofrefsize{\proofonname{##1}{##2}}%
+    }%
   }%
 }
 %    \end{macrocode}
@@ -2127,11 +2174,12 @@
 % of the theorem, so plug in |\phfthm@proofref@default@main| onto |...@end| and
 % not onto |...@afterlabel|.  Don't forget that these macros accept one
 % argument, the theorem label.  In |...@afterlabel| we place a dummy marginpar
-% with an invisibile rule one |\baselineskip| upwards, so that we force any
+% with an invisible rule one |\baselineskip| upwards, so that we force any
 % proof-ref marginpar not to extend above the top of the theorem statement.
 %    \begin{macrocode}
   \def\phfthm@proofref@impl@afterlabel##1{%
-    \leavevmode\marginpar{\vspace{-\baselineskip}\rule{\z@}{\z@}}}%
+    \phfthmproofref@placephantommarginpar
+  }%
   \let\phfthm@proofref@impl@end\phfthm@proofrefstyle@default@main
 %    \end{macrocode}
 % 
@@ -2140,12 +2188,24 @@
 % the paragraph.\footnote{\url{https://tex.stackexchange.com/a/388018/32188}}
 %    \begin{macrocode}
   \def\phfthm@proofref@impl@fmt##1##2{%
-    \marginpar{%
-      \parbox[b]{\marginparwidth}{\sloppy
-        \proofrefsize{\strut\proofonname{##1}{##2}\strut}}%
-    }%
+    \phfthmproofref@marginbottom@domarginpar{##1}{##2}%
   }%
 }
+\def\phfthmproofref@marginbottom@domarginpar#1#2{%
+  \setbox\phfthm@tmp@boxa=\hbox to \marginparwidth{%
+    \parbox[b]{\marginparwidth}{\raggedleft\sloppy
+      \proofrefsize{\strut\proofonname{#1}{#2}\strut}}}%
+  \setbox\phfthm@tmp@box=\hbox to \marginparwidth{%
+    \parbox[b]{\marginparwidth}{\raggedright\sloppy
+      \proofrefsize{\strut\proofonname{#1}{#2}\strut}}}%
+  \phfthmproofref@placemarginpar{%
+    \box\phfthm@tmp@boxa%
+  }{%
+    \box\phfthm@tmp@box%
+  }%
+}
+\newbox\phfthm@tmp@box
+\newbox\phfthm@tmp@boxa
 %    \end{macrocode}
 % \end{macro}
 %
@@ -2283,6 +2343,7 @@
 \def\ideaname{Idea}
 \def\questionname{Question}
 \def\claimname{Claim}
+\def\observationname{Observation}
 \def\problemname{Problem}
 %    \end{macrocode}
 % 
@@ -2364,6 +2425,7 @@
   \phfthm@def@thmset@mktheorem{idea}{\ideaname}
   \phfthm@def@thmset@mktheorem{question}{\questionname}
   \phfthm@def@thmset@mktheorem{claim}{\claimname}
+  \phfthm@def@thmset@mktheorem{observation}{\observationname}
   \phfthm@def@thmset@mktheorem{problem}{\problemname}
 }
 %    \end{macrocode}

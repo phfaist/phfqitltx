@@ -1,4 +1,4 @@
-\documentclass[12pt,a5paper]{article}
+\documentclass[12pt]{article}
 
 %\usepackage[thmset=rich,sepcounters,proofref={margin,always},prooftitleitbf]{phfthm}
 %\usepackage[thmset=rich,sepcounters,countpersection,proofref={margin,always},prooftitleitbf]{phfthm}
@@ -13,10 +13,28 @@
 
 \def\proofrefsize{\tiny}
 
+
+\usepackage[twoside,a5paper,vmargin=2in,
+inner=0.5in,outer=2in,
+marginparsep=10pt,marginparwidth=30pt]{geometry}
+
+% \makeatletter
+% \renewcommand\phfthmproofref@placemarginpar[2]{%
+%   \marginpar[%
+%     \fbox{\raggedleft #1}%
+%   ]{%
+%     \fbox{\raggedright #2}%
+%   }%
+% }
+% \makeatother
+
+
 \usepackage{hyperref}  % for \autoref{}
 
 
 \begin{document}
+
+\sloppy
 
 
 \section{Test section 1}
@@ -32,7 +50,7 @@ Another lemma here.
 
 \begin{proposition}
   \label{prop:1}
-  Proposition here.
+  Proposition here.  Proposition here.
 \end{proposition}
 \begin{proof}[*prop:1]
   This is a proof.
