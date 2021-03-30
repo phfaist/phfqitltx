@@ -243,6 +243,9 @@
 % \item[proofref=\pkgoptattrib{margin}] The proof reference is displayed in
 %   the margin, instead of after the theorem.
 %
+% \item[proofref=\pkgoptattrib{marginbottom}] The proof reference is displayed
+%   in the margin, but aligned with the bottom of the theorem statement.
+%
 % \item[proofref=\pkgoptattrib{longref}] The proof reference is displayed as
 %   a full sentence (``The proof of this \meta{Theorem Name} can be found on
 %   page \meta{XYZ}.'').
@@ -436,8 +439,10 @@
 %   the margin, long sentence, ...).  Possible styles are
 %   \cmdoptionfmt{proofrefstyle=default} (the default),
 %   \cmdoptionfmt{proofrefstyle=margin} (display the proof ref in the margin of
-%   the page) and \cmdoptionfmt{proofrefstyle=longref} (as by default but with a
-%   full sentence).  See \autoref{sec:proof-ref-customize-appearance} for how to
+%   the page), \cmdoptionfmt{proofrefstyle=marginbottom} (display the proof ref
+%   in the margin of the page aligned with the bottom of the theorem statement)
+%   and \cmdoptionfmt{proofrefstyle=longref} (as by default but with a full
+%   sentence).  See \autoref{sec:proof-ref-customize-appearance} for how to
 %   further customize the appearance of the proof reference.
 %
 % \end{cmdoptions}
@@ -2072,10 +2077,12 @@
 % \end{macro}
 % 
 %
-% \subsubsection{Other proof-ref styles: only \phfverb{margin} for now}
+% \subsubsection{Other proof-ref styles: \phfverb{margin} and \phfverb{marginbottom}}
 %
 % These styles simply use the same mechanism as the default style, but plug in
 % different sub-callbacks.
+%
+% \paragraph{The \phfverb{margin} style}
 %
 % \begin{macro}{\phfthm@proofrefstyle@margin@setup}
 %   Set-up macro for the ``|margin|'' proof-ref style (displays the proof
@@ -2092,6 +2099,37 @@
 %    \begin{macrocode}
   \let\phfthm@proofref@impl@afterlabel\phfthm@proofrefstyle@default@main
   \let\phfthm@proofref@impl@end\@gobble
+%    \end{macrocode}
+% 
+% Define the formatting callback to put the note in the margin of the page using
+% a |\marginpar|.  We need |\leavevmode| to make sure it's aligned properly
+% vertically with the paragraph.\footnote{See
+% \url{http://tex.stackexchange.com/a/16161/32188}}
+%    \begin{macrocode}
+  \def\phfthm@proofref@impl@fmt##1##2{%
+    \leavevmode\marginpar{\proofrefsize{\proofonname{##1}{##2}}}%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \paragraph{The \phfverb{marginbottom} style}
+%
+% \begin{macro}{\phfthm@proofrefstyle@marginbottom@setup}
+%   Set-up macro for the ``|marginbottom|'' proof-ref style (displays the proof
+%   reference in the margin of the page).
+%    \begin{macrocode}
+\def\phfthm@proofrefstyle@marginbottom@setup{%
+  \phfthm@proofrefstyle@default@setup
+%    \end{macrocode}
+% 
+% The proof reference should be displayed directly at the bottom, not at the end
+% of the theorem, so plug in |\phfthm@proofref@default@main| onto |...@end| and
+% not onto |...@afterlabel|.  Don't forget that these macros accept one
+% argument, the theorem label.
+%    \begin{macrocode}
+  \let\phfthm@proofref@impl@afterlabel\@gobble
+  \let\phfthm@proofref@impl@end\phfthm@proofrefstyle@default@main
 %    \end{macrocode}
 % 
 % Define the formatting callback to put the note in the margin of the page using
@@ -2547,6 +2585,9 @@
   }
   \def\phfthm@proofref@style@margin{
     \def\phfthm@val@mkthmopt@proofrefstyle{proofrefstyle=margin}
+  }
+  \def\phfthm@proofref@style@marginbottom{
+    \def\phfthm@val@mkthmopt@proofrefstyle{proofrefstyle=marginbottom}
   }
   \def\phfthm@proofref@style@longref{
 %    \end{macrocode}
