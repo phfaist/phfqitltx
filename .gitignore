@@ -44,3 +44,8 @@ phfquotetext/pkg.mk
 phfsvnwatermark/pkg.mk
 phfthm/pkg.mk
 phfcc/pkg.mk
+
+
+
+# other junk/temp files
+test/testthm-revtexNotes.bib

@@ -1,0 +1,258 @@
+\documentclass[%
+  aps,%
+  pra,%
+  superscriptaddress,%
+  reprint,%
+  longbibliography,%
+  nofootinbib,%
+  notitlepage]{revtex4-2}
+
+
+\usepackage[preset=reset,pkgset=extended,hyperrefdefs={defer,noemail}]{phfnote}
+\usepackage{phfqit}
+\usepackage{phfparen}
+\usepackage[thmset=rich,smallproofs=false,proofref={marginbottom}]{phfthm}
+%\renewcommand\proofonname[2]{\raggedright\emph{(Proof on #2.)}}
+\renewcommand\proofonname[2]{\textit{(Proof on #2.)}}
+
+
+%\usepackage[a5paper,vmargin=2in,marginparsep=4pt,marginparwidth=30pt]{geometry}
+\usepackage[reset]{geometry}
+\csname Gm@restore@org\endcsname
+
+
+\usepackage{hyperref}
+\usepackage[nameinlink,capitalize]{cleveref}
+
+
+\makeatletter
+\renewcommand\phfthmproofref@placephantommarginpar{%
+  \begingroup\csdef{@captype}{figure}\marginpar{%
+    \vspace{-\baselineskip}\rule{0pt}{0pt}}\endgroup%
+}
+\makeatother
+
+
+\phfMakeTheorem[counter={},defstar=false,proofref=false]{algorithm}{Algorithm}
+
+\def\proofrefsize{\tiny}
+
+
+\begin{document}
+\title{Test document}
+\author{Me}
+\author{You}
+% \begin{abstract} Test document! Test document! Test document! Test document!
+%   Test document! Test document! Test document! Test document! Test document!
+%   Test document! Test document! Test document! Test document! Test document!
+%   Test document! Test document!\end{abstract}
+\maketitle
+
+
+\section{Test section 1}
+
+\begin{lemma}
+\label{lem:1}
+Another lemma here.
+\end{lemma}
+\begin{proof}[a different Lemma]
+  this is another proof.
+\end{proof}
+
+
+
+\begin{proposition}
+  \label{prop:1}
+  Proposition here.
+\end{proposition}
+\begin{proof}[*prop:1]
+  This is a proof.
+
+  And more stuff.
+\end{proof}
+
+\begin{proof}[*x:backrefproof]
+  This is a funny back-referenced proof.
+\end{proof}
+
+
+You might also like the defintion of the \ref{thmheading:trace-dist} on \autopageref{thmheading:trace-dist}.
+
+\begin{proposition}
+  \noproofref
+  Another proposition here.  This proposition has no proof ref.
+\end{proposition}
+
+\begin{proof}
+  This is yet another proof.  This proof has no associated theorem.
+\end{proof}
+
+
+\begin{theorem}
+\label{thm:1}
+And a theorem
+\end{theorem}
+
+
+\begin{theorem}
+\noproofref
+\label{thm:2}
+I heard you like theorems?
+\end{theorem}
+
+\begin{definition*}
+This is a definition.
+\end{definition*}
+
+
+\begin{proposition*}
+Another proposition here, with no numbering.
+\end{proposition*}
+\begin{proof}
+  this is yet another proof.
+\end{proof}
+
+
+\begin{figure}
+\centering
+\rule{4cm}{6cm}
+\caption{Figure one}
+\end{figure}
+
+\begin{theorem}
+  \label{thm:another}
+  Yet another theorem here.
+\end{theorem}
+
+
+\begin{figure}
+\centering
+\rule{5cm}{5cm}
+\caption{Figure two somehow messes up marginpar's in my other document?}
+\end{figure}
+
+See also \autoref{prop:1}, \autoref{thm:1} and \autoref{lem:1}
+
+\clearpage
+\newgeometry{hmargin=1.5in,vmargin=1in,marginparsep=12pt,marginparwidth=40pt}
+\onecolumngrid
+
+\appendix
+\section{Appendix One}
+
+
+\begin{proposition}[Solutions to the anticommutator equation]
+  \label{thm:solutions-to-anticommutator-eqn}
+  BVLah lbha kdnafklsfdn klsan fdklsanf kldsnaflk kasl BVLah lbha kdnafklsfdn
+  klsan fdklsanf kldsnaflk kasl BVLah lbha kdnafklsfdn klsan fdklsanf kldsnaflk
+  kasl BVLah lbha kdnafklsfdn klsan fdklsanf kldsnaflk kasl BVLah lbha
+  kdnafklsfdn klsan fdklsanf kldsnaflk kasl BVLah lbha kdnafklsfdn klsan
+  fdklsanf kldsnaflk kasl BVLah lbha kdnafklsfdn klsan fdklsanf kldsnaflk kasl
+\end{proposition}
+
+bla blah blah
+
+\begin{proof}[**thm:solutions-to-anticommutator-eqn]
+  .................. ....................... 
+\end{proof}
+
+
+\begin{proposition}[Locally optimal sensing]
+  \label{thm:optimal-local-sensing-obs}
+  Any operator $T$ that is optimal.................. ................
+\end{proposition}
+
+
+\begin{proof}[*thm:optimal-local-sensing-obs]
+  Without loss of generality, we assume $t=0$ throughout this proof; this is
+  achieved by shifting the parameter to center it at zero, implying the
+\end{proof}
+
+
+xxxx
+\begin{proof}[*thm:1]
+  ....... and this is yet yet another proof.  This proof is only on the next page of the
+  theorem, so it should not necessary display the reference there.
+\end{proof}
+
+\begin{thmheading}{Trace Distance}
+  \label{thmheading:trace-dist}
+  The \emph{trace distance} is given by the following expression:
+  \begin{align}
+    \delta(\rho,\sigma) = \frac12 \left\lVert \rho - \sigma \right\rVert_1
+  \end{align}
+\end{thmheading}
+
+\begin{theorem}
+  \label{thm:long}
+  Some theorem which has a little longer statement.
+  Some theorem which has a little longer statement.
+  Some theorem which has a little longer statement.
+  Some theorem which has a little longer statement.
+
+  Some theorem which has a little longer statement.
+  Some theorem which has a little longer statement.
+  Some theorem which has a little longer statement.
+\end{theorem}
+
+\cleardoublepage
+
+\section{Test section 2}
+
+\begin{proof}[*lem:1]
+  this is another proof.
+\end{proof}
+
+\begin{algorithm}
+  \label{algo:1}
+  An algorithm here.
+  % note that no proof-ref is generated.
+\end{algorithm}
+
+\begin{algorithm}
+  \label{algo:2}
+  Another algorithm here.
+\end{algorithm}
+
+\cleardoublepage
+
+\begin{proof}[*thm:another]
+  Proof proof proof proof. You're convinced?
+\end{proof}
+
+\begin{proof}[*algo:1]
+  Proof of an algorithm (WTF?).
+\end{proof}
+
+\begin{proof}[*thm:long]
+  Proof.
+\end{proof}
+
+\begin{claim}
+  I claim this and that.
+  % should generate warning of missing label
+\end{claim}
+
+\cleardoublepage
+
+\begin{theorem}
+  \label{thm:blablabla}
+  A theorem with a proof that follows immediately.
+\end{theorem}
+\begin{proof}[**thm:blablabla]
+  Proof of the immediately preceding theorem.
+\end{proof}
+
+
+\begin{theorem}[Final Theorem]
+  \label{x:backrefproof}
+  A very fine final theorem.
+\end{theorem}
+
+\end{document}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
