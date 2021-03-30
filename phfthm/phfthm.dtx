@@ -2126,24 +2126,29 @@
 % The proof reference should be displayed directly at the bottom, not at the end
 % of the theorem, so plug in |\phfthm@proofref@default@main| onto |...@end| and
 % not onto |...@afterlabel|.  Don't forget that these macros accept one
-% argument, the theorem label.
+% argument, the theorem label.  In |...@afterlabel| we place a dummy marginpar
+% with an invisibile rule one |\baselineskip| upwards, so that we force any
+% proof-ref marginpar not to extend above the top of the theorem statement.
 %    \begin{macrocode}
-  \let\phfthm@proofref@impl@afterlabel\@gobble
+  \def\phfthm@proofref@impl@afterlabel##1{%
+    \leavevmode\marginpar{\vspace{-\baselineskip}\rule{\z@}{\z@}}}%
   \let\phfthm@proofref@impl@end\phfthm@proofrefstyle@default@main
 %    \end{macrocode}
 % 
 % Define the formatting callback to put the note in the margin of the page using
-% a |\marginpar|.  We need |\leavevmode| to make sure it's aligned properly
-% vertically with the paragraph.\footnote{See
-% \url{http://tex.stackexchange.com/a/16161/32188}}
+% a |\marginpar|.  We use a trick to align the margin note with the bottom of
+% the paragraph.\footnote{\url{https://tex.stackexchange.com/a/388018/32188}}
 %    \begin{macrocode}
   \def\phfthm@proofref@impl@fmt##1##2{%
-    \leavevmode\marginpar{\proofrefsize{\proofonname{##1}{##2}}}%
+    \marginpar{%
+      \parbox[b]{\marginparwidth}{\sloppy
+        \proofrefsize{\strut\proofonname{##1}{##2}\strut}}%
+    }%
   }%
 }
 %    \end{macrocode}
 % \end{macro}
-% 
+%
 %
 % \subsection{Thmheading definition-like environments}
 %
