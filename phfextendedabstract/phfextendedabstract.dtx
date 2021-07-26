@@ -1,0 +1,288 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2021 by Philippe Faist <philippe.faist@bluewin.ch>
+% -------------------------------------------------------
+% 
+% This file may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in:
+%
+%    http://www.latex-project.org/lppl.txt
+%
+% and version 1.3 or later is part of all distributions of LaTeX 
+% version 2005/12/01 or later.
+%
+% \fi
+%
+% \iffalse
+%<*driver>
+\ProvidesFile{phfextendedabstract.dtx}
+%</driver>
+%<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
+%<package>\ProvidesClass{phfextendedabstract}
+%<*package>
+    [2021/07/26 v0.1 phfextendedabstract class]
+%</package>
+%
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{xcolor}
+\usepackage[preset=xpkgdoc]{phfnote}
+\def\revtex{REV\TeX}
+\EnableCrossrefs         
+\CodelineIndex
+\RecordChanges
+\begin{document}
+  \DocInput{phfextendedabstract.dtx}
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+%
+% \changes{v1.0}{2016/04/20}{Initial version}
+%
+% \GetFileInfo{phfextendedabstract.dtx}
+%
+% \DoNotIndex{\newcommand,\newenvironment,\def,\gdef,\edef,\xdef,\if,\else,\fi,\ifx}
+% 
+% \title{\phfqitltxPkgTitle{phfextendedabstract}}
+% \author{Philippe Faist\quad\email{philippe.faist@bluewin.ch}}
+%
+% \maketitle
+%
+% \begin{abstract}
+%   \pkgname{phfextendedabstract}---Typeset extended abstracts for conferences,
+%   such as often encountered in quantum information theory.
+% \end{abstract}
+%
+% \inlinetoc
+%
+% \section{Introduction}
+%
+% User documentation goes here.
+%
+% \emph{TODO: Please document me!!!!!!!}
+%
+%
+% \StopEventually{\vskip 3cm plus 2cm minus 2cm\relax\PrintChanges
+%     \vskip 3cm plus 2cm minus 2cm\relax\PrintIndex}
+%
+% \section{Implementation}
+%
+% \paragraph{Class options}
+% We process these first, to see which options we should pass on to
+% \revtex.
+%    \begin{macrocode}
+\RequirePackage{kvoptions}
+\SetupKeyvalOptions{%
+  family=phfea,%
+  prefix=phfeaopt@%
+}
+\DeclareStringOption[]{papertype}
+\DeclareStringOption[11pt]{ptsize}
+\DeclareBoolOption[true]{sectiondecorations}
+\DeclareBoolOption[true]{loadtheorems}
+\DeclareBoolOption[true]{sansstyle}
+\ProcessKeyvalOptions*
+%    \end{macrocode}
+%
+% \paragraph{Load \revtex, the base class}
+%
+%    \begin{macrocode}
+\PassOptionsToClass{%
+  aps,prl,notitlepage,reprint,onecolumn,tightenlines,superscriptaddress,%
+  \phfeaopt@ptsize,\phfeaopt@papertype%
+}{revtex4-2}
+\LoadClass{revtex4-2}
+%    \end{macrocode}
+% 
+% \paragraph{Load \pkgname{phfnote} for the basic document setup}
+%    \begin{macrocode}
+\PassOptionsToPackage{preset=reset,pkgset=extended,hyperrefdefs={defer,noemail}}{phfnote}
+\RequirePackage{phfnote}
+%    \end{macrocode}
+%
+%
+% \paragraph{Default sans serif font}
+%
+% \begin{macro}{\phfeaSansStyle}
+%   Unless instructed not to do so, \iffalse load the ``Source Sans Pro'' font
+%   as default sans serif font, using the semibold glyphs in place of bold.  By
+%   default, this font will \else set the sans serif font family to \fi be used
+%   for section headings and the main title.
+%    \begin{macrocode}
+\ifphfeaopt@sansstyle
+%%\RequirePackage[semibold]{sourcesanspro}
+\def\phfeaSansStyle{\sffamily}
+\else
+\def\phfeaSansStyle{}
+\fi
+%    \end{macrocode}
+% \end{macro}
+%
+% \paragraph{Default title format}
+%
+% \begin{macro}{\phfeaTitleStyle}
+%   Change \revtex\ title format.  Title style can be customized by redefining
+%   |\phfeaTitleStyle|.
+%    \begin{macrocode}
+\def\phfeaTitleStyle{\phfeaSansStyle\Large}
+\def\frontmatter@title@format{\phfeaTitleStyle\centering\parskip\z@skip}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \paragraph{Setup specific for sectioning}
+% By design, there are only two sectioning levels in a
+% \pkgname{phfextendedabstract} document: sections (|\section|) and paragraphs
+% (|\paragraph|).  Any other sectioning command (e.g., |\subsection|) will
+% produce an error.
+%
+%
+% Neither of these two section levels is numbered.
+%    \begin{macrocode}
+\setcounter{secnumdepth}{0}
+\setcounter{tocdepth}{1}
+%    \end{macrocode}
+%
+% \begin{macro}{\phfeaSectionBeforeSkip}
+% \begin{macro}{\phfeaSectionAfterHSkip}
+% \begin{macro}{\phfeaSectionStyle}
+% \begin{macro}{\phfeaSectionDecoration}
+% \begin{macro}{\phfeaSectionDecorationSymbol}
+%   Some helper and customization macros for |\section|.
+%    \begin{macrocode}
+\def\phfeaSectionBeforeSkip{1ex}
+\def\phfeaSectionAfterHSkip{1em}
+\def\phfeaSectionStyle{\normalfont\normalsize\phfeaSansStyle\bfseries}
+\ifphfeaopt@sectiondecorations
+\def\phfeaSectionDecoration{%
+  \raisebox{0.2ex}{{%
+      \notesmaller[0.4]\phfeaSectionDecorationSymbol}}%
+  \hspace*{1.5ex}%
+}
+\def\phfeaSectionDecorationSymbol{\ensuremath{\blacksquare}}
+\else
+\def\phfeaSectionDecoration{}
+\def\phfeaSectionDecorationSymbol{}
+\fi
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\phfeaParagraphBeforeSkip}
+% \begin{macro}{\phfeaParagraphAfterHSkip}
+% \begin{macro}{\phfeaParagraphStyle}
+% \begin{macro}{\phfeaParagraphDecoration}
+% \begin{macro}{\phfeaParagraphDecorationSymbol}
+%   Same helper and customization macros, now for |\paragraph|.
+%    \begin{macrocode}
+\def\phfeaParagraphBeforeSkip{0.4ex plus 0.1ex minus 0.1ex}
+\def\phfeaParagraphAfterHSkip{0.75em}
+\def\phfeaParagraphStyle{\normalfont\normalsize\phfeaSansStyle\small}
+\ifphfeaopt@sectiondecorations
+\def\phfeaParagraphDecoration{%
+  \raisebox{0.2ex}{{%
+      \notesmaller[0.6]\phfeaParagraphDecorationSymbol}}%
+  \hspace*{1ex}%
+}
+\def\phfeaParagraphDecorationSymbol{\ensuremath{\triangleright}}
+\else
+\def\phfeaParagraphDecoration{}
+\def\phfeaParagraphDecorationSymbol{}
+\fi
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}{\section}
+% \begin{macro}{\paragraph}
+%   Redefine |\section| and |\paragraph| for formatting.  Observe that
+%   |\section| and |\paragraph| have no optional argument and no starred
+%   variant.
+%    \begin{macrocode}
+\renewcommand\section[1]{%
+  \@startsection{section}%
+  {1}% (level)
+  {0pt}% (indent)
+  {\phfeaSectionBeforeSkip}% (beforeskip)
+  {-\dimexpr\phfeaSectionAfterHSkip\relax}% (afterskip)
+  {\phfeaSectionStyle}% (style)
+  [#1]% (toc title)
+  {\makebox[0pt][r]{\phfeaSectionDecoration}#1}% (title)
+}
+\renewcommand\paragraph[1]{%
+  \@startsection{paragraph}%
+  {2}% (level)
+  {0pt}% (indent)
+  {\phfeaParagraphBeforeSkip}% (beforeskip)
+  {-\dimexpr\phfeaParagraphAfterHSkip\relax}% (afterskip)
+  {\phfeaParagraphStyle}% (style)
+  [#1]% (toc title)
+  {\makebox[0pt][r]{\phfeaParagraphDecoration}#1}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+%    \begin{macrocode}
+\let\subsection\undefined
+\let\subsubsection\undefined
+\let\subparagraph\undefined
+%    \end{macrocode}
+%
+%
+% \paragraph{Setup specific for theorems}
+%
+% Create a new theorem style called |extendedabstracthm|.  Then load our
+% \pkgname{phfthm} package.  Make sure we don't do any of this if we were asked
+% not to load theorems in the package options.
+%    \begin{macrocode}
+\ifphfeaopt@loadtheorems
+\newtheoremstyle{extendedabstractthm}%
+  {0.6ex plus 0.3ex minus 0.1ex}%
+  {0.6ex plus 0.3ex minus 0.1ex}%
+  {\itshape}%
+  {0pt}%
+  {\bfseries\itshape}%
+  {:}%
+  {0.8em}%
+  {\thmname{#1\thmnumber{ #2}\thmnote{ (#3)}}}%
+\PassOptionsToPackage{proofref=false,theoremstyle=extendedabstractthm}{phfthm}
+\RequirePackage{phfthm}
+\fi
+%    \end{macrocode}
+%
+% Add a reminder for the user to load the \pkgname{hyperref} pacakge themselves.
+%    \begin{macrocode}
+\AtBeginDocument{%
+  
+}
+%    \end{macrocode}
+%
+%\Finale
+\endinput

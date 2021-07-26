@@ -2842,7 +2842,19 @@
   menucolor=docnotelinkcolor,runcolor=docnotelinkcolor,%
   urlcolor=docnotelinkcolor%
 }%
-\def\phfnote@hyperrefdefs@deferredhypersetup#1{\AtBeginDocument{\hypersetup{#1}}}
+\def\phfnote@hyperrefdefs@deferredhypersetup#1{%
+  \AtBeginDocument{%
+    \@ifpackageloaded{hyperref}{%
+      \hypersetup{#1}%
+    }{%
+      \PackageWarning{phfnote}{\MessageBreak\MessageBreak
+        *** package `hyperref` was not loaded ***\MessageBreak
+        Since you specified `hyperrefdefs=defer`, I was expecting you would call
+        `\string\usepackage{hyperref}` at some point later in your preamble, but
+        it does not appear you did so.  Your document might look weird.}%
+    }%
+  }%
+}
 \providecommand\phfnote@hyperrefdefs@dopkgoptions{%
   \PassOptionsToPackage{unicode=true}{hyperref}
 }

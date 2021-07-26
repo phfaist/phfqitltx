@@ -30,28 +30,31 @@ PKGREADME = README.md
 DIST_ADDITIONAL_FILES ?= 
 
 
+# By default, the generated style file is a '.sty' latex package.  If it's a
+# '.cls' class file instead, the local Makefile will redefine this to 'cls'.
+PKGSTYEXT ?= sty
+
 PKGDTX = $(PKG).dtx
+PKGSTY = $(PKG).$(PKGSTYEXT)
 PKGINS = $(PKG).ins
-PKGSTY = $(PKG).sty
 PKGPDF = $(PKG).pdf
 PKGTDSZIP = $(PKG).tds.zip
 PKGZIP = $(PKG).zip
 
 
-
-.PHONY: help sty pdf install install_sty install_doc tdszip dist clean cleanall cleansty cleanaux cleanpdf cleantdszip cleandist
+.PHONY: help sty cls pdf install install_sty install_cls install_doc tdszip dist clean cleanall cleansty cleancls cleanaux cleanpdf cleantdszip cleandist
 
 
 help:
 	@echo "Targets for $(PKG):"
-	@echo "make sty             -- generate LaTeX package file $(PKG).sty"
+	@echo "make $(PKGSTYEXT)             -- generate LaTeX package file $(PKG).$(PKGSTYEXT)"
 	@echo "make pdf             -- generate pdf documentation"
 	@echo "make install         -- install style and documentation files to TEXMF tree"
 	@echo "make install PREFIX=[specify texmf directory]"
 	@echo "make $(PKG).tds.zip  -- create TDS.ZIP to include in CTAN upload"
 	@echo "make dist            -- create distribution ZIP, ready for upload to CTAN"
 	@echo "make clean           -- remove LaTeX auxiliary files"
-	@echo "make cleansty        -- remove generated style file"
+	@echo "make clean$(PKGSTYEXT)        -- remove generated style file"
 	@echo "make cleanpdf        -- remove generated pdf documentation"
 	@echo "make cleanall        -- remove all generated files, incl. distribution zip"
 
@@ -66,11 +69,17 @@ cleanall: cleansty cleanaux cleanpdf cleantdszip cleandist
 
 sty: $(PKGSTY)
 
+# synonym of `sty` in case of LaTeX classes, we use same commands etc.
+cls: $(PKGSTY)
+
 $(PKGSTY): $(PKGINS) $(PKGDTX)
 	$(LATEX) $<
 
 cleansty:
 	@rm -f $(PKGSTY)
+
+cleancls: cleansty
+
 
 # ------------------------------------------------
 # make pdf
@@ -122,6 +131,8 @@ cleanpdf:
 install_sty: $(PKGSTY)
 	mkdir -p $(DESTDIR)$(PREFIX)/tex/latex/$(PKG)
 	cp $(PKGSTY)  $(DESTDIR)$(PREFIX)/tex/latex/$(PKG)
+
+install_cls: install_sty
 
 install_doc: $(PKGPDF)
 	mkdir -p $(DESTDIR)$(PREFIX)/doc/latex/$(PKG)

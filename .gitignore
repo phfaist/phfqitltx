@@ -19,8 +19,9 @@
 *.hd
 *.synctex.gz
 
-# auto-generated sty files
+# auto-generated sty/cls files
 phf*/*.sty
+phf*/*.cls
 
 # distribution files (TDS.ZIP)
 */*.tds.zip
@@ -49,3 +50,4 @@ phfcc/pkg.mk
 
 # other junk/temp files
 test/testthm-revtexNotes.bib
+test/testextendedabstractNotes.bib
