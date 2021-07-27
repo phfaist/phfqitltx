@@ -29,7 +29,58 @@
 \documentclass{ltxdoc}
 \usepackage{xcolor}
 \usepackage[preset=xpkgdoc]{phfnote}
-\def\revtex{REV\TeX}
+\usepackage{needspace}
+\makeatletter
+\newsavebox\phfeaDocVirtualPage@contents
+\newenvironment{phfeaDocVirtualPage}{%
+  \par%
+  \begingroup%
+  \makeatletter%
+  \begin{lrbox}{\phfeaDocVirtualPage@contents}%
+  \begin{minipage}{12cm}\relax%
+    \def\rmdefault{cmr}\def\sfdefault{cmbr}\normalfont%
+    \def\shortlipsum{Lorem ipsum dolor sit amet, consectetuer
+      adipiscing elit. Ut purus elit, vestibulum ut, placerat ac,
+      adipiscing vitae, felis. Curabitur dictum gravida
+      mauris. Nam arcu libero, nonummy eget, consectetuer id,
+      vulputate a, magna.}%
+    \let\RequirePackage\@gobble%
+    \def\morepagecontents{\par\vspace{1em}\centering\ldots}%
+    \ignorespaces%
+  }%
+  {%
+  \end{minipage}%
+  \end{lrbox}%
+  %%\centering%
+  \begin{tcolorbox}[text width=6cm,sharp corners,%
+    before={\par\vspace{5pt}\centering\nopagebreak\parindent=0pt},after={\par\vspace{5pt}},%
+    leftrule=0.4pt,toprule=0.4pt,rightrule=0.6pt,bottomrule=0.6pt,%
+    colframe=black,colback=white]%
+    \scalebox{0.5}{\usebox{\phfeaDocVirtualPage@contents}}%
+  \end{tcolorbox}%
+  %%\par%
+  \endgroup%
+}
+\def\phfeaSectionDecoration{%
+  \raisebox{0.2ex}{{%
+      \notesmaller[0.4]\phfeaSectionDecorationSymbol}}%
+  \hspace*{1.5ex}%
+}
+\def\phfeaSectionDecorationSymbol{\ensuremath{\blacksquare}}
+\def\phfeaParagraphDecoration{%
+  \raisebox{0.2ex}{{%
+      \notesmaller[0.6]\phfeaParagraphDecorationSymbol}}%
+  \hspace*{1ex}%
+}
+\def\phfeaParagraphDecorationSymbol{\ensuremath{\triangleright}}
+
+\def\eqsign@{=}
+\def\eqsign{\protect\eqsign@}
+\robustify\eqsign
+\makeatother
+
+\def\RevTeX{{\small R\raise-0.2ex\hbox{\textsc{ev}}}\TeX}
+
 \EnableCrossrefs         
 \CodelineIndex
 \RecordChanges
@@ -78,9 +129,219 @@
 %
 % \section{Introduction}
 %
-% User documentation goes here.
+% Several conferences in Quantum Information Theory (and presumably in other
+% fields, too) require the submission of \emph{extended abstracts}.  An extended
+% abstract is a summary of a scientific result, presented at a high level, and
+% consisting of a handful of pages.
 %
-% \emph{TODO: Please document me!!!!!!!}
+% I found myself repeatedly copying my \LaTeX\ preamble from one submission to
+% another with definitions for a format that I elaborated and liked.  So at some
+% point I collected the main definitions into this class file.
+% 
+% The \pkgname{phfextendedabstract} class sets up the document for an extended
+% abstract submission as a single-column document, typeset by default at 11
+% point size, with at most two sectioning levels (|\section|\,s and
+% |\paragraph|\,s).
+%
+% The extended abstract style looks approximately like this:
+% \nopagebreak
+% \iffalse COMMENT: Spacings are copied/emulated ! They might appear wrong!! \fi
+% \begin{phfeaDocVirtualPage}
+%   {\parskip=8pt\relax
+%     {\sffamily\Large\centering Title of my extended abstract\par}
+%     {\centering Author One,\ \ Author Two,\ \  and\ \ Author Three\par}
+%   }\vspace{0.2cm}
+%   \parskip=3pt\relax
+%   
+%   \noindent{\normalfont\normalsize\sffamily\fontseries{sb}\selectfont
+%     \makebox[0pt][r]{\phfeaSectionDecoration}Introduction.}
+%   \shortlipsum
+%   
+%   \noindent{\normalfont\normalsize\sffamily\fontseries{sb}\selectfont
+%     \makebox[0pt][r]{\phfeaSectionDecoration}Results.}
+%   \shortlipsum
+%   
+%   \noindent{\normalfont\normalsize\sffamily\small
+%     \makebox[0pt][r]{\phfeaParagraphDecoration}First result.}
+%   \ldots
+%
+%   \noindent{\normalfont\normalsize\sffamily\small
+%     \makebox[0pt][r]{\phfeaParagraphDecoration}Second result.}
+%   \ldots
+%
+%   \noindent{\normalfont\normalsize\sffamily\fontseries{sb}\selectfont
+%     \makebox[0pt][r]{\phfeaSectionDecoration}Discussion.}
+%   \shortlipsum   
+%  \hspace*{1.5ex}%
+%
+% \end{phfeaDocVirtualPage}
+%
+% Here are the main features of the \pkgname{phfextendedabstract} class:
+% \begin{itemize}
+% \item The class \pkgname{phfextendedabstract} loads the \pkgname{revtex4-2}
+%   class, so you can directly use \RevTeX's features such as author
+%   affiliations, etc.
+%
+% \item Only two sectioning commands are enabled: |\section| and |\paragraph|.
+%   Both have run-in headings.  If you find yourself needing additional
+%   sectioning levels, it might be that your extended abstract is too detailed
+%   and you might want to think about how to keep it at a higher level.
+%
+%   By default, section and paragraphs have ``decorations'' (by default a symbol
+%   in the margin) to guide the reader through the overall high-level structure
+%   of the document.
+%
+% \item The \pkgname{phfnote} package is loaded in order to provide a set of
+%   default \LaTeX\ packages and set up hyperlinks.  A generous default set of
+%   standard LaTeX packages are loaded, including \pkgname{caption} and
+%   \pkgname{enumitem}; see \pkgname{phfnote}'s documentation for the option
+%   |pkgset=extended|).
+%
+%   You are expected to call |\usepackage{hyperref}| somewhere in your preamble.
+%   We deliberately don't include \pkgname{hyperref} to give you greater control
+%   of package loading order (most packages you might want to use must be loaded
+%   before \pkgname{hyperref}).
+%
+% \item By default a customized theorem style so that it stands out but also so
+%   that it contrasts well with the section and paragraph headings.
+%
+% \end{itemize}
+%
+% \section{Usage}
+%
+% Here's a minimal usage template:
+% \begin{verbatim}
+% \documentclass[papertype=a4paper]{phfextendedabstract}
+% \usepackage{hyperref}
+% \begin{document}
+% \title{Title goes here}
+% \author{Author 1}
+% %\affiliation{...}
+% \author{Author 2}
+% %\affiliation{...}
+% %\date{July 27, 2021}
+% \maketitle
+% 
+% \section{Introduction}
+% ...
+%
+% \end{document}
+% \end{verbatim}
+%
+%
+% \section{Package options}
+%
+% Here is a summary of package options:
+% \begin{pkgoptions}
+% \item[papertype=a4paper,letterpaper,\meta{paper type},\meta{empty}] Specify
+%   the paper type to use (A4 or letter).  The argument given to this option is
+%   directly specified as an option to the underlying \RevTeX\ class.
+% \item[ptsize=10pt,11pt,12pt] Default font size to use.  Again the argument
+%   given to this option is directly specified as an option to the underlying
+%   \RevTeX\ class.
+% \item[sectiondecorations=\meta{true or false}] Whether or not to ``decorate''
+%   section headings, by default with a small black square typeset in the margin
+%   of the section heading.
+% \item[paragraphdecorations=\meta{true or false}] Whether or not to
+%   ``decorate'' paragraph headings, by default with a small right-pointing
+%   outlined triangle typeset in the margin of the section heading.
+% \item[noheadingdecorations] Shorthand for
+%   |sectiondecorations=false,paragraphdecorations=false|.
+% \item[loadtheorems=\meta{true or false}] If |loadtheorems=true| (the default),
+%   then the \pkgname{phfthm} package is loaded with some suitable default
+%   options and a custom theorem style.  (The theorem style
+%   |phfextendedabstractthm| is always defined, regardless of this package
+%   option.)
+% \item[sansstyle=\meta{true or false}] Use sans serif style by default for the
+%   main title as well as for section and paragraph headings.  For greater
+%   degree of control, see the ``customization macros'' section below.
+% \end{pkgoptions}
+% 
+% \section{Customization macros}
+% \subsection{Main Title and general headings style}
+%
+% \DescribeMacro{\phfeaHeadingStyle} The macro |\phfeaHeadingStyle| is defined to be
+% |\sffamily|, unless the |sansstyle=false| package option is provided
+% in which case the macro expands to nothing.  You can redefine it to give a
+% different general style to your main title and your section and paragraph
+% headings.
+%
+% \DescribeMacro{\phfeaTitleStyle} The macro |\phfeaTitleStyle| sets the font
+% style for the main document title.  By default the macro is defined to
+% |\phfeaHeadingStyle\Large|.  Redefine this macro to change the title style.
+%
+% For instance, if you prefer \RevTeX's own simple boldface title, you can use:
+% \begin{verbatim}
+% \renewcommand\phfeaTitleStyle{\bfseries}
+% \end{verbatim}
+% 
+% 
+% \subsection{Sections and paragraphs}
+%
+% You can customize section and paragraph headings, including spacing and style,
+% by redefining the following macros.
+%
+% \DescribeMacro{\phfeaSectionBeforeSkip}
+% \DescribeMacro{\phfeaSectionAfterHSkip} The macro |\phfeaSectionBeforeSkip|
+% (it's a macro, not a length) is used to specify the vertical spacing before a
+% new section heading.  The macro (not length) |\phfeaSectionAfterHSkip| is the
+% horizontal space between the end of the section heading and the beginning of
+% the section text contents.
+%
+% If you're keen to save more space and compress the spacing between sections
+% you can use:
+% \begin{verbatim}
+% \renewcommand\phfeaSectionBeforeSkip{0ex}
+% \end{verbatim}
+%
+% \DescribeMacro{\phfeaSectionStyle} The macro |\phfeaSectionStyle| is used to
+% set the style of the section headings.  By default, the default sans/heading
+% style is used at the normal size and in bold face series.
+%
+% \DescribeMacro{\phfeaSectionDecoration}
+% \DescribeMacro{\phfeaSectionDecorationSymbol} By default, section headings are
+% ``decorated'' with a black square in the margin, to guide the reader's eye
+% through the document's high-level structure.  You can customize this
+% decoration by redefining the macros |\phfeaSectionDecoration| and
+% |\phfeaSectionDecorationSymbol|.
+%
+% If the |sectiondecorations=false| package option was specified, the macros
+% |\phfeaSectionDecoration| and |\phfeaSectionDecorationSymbol| are defined to
+% be empty.
+%
+% If you simply want to change the decoration symbol (say change it to a star),
+% you can redefine |\phfeaSectionDecorationSymbol| as follows:
+% \begin{verbatim}
+% \renewcommand{\phfeaSectionDecorationSymbol}{$\star$}
+% \end{verbatim}
+% If you want greater control over the decoration you can redefine
+% |\phfeaSectionDecoration| instead (e.g., to change the spacing, vertical
+% alignment, etc., of the decoration).  The contents of the macro
+% |\pheaSectionDecoration| will be typeset in a zero-width right-aligned box
+% which is anchored to the beginning of the section heading.  E.g.:
+% \begin{verbatim}
+% \renewcommand{\phfeaSectionDecoration}{%
+%   \raisebox{-0.1ex}{{%
+%     \Large\phfeaSectionDecorationSymbol}}%
+%   \hspace*{2.5ex}%
+% }
+% \renewcommand{\phfeaSectionDecorationSymbol}{$\Rightarrow$}
+% \end{verbatim}
+%
+% By default, the macro |\phfeaSectionDecoration| calls the macro
+% |\phfeaSectionDecorationSymbol|, so if you redefine the former without calling
+% the latter, the latter won't be used at all.
+%
+% \needspace{5\baselineskip} \DescribeMacro{\phfeaParagraphBeforeSkip}
+% \DescribeMacro{\phfeaParagraphAfterHSkip} \DescribeMacro{\phfeaParagraphStyle}
+% \DescribeMacro{\phfeaParagraphDecoration}
+% \DescribeMacro{\phfeaParagraphDecorationSymbol} You can customize paragraphs
+% in the exact same way as sections, with the corresponding macros
+% |\phfeaParagraphBeforeSkip|, |\phfeaParagraphAfterHSkip|,
+% |\phfeaParagraphStyle|, |\phfeaParagraphDecoration|,
+% |\phfeaParagraphDecorationSymbol|.
+% 
+%
 %
 %
 % \StopEventually{\vskip 3cm plus 2cm minus 2cm\relax\PrintChanges
@@ -90,7 +351,7 @@
 %
 % \paragraph{Class options}
 % We process these first, to see which options we should pass on to
-% \revtex.
+% \RevTeX.
 %    \begin{macrocode}
 \RequirePackage{kvoptions}
 \SetupKeyvalOptions{%
@@ -100,12 +361,17 @@
 \DeclareStringOption[]{papertype}
 \DeclareStringOption[11pt]{ptsize}
 \DeclareBoolOption[true]{sectiondecorations}
+\DeclareBoolOption[true]{paragraphdecorations}
+\DeclareVoidOption{noheadingdecorations}{%
+  \ifphfeaopt@sectiondecorationsfalse
+  \ifphfeaopt@paragraphdecorationsfalse
+}
 \DeclareBoolOption[true]{loadtheorems}
 \DeclareBoolOption[true]{sansstyle}
 \ProcessKeyvalOptions*
 %    \end{macrocode}
 %
-% \paragraph{Load \revtex, the base class}
+% \paragraph{Load \RevTeX, the base class}
 %
 %    \begin{macrocode}
 \PassOptionsToClass{%
@@ -117,14 +383,19 @@
 % 
 % \paragraph{Load \pkgname{phfnote} for the basic document setup}
 %    \begin{macrocode}
-\PassOptionsToPackage{preset=reset,pkgset=extended,hyperrefdefs={defer,noemail}}{phfnote}
+\PassOptionsToPackage{%
+  preset=reset,%
+  pkgset=extended,%
+  hyperrefdefs={defer,noemail},%
+}{phfnote}
+
 \RequirePackage{phfnote}
 %    \end{macrocode}
 %
 %
 % \paragraph{Default sans serif font}
 %
-% \begin{macro}{\phfeaSansStyle}
+% \begin{macro}{\phfeaHeadingStyle}
 %   Unless instructed not to do so, \iffalse load the ``Source Sans Pro'' font
 %   as default sans serif font, using the semibold glyphs in place of bold.  By
 %   default, this font will \else set the sans serif font family to \fi be used
@@ -132,9 +403,9 @@
 %    \begin{macrocode}
 \ifphfeaopt@sansstyle
 %%\RequirePackage[semibold]{sourcesanspro}
-\def\phfeaSansStyle{\sffamily}
+\def\phfeaHeadingStyle{\sffamily}
 \else
-\def\phfeaSansStyle{}
+\def\phfeaHeadingStyle{}
 \fi
 %    \end{macrocode}
 % \end{macro}
@@ -142,10 +413,10 @@
 % \paragraph{Default title format}
 %
 % \begin{macro}{\phfeaTitleStyle}
-%   Change \revtex\ title format.  Title style can be customized by redefining
+%   Change \RevTeX\ title format.  Title style can be customized by redefining
 %   |\phfeaTitleStyle|.
 %    \begin{macrocode}
-\def\phfeaTitleStyle{\phfeaSansStyle\Large}
+\def\phfeaTitleStyle{\phfeaHeadingStyle\Large}
 \def\frontmatter@title@format{\phfeaTitleStyle\centering\parskip\z@skip}
 %    \end{macrocode}
 % \end{macro}
@@ -172,7 +443,7 @@
 %    \begin{macrocode}
 \def\phfeaSectionBeforeSkip{1ex}
 \def\phfeaSectionAfterHSkip{1em}
-\def\phfeaSectionStyle{\normalfont\normalsize\phfeaSansStyle\bfseries}
+\def\phfeaSectionStyle{\normalfont\normalsize\phfeaHeadingStyle\bfseries}
 \ifphfeaopt@sectiondecorations
 \def\phfeaSectionDecoration{%
   \raisebox{0.2ex}{{%
@@ -200,8 +471,8 @@
 %    \begin{macrocode}
 \def\phfeaParagraphBeforeSkip{0.4ex plus 0.1ex minus 0.1ex}
 \def\phfeaParagraphAfterHSkip{0.75em}
-\def\phfeaParagraphStyle{\normalfont\normalsize\phfeaSansStyle\small}
-\ifphfeaopt@sectiondecorations
+\def\phfeaParagraphStyle{\normalfont\normalsize\phfeaHeadingStyle\small}
+\ifphfeaopt@paragraphdecorations
 \def\phfeaParagraphDecoration{%
   \raisebox{0.2ex}{{%
       \notesmaller[0.6]\phfeaParagraphDecorationSymbol}}%
@@ -233,7 +504,10 @@
   {-\dimexpr\phfeaSectionAfterHSkip\relax}% (afterskip)
   {\phfeaSectionStyle}% (style)
   [#1]% (toc title)
-  {\makebox[0pt][r]{\phfeaSectionDecoration}#1}% (title)
+  {%
+    \texorpdfstring{\makebox[0pt][r]{\phfeaSectionDecoration}}{}%
+    #1%
+  }% (title)
 }
 \renewcommand\paragraph[1]{%
   \@startsection{paragraph}%
@@ -243,7 +517,10 @@
   {-\dimexpr\phfeaParagraphAfterHSkip\relax}% (afterskip)
   {\phfeaParagraphStyle}% (style)
   [#1]% (toc title)
-  {\makebox[0pt][r]{\phfeaParagraphDecoration}#1}%
+  {%
+    \texorpdfstring{\makebox[0pt][r]{\phfeaParagraphDecoration}}{}%
+    #1%
+  }% (title)
 }
 %    \end{macrocode}
 % \end{macro}
@@ -259,11 +536,10 @@
 % \paragraph{Setup specific for theorems}
 %
 % Create a new theorem style called |extendedabstracthm|.  Then load our
-% \pkgname{phfthm} package.  Make sure we don't do any of this if we were asked
-% not to load theorems in the package options.
+% \pkgname{phfthm} package.  Make sure we don't load \pkgname{phfthm} if we were
+% asked not to load theorems in the package options.
 %    \begin{macrocode}
-\ifphfeaopt@loadtheorems
-\newtheoremstyle{extendedabstractthm}%
+\newtheoremstyle{phfextendedabstractthm}%
   {0.6ex plus 0.3ex minus 0.1ex}%
   {0.6ex plus 0.3ex minus 0.1ex}%
   {\itshape}%
@@ -272,17 +548,12 @@
   {:}%
   {0.8em}%
   {\thmname{#1\thmnumber{ #2}\thmnote{ (#3)}}}%
-\PassOptionsToPackage{proofref=false,theoremstyle=extendedabstractthm}{phfthm}
+\ifphfeaopt@loadtheorems
+\PassOptionsToPackage{proofref=false,theoremstyle=phfextendedabstractthm}{phfthm}
 \RequirePackage{phfthm}
 \fi
 %    \end{macrocode}
 %
-% Add a reminder for the user to load the \pkgname{hyperref} pacakge themselves.
-%    \begin{macrocode}
-\AtBeginDocument{%
-  
-}
-%    \end{macrocode}
 %
 %\Finale
 \endinput
