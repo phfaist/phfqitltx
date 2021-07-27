@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfqit}
 %<*package>
-    [2020/07/31 v3.0 phfqit package]
+    [2021/07/27 v3.1 phfqit package]
 %</package>
 %
 %<*driver>
@@ -75,9 +75,9 @@
 % \maketitle
 %
 % \begin{abstract}
-%   \pkgname{phfqit}---Utilities to typeset stuff in Quantum Information Theory
-%   (quite biased towards theory), in particular general mathematical symbols,
-%   operators, and shorthands for entropy measures.
+%   \pkgname{phfqit}---Utilities to typeset stuff in Quantum Information Theory,
+%   in particular general mathematical symbols, operators, and shorthands for
+%   entropy measures.
 % \end{abstract}
 %
 % \inlinetoc
@@ -483,9 +483,9 @@
 % \label{sec:entropy-function}
 %
 % \DescribeMacro{\Hfn} The entropy, written as a mathematical function.  It is
-% useful to write, e.g., $\Hfunc(p_1\rho_1 + p_2\rho_2)$ as \relax
-% |\Hfunc(p_1\rho_1 + p_2\rho_2)|.  Sizing specifications also work, e.g.\@
-% |\Hfunc`\big(x)| or |\Hfunc`*(x)|.
+% useful to write, e.g., $\Hfn(p_1\rho_1 + p_2\rho_2)$ as \relax
+% |\Hfn(p_1\rho_1 + p_2\rho_2)|.  Sizing specifications also work, e.g.\@
+% |\Hfn`\big(x)| or |\Hfn`*(x)|.
 %
 % Usage is: |\Hfn|\hspace{0pt}\meta{size-spec}\hspace{0pt}|(|\meta{argument}|)|
 %
@@ -574,16 +574,21 @@
 % \DescribeMacro{\Dr} The Rob-relative entropy.  The syntax is the same as for
 % |\Dmax|.
 %
-% \DescribeMacro{\DHyp} The hypothesis testing relative entropy.  The syntax is
-% the same as for |\Dmax|, except that by default the optional argument is
-% |\eta|.  That is, |\DHyp{\rho}{\sigma}| gives $\DHyp{\rho}{\sigma}$.  (This is
-% because this quantity is directly defined with a $\eta$ (or $\epsilon$) built
-% in, and it is not a zero-error quantity which is smoothed with the purified
-% distance.)
+% \DescribeMacro{\DHyp} \DescribeMacro{\Dhyp} The hypothesis testing relative
+% entropy (two possible variants).  The syntax is the same as for |\Dmax|,
+% except that by default the optional argument is |\eta|.  The symbols
+% `$\mathrm{H}$' and `$\mathrm{h}$' are used as subscripts, respectively, for
+% |\DHyp| and |\Dhyp|.  Examples: The code |\DHyp{\rho}{\sigma}| gives
+% $\DHyp{\rho}{\sigma}$ and |\Dhyp[\eta']{\rho}{\sigma}| gives
+% $\Dhyp[\eta']{\rho}{\sigma}$.  (This is because this quantity is directly
+% defined with a $\eta$ (or $\epsilon$) built in, and it is not a zero-error
+% quantity which is smoothed with the purified distance.)
 %
-% The commands |\DD|, |\Dmax|, |\Dminz|, |\Dminf|, |\Dr| and |\DHyp| are defined
-% only if the package option \pkgoptionfmt{qitobjdef=stdset} is set (which is
-% the default).
+% The commands |\DD|, |\Dmax|, |\Dminz|, |\Dminf|, |\Dr|, |\DHyp| and |\Dhyp|
+% are defined only if the package option \pkgoptionfmt{qitobjdef=stdset} is set
+% (which is the default).
+%
+% \changedreftext{v3.1-added-Dhyp-qitobjdef-stdset}
 %
 % \DescribeMacro{\DSym} The symbol to use to denote a relative entropy.  You
 % may redefine this command to change the symbol.  (This works like |\HSym|
@@ -2197,6 +2202,15 @@
 %   Hypothesis testing relative entropy.
 %    \begin{macrocode}
 \newcommand\DHyp[1][\eta]{\Dbase{\DSym}_{\mathrm{H}}^{#1}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\Dhyp}
+%   Hypothesis testing relative entropy (alternative definition).
+%   \changed[v3.1-added-Dhyp-qitobjdef-stdset]{v3.1}{2021/07/27}{Added the
+%   \phfverb{\Dhyp} variant of the hypothesis testing relative entropy}
+%    \begin{macrocode}
+\newcommand\Dhyp[1][\eta]{\Dbase{\DSym}_{\mathrm{h}}^{#1}}
 %    \end{macrocode}
 % \end{macro}
 %

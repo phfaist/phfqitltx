@@ -42,6 +42,8 @@ independently to CTAN.
 
 - `phfcc` — inline commenting in collaborative documents
 
+- `phfextendedabstract` — Typeset extended abstracts for conferences, such as
+  often encountered in quantum information theory.
 
 
 # Installation
