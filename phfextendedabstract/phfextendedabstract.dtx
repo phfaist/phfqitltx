@@ -191,6 +191,12 @@
 %   in the margin) to guide the reader through the overall high-level structure
 %   of the document.
 %
+% \item You can easily scale all vertical spacing dimensions (section and
+%   paragraph spacing, vertical space around theorems and list environments,
+%   etc.) by a common factor with a class option.  Do you have those extra two
+%   lines that make you exceed your 3-page limit?  Try squeezing everything
+%   together with something like |compressverticalspacing=0.7| class option.
+%
 % \item The \pkgname{phfnote} package is loaded in order to provide a set of
 %   default \LaTeX\ packages and set up hyperlinks.  A generous default set of
 %   standard LaTeX packages are loaded, including \pkgname{caption} and
@@ -238,9 +244,9 @@
 % \end{verbatim}
 %
 %
-% \section{Package options}
+% \section{Class options}
 %
-% Here is a summary of package options:
+% Here is a summary of class options:
 % \begin{pkgoptions}
 % \item[papertype=a4paper,letterpaper,\meta{paper type},\meta{empty}] Specify
 %   the paper type to use (A4 or letter).  The argument given to this option is
@@ -300,7 +306,7 @@
 % globally adjust the vertical spacings in the document (including the section
 % and paragraph vertical spacings, as well as the spacing above and below
 % theorems, itemize, and enumerate environments), you can also use the
-% |compressverticalspacing=X| package option.  Alternatively, you can redefine
+% |compressverticalspacing=X| class option.  Alternatively, you can redefine
 % the macro |\phfeaVerticalSpacingCompressionFactor| to the desired compression
 % factor:
 % \begin{verbatim}
@@ -364,7 +370,7 @@
 % \subsection{Customization of the main title and general headings style}
 %
 % \DescribeMacro{\phfeaHeadingStyle} The macro |\phfeaHeadingStyle| is defined to be
-% |\sffamily|, unless the |sansstyle=false| package option is provided
+% |\sffamily|, unless the |sansstyle=false| class option is provided
 % in which case the macro expands to nothing.  You can redefine it to give a
 % different general style to your main title and your section and paragraph
 % headings.
@@ -393,7 +399,7 @@
 %
 % If you're keen to save more space and compress the vertical spacing between
 % sections you can redefine the ``before skip'' macro (but see also the
-% |compressverticalspacing=| package option and the
+% |compressverticalspacing=| class option and the
 % |\phfeaVerticalSpacingCompressionFactor| macro):
 % \begin{verbatim}
 % \renewcommand\phfeaSectionBeforeSkip{0.3ex plus 0.2ex minus 0.1ex}
@@ -410,7 +416,7 @@
 % decoration by redefining the macros |\phfeaSectionDecoration| and
 % |\phfeaSectionDecorationSymbol|.
 %
-% If the |sectiondecorations=false| package option was specified, the macros
+% If the |sectiondecorations=false| class option was specified, the macros
 % |\phfeaSectionDecoration| and |\phfeaSectionDecorationSymbol| are defined to
 % be empty.
 %
@@ -804,7 +810,7 @@
 \fi
 %    \end{macrocode}
 % Load our \pkgname{phfthm} package.  Make sure we don't load \pkgname{phfthm}
-% if we were asked not to load theorems in the package options.
+% if we were asked not to load theorems in the class options.
 %    \begin{macrocode}
 \ifphfeaopt@loadtheorems
   \ifdefined\newtheoremstyle\else
