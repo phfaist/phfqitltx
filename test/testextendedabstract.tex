@@ -1,21 +1,40 @@
 \documentclass[
-%    ptsize=12pt,
-%    papertype=a4paper,
-    sansstyle=false,
+%    ptsize=11pt,
+    papertype=a4paper,
+%    sansstyle=false,
 %    sectiondecorations=false,
+%    compresssectionspacing=1,
+%    pkgset=none,
+%    loadtheorems=false,
 ]{phfextendedabstract}
 
 \usepackage{lipsum}
 
-\renewcommand\phfeaTitleStyle{\bfseries} % default \RevTeX title style
+%\geometry{margin=0.3in}
 
+
+%\usepackage{amssymb}
+
+\renewcommand\phfeaTitleStyle{\bfseries} % default \RevTeX title style
 
 \renewcommand\phfeaParagraphAfterHSkip{1pt}
 
+\renewcommand\phfeaParagraphStyle{\itshape}
+
+% \renewcommand\phfeaSectionSpacingCompressionFactor{2.5}
+% \setstretch{1.2}
+
+% \renewcommand\refname{References.}
+% \let\bibsection\rtxapsbibsection
+
 %\usepackage{mathptmx}
+
 %\renewcommand\phfeaHeadingStyle{}
 
 %\renewcommand\phfeaHeadingStyle{\ttfamily}
+
+
+
 
 % \renewcommand{\phfeaSectionDecoration}{%
 %   \raisebox{-0.1ex}{{%
@@ -25,6 +44,9 @@
 % \renewcommand{\phfeaSectionDecorationSymbol}{$\Rightarrow$}
 
 
+
+
+
 \usepackage{hyperref}
 %\usepackage{cleveref}
 
@@ -32,9 +54,9 @@
 \title{Test of my extended abstract document style}
 \author{Philippe Faist}
 %\affiliation{Affil. 1}
-\author{Alter ego}
+\author{Alter Ego}
 % \affiliation[Affil. X}
-\author{Someone else}
+\author{Someone Else}
 % \affiliation{Affil. 1}
 % \affiliation{Another Affil.}
 %\email{someoneelse@example.com}
@@ -53,12 +75,28 @@
 
 \paragraph{First result---}
 \lipsum[3]
+Therefore:
+
+\begin{theorem}
+  Let $a\in \mathcal{A}$.  Then for all $b\notin\mathcal{B}$ there exists
+  $\eta>0$ with an $\epsilon$-conform $v$-differentiable manifold with the
+  covariant property such that all $x$-symmetric $D$-forms are irreducible
+  almost everywhere.
+\end{theorem}
+
+The proof is an elementary application of Gromov's $T$-property of
+$(\epsilon,\eta)$-elevated maps.
 
 \paragraph{Another part of the result---}
 \lipsum[4-5]
+\marginpar{A margin note.}
+
 
 \section{Hopefully more results.}
-Will we get more results?
+Nulla malesuada porttitor diam. Donec felis erat, congue non, volutpat at,
+tincidunt tristique, libero. Vivamus viverra fermentum felis. Donec nonummy
+pellentesque ante. Phasellus adipiscing semper elit. Proin fermentum massa ac
+quam.   So here are our additional results.
 
 \paragraph{Yes, more results---}
 \lipsum[6]
@@ -69,7 +107,19 @@ Will we get more results?
 \section{Discussion.}
 \lipsum[8]
 
+And so that was some discussion\footnote{Let's check that footnotes work, too} to be done.\marginpar{What if we'd like a margin note?}
+
 \section{Outlook.}
 \lipsum[9]
+
+
+% typically you'd use \bibliography{bibtexfile}, but for the sake of the example
+% I'll directly use \begin{thebibliography} here instead
+\begin{thebibliography}{9}
+\bibitem{Item1}
+  A, B, and C, Journal of Future Results 3:99, 2033.
+\bibitem{Item2}
+  D E, F, and G, Another Journal of Cool Results 1:103, 2021.
+\end{thebibliography}
 
 \end{document}

@@ -202,6 +202,10 @@
 %   of package loading order (most packages you might want to use must be loaded
 %   before \pkgname{hyperref}).
 %
+% \item The page margins are tweaked with the \pkgname{geometry} package.
+%   (Simply call |\geometry{...}| from the \pkgname{geometry} package if you'd
+%   like to further change them.)
+%
 % \item By default a customized theorem style so that it stands out but also so
 %   that it contrasts well with the section and paragraph headings.
 %
@@ -247,6 +251,13 @@
 %   outlined triangle typeset in the margin of the section heading.
 % \item[noheadingdecorations] Shorthand for
 %   |sectiondecorations=false,paragraphdecorations=false|.
+% \item[compresssectionspacing=\meta{factor}] Real factor by which to multiply
+%   the spacing between sections.  If you need to compress the sections a bit to
+%   fit more content on a fixed number of pages (e.g.\@ because of page number
+%   constraints), you can set this option to a factor that's less than one.  A
+%   \meta{factor} that's less than one compresses sections together, a
+%   \meta{factor} equal to |1| does nothing, and a \meta{factor} greater than
+%   one expands the sections further apart.
 % \item[loadtheorems=\meta{true or false}] If |loadtheorems=true| (the default),
 %   then the \pkgname{phfthm} package is loaded with some suitable default
 %   options and a custom theorem style.  (The theorem style
@@ -255,6 +266,23 @@
 % \item[sansstyle=\meta{true or false}] Use sans serif style by default for the
 %   main title as well as for section and paragraph headings.  For greater
 %   degree of control, see the ``customization macros'' section below.
+% \item[usehypreref=\meta{true or false}] Should we set up the document for use
+%   with the \pkgname{hyperref} package or not?  This option influences how we
+%   load the \pkgname{phfnote} package.  If this option is set to |true| (the
+%   default), then the \pkgname{phfnote} package is loaded with
+%   |hyperrefdefs={defer,noemail}|.  This means that the document is set up for
+%   use with \pkgname{hyperref}, although you will still need to say
+%   |\usepackage{hyperref}| somewhere in your preamble.  If |usehyperref=false|,
+%   then the \pkgname{phfnote} package is loaded without any hyperref options.
+% \item[pkgset=\meta{\pkgname{phfnote} package set name}] The \pkgname{phfnote}
+%   package (which we load internally) loads a bunch of standard packages for
+%   your convenience, such as \pkgname{enumitem} or \pkgname{microtype}.  You
+%   can influence this behavior by specifying a ``package set'' to load.  By
+%   default, the |pkgset=extended| package set is loaded.  If you don't want to
+%   load any additional packages beyond those that are strictly necessary, use
+%   |pkgset=none| or |pkgset=minimal|.  See \pkgname{phfnote}'s documentation
+%   for the package option |pkgset=...| for more information and a list of
+%   possible package set names.
 % \end{pkgoptions}
 % 
 % \section{Customization macros}
@@ -289,9 +317,11 @@
 % the section text contents.
 %
 % If you're keen to save more space and compress the spacing between sections
-% you can use:
+% you can redefine the ``before skip'' macro (but see also the
+% |compresssectionfactor=| package option and the
+% |\phfeaSectionSpacingCompressionFactor| macro):
 % \begin{verbatim}
-% \renewcommand\phfeaSectionBeforeSkip{0ex}
+% \renewcommand\phfeaSectionBeforeSkip{0.3ex plus 0.2ex minus 0.1ex}
 % \end{verbatim}
 %
 % \DescribeMacro{\phfeaSectionStyle} The macro |\phfeaSectionStyle| is used to
@@ -340,9 +370,17 @@
 % |\phfeaParagraphBeforeSkip|, |\phfeaParagraphAfterHSkip|,
 % |\phfeaParagraphStyle|, |\phfeaParagraphDecoration|,
 % |\phfeaParagraphDecorationSymbol|.
+%
+% \DescribeMacro{\phfeaSectionSpacingCompressionFactor} To conveniently globally
+% adjust the section and paragraph vertical spacings you can also use the
+% |compresssectionspacing=X| package option, which scales the vertical spacing
+% |\phfSectionBeforeSkip| and |\phfeaParagraphBeforeSkip| by the given factor.
+% Alternatively, you can redefine the macro
+% |\phfeaSectionSpacingCompressionFactor| to the desired compression factor:
+% \begin{verbatim}
+% \renewcommand\phfeaSectionSpacingCompressionFactor{0.7}
+% \end{verbatim}
 % 
-%
-%
 %
 % \StopEventually{\vskip 3cm plus 2cm minus 2cm\relax\PrintChanges
 %     \vskip 3cm plus 2cm minus 2cm\relax\PrintIndex}
@@ -368,15 +406,26 @@
 }
 \DeclareBoolOption[true]{loadtheorems}
 \DeclareBoolOption[true]{sansstyle}
+\DeclareStringOption[1]{compresssectionspacing}
+\DeclareBoolOption[true]{usehyperref}
+\DeclareStringOption[extended]{pkgset}
 \ProcessKeyvalOptions*
 %    \end{macrocode}
 %
 % \paragraph{Load \RevTeX, the base class}
 %
 %    \begin{macrocode}
+\providecommand\phfea@revtexopts{%
+  aps,pra,%
+  notitlepage,reprint,%
+  onecolumn,tightenlines,%
+  superscriptaddress,%
+  nofootinbib%
+}
 \PassOptionsToClass{%
-  aps,prl,notitlepage,reprint,onecolumn,tightenlines,superscriptaddress,%
-  \phfeaopt@ptsize,\phfeaopt@papertype%
+  \phfea@revtexopts,%
+  \phfeaopt@ptsize,%
+  \phfeaopt@papertype,%
 }{revtex4-2}
 \LoadClass{revtex4-2}
 %    \end{macrocode}
@@ -385,14 +434,24 @@
 %    \begin{macrocode}
 \PassOptionsToPackage{%
   preset=reset,%
-  pkgset=extended,%
+  pkgset=\phfeaopt@pkgset,%
+  \ifphfeaopt@usehyperref
   hyperrefdefs={defer,noemail},%
+  \fi
 }{phfnote}
-
 \RequirePackage{phfnote}
 %    \end{macrocode}
 %
 %
+% \paragraph{Page geometry}
+%
+% Set a default page geometry.  Works both for A4 paper and for letter paper.
+% It's optimized for 11pt size, though.
+%    \begin{macrocode}
+\RequirePackage{geometry}
+\geometry{hmargin=0.75in,vmargin=0.75in,marginparwidth=0.5in,marginparsep=0.125in}
+%    \end{macrocode}
+% 
 % \paragraph{Default sans serif font}
 %
 % \begin{macro}{\phfeaHeadingStyle}
@@ -434,6 +493,14 @@
 \setcounter{tocdepth}{1}
 %    \end{macrocode}
 %
+% Define a general factor by which the section and paragraph spacings will be
+% compressed.  This macro is set by the |compresssectionspacing=X| package
+% option.
+%    \begin{macrocode}
+\edef\phfeaSectionSpacingCompressionFactor{\phfeaopt@compresssectionspacing}
+%    \end{macrocode}
+% 
+%
 % \begin{macro}{\phfeaSectionBeforeSkip}
 % \begin{macro}{\phfeaSectionAfterHSkip}
 % \begin{macro}{\phfeaSectionStyle}
@@ -441,7 +508,7 @@
 % \begin{macro}{\phfeaSectionDecorationSymbol}
 %   Some helper and customization macros for |\section|.
 %    \begin{macrocode}
-\def\phfeaSectionBeforeSkip{1ex}
+\def\phfeaSectionBeforeSkip{1.5ex plus 0.8ex minus 0.25ex}
 \def\phfeaSectionAfterHSkip{1em}
 \def\phfeaSectionStyle{\normalfont\normalsize\phfeaHeadingStyle\bfseries}
 \ifphfeaopt@sectiondecorations
@@ -469,7 +536,7 @@
 % \begin{macro}{\phfeaParagraphDecorationSymbol}
 %   Same helper and customization macros, now for |\paragraph|.
 %    \begin{macrocode}
-\def\phfeaParagraphBeforeSkip{0.4ex plus 0.1ex minus 0.1ex}
+\def\phfeaParagraphBeforeSkip{0.6ex plus 0.4ex minus 0.1ex}
 \def\phfeaParagraphAfterHSkip{0.75em}
 \def\phfeaParagraphStyle{\normalfont\normalsize\phfeaHeadingStyle\small}
 \ifphfeaopt@paragraphdecorations
@@ -500,8 +567,9 @@
   \@startsection{section}%
   {1}% (level)
   {0pt}% (indent)
-  {\phfeaSectionBeforeSkip}% (beforeskip)
-  {-\dimexpr\phfeaSectionAfterHSkip\relax}% (afterskip)
+  {\phfeaSectionSpacingCompressionFactor
+    \glueexpr\phfeaSectionBeforeSkip\relax}% (beforeskip)
+  {-\glueexpr\phfeaSectionAfterHSkip\relax}% (afterskip)
   {\phfeaSectionStyle}% (style)
   [#1]% (toc title)
   {%
@@ -513,8 +581,9 @@
   \@startsection{paragraph}%
   {2}% (level)
   {0pt}% (indent)
-  {\phfeaParagraphBeforeSkip}% (beforeskip)
-  {-\dimexpr\phfeaParagraphAfterHSkip\relax}% (afterskip)
+  {\phfeaSectionSpacingCompressionFactor
+    \glueexpr\phfeaParagraphBeforeSkip\relax}% (beforeskip)
+  {-\glueexpr\phfeaParagraphAfterHSkip\relax}% (afterskip)
   {\phfeaParagraphStyle}% (style)
   [#1]% (toc title)
   {%
@@ -535,24 +604,53 @@
 %
 % \paragraph{Setup specific for theorems}
 %
-% Create a new theorem style called |extendedabstracthm|.  Then load our
-% \pkgname{phfthm} package.  Make sure we don't load \pkgname{phfthm} if we were
-% asked not to load theorems in the package options.
+% Create a new theorem style called |extendedabstracthm|.  Note that if
+% \pkgname{amsthm} (or similar) wasn't loaded, then |\newtheoremstyle| isn't
+% defined.  In that case, simply don't define the new theorem style.
 %    \begin{macrocode}
-\newtheoremstyle{phfextendedabstractthm}%
-  {0.6ex plus 0.3ex minus 0.1ex}%
-  {0.6ex plus 0.3ex minus 0.1ex}%
-  {\itshape}%
-  {0pt}%
-  {\bfseries\itshape}%
-  {:}%
-  {0.8em}%
-  {\thmname{#1\thmnumber{ #2}\thmnote{ (#3)}}}%
-\ifphfeaopt@loadtheorems
-\PassOptionsToPackage{proofref=false,theoremstyle=phfextendedabstractthm}{phfthm}
-\RequirePackage{phfthm}
+\def\phfeaTheoremBeforeSkip{0.6ex plus 0.4ex minus 0.1ex}
+\def\phfeaTheoremAfterSkip{0.6ex plus 0.4ex minus 0.1ex}
+\ifdefined\newtheoremstyle
+  \newtheoremstyle{phfextendedabstractthm}%
+    {\phfeaSectionSpacingCompressionFactor\glueexpr\phfeaTheoremBeforeSkip\relax}%
+    {\phfeaSectionSpacingCompressionFactor\glueexpr\phfeaTheoremAfterSkip\relax}%
+    {\itshape}%
+    {0pt}%
+    {\bfseries\itshape}%
+    {:}%
+    {0.8em}%
+    {\thmname{#1\thmnumber{ #2}\thmnote{ (#3)}}}%
 \fi
 %    \end{macrocode}
+% Load our \pkgname{phfthm} package.  Make sure we don't load \pkgname{phfthm}
+% if we were asked not to load theorems in the package options.
+%    \begin{macrocode}
+\ifphfeaopt@loadtheorems
+  \ifdefined\newtheoremstyle\else
+    \PackageError{phfextendedabstract}{Impossible to load theorems
+      (loadtheorems=true) because there is no \string\newtheoremstyle\space
+      command that was defined.  Consider setting pkgset= so that a theroems-related
+      package (e.g., amsthm) is loaded! (e.g. pkgset=minimal, pkgset=rich or
+      pkgset=extended)}{}
+  \fi
+  \PassOptionsToPackage{proofref=false,theoremstyle=phfextendedabstractthm}{phfthm}
+  \RequirePackage{phfthm}
+\fi
+%    \end{macrocode}
+%
+% \iffalse
+% \paragraph{References section}
+%
+% Have a simple section for references.  If you'd like to restore \RevTeX'
+% ornament you can simply do |\let\bibsection\rtxapsbibsection|.
+%    \begin{XXXmacrocode}
+%% \let\rtxapsbibsection\bibsection
+%% \def\bibsection{%
+%%   \par\section{\refname}\leavevmode\par\addvspace{4pt}\relax
+%% %%  \par\noindent\rule{6em}{.4pt}\par\addvspace{6pt}\relax
+%% }
+%    \end{XXXmacrocode}
+% \fi
 %
 %
 %\Finale
