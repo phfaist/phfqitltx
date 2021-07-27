@@ -302,26 +302,26 @@
 %
 % \subsection{Vertical spacing}
 %
-% \DescribeMacro{\phfeaVerticalSpacingCompressionFactor} To conveniently
-% globally adjust the vertical spacings in the document (including the section
-% and paragraph vertical spacings, as well as the spacing above and below
-% theorems, itemize, and enumerate environments), you can also use the
-% |compressverticalspacing=X| class option.  Alternatively, you can redefine
-% the macro |\phfeaVerticalSpacingCompressionFactor| to the desired compression
+% \DescribeMacro{\phfeaVerticalSpacingCompressionFactor} \leavevmode\\ To
+% conveniently globally adjust the vertical spacings in the document (including
+% the section and paragraph vertical spacings, as well as the spacing above and
+% below theorems, itemize, and enumerate environments), you can also use the
+% |compressverticalspacing=X| class option.  Alternatively, you can redefine the
+% macro |\phfeaVerticalSpacingCompressionFactor| to the desired compression
 % factor:
 % \begin{verbatim}
 % \renewcommand\phfeaVerticalSpacingCompressionFactor{0.7}
 % \end{verbatim}
 %
-% \DescribeMacro{\phfeaDisplayVerticalSpacingFactorWeight} The vertical spacing
-% factor also affects the vertical spacing around equations, but to a lesser
-% extent. (Compressing the space around the equations by too much would not look
-% nice.) For the spacing between equations, we take the weighted average of $1$
-% and the vertical spacing compression factor, where the weight is given in the
-% macro |\phfeaDisplayVerticalSpacingFactorWeight|.  A weight of |0| means the
-% vertical compression factor doesn't affect the vertical spacing around
-% equations at all; a weight of |1| means the spacing around the equations is
-% scaled exactly by the vertical compression factor.
+% \DescribeMacro{\phfeaDisplayVerticalSpacingFactorWeight} \leavevmode\\ The
+% vertical spacing factor also affects the vertical spacing around equations,
+% but to a lesser extent. (Compressing the space around the equations by too
+% much would not look nice.) For the spacing between equations, we take the
+% weighted average of $1$ and the vertical spacing compression factor, where the
+% weight is given in the macro |\phfeaDisplayVerticalSpacingFactorWeight|.  A
+% weight of |0| means the vertical compression factor doesn't affect the
+% vertical spacing around equations at all; a weight of |1| means the spacing
+% around the equations is scaled exactly by the vertical compression factor.
 %
 %
 % \subsection{List environments}
@@ -592,7 +592,13 @@
 % We only apply a fraction of the scaling, because it's ugly if we compress
 % equations too much.  Define |\phfeaDisplayVerticalSpacingFactorWeight| as $w$ and
 % $\alpha$ as the vertical scaling factor.  The new skips are computed as
-% $(1-w)\phfverb{\oldskip} + w\,\alpha\phfverb{\oldskip}$.
+% \begin{equation*}
+%   \phfverb{oldskip}\quad\rightarrow\quad
+%     (1-w)\,\phfverb{oldskip} + w\,\alpha\,\phfverb{oldskip}\ .
+% \end{equation*}
+% (For $w=0$ we have $\phfverb{oldskip}\rightarrow\phfverb{oldskip}$.  For $w=1$
+% the full scaling factor is applied,
+% $\phfverb{oldskip}\rightarrow \alpha\,\phfverb{oldskip}$.)
 %    \begin{macrocode}
 \def\phfeaDisplayVerticalSpacingFactorWeight{.5}
 %    \end{macrocode}
@@ -709,8 +715,8 @@
   \@startsection{section}%
   {1}% (level)
   {0pt}% (indent)
-  {\phfeaVerticalSpacingCompressionFactor
-    \glueexpr\phfeaSectionBeforeSkip\relax}% (beforeskip)
+  {\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{%
+    \glueexpr\phfeaSectionBeforeSkip\relax}}% (beforeskip)
   {-\glueexpr\phfeaSectionAfterHSkip\relax}% (afterskip)
   {\phfeaSectionStyle}% (style)
   [#1]% (toc title)
@@ -723,8 +729,8 @@
   \@startsection{paragraph}%
   {2}% (level)
   {0pt}% (indent)
-  {\phfeaVerticalSpacingCompressionFactor
-    \glueexpr\phfeaParagraphBeforeSkip\relax}% (beforeskip)
+  {\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{%
+      \glueexpr\phfeaParagraphBeforeSkip\relax}}% (beforeskip)
   {-\glueexpr\phfeaParagraphAfterHSkip\relax}% (afterskip)
   {\phfeaParagraphStyle}% (style)
   [#1]% (toc title)
@@ -767,9 +773,9 @@
 % Apply the spacings.
 %    \begin{macrocode}
   \setlist{%
-    itemsep=\phfeaVerticalSpacingCompressionFactor\glueexpr\phfeaListsItemSep\relax,
-    parsep=\phfeaVerticalSpacingCompressionFactor\glueexpr\phfeaListsParSep\relax,
-    topsep=\phfeaVerticalSpacingCompressionFactor\glueexpr\phfeaListsVerticalSkip\relax,
+    itemsep=\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsItemSep},
+    parsep=\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsParSep},
+    topsep=\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip},
   }%
 %    \end{macrocode}
 % \begin{environment}{enumerate*}
@@ -799,8 +805,8 @@
 %    \begin{macrocode}
 \ifdefined\newtheoremstyle
   \newtheoremstyle{phfextendedabstractthm}%
-    {\phfeaVerticalSpacingCompressionFactor\glueexpr\phfeaListsVerticalSkip\relax}%
-    {\phfeaVerticalSpacingCompressionFactor\glueexpr\phfeaListsVerticalSkip\relax}%
+    {\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip}}%
+    {\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip}}%
     {\itshape}%
     {0pt}%
     {\bfseries\itshape}%
