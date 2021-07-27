@@ -3,7 +3,7 @@
     papertype=a4paper,
 %    sansstyle=false,
 %    sectiondecorations=false,
-%    compresssectionspacing=1,
+%    compressverticalspacing=0.3,
 %    pkgset=none,
 %    loadtheorems=false,
 ]{phfextendedabstract}
@@ -12,6 +12,7 @@
 
 %\geometry{margin=0.3in}
 
+%\def\phfeaDisplayVerticalSpacingFactorWeight{0.}
 
 %\usepackage{amssymb}
 
@@ -88,7 +89,15 @@ The proof is an elementary application of Gromov's $T$-property of
 $(\epsilon,\eta)$-elevated maps.
 
 \paragraph{Another part of the result---}
-\lipsum[4-5]
+\lipsum[4]
+So we have:
+\begin{align}
+  a = b + \int_0^\infty f(x)\,dx\ .
+\end{align}
+(Additionally, \texttt{\the\abovedisplayskip, \the\belowdisplayskip,
+  \the\abovedisplayshortskip, \the\belowdisplayshortskip}.)
+
+\lipsum[5]
 \marginpar{A margin note.}
 
 
@@ -108,6 +117,28 @@ quam.   So here are our additional results.
 \lipsum[8]
 
 And so that was some discussion\footnote{Let's check that footnotes work, too} to be done.\marginpar{What if we'd like a margin note?}
+
+We can also check that:
+\begin{itemize}
+\item Itemization lists look okay;
+\item Itemization lists can have a second point;
+\item \ldots as well as a third point.
+\end{itemize}
+
+Finally, enumeration environments
+\begin{enumerate}
+\item Can have one;
+\item two;
+\item \ldots and three points.
+\end{enumerate}
+
+We can also have inline enumeration environments that have
+\begin{enumerate*}[label=\textbf{(\roman*)},itemjoin*={{ \ldots\ and }}]
+\item one;
+\item two;
+\item even three
+\end{enumerate*}
+points!
 
 \section{Outlook.}
 \lipsum[9]

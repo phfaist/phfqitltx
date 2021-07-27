@@ -206,10 +206,15 @@
 %   (Simply call |\geometry{...}| from the \pkgname{geometry} package if you'd
 %   like to further change them.)
 %
+% \item Lists, i.e.\@ itemization and enumeration environments, are customized
+%   so they take less space.  You also get a |enumerate*| environment that
+%   typesets its items in-line, in a single paragraph.
+%
 % \item By default a customized theorem style so that it stands out but also so
 %   that it contrasts well with the section and paragraph headings.
 %
 % \end{itemize}
+%
 %
 % \section{Usage}
 %
@@ -251,13 +256,14 @@
 %   outlined triangle typeset in the margin of the section heading.
 % \item[noheadingdecorations] Shorthand for
 %   |sectiondecorations=false,paragraphdecorations=false|.
-% \item[compresssectionspacing=\meta{factor}] Real factor by which to multiply
-%   the spacing between sections.  If you need to compress the sections a bit to
-%   fit more content on a fixed number of pages (e.g.\@ because of page number
-%   constraints), you can set this option to a factor that's less than one.  A
-%   \meta{factor} that's less than one compresses sections together, a
-%   \meta{factor} equal to |1| does nothing, and a \meta{factor} greater than
-%   one expands the sections further apart.
+% \item[compressverticalspacing=\meta{factor}] Real factor by which to multiply
+%   the vertical spacing between sections, paragraphs, theorems, and list
+%   environments such as |itemize| and |enumerate|.  If you need to compress the
+%   sections a bit to fit more content on a fixed number of pages (e.g.\@
+%   because of page number constraints), you can set this option to a factor
+%   that's less than one.  A \meta{factor} that's less than one compresses
+%   sections together, a \meta{factor} equal to |1| does nothing, and a
+%   \meta{factor} greater than one expands the sections further apart.
 % \item[loadtheorems=\meta{true or false}] If |loadtheorems=true| (the default),
 %   then the \pkgname{phfthm} package is loaded with some suitable default
 %   options and a custom theorem style.  (The theorem style
@@ -285,8 +291,77 @@
 %   possible package set names.
 % \end{pkgoptions}
 % 
-% \section{Customization macros}
-% \subsection{Main Title and general headings style}
+%
+% \section{Provided macros and environments}
+%
+% \subsection{Vertical spacing}
+%
+% \DescribeMacro{\phfeaVerticalSpacingCompressionFactor} To conveniently
+% globally adjust the vertical spacings in the document (including the section
+% and paragraph vertical spacings, as well as the spacing above and below
+% theorems, itemize, and enumerate environments), you can also use the
+% |compressverticalspacing=X| package option.  Alternatively, you can redefine
+% the macro |\phfeaVerticalSpacingCompressionFactor| to the desired compression
+% factor:
+% \begin{verbatim}
+% \renewcommand\phfeaVerticalSpacingCompressionFactor{0.7}
+% \end{verbatim}
+%
+% \DescribeMacro{\phfeaDisplayVerticalSpacingFactorWeight} The vertical spacing
+% factor also affects the vertical spacing around equations, but to a lesser
+% extent. (Compressing the space around the equations by too much would not look
+% nice.) For the spacing between equations, we take the weighted average of $1$
+% and the vertical spacing compression factor, where the weight is given in the
+% macro |\phfeaDisplayVerticalSpacingFactorWeight|.  A weight of |0| means the
+% vertical compression factor doesn't affect the vertical spacing around
+% equations at all; a weight of |1| means the spacing around the equations is
+% scaled exactly by the vertical compression factor.
+%
+%
+% \subsection{List environments}
+%
+% \DescribeEnv{enumerate*} This class provides an |enumerate|-like
+% environment which typesets its items inline, as a list.  For example, here is
+% an inline paragraph with (a) one, (b) two, and (c) three points.
+% \iffalse yeah, I cheated for this doc code, whatever \fi
+%
+% The |enumerate*| can be used exactly like you'd use the |enumerate|
+% environment from the \pkgname{enumitem} package, for instance:
+% \begin{verbatim}
+% here is an inline paragraph with \begin{enumerate*}[label=(\alph*)]
+% \item one,
+% \item two,
+% \item three
+% \end{enumerate*}
+% points.
+% \end{verbatim}
+%
+% Check \pkgname{enumitem}'s documentation for inline lists.  You can specify
+% for instance the keys |before={{}}|, |itemjoin={{ }}|, and \relax\relax\relax
+% |itemjoin*={{ and }}| either as an optional argument to
+% |\begin{enumerate*}| \iffalse\end{enumerate*}\fi or using
+% |\setlist|:
+% \begin{verbatim}
+% \setlist[enumerate*]{%
+%   itemjoin*={{ et }}%
+% }
+% \end{verbatim}
+%
+% \DescribeMacro{\phfeaListsVerticalSkip} \DescribeMacro{\phfeaListsItemSep}
+% \DescribeMacro{\phfeaListsParSep} For (non-inline) list environments such as
+% |itemize| and |enumerate|, you can redefine |\phfeaListsVerticalSkip|,
+% |\phfeaListsItemSep|, and |\phfeaListsParSep| to set the |topsep|, |itemsep|
+% and |parsep| properties of all of \pkgname{enumitem}'s list environments.
+% These correspond to the vertical space above and below lists, the space
+% between items, and the space between paragraphs within an item.  All these
+% spacings automatically get compressed according to the
+% |\phfeaVerticalSpacingCompressionFactor|.
+%
+% Note that |\phfeaListsVerticalSkip| is also used for the spacing above and
+% below theorem environments.
+%
+%
+% \subsection{Customization of the main title and general headings style}
 %
 % \DescribeMacro{\phfeaHeadingStyle} The macro |\phfeaHeadingStyle| is defined to be
 % |\sffamily|, unless the |sansstyle=false| package option is provided
@@ -304,7 +379,7 @@
 % \end{verbatim}
 % 
 % 
-% \subsection{Sections and paragraphs}
+% \subsection{Customizing sections and paragraphs}
 %
 % You can customize section and paragraph headings, including spacing and style,
 % by redefining the following macros.
@@ -316,10 +391,10 @@
 % horizontal space between the end of the section heading and the beginning of
 % the section text contents.
 %
-% If you're keen to save more space and compress the spacing between sections
-% you can redefine the ``before skip'' macro (but see also the
-% |compresssectionfactor=| package option and the
-% |\phfeaSectionSpacingCompressionFactor| macro):
+% If you're keen to save more space and compress the vertical spacing between
+% sections you can redefine the ``before skip'' macro (but see also the
+% |compressverticalspacing=| package option and the
+% |\phfeaVerticalSpacingCompressionFactor| macro):
 % \begin{verbatim}
 % \renewcommand\phfeaSectionBeforeSkip{0.3ex plus 0.2ex minus 0.1ex}
 % \end{verbatim}
@@ -371,21 +446,17 @@
 % |\phfeaParagraphStyle|, |\phfeaParagraphDecoration|,
 % |\phfeaParagraphDecorationSymbol|.
 %
-% \DescribeMacro{\phfeaSectionSpacingCompressionFactor} To conveniently globally
-% adjust the section and paragraph vertical spacings you can also use the
-% |compresssectionspacing=X| package option, which scales the vertical spacing
-% |\phfSectionBeforeSkip| and |\phfeaParagraphBeforeSkip| by the given factor.
-% Alternatively, you can redefine the macro
-% |\phfeaSectionSpacingCompressionFactor| to the desired compression factor:
-% \begin{verbatim}
-% \renewcommand\phfeaSectionSpacingCompressionFactor{0.7}
-% \end{verbatim}
 % 
 %
 % \StopEventually{\vskip 3cm plus 2cm minus 2cm\relax\PrintChanges
 %     \vskip 3cm plus 2cm minus 2cm\relax\PrintIndex}
 %
+%
+%
 % \section{Implementation}
+%
+% Here come the gory details.
+%
 %
 % \paragraph{Class options}
 % We process these first, to see which options we should pass on to
@@ -406,11 +477,12 @@
 }
 \DeclareBoolOption[true]{loadtheorems}
 \DeclareBoolOption[true]{sansstyle}
-\DeclareStringOption[1]{compresssectionspacing}
+\DeclareStringOption[1]{compressverticalspacing}
 \DeclareBoolOption[true]{usehyperref}
 \DeclareStringOption[extended]{pkgset}
 \ProcessKeyvalOptions*
 %    \end{macrocode}
+%
 %
 % \paragraph{Load \RevTeX, the base class}
 %
@@ -429,8 +501,10 @@
 }{revtex4-2}
 \LoadClass{revtex4-2}
 %    \end{macrocode}
-% 
+%
+%
 % \paragraph{Load \pkgname{phfnote} for the basic document setup}
+%
 %    \begin{macrocode}
 \PassOptionsToPackage{%
   preset=reset,%
@@ -452,6 +526,7 @@
 \geometry{hmargin=0.75in,vmargin=0.75in,marginparwidth=0.5in,marginparsep=0.125in}
 %    \end{macrocode}
 % 
+%
 % \paragraph{Default sans serif font}
 %
 % \begin{macro}{\phfeaHeadingStyle}
@@ -469,6 +544,7 @@
 %    \end{macrocode}
 % \end{macro}
 %
+%
 % \paragraph{Default title format}
 %
 % \begin{macro}{\phfeaTitleStyle}
@@ -479,27 +555,87 @@
 \def\frontmatter@title@format{\phfeaTitleStyle\centering\parskip\z@skip}
 %    \end{macrocode}
 % \end{macro}
-% 
+%
+%
+% \paragraph{Vertical spacing compression factor}
+%
+% Define a general factor by which the section and paragraph spacings will be
+% compressed.  This macro is set by the |compressverticalspacing=X| package
+% option.
+%    \begin{macrocode}
+\edef\phfeaVerticalSpacingCompressionFactor{\phfeaopt@compressverticalspacing}
+%    \end{macrocode}
+%
+% Tool for scaling glue expressions (for use with our vertical compression
+% factor):
+%    \begin{macrocode}
+\def\phfea@scaleglue#1#2{% {factor}{glueexpr}
+  \glueexpr#2*\numexpr\dimexpr#1pt\relax\relax/65536\relax
+}
+\def\phfea@scalegluedpt#1#2{% {factor given as dimexpr in pt}{glueexpr}
+  \glueexpr#2*\numexpr#1\relax/65536\relax
+}
+%    \end{macrocode}
+%
+% Adjust spacing around display equations according to the vertical compression
+% factor.  Do this only at the beginning of the document, since the user might
+% still want to adjust |\phfeaVerticalSpacingCompressionFactor| in their
+% preamble.
+%
+% \begin{macro}{\phfeaDisplayVerticalSpacingFactorWeight}
+% We only apply a fraction of the scaling, because it's ugly if we compress
+% equations too much.  Define |\phfeaDisplayVerticalSpacingFactorWeight| as $w$ and
+% $\alpha$ as the vertical scaling factor.  The new skips are computed as
+% $(1-w)\phfverb{\oldskip} + w\,\alpha\phfverb{\oldskip}$.
+%    \begin{macrocode}
+\def\phfeaDisplayVerticalSpacingFactorWeight{.5}
+%    \end{macrocode}
+% \end{macro}
+% Tool to compute the new spacing for each of the relevant display-related
+% skips:
+%    \begin{macrocode}
+\def\phfea@adjustdisplayskip#1{%
+  #1=\glueexpr
+    \phfea@scalegluedpt{%
+      \dimexpr 1\p@ - \phfeaDisplayVerticalSpacingFactorWeight\p@\relax
+    }{#1}%
+    +
+    \phfea@scaleglue{%
+      \phfeaDisplayVerticalSpacingFactorWeight
+    }{%
+      \phfea@scaleglue{%
+        \phfeaVerticalSpacingCompressionFactor
+      }{%
+        #1
+      }%
+    }%
+    \relax
+}
+%    \end{macrocode}
+% And schedule this adjustment to be carried out at the beginning of the
+% document.
+%    \begin{macrocode}
+\AtBeginDocument{%
+  \phfea@adjustdisplayskip\abovedisplayskip
+  \phfea@adjustdisplayskip\belowdisplayskip
+  \phfea@adjustdisplayskip\abovedisplayshortskip
+  \phfea@adjustdisplayskip\belowdisplayshortskip
+}
+%    \end{macrocode}
+%
+%
 % \paragraph{Setup specific for sectioning}
+%
 % By design, there are only two sectioning levels in a
 % \pkgname{phfextendedabstract} document: sections (|\section|) and paragraphs
 % (|\paragraph|).  Any other sectioning command (e.g., |\subsection|) will
 % produce an error.
-%
 %
 % Neither of these two section levels is numbered.
 %    \begin{macrocode}
 \setcounter{secnumdepth}{0}
 \setcounter{tocdepth}{1}
 %    \end{macrocode}
-%
-% Define a general factor by which the section and paragraph spacings will be
-% compressed.  This macro is set by the |compresssectionspacing=X| package
-% option.
-%    \begin{macrocode}
-\edef\phfeaSectionSpacingCompressionFactor{\phfeaopt@compresssectionspacing}
-%    \end{macrocode}
-% 
 %
 % \begin{macro}{\phfeaSectionBeforeSkip}
 % \begin{macro}{\phfeaSectionAfterHSkip}
@@ -512,15 +648,15 @@
 \def\phfeaSectionAfterHSkip{1em}
 \def\phfeaSectionStyle{\normalfont\normalsize\phfeaHeadingStyle\bfseries}
 \ifphfeaopt@sectiondecorations
-\def\phfeaSectionDecoration{%
-  \raisebox{0.2ex}{{%
-      \notesmaller[0.4]\phfeaSectionDecorationSymbol}}%
-  \hspace*{1.5ex}%
-}
-\def\phfeaSectionDecorationSymbol{\ensuremath{\blacksquare}}
+  \def\phfeaSectionDecoration{%
+    \raisebox{0.2ex}{{%
+        \notesmaller[0.4]\phfeaSectionDecorationSymbol}}%
+    \hspace*{1.5ex}%
+  }
+  \def\phfeaSectionDecorationSymbol{\ensuremath{\blacksquare}}
 \else
-\def\phfeaSectionDecoration{}
-\def\phfeaSectionDecorationSymbol{}
+  \def\phfeaSectionDecoration{}
+  \def\phfeaSectionDecorationSymbol{}
 \fi
 %    \end{macrocode}
 % \end{macro}
@@ -540,15 +676,15 @@
 \def\phfeaParagraphAfterHSkip{0.75em}
 \def\phfeaParagraphStyle{\normalfont\normalsize\phfeaHeadingStyle\small}
 \ifphfeaopt@paragraphdecorations
-\def\phfeaParagraphDecoration{%
-  \raisebox{0.2ex}{{%
-      \notesmaller[0.6]\phfeaParagraphDecorationSymbol}}%
-  \hspace*{1ex}%
-}
-\def\phfeaParagraphDecorationSymbol{\ensuremath{\triangleright}}
+  \def\phfeaParagraphDecoration{%
+    \raisebox{0.2ex}{{%
+        \notesmaller[0.6]\phfeaParagraphDecorationSymbol}}%
+    \hspace*{1ex}%
+  }
+  \def\phfeaParagraphDecorationSymbol{\ensuremath{\triangleright}}
 \else
-\def\phfeaParagraphDecoration{}
-\def\phfeaParagraphDecorationSymbol{}
+  \def\phfeaParagraphDecoration{}
+  \def\phfeaParagraphDecorationSymbol{}
 \fi
 %    \end{macrocode}
 % \end{macro}
@@ -567,7 +703,7 @@
   \@startsection{section}%
   {1}% (level)
   {0pt}% (indent)
-  {\phfeaSectionSpacingCompressionFactor
+  {\phfeaVerticalSpacingCompressionFactor
     \glueexpr\phfeaSectionBeforeSkip\relax}% (beforeskip)
   {-\glueexpr\phfeaSectionAfterHSkip\relax}% (afterskip)
   {\phfeaSectionStyle}% (style)
@@ -581,7 +717,7 @@
   \@startsection{paragraph}%
   {2}% (level)
   {0pt}% (indent)
-  {\phfeaSectionSpacingCompressionFactor
+  {\phfeaVerticalSpacingCompressionFactor
     \glueexpr\phfeaParagraphBeforeSkip\relax}% (beforeskip)
   {-\glueexpr\phfeaParagraphAfterHSkip\relax}% (afterskip)
   {\phfeaParagraphStyle}% (style)
@@ -602,18 +738,63 @@
 %    \end{macrocode}
 %
 %
+% \paragraph{Set up itemization and enumeration environments}
+%
+% Provide customizable lengths for lists via macros (item sep, paragraph sep and
+% vertical skip above and below list environments).
+% \begin{macro}{\phfeaListsVerticalSkip}
+% \begin{macro}{\phfeaListsItemSep}
+% \begin{macro}{\phfeaListsParSep}
+%    \begin{macrocode}
+\def\phfeaListsVerticalSkip{0.6ex plus 0.4ex minus 0.1ex}
+\def\phfeaListsItemSep{0.3ex plus 0.15ex minus 0.1ex}
+\def\phfeaListsParSep{0.7\parskip}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% Prepare the commands to run to configure \pkgname{enumitem} correctly in an
+% internal macro which we will call if \pkgname{enumitem} is indeed loaded.
+%    \begin{macrocode}
+\def\phfea@setup@enumitem{%
+%    \end{macrocode}
+% Apply the spacings.
+%    \begin{macrocode}
+  \setlist{%
+    itemsep=\phfeaVerticalSpacingCompressionFactor\glueexpr\phfeaListsItemSep\relax,
+    parsep=\phfeaVerticalSpacingCompressionFactor\glueexpr\phfeaListsParSep\relax,
+    topsep=\phfeaVerticalSpacingCompressionFactor\glueexpr\phfeaListsVerticalSkip\relax,
+  }%
+%    \end{macrocode}
+% \begin{environment}{enumerate*}
+% Create the |enumerate*| list enumeration environment.
+%    \begin{macrocode}
+  \newlist{enumerate*}{enumerate*}{1}
+  \setlist[enumerate*]{
+    label={(\roman*)},
+    before={},
+    itemjoin={{ }},
+    itemjoin*={{ and }}
+  }%
+}
+%    \end{macrocode}
+% \end{environment}
+% And now, check if \pkgname{enumitem} is loaded and apply the definitions.
+%    \begin{macrocode}
+\@ifpackageloaded{enumitem}{\phfea@setup@enumitem}{}
+%    \end{macrocode}
+% 
+%
 % \paragraph{Setup specific for theorems}
 %
 % Create a new theorem style called |extendedabstracthm|.  Note that if
 % \pkgname{amsthm} (or similar) wasn't loaded, then |\newtheoremstyle| isn't
 % defined.  In that case, simply don't define the new theorem style.
 %    \begin{macrocode}
-\def\phfeaTheoremBeforeSkip{0.6ex plus 0.4ex minus 0.1ex}
-\def\phfeaTheoremAfterSkip{0.6ex plus 0.4ex minus 0.1ex}
 \ifdefined\newtheoremstyle
   \newtheoremstyle{phfextendedabstractthm}%
-    {\phfeaSectionSpacingCompressionFactor\glueexpr\phfeaTheoremBeforeSkip\relax}%
-    {\phfeaSectionSpacingCompressionFactor\glueexpr\phfeaTheoremAfterSkip\relax}%
+    {\phfeaVerticalSpacingCompressionFactor\glueexpr\phfeaListsVerticalSkip\relax}%
+    {\phfeaVerticalSpacingCompressionFactor\glueexpr\phfeaListsVerticalSkip\relax}%
     {\itshape}%
     {0pt}%
     {\bfseries\itshape}%
