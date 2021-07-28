@@ -25,9 +25,9 @@
 
 \renewcommand\phfeaTitleStyle{\bfseries} % default \RevTeX title style
 
-\renewcommand\phfeaParagraphAfterHSkip{1pt}
+\renewcommand\phfeaParagraphAfterHSkip{3pt}
 
-\renewcommand\phfeaParagraphStyle{\itshape}
+%\renewcommand\phfeaParagraphStyle{\itshape}
 
 % \renewcommand\refname{References.}
 % \let\bibsection\rtxapsbibsection
@@ -40,14 +40,12 @@
 
 
 
+% \renewcommand{\phfeaSectionDecorationSymbol}{\Large$\Rightarrow$}
+% \renewcommand{\phfeaParagraphDecorationSymbol}{\raisebox{1pt}{\tiny $>$}}
 
-% \renewcommand{\phfeaSectionDecoration}{%
-%   \raisebox{-0.1ex}{{%
-%     \Large\phfeaSectionDecorationSymbol}}%
-%   \hspace*{2.5ex}%
-% }
-% \renewcommand{\phfeaSectionDecorationSymbol}{$\Rightarrow$}
+%\renewcommand\phfeaSectionFormatHeading[1]{\MakeUppercase{#1}}
 
+\renewcommand\phfeaParagraphFormatHeading[1]{#1\,---}
 
 
 
@@ -78,7 +76,7 @@
 \section{Results.}
 \lipsum[2]
 
-\paragraph{First result---}
+\paragraph{First result}
 \lipsum[3]
 Therefore:
 
@@ -92,7 +90,7 @@ Therefore:
 The proof is an elementary application of Gromov's $T$-property of
 $(\epsilon,\eta)$-elevated maps.
 
-\paragraph{Another part of the result---}
+\paragraph{Another part of the result}
 \lipsum[4]
 So we have:
 \begin{align}
@@ -111,10 +109,10 @@ tincidunt tristique, libero. Vivamus viverra fermentum felis. Donec nonummy
 pellentesque ante. Phasellus adipiscing semper elit. Proin fermentum massa ac
 quam.   So here are our additional results.
 
-\paragraph{Yes, more results---}
+\paragraph{Yes, more results}
 \lipsum[6]
 
-\paragraph{Wow, even more results---}
+\paragraph{Wow, even more results}
 \lipsum[7-9]
 
 \section{Discussion.}
@@ -147,6 +145,34 @@ points!
 \section{Outlook.}
 \lipsum[9]
 
+\section!{Section with no decoration.}%
+How does this look like?
+\lipsum[1]
+
+\paragraph!{Same for paragraphs.}%
+Same here. Does this work?
+
+\section!{} This is actually a new section, but with no decoration and an empty
+title! Also, the spacing should be removed when the section has an empty title
+argument.
+
+\paragraph!{} Same here. Does this work?
+
+\section{} The spacing should also be removed when the section has an empty
+title argument even if we still have the section margin decoration symbol in
+place (pretty fun, isn't it?).
+
+\paragraph{} Same here. Does this work? work? work?
+
+\section*{Starred} \ldots\ versions of the \verb+\section+ and \ldots
+
+\paragraph*{B} the \verb+\paragraph+ commands should also work. Do they?
+
+
+\section!{}\phfeaSectionDecoration{\guillemotright}%
+You can use \verb+\section!{}+ to get the spacing for a section, without
+producing anything.  For instance, you can use it to place your own decoration
+in front of a line that should take the same type of space as a section would.
 
 % typically you'd use \bibliography{bibtexfile}, but for the sake of the example
 % I'll directly use \begin{thebibliography} here instead

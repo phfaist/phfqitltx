@@ -300,6 +300,98 @@
 %
 % \section{Provided macros and environments}
 %
+% \subsection{Sections and paragraphs}
+%
+% \DescribeMacro{\section} \DescribeMacro{\paragraph} This class only provides
+% two sectioning levels: |\section| and |\paragraph|.  Both produce run-in
+% headings.  By default, they also produce a small ``decoration'' in the left
+% margin, to guide the reader's eye through the document's high-level structure.
+%
+% You can disable/enable section and paragraph decorations with the
+% |sectiondecorations|, |paragraphdecorations| and |noheadingdecorations| class
+% options.
+%
+% The |\section| and |\paragraph| also accept a special command form: If they
+% are immediately followed by an exclamation mark (|!|), then they do not
+% produce the corresponding decoration.  E.g.:
+% \begin{verbatim}
+% \section!{A section heading without its decoration}
+% \end{verbatim}
+%
+% Also, section and paragraphs will not produce any horizontal space if the
+% title is empty.  You can use this feature to produce the spacing and
+% decoration of a section, but not the heading:
+% \begin{verbatim}
+% \section{} This line has the vertical spacing and decoration
+% associated with a section, but with no run-in heading.
+%
+% \section!{} This line has the vertical spacing associated
+% with a section, but with no decoration or run-in heading.
+% \end{verbatim}
+%
+% \DescribeMacro{\phfeaSectionDecoration}
+% \DescribeMacro{\phfeaParagraphDecoration} You can use the
+% |\phfeaSectionDecoration{<symbol>}| and |\phfeaParagraphDecoration{<symbol>}|
+% to manually place a section or paragraph decoration at any place.  These
+% commands can be used, for instance, in combination with |\section!{}| to place
+% a section-level line with a different decoration symbol:
+% \begin{verbatim}
+% \section!{}\phfeaSectionDecoration{$\to$} Check out our website at
+% \href{https://github.com/phfaist/phfqitltx}{github.com/phfaist/phfqitltx}
+% \end{verbatim}
+%
+% If the |sectiondecorations=false| class option was specified, the macro
+% |\phfeaSectionDecoration{...}| produces no output.  Similarly,
+% |\phfeaParagraphDecoration{...}| does nothing if |paragraphdecoration=false|
+% was specified.
+%
+% \DescribeMacro{\phfeaSectionDecorationSymbol}
+% \DescribeMacro{\phfeaParagraphDecorationSymbol}
+% The default section and paragraph symbols (including size and vertical
+% adjustments) are stored in the |\phfeaSectionDecorationSymbol| and
+% |\phfeaParagraphDecorationSymbol| macros.  You can redefine these macros to
+% set custom decoration symbols:
+% \begin{verbatim}
+% \renewcommand{\phfeaSectionDecorationSymbol}{\Large$\Rightarrow$}
+% \renewcommand{\phfeaParagraphDecorationSymbol}{\raisebox{1pt}{\tiny $>$}}
+% \end{verbatim}
+%
+% You can customize section and paragraph headings, including spacing and style,
+% by redefining the following macros.
+%
+% \DescribeMacro{\phfeaSectionBeforeSkip}
+% \DescribeMacro{\phfeaSectionAfterHSkip} The macro |\phfeaSectionBeforeSkip|
+% (it's a macro, not a length) is used to specify the vertical spacing before a
+% new section heading.  The macro (not length) |\phfeaSectionAfterHSkip| is the
+% horizontal space between the end of the section heading and the beginning of
+% the section text contents.  You can redefine these macros to set your custom
+% spacings.  (If you're looking to compress the vertical spacings to save on the
+% number of pages, look at the |compressverticalspacings=| class option and the
+% |\phfeaVerticalSpacingCompressionFactor| macro).
+%
+% \DescribeMacro{\phfeaParagraphBeforeSkip}
+% \DescribeMacro{\phfeaParagraphAfterHSkip} The macros
+% |\phfeaParagraphBeforeSkip| and |\phfeaParagraphAfterHSkip| behave similarly
+% for paragraphs.
+%
+% \DescribeMacro{\phfeaSectionStyle} \DescribeMacro{\phfeaParagraphStyle} The
+% macros |\phfeaSectionStyle| and |\phfeaParagraphStyle| are used to set the
+% style of the section and paragraph headings.  By default, the default
+% sans/heading style is used at the normal size and in bold face series for
+% sections, and the normal sans style is used at a smaller size for paragraph
+% headings.
+%
+% \DescribeMacro{\phfeaSectionFormatHeading}
+% \DescribeMacro{\phfeaParagraphFormatHeading} The macros
+% |\phfeaSectionFormatHeading{...}| and |\phfeaParagraphFormatHeading{...}| can
+% be redefined to format the section and paragraph headings, respectively.  You
+% can redefine these macros to add punctuation, to capitalize the title, etc.
+% For instance:
+% \begin{verbatim}
+% \renewcommand\phfeaSectionFormatHeading[1]{\MakeUppercase{#1}\ ---}
+% \end{verbatim}
+%
+%
 % \subsection{Vertical spacing}
 %
 % \DescribeMacro{\phfeaVerticalSpacingCompressionFactor} \leavevmode\\ To
@@ -395,76 +487,10 @@
 % \begin{verbatim}
 % \renewcommand\phfeaTitleStyle{\bfseries}
 % \end{verbatim}
-% 
-% 
-% \subsection{Customizing sections and paragraphs}
 %
-% You can customize section and paragraph headings, including spacing and style,
-% by redefining the following macros.
 %
-% \DescribeMacro{\phfeaSectionBeforeSkip}
-% \DescribeMacro{\phfeaSectionAfterHSkip} The macro |\phfeaSectionBeforeSkip|
-% (it's a macro, not a length) is used to specify the vertical spacing before a
-% new section heading.  The macro (not length) |\phfeaSectionAfterHSkip| is the
-% horizontal space between the end of the section heading and the beginning of
-% the section text contents.
 %
-% If you're keen to save more space and compress the vertical spacing between
-% sections you can redefine the ``before skip'' macro (but see also the
-% |compressverticalspacing=| class option and the
-% |\phfeaVerticalSpacingCompressionFactor| macro):
-% \begin{verbatim}
-% \renewcommand\phfeaSectionBeforeSkip{0.3ex plus 0.2ex minus 0.1ex}
-% \end{verbatim}
 %
-% \DescribeMacro{\phfeaSectionStyle} The macro |\phfeaSectionStyle| is used to
-% set the style of the section headings.  By default, the default sans/heading
-% style is used at the normal size and in bold face series.
-%
-% \DescribeMacro{\phfeaSectionDecoration}
-% \DescribeMacro{\phfeaSectionDecorationSymbol} By default, section headings are
-% ``decorated'' with a black square in the margin, to guide the reader's eye
-% through the document's high-level structure.  You can customize this
-% decoration by redefining the macros |\phfeaSectionDecoration| and
-% |\phfeaSectionDecorationSymbol|.
-%
-% If the |sectiondecorations=false| class option was specified, the macros
-% |\phfeaSectionDecoration| and |\phfeaSectionDecorationSymbol| are defined to
-% be empty.
-%
-% If you simply want to change the decoration symbol (say change it to a star),
-% you can redefine |\phfeaSectionDecorationSymbol| as follows:
-% \begin{verbatim}
-% \renewcommand{\phfeaSectionDecorationSymbol}{$\star$}
-% \end{verbatim}
-% If you want greater control over the decoration you can redefine
-% |\phfeaSectionDecoration| instead (e.g., to change the spacing, vertical
-% alignment, etc., of the decoration).  The contents of the macro
-% |\pheaSectionDecoration| will be typeset in a zero-width right-aligned box
-% which is anchored to the beginning of the section heading.  E.g.:
-% \begin{verbatim}
-% \renewcommand{\phfeaSectionDecoration}{%
-%   \raisebox{-0.1ex}{{%
-%     \Large\phfeaSectionDecorationSymbol}}%
-%   \hspace*{2.5ex}%
-% }
-% \renewcommand{\phfeaSectionDecorationSymbol}{$\Rightarrow$}
-% \end{verbatim}
-%
-% By default, the macro |\phfeaSectionDecoration| calls the macro
-% |\phfeaSectionDecorationSymbol|, so if you redefine the former without calling
-% the latter, the latter won't be used at all.
-%
-% \needspace{5\baselineskip} \DescribeMacro{\phfeaParagraphBeforeSkip}
-% \DescribeMacro{\phfeaParagraphAfterHSkip} \DescribeMacro{\phfeaParagraphStyle}
-% \DescribeMacro{\phfeaParagraphDecoration}
-% \DescribeMacro{\phfeaParagraphDecorationSymbol} You can customize paragraphs
-% in the exact same way as sections, with the corresponding macros
-% |\phfeaParagraphBeforeSkip|, |\phfeaParagraphAfterHSkip|,
-% |\phfeaParagraphStyle|, |\phfeaParagraphDecoration|,
-% |\phfeaParagraphDecorationSymbol|.
-%
-% 
 %
 % \StopEventually{\vskip 3cm plus 2cm minus 2cm\relax\PrintChanges
 %     \vskip 3cm plus 2cm minus 2cm\relax\PrintIndex}
@@ -679,16 +705,15 @@
 \def\phfeaSectionBeforeSkip{1.5ex plus 0.8ex minus 0.25ex}
 \def\phfeaSectionAfterHSkip{1em}
 \def\phfeaSectionStyle{\normalfont\normalsize\phfeaHeadingStyle\bfseries}
+\def\phfeaSectionFormatHeading#1{#1}
+\def\phfeaSectionDecorationSymbol{%
+  \raisebox{0.2ex}{{\notesmaller[0.4]{\ensuremath{\blacksquare}}}}}
 \ifphfeaopt@sectiondecorations
-  \def\phfeaSectionDecoration{%
-    \raisebox{0.2ex}{{%
-        \notesmaller[0.4]\phfeaSectionDecorationSymbol}}%
-    \hspace*{1.5ex}%
+  \def\phfeaSectionDecoration#1{%
+    \makebox[\z@][r]{{#1}\hspace*{1.5ex}}%
   }
-  \def\phfeaSectionDecorationSymbol{\ensuremath{\blacksquare}}
 \else
-  \def\phfeaSectionDecoration{}
-  \def\phfeaSectionDecorationSymbol{}
+  \def\phfeaSectionDecoration#1{}
 \fi
 %    \end{macrocode}
 % \end{macro}
@@ -707,16 +732,15 @@
 \def\phfeaParagraphBeforeSkip{0.6ex plus 0.4ex minus 0.1ex}
 \def\phfeaParagraphAfterHSkip{0.75em}
 \def\phfeaParagraphStyle{\normalfont\normalsize\phfeaHeadingStyle\small}
+\def\phfeaParagraphFormatHeading#1{#1}
+\def\phfeaParagraphDecorationSymbol{%
+  \raisebox{0.2ex}{{\notesmaller[0.6]{\ensuremath{\triangleright}}}}}
 \ifphfeaopt@paragraphdecorations
-  \def\phfeaParagraphDecoration{%
-    \raisebox{0.2ex}{{%
-        \notesmaller[0.6]\phfeaParagraphDecorationSymbol}}%
-    \hspace*{1ex}%
+  \def\phfeaParagraphDecoration#1{%
+    \makebox[\z@][r]{{#1}\hspace*{1ex}}%
   }
-  \def\phfeaParagraphDecorationSymbol{\ensuremath{\triangleright}}
 \else
-  \def\phfeaParagraphDecoration{}
-  \def\phfeaParagraphDecorationSymbol{}
+  \def\phfeaParagraphDecoration#1{}
 \fi
 %    \end{macrocode}
 % \end{macro}
@@ -729,34 +753,66 @@
 % \begin{macro}{\paragraph}
 %   Redefine |\section| and |\paragraph| for formatting.  Observe that
 %   |\section| and |\paragraph| have no optional argument and no starred
-%   variant.
+%   variant.  Also define |\section!| and |\paragraph!| that remove the
+%   decoration.  In all cases, the indent is removed if the main argument
+%   (section/paragraph title) is an empty argument.  Also accept a starred
+%   version, just in case someone/a package/... used |\section*| to produce a
+%   section heading; |\section*| is the same as |\section|.
 %    \begin{macrocode}
-\renewcommand\section[1]{%
+\newif\ifphfea@showdecoration
+\def\section{\@ifnextchar!\phfea@sectionbang\phfea@section}
+\def\phfea@section{\phfea@showdecorationtrue\phfea@section@}
+\def\phfea@sectionbang!{\phfea@showdecorationfalse\phfea@section@}
+\def\phfea@section@{\@ifstar\phfea@section@@\phfea@section@@}
+\def\phfea@section@@#1{%
   \@startsection{section}%
   {1}% (level)
   {0pt}% (indent)
   {\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{%
     \glueexpr\phfeaSectionBeforeSkip\relax}}% (beforeskip)
-  {-\glueexpr\phfeaSectionAfterHSkip\relax}% (afterskip)
+  {\if\relax\detokenize{#1}\relax
+     \z@
+   \else
+     -\glueexpr\phfeaSectionAfterHSkip\relax
+   \fi}% (afterskip)
   {\phfeaSectionStyle}% (style)
   [#1]% (toc title)
   {%
-    \texorpdfstring{\makebox[0pt][r]{\phfeaSectionDecoration}}{}%
-    #1%
+    \ifphfea@showdecoration
+      \texorpdfstring{\phfeaSectionDecoration\phfeaSectionDecorationSymbol}{}%
+    \fi
+    \if\relax\detokenize{#1}\relax\else
+      \texorpdfstring{\phfeaSectionFormatHeading{#1}}{#1}%
+    \fi
   }% (title)
 }
-\renewcommand\paragraph[1]{%
+%    \end{macrocode}
+% 
+%    \begin{macrocode}
+\def\paragraph{\@ifnextchar!\phfea@paragraphbang\phfea@paragraph}
+\def\phfea@paragraph{\phfea@showdecorationtrue\phfea@paragraph@}
+\def\phfea@paragraphbang!{\phfea@showdecorationfalse\phfea@paragraph@}
+\def\phfea@paragraph@{\@ifstar\phfea@paragraph@@\phfea@paragraph@@}
+\def\phfea@paragraph@@#1{%
   \@startsection{paragraph}%
   {2}% (level)
   {0pt}% (indent)
   {\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{%
       \glueexpr\phfeaParagraphBeforeSkip\relax}}% (beforeskip)
-  {-\glueexpr\phfeaParagraphAfterHSkip\relax}% (afterskip)
+  {\if\relax\detokenize{#1}\relax
+     \z@
+   \else
+     -\glueexpr\phfeaParagraphAfterHSkip\relax
+   \fi}% (afterskip)
   {\phfeaParagraphStyle}% (style)
   [#1]% (toc title)
   {%
-    \texorpdfstring{\makebox[0pt][r]{\phfeaParagraphDecoration}}{}%
-    #1%
+    \ifphfea@showdecoration
+      \texorpdfstring{\phfeaParagraphDecoration\phfeaParagraphDecorationSymbol}{}%
+    \fi
+    \if\relax\detokenize{#1}\relax\else
+      \texorpdfstring{\phfeaParagraphFormatHeading{#1}}{}%
+    \fi
   }% (title)
 }
 %    \end{macrocode}
