@@ -224,24 +224,41 @@
 %
 % \section{Usage}
 %
-% Here's a minimal usage template:
+% Here's a simple template:
 % \begin{verbatim}
 % \documentclass[papertype=a4paper]{phfextendedabstract}
+%
 % \usepackage{hyperref}
+%
 % \begin{document}
 % \title{Title goes here}
 % \author{Author 1}
-% %\affiliation{...}
 % \author{Author 2}
-% %\affiliation{...}
-% %\date{July 27, 2021}
 % \maketitle
 % 
-% \section{Introduction}
+% \section{Introduction.}
+% Lorem ipsum ...
+%
+% \section{Results.}
+% We had some cool results about
+% \begin{enumerate*} % inline enumeration
+% \item a first result,
+% \item a second result, % and
+% \item a final result.
+% \end{enumerate*}
+%
+% \paragraph{First result.}
+% Here's a first result ...
+%
+% \paragraph{Second result.}
+% Here's another result ...
+%
 % ...
 %
 % \end{document}
 % \end{verbatim}
+%
+% (Try it out!)
 %
 %
 % \section{Class options}
@@ -304,14 +321,16 @@
 %
 % \DescribeMacro{\section} \DescribeMacro{\paragraph} This class only provides
 % two sectioning levels: |\section| and |\paragraph|.  Both produce run-in
-% headings.  By default, they also produce a small ``decoration'' in the left
+% headings.
+%
+% By default, sections and paragraphs produce a small ``decoration'' in the left
 % margin, to guide the reader's eye through the document's high-level structure.
 %
 % You can disable/enable section and paragraph decorations with the
 % |sectiondecorations|, |paragraphdecorations| and |noheadingdecorations| class
 % options.
 %
-% The |\section| and |\paragraph| also accept a special command form: If they
+% The |\section| and |\paragraph| macros also accept a special syntax: If they
 % are immediately followed by an exclamation mark (|!|), then they do not
 % produce the corresponding decoration.  E.g.:
 % \begin{verbatim}
@@ -390,6 +409,10 @@
 % \begin{verbatim}
 % \renewcommand\phfeaSectionFormatHeading[1]{\MakeUppercase{#1}\ ---}
 % \end{verbatim}
+%
+% The macros |\phfeaSectionFormatHeading{...}| and
+% |\phfeaParagraphFormatHeading{...}| are not called if the section/paragraph
+% title argument is empty.
 %
 %
 % \subsection{Vertical spacing}
@@ -516,8 +539,8 @@
 \DeclareBoolOption[true]{sectiondecorations}
 \DeclareBoolOption[true]{paragraphdecorations}
 \DeclareVoidOption{noheadingdecorations}{%
-  \ifphfeaopt@sectiondecorationsfalse
-  \ifphfeaopt@paragraphdecorationsfalse
+  \phfeaopt@sectiondecorationsfalse
+  \phfeaopt@paragraphdecorationsfalse
 }
 \DeclareBoolOption[true]{loadtheorems}
 \DeclareBoolOption[true]{sansstyle}
@@ -554,7 +577,7 @@
   preset=reset,%
   pkgset=\phfeaopt@pkgset,%
   \ifphfeaopt@usehyperref
-  hyperrefdefs={defer,noemail},%
+    hyperrefdefs={defer,noemail},%
   \fi
 }{phfnote}
 \RequirePackage{phfnote}
@@ -580,10 +603,9 @@
 %   for section headings and the main title.
 %    \begin{macrocode}
 \ifphfeaopt@sansstyle
-%%\RequirePackage[semibold]{sourcesanspro}
-\def\phfeaHeadingStyle{\sffamily}
+  \def\phfeaHeadingStyle{\sffamily}
 \else
-\def\phfeaHeadingStyle{}
+  \def\phfeaHeadingStyle{}
 \fi
 %    \end{macrocode}
 % \end{macro}
