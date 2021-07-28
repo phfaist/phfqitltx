@@ -323,6 +323,14 @@
 % vertical spacing around equations at all; a weight of |1| means the spacing
 % around the equations is scaled exactly by the vertical compression factor.
 %
+% \DescribeMacro{\phfeaDefineTheoremStyle} Note: because the theorem style
+% |phfextendedabstracthm| is defined when the class is loaded, any customization
+% of |\phfeaVerticalSpacingCompressionFactor| and |\phfeaListsVerticalSkip| that
+% happen later in the preamble aren't taken into account.  If you customize
+% these quantities in your preamble, you should call |\phfeaDefineTheoremStyle|
+% to redefine the theorem style after your customization.
+%
+%
 % \DescribeMacro{\phfeaParskipVerticalSpacingFactorWeight} \leavevmode\\ A
 % similar mechanism happens for how we adjust |\parskip|, the spacing between
 % paragraphs.
