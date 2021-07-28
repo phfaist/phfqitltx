@@ -773,9 +773,9 @@
 % Apply the spacings.
 %    \begin{macrocode}
   \setlist{%
-    itemsep=\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsItemSep},
-    parsep=\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsParSep},
-    topsep=\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip},
+    itemsep={\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsItemSep}},
+    parsep={\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsParSep}},
+    topsep={\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip}},
   }%
 %    \end{macrocode}
 % \begin{environment}{enumerate*}
@@ -799,11 +799,16 @@
 %
 % \paragraph{Setup specific for theorems}
 %
+% \emph{BUG: \phfverb{\phfeaListsVerticalSkip} is evaluated at this point when
+% defining the new theorem style, ignoring any later redefinition by the user in
+% their preamble.  I'm not sure how to fix this.}
+%
 % Create a new theorem style called |extendedabstracthm|.  Note that if
 % \pkgname{amsthm} (or similar) wasn't loaded, then |\newtheoremstyle| isn't
-% defined.  In that case, simply don't define the new theorem style.
+% defined.  In that case, we simply won't define the new theorem style right
+% now.
 %    \begin{macrocode}
-\ifdefined\newtheoremstyle
+\def\phfeaDefineTheoremStyle{%
   \newtheoremstyle{phfextendedabstractthm}%
     {\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip}}%
     {\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip}}%
@@ -812,12 +817,16 @@
     {\bfseries\itshape}%
     {:}%
     {0.8em}%
-    {\thmname{#1\thmnumber{ #2}\thmnote{ (#3)}}}%
-\fi
+    {\thmname{##1\thmnumber{ ##2}\thmnote{ (##3)}}}%
+}
 %    \end{macrocode}
-% Load our \pkgname{phfthm} package.  Make sure we don't load \pkgname{phfthm}
-% if we were asked not to load theorems in the class options.
+% Ensure we create our new theorem style (only if |\newtheoremstyle| is
+% available) and load our \pkgname{phfthm} package.  Make sure we don't load
+% \pkgname{phfthm} if we were asked not to load theorems in the class options.
 %    \begin{macrocode}
+\ifdefined\newtheoremstyle
+  \phfeaDefineTheoremStyle
+\fi
 \ifphfeaopt@loadtheorems
   \ifdefined\newtheoremstyle\else
     \PackageError{phfextendedabstract}{Impossible to load theorems
