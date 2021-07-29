@@ -292,22 +292,21 @@
 % \item[noheadingdecorations] Shorthand for
 %   |sectiondecorations=false,paragraphdecorations=false|.
 % \item[compressverticalspacing=\meta{factor}] Real factor by which to multiply
-%   the vertical spacing between sections, paragraphs, theorems, and list
-%   environments such as |itemize| and |enumerate|.  If you need to compress the
-%   sections a bit to fit more content on a fixed number of pages (e.g.\@
-%   because of page number constraints), you can set this option to a factor
-%   that's less than one.  A \meta{factor} that's less than one compresses
-%   sections together, a \meta{factor} equal to |1| does nothing, and a
-%   \meta{factor} greater than one expands the sections further apart.
+%   the vertical spacing between sections, paragraphs, theorems, paragraphs, and
+%   list environments such as |itemize| and |enumerate|.  If you need to
+%   compress the sections a bit to fit more content on a fixed number of pages
+%   (e.g.\@ because of page number constraints), you can set this option to a
+%   factor that's less than one.  A \meta{factor} that's less than one
+%   compresses sections together, a \meta{factor} equal to |1| does nothing, and
+%   a \meta{factor} greater than one expands the sections further apart.
 % \item[loadtheorems=\meta{true or false}] If |loadtheorems=true| (the default),
 %   then the \pkgname{phfthm} package is loaded with some suitable default
 %   options and a custom theorem style.  (The theorem style
-%   |phfextendedabstractthm| is always defined, regardless of this package
-%   option.)
+%   |phfextendedabstractthm| is defined regardless of this package option.)
 % \item[sansstyle=\meta{true or false}] Use sans serif style by default for the
 %   main title as well as for section and paragraph headings.  For greater
 %   degree of control, see the ``customization macros'' section below.
-% \item[usehypreref=\meta{true or false}] Should we set up the document for use
+% \item[usehyperref=\meta{true or false}] Should we set up the document for use
 %   with the \pkgname{hyperref} package or not?  This option influences how we
 %   load the \pkgname{phfnote} package.  If this option is set to |true| (the
 %   default), then the \pkgname{phfnote} package is loaded with
@@ -315,6 +314,10 @@
 %   use with \pkgname{hyperref}, although you will still need to say
 %   |\usepackage{hyperref}| somewhere in your preamble.  If |usehyperref=false|,
 %   then the \pkgname{phfnote} package is loaded without any hyperref options.
+%
+%   (The |noemail| option is specified to \pkgname{phfnote} to avoid
+%   interference with \RevTeX's own |\email| command used to specify email
+%   addresses for individual authors.)
 % \item[pkgset=\meta{\pkgname{phfnote} package set name}] The \pkgname{phfnote}
 %   package (which we load internally) loads a bunch of standard packages for
 %   your convenience, such as \pkgname{enumitem} or \pkgname{microtype}.  You
