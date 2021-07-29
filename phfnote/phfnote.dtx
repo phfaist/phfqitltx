@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfnote}
 %<*package>
-    [2020/05/25 v3.1 phfnote package]
+    [2021/07/29 v3.2 phfnote package]
 %</package>
 %
 %<*driver>
@@ -1064,6 +1064,14 @@
 %   The version of this command by \pkgname{phfnote} is still available as
 %   |\phfnoteEmail|.
 %
+% \item[hyperrefdefs=\pkgoptattrib{noeqref}] Do not redefine the |\eqref|
+%   command to include the parenthesis in the hyperlink.
+%
+%   \changed[chg-hyperref-redefeqref]{v3.2}{2021/07/29}{We now redefine
+%   \phfverb{\eqref} by default to include the parentheses inside the hyperlink.
+%   Use the \texttt{hyperrefdefs\eqsign noeqref} package option to disable this
+%   feature}
+%
 % \item[hyperrefdefs=\pkgoptattrib{noload}] Do not load the \pkgname{hyperref}
 %   package, and don't bother to set any related settings.  However,
 %   \pkgname{url} package is loaded, and the commands |\url| and |\email| are
@@ -1120,8 +1128,8 @@
 %   see \autoref{sec:package-sets}.)
 % \end{pkgnote}
 %
-% The internal name for the link color is |docnotelinkcolor|.  (This is
-% historical, and I'm not going to change it.)
+% The internal name for the link color is |docnotelinkcolor|.  (This name is
+% historical, and I'm not really willing to change it.)
 %
 %
 % \subsection{Bibliography Definitions}
@@ -2862,6 +2870,12 @@
     \phfnote@hyperrefdefs@dopkgoptions
     \RequirePackage{hyperref}}
 \def\phfnote@hyperrefdefs@provideemail{\let\email\phfnote@email}
+\def\phfnote@eqref#1{%
+  \hyperref[{#1}]{\textup{\tagform@{\ref*{#1}}}}%
+}
+\def\phfnote@hyperrefdefs@redefeqref{%
+  \let\eqref\phfnote@eqref
+}
 \def\phfnote@hyperrefdefs@afterhook{}
 %    \end{macrocode}
 %
@@ -2881,8 +2895,12 @@
 \def\phfnote@do@hyperrefdefs@attr@noemail{
   \def\phfnote@hyperrefdefs@provideemail{}
 }
+\def\phfnote@do@hyperrefdefs@attr@noeqref{
+  \def\phfnote@hyperrefdefs@redefeqref{}
+}
 \def\phfnote@do@hyperrefdefs@attr@noload{
   \def\phfnote@hyperrefdefs@loadhyperref{}
+  \def\phfnote@hyperrefdefs@redefeqref{}
   \let\hypersetup\@gobble
 }
 %    \end{macrocode}
@@ -2924,6 +2942,7 @@
     \phfnote@hyperrefdefs@loadhyperref
     \expandafter\hypersetup\expandafter{\phfnote@hyperrefdefs@val@options}
     \phfnote@hyperrefdefs@provideemail
+    \phfnote@hyperrefdefs@redefeqref
     \urlstyle{notesf}
     \phfnote@hyperrefdefs@afterhook
   }
