@@ -841,7 +841,8 @@
 % arguments, let's be careful not to miss any.  Also, we can use the convenient
 % construct |\phfea@ss@getnoexpand{#1}{XyzProperty}| which in this |\edef| will
 % expand to
-% |\noexpand\phfea|\emph{$\langle$}|Section|\emph{\textbar}|Paragraph|\emph{$\rangle$}|XyzProperty|
+% |\noexpand\phfea|\emph{$\langle$}|Section|\emph{\textbar}\relax
+% |Paragraph|\emph{$\rangle$}|XyzProperty|.
 %    \begin{macrocode}
   \edef\x{%
     \noexpand\@startsection{\phfea@ss@levelname{#1}}%
@@ -854,8 +855,11 @@
 % Then comes the \meta{before skip} argument.  Use |\phfea@scaleglue| to account for
 % the vertical compression factor.
 %    \begin{macrocode}
-      {\noexpand\phfea@scaleglue{\noexpand\phfeaVerticalSpacingCompressionFactor}{%
-          \noexpand\glueexpr\phfea@ss@getnoexpand{#1}{BeforeSkip}\noexpand\relax}}%
+      {%
+        \noexpand\phfea@scaleglue{\noexpand\phfeaVerticalSpacingCompressionFactor}{%
+          \noexpand\glueexpr\phfea@ss@getnoexpand{#1}{BeforeSkip}\noexpand\relax
+        }%
+      }%
 %    \end{macrocode}
 % Then comes the \meta{after skip} argument.  Set the after skip to zero if the
 % title is empty, otherwise specify the given
@@ -885,7 +889,8 @@
 %    \end{macrocode}
 % An optional |*| indicates the starred version of the sectioning commands.  If
 % the user increased the |secnumcounter| to have numbered sections, then the
-% starred variant gives no section number.
+% starred variant gives a section heading without any section number or TOC
+% entry.
 %    \begin{macrocode}
       \IfBooleanT{#2}{*}%
 %    \end{macrocode}
@@ -894,7 +899,7 @@
 % specifying by default the main title argument |#5| (non-starred variant) or an
 % empty argument (for a starred variant).  We do this because otherwise,
 % |\@startsection| will copy all the other commands we add in its argument
-% (decoration, title formatting, etc.) and will write them to the AUX file.
+% (e.g., title formatting, etc.) and will write them to the AUX file.
 %    \begin{macrocode}
       \IfValueTF{#4}{[\the\phfea@ss@alttitle]}{%
         \IfBooleanTF{#2}{[]}{[#5]}%
@@ -916,7 +921,7 @@
         \fi
       }%
   }%
-%  \message{**** EMITTING @startsection: |\detokenize\expandafter{\x}| ***}%
+  %\message{**** EMITTING @startsection: |\detokenize\expandafter{\x}| ***}%
   \x
 }
 %    \end{macrocode}
@@ -939,9 +944,9 @@
   \ClassError{phfextendedabstract}{%
     %
     There is no `\string#1' command in `phfextendedabstract' documents.  You can
-    only use `\string\section` and `\string\paragraph'.  If you find yourself
+    only use `\string\section' and `\string\paragraph'.  If you find yourself
     needing additional sectioning levels, it might be that your extended
-    abstract is too detailed and you should stick at a higher level description
+    abstract is too detailed and you should stick to a higher level description
     of your results.  If you do need additional section levels, it is likely
     that you will be better off with a different document class.  If you'd like
     to stick with `phfextendedabstract' and you really know what you're doing,
@@ -984,9 +989,12 @@
 % Apply the spacings.
 %    \begin{macrocode}
   \setlist{%
-    itemsep={\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsItemSep}},
-    parsep={\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsParSep}},
-    topsep={\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip}},
+    itemsep={%
+      \phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsItemSep}},
+    parsep={%
+      \phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsParSep}},
+    topsep={%
+      \phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip}},
   }%
 %    \end{macrocode}
 % \begin{environment}{enumerate*}
@@ -1010,10 +1018,6 @@
 %
 % \paragraph{Setup specific for theorems}
 %
-% \emph{BUG: \phfverb{\phfeaListsVerticalSkip} is evaluated at this point when
-% defining the new theorem style, ignoring any later redefinition by the user in
-% their preamble.  I'm not sure how to fix this.}
-%
 % Create a new theorem style called |extendedabstracthm|.  Note that if
 % \pkgname{amsthm} (or similar) wasn't loaded, then |\newtheoremstyle| isn't
 % defined.  In that case, we simply won't define the new theorem style right
@@ -1024,7 +1028,7 @@
     {\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip}}%
     {\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip}}%
     {\itshape}%
-    {0pt}%
+    {\z@}%
     {\bfseries\itshape}%
     {:}%
     {0.8em}%
