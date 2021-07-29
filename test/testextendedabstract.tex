@@ -11,6 +11,8 @@
 
 \usepackage{lipsum}
 
+
+
 %\geometry{margin=0.3in}
 
 \parskip=2pt plus 1pt minus 0pt\relax
@@ -18,6 +20,7 @@
 %\renewcommand\phfeaVerticalSpacingCompressionFactor{0.3} %2.5}
 % \setstretch{1.2}
 
+%\setcounter{secnumdepth}{2}
 
 
 \def\phfeaDisplayVerticalSpacingFactorWeight{1.}
@@ -169,14 +172,21 @@ place (pretty fun, isn't it?).
 
 \section*{Starred} \ldots\ versions of the \verb+\section+ command and \ldots
 
-\paragraph*{the \texttt{\textbackslash paragraph} command} should also work
+\paragraph*{of the \texttt{\textbackslash paragraph} command} should also work
 without any noticeable difference. Do they?
 
 
-\section!{}\phfeaSectionDecoration{\guillemotright}%
-You can use \verb+\section!{}+ to get the spacing for a section, without
-producing anything.  For instance, you can use it to place your own decoration
-in front of a line that should take the same type of space as a section would.
+\section*!{}\phfeaSectionDecoration{\guillemotright}%
+You can use \verb+\section!{}+ (or \verb+\section*!{}+, in case you enabled
+section numbering) to get the spacing for a section, without producing anything.
+For instance, you can use it to place your own decoration in front of a line
+that should take the same type of space as a section would.
+
+
+% We can also test if the table of contents works:
+%
+% \tableofcontents
+
 
 % typically you'd use \bibliography{bibtexfile}, but for the sake of the example
 % I'll directly use \begin{thebibliography} here instead

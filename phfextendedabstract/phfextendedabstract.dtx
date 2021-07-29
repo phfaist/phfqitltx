@@ -73,18 +73,18 @@
   %%\par%
   \endgroup%
 }
-\def\phfeaSectionDecoration{%
+\def\phfeaSectionDecoration{% only for doc purposes
   \raisebox{0.2ex}{{%
       \notesmaller[0.4]\phfeaSectionDecorationSymbol}}%
   \hspace*{1.5ex}%
 }
-\def\phfeaSectionDecorationSymbol{\ensuremath{\blacksquare}}
-\def\phfeaParagraphDecoration{%
+\def\phfeaSectionDecorationSymbol{\ensuremath{\blacksquare}}% only for doc purposes
+\def\phfeaParagraphDecoration{% only for doc purposes
   \raisebox{0.2ex}{{%
       \notesmaller[0.6]\phfeaParagraphDecorationSymbol}}%
   \hspace*{1ex}%
 }
-\def\phfeaParagraphDecorationSymbol{\ensuremath{\triangleright}}
+\def\phfeaParagraphDecorationSymbol{\ensuremath{\triangleright}}% only for doc purposes
 
 \def\eqsign@{=}
 \def\eqsign{\protect\eqsign@}
@@ -398,7 +398,7 @@
 % the section text contents.  You can redefine these macros to set your custom
 % spacings.  (If you're looking to compress the vertical spacings to save on the
 % number of pages, look at the |compressverticalspacings=| class option and the
-% |\phfeaVerticalSpacingCompressionFactor| macro).
+% |\phfeaVerticalSpacingCompressionFactor| macro.)
 %
 % \DescribeMacro{\phfeaParagraphBeforeSkip}
 % \DescribeMacro{\phfeaParagraphAfterHSkip} The macros
@@ -440,6 +440,14 @@
 % \renewcommand\phfeaVerticalSpacingCompressionFactor{0.7}
 % \end{verbatim}
 %
+% \DescribeMacro{\phfeaDefineTheoremStyle} Because the theorem style
+% |phfextendedabstracthm| is defined at the time that the class is loaded, any
+% customization of |\phfeaVerticalSpacingCompressionFactor| and
+% |\phfeaListsVerticalSkip| that happen later in the preamble aren't taken into
+% account.  If you change these values in your preamble, you should call
+% |\phfeaDefineTheoremStyle| to redefine the theorem style after your
+% customization.
+%
 % \DescribeMacro{\phfeaDisplayVerticalSpacingFactorWeight} The
 % vertical spacing factor also affects the vertical spacing around equations,
 % but to a lesser extent. (Compressing the space around the equations by too
@@ -449,14 +457,6 @@
 % weight of |0| means the vertical compression factor doesn't affect the
 % vertical spacing around equations at all; a weight of |1| means the spacing
 % around the equations is scaled exactly by the vertical compression factor.
-%
-% \DescribeMacro{\phfeaDefineTheoremStyle} Note: because the theorem style
-% |phfextendedabstracthm| is defined when the class is loaded, any customization
-% of |\phfeaVerticalSpacingCompressionFactor| and |\phfeaListsVerticalSkip| that
-% happen later in the preamble aren't taken into account.  If you customize
-% these quantities in your preamble, you should call |\phfeaDefineTheoremStyle|
-% to redefine the theorem style after your customization.
-%
 %
 % \DescribeMacro{\phfeaParskipVerticalSpacingFactorWeight} A similar mechanism
 % happens for how we adjust |\parskip|, the spacing between paragraphs.
@@ -580,7 +580,12 @@
 \LoadClass{revtex4-2}
 %    \end{macrocode}
 %
-%
+% We will also need the \pkgname{xparse} command for defining some of our
+% commands.
+%    \begin{macrocode}
+\RequirePackage{xparse}
+%    \end{macrocode}
+% 
 % \paragraph{Load \pkgname{phfnote} for the basic document setup}
 %
 %    \begin{macrocode}
@@ -669,7 +674,8 @@
 % \end{equation*}
 % (For $w=0$ we have $\phfverb{oldskip}\rightarrow\phfverb{oldskip}$.  For $w=1$
 % the full scaling factor is applied,
-% $\phfverb{oldskip}\rightarrow \alpha\,\phfverb{oldskip}$.)
+% $\phfverb{oldskip}\rightarrow \alpha\,\phfverb{oldskip}$.)  By default,
+% $w=1/2$:
 %    \begin{macrocode}
 \def\phfeaDisplayVerticalSpacingFactorWeight{.5}
 %    \end{macrocode}
@@ -784,16 +790,19 @@
 % \end{macro}
 % \end{macro}
 % 
-% Now we redefine |\section| and |\paragraph| for formatting.  Observe that
-% |\section| and |\paragraph| have no optional argument and no starred variant.
-% Also define |\section!| and |\paragraph!| that remove the decoration.  In all
-% cases, the indent is removed if the main argument (section/paragraph title) is
-% an empty argument.  Also accept a starred version, just in case someone/a
-% package/... used |\section*| to produce a section heading; |\section*| is the
-% same as |\section|.
+% Now we redefine |\section| and |\paragraph| for formatting.  Also allow
+% |\section!| and |\paragraph!| that remove the decoration.  In all cases, the
+% indent is removed if the main argument (section/paragraph title) is an empty
+% argument.  We also accept a starred version and an optional argument, and pass
+% those on to |\@startsection|; these options are sometimes useful in order to
+% work around fragile tokens in the title, etc.
 %
-% Start with some generic, common definitions.  The |\phfea@startsection| macro
-% regroups common definitions for both sections and paragraphs.
+% We start with the generic code that will call |\@startsection| for both
+% sections and paragraphs.  The generic code will be given the level number (|1|
+% or |2|) and will produce the correct |\@startsection| code for that level,
+% fetching its information from the correctly named macros.  We first define
+% some simple definitions that specify where to look for those level-specific
+% macros.
 %    \begin{macrocode}
 \def\phfea@ss@levelname#1{\ifcase#1\or section\or paragraph\fi}
 \def\phfea@ss@levelName#1{\ifcase#1\or Section\or Paragraph\fi}
@@ -801,33 +810,103 @@
   \csname phfea\phfea@ss@levelName{#1}#2\endcsname}
 \def\phfea@ss@getnoexpand#1#2{% <levelno><MacroPostfixName>
   \expandafter\noexpand\csname phfea\phfea@ss@levelName{#1}#2\endcsname}
+%    \end{macrocode}
+%
+% \begin{macro}{\phfea@startsection}
+%   We now define the main internal |\phfea@startsection| macro which will
+%   produce the correct |\@startsection| command for the given section level.
+%   The arguments to |\phfea@startsection| are:
+%   \begin{itemize}[itemsep=0pt,topsep=0pt]
+%   \item[\#1:] level number, |1| or |2|;
+%   \item[\#2:] an optional star;
+%   \item[\#3:] an optional |!| character (meaning, don't display the decoration);
+%   \item[\#4:] an optional argument, the alternative title to write in the AUX
+%     file (e.g.\@ for use in the table of contents);
+%   \item[\#5:] a mandatory argument, the title of the section/paragraph.
+%   \end{itemize}
+%    \begin{macrocode}
 \newtoks\phfea@ss@alttitle
 \newtoks\phfea@ss@title
 \NewDocumentCommand{\phfea@startsection}{m s t! o m}{%
+%    \end{macrocode}
+% Store the alternative title and title in token registers.
+%    \begin{macrocode}
   \phfea@ss@alttitle={#4}%
   \phfea@ss@title={#5}%
+%    \end{macrocode}
+% Now define a temporary macro |\x| that will contain the correct code for a
+% call to \LaTeX' low-level |\@startsection| command.  Remember to prefix all
+% macros by |\noexpand| unless they should be expanded in the preparation of
+% that code for |\@startsection|.  \LaTeX' |\@startsection| takes a lot of
+% arguments, let's be careful not to miss any.  Also, we can use the convenient
+% construct |\phfea@ss@getnoexpand{#1}{XyzProperty}| which in this |\edef| will
+% expand to
+% |\noexpand\phfea|\emph{$\langle$}|Section|\emph{\textbar}|Paragraph|\emph{$\rangle$}|XyzProperty|
+%    \begin{macrocode}
   \edef\x{%
     \noexpand\@startsection{\phfea@ss@levelname{#1}}%
-      {#1}% (level)
-      {0pt}% (indent)
+%    \end{macrocode}
+% First come the \meta{level number} and \meta{indent} arguments:
+%    \begin{macrocode}
+      {#1}%
+      {\z@}%
+%    \end{macrocode}
+% Then comes the \meta{before skip} argument.  Use |\phfea@scaleglue| to account for
+% the vertical compression factor.
+%    \begin{macrocode}
       {\noexpand\phfea@scaleglue{\noexpand\phfeaVerticalSpacingCompressionFactor}{%
-          \noexpand\glueexpr\phfea@ss@getnoexpand{#1}{BeforeSkip}\noexpand\relax}}% (beforeskip)
+          \noexpand\glueexpr\phfea@ss@getnoexpand{#1}{BeforeSkip}\noexpand\relax}}%
+%    \end{macrocode}
+% Then comes the \meta{after skip} argument.  Set the after skip to zero if the
+% title is empty, otherwise specify the given
+% |\phfeaSection/ParagraphAfterHSkip| as a negative value to indicate we want a
+% run-in heading.  Note that while the syntax `|1.5\glueexpr...|' doesn't
+% preserve plus/minus stretchability components as it coerces the glue to a
+% dimen, the syntax `|-\glueexpr...|' does preserve these components (presumably
+% because $-1$ is integer?).
+%    \begin{macrocode}
       {\if\relax\detokenize{#5}\relax
           \noexpand\z@
         \else
-          % -\glueexpr... keeps plus/minus parts
           -\noexpand\glueexpr\phfea@ss@getnoexpand{#1}{AfterHSkip}\noexpand\relax
-        \fi}% (afterskip)
-      {\phfea@ss@getnoexpand{#1}{Style}}% (style)
-      \IfBooleanT{#2}{*}% (optional star)
-      \IfValueT{#4}{[\the\phfea@ss@alttitle]}% (alternative title, e.g. for toc)
+        \fi}%
+%    \end{macrocode}
+% The \meta{style} argument to specify the section heading's font style.  We
+% provide a decoration, unless the no-decoration argument (a |!| character) was
+% specified.
+%    \begin{macrocode}
       {%
-        \IfBooleanF{#3}{% don't skip decoration
-          \noexpand\texorpdfstring{%
-            \phfea@ss@getnoexpand{#1}{Decoration}%
-            \phfea@ss@getnoexpand{#1}{DecorationSymbol}%
-          }{}%
+        \IfBooleanF{#3}{%
+          \phfea@ss@getnoexpand{#1}{Decoration}%
+          \phfea@ss@getnoexpand{#1}{DecorationSymbol}%
         }%
+        \phfea@ss@getnoexpand{#1}{Style}%
+      }%
+%    \end{macrocode}
+% An optional |*| indicates the starred version of the sectioning commands.  If
+% the user increased the |secnumcounter| to have numbered sections, then the
+% starred variant gives no section number.
+%    \begin{macrocode}
+      \IfBooleanT{#2}{*}%
+%    \end{macrocode}
+% Now comes the optional \meta{alternative title} argument that will be written
+% to the AUX file.  We always provide this argument to |\@startsection|,
+% specifying by default the main title argument |#5| (non-starred variant) or an
+% empty argument (for a starred variant).  We do this because otherwise,
+% |\@startsection| will copy all the other commands we add in its argument
+% (decoration, title formatting, etc.) and will write them to the AUX file.
+%    \begin{macrocode}
+      \IfValueTF{#4}{[\the\phfea@ss@alttitle]}{%
+        \IfBooleanTF{#2}{[]}{[#5]}%
+      }%
+%    \end{macrocode}
+% Finally, this is the main \meta{section title} argument.  
+% If the title is not empty, we also provide the title wrapped in a
+% corresponding |\phfeaSection/ParagraphFormatHeading| macro call.  Everything
+% should be protected in |\texorpdfstring| calls to avoid \emph{pdflatex} from
+% complaining about invalid junk in PDF bookmark strings.
+%    \begin{macrocode}
+      {%
         \if\relax\detokenize{#5}\relax\else
           \noexpand\texorpdfstring{%
             \phfea@ss@getnoexpand{#1}{FormatHeading}{\the\phfea@ss@title}%
@@ -835,17 +914,17 @@
             \the\phfea@ss@title
           }%
         \fi
-      }% (title)
+      }%
   }%
-  %\message{**** EMITTING SECTION: |\detokenize\expandafter{\x}| ***}%
+%  \message{**** EMITTING @startsection: |\detokenize\expandafter{\x}| ***}%
   \x
 }
 %    \end{macrocode}
+% \end{macro}
 % 
-%
 % \begin{macro}{\section}
 % \begin{macro}{\paragraph}
-%   Define |\section| and |\paragraph| for sectioning levels 1 and 2.
+%   Define |\section| and |\paragraph| as sectioning levels 1 and 2.
 %    \begin{macrocode}
 \def\section{\phfea@startsection{1}}
 \def\paragraph{\phfea@startsection{2}}
