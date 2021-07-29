@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesClass{phfextendedabstract}
 %<*package>
-    [2021/07/26 v0.1 phfextendedabstract class]
+    [2021/07/29 v0.1 phfextendedabstract class]
 %</package>
 %
 %<*driver>
@@ -792,71 +792,69 @@
 % package/... used |\section*| to produce a section heading; |\section*| is the
 % same as |\section|.
 %
+% Start with some generic, common definitions.  The |\phfea@startsection| macro
+% regroups common definitions for both sections and paragraphs.
+%    \begin{macrocode}
+\def\phfea@ss@levelname#1{\ifcase#1\or section\or paragraph\fi}
+\def\phfea@ss@levelName#1{\ifcase#1\or Section\or Paragraph\fi}
+\def\phfea@ss@get#1#2{% <levelno><MacroPostfixName>
+  \csname phfea\phfea@ss@levelName{#1}#2\endcsname}
+\def\phfea@ss@getnoexpand#1#2{% <levelno><MacroPostfixName>
+  \expandafter\noexpand\csname phfea\phfea@ss@levelName{#1}#2\endcsname}
+\newtoks\phfea@ss@alttitle
+\newtoks\phfea@ss@title
+\NewDocumentCommand{\phfea@startsection}{m s t! o m}{%
+  \phfea@ss@alttitle={#4}%
+  \phfea@ss@title={#5}%
+  \edef\x{%
+    \noexpand\@startsection{\phfea@ss@levelname{#1}}%
+      {#1}% (level)
+      {0pt}% (indent)
+      {\noexpand\phfea@scaleglue{\noexpand\phfeaVerticalSpacingCompressionFactor}{%
+          \noexpand\glueexpr\phfea@ss@getnoexpand{#1}{BeforeSkip}\noexpand\relax}}% (beforeskip)
+      {\if\relax\detokenize{#5}\relax
+          \noexpand\z@
+        \else
+          % -\glueexpr... keeps plus/minus parts
+          -\noexpand\glueexpr\phfea@ss@getnoexpand{#1}{AfterHSkip}\noexpand\relax
+        \fi}% (afterskip)
+      {\phfea@ss@getnoexpand{#1}{Style}}% (style)
+      \IfBooleanT{#2}{*}% (optional star)
+      \IfValueT{#4}{[\the\phfea@ss@alttitle]}% (alternative title, e.g. for toc)
+      {%
+        \IfBooleanF{#3}{% don't skip decoration
+          \noexpand\texorpdfstring{%
+            \phfea@ss@getnoexpand{#1}{Decoration}%
+            \phfea@ss@getnoexpand{#1}{DecorationSymbol}%
+          }{}%
+        }%
+        \if\relax\detokenize{#5}\relax\else
+          \noexpand\texorpdfstring{%
+            \phfea@ss@getnoexpand{#1}{FormatHeading}{\the\phfea@ss@title}%
+          }{%
+            \the\phfea@ss@title
+          }%
+        \fi
+      }% (title)
+  }%
+  %\message{**** EMITTING SECTION: |\detokenize\expandafter{\x}| ***}%
+  \x
+}
+%    \end{macrocode}
+% 
+%
 % \begin{macro}{\section}
-%   Start with definitions for |\section|.
-%    \begin{macrocode}
-\newif\ifphfea@showdecoration
-\def\section{\@ifnextchar!\phfea@sectionbang\phfea@section}
-\def\phfea@section{\phfea@showdecorationtrue\phfea@section@}
-\def\phfea@sectionbang!{\phfea@showdecorationfalse\phfea@section@}
-\def\phfea@section@{\@ifstar\phfea@section@@\phfea@section@@}
-\def\phfea@section@@#1{%
-  \@startsection{section}%
-  {1}% (level)
-  {0pt}% (indent)
-  {\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{%
-    \glueexpr\phfeaSectionBeforeSkip\relax}}% (beforeskip)
-  {\if\relax\detokenize{#1}\relax
-     \z@
-   \else
-     -\glueexpr\phfeaSectionAfterHSkip\relax% -\glueexpr... keeps plus/minus parts
-   \fi}% (afterskip)
-  {\phfeaSectionStyle}% (style)
-  [#1]% (toc title)
-  {%
-    \ifphfea@showdecoration
-      \texorpdfstring{\phfeaSectionDecoration\phfeaSectionDecorationSymbol}{}%
-    \fi
-    \if\relax\detokenize{#1}\relax\else
-      \texorpdfstring{\phfeaSectionFormatHeading{#1}}{#1}%
-    \fi
-  }% (title)
-}
-%    \end{macrocode}
-% \end{macro}
-%
 % \begin{macro}{\paragraph}
-%   Produce similar definitions for |\paragraph|.
+%   Define |\section| and |\paragraph| for sectioning levels 1 and 2.
 %    \begin{macrocode}
-\def\paragraph{\@ifnextchar!\phfea@paragraphbang\phfea@paragraph}
-\def\phfea@paragraph{\phfea@showdecorationtrue\phfea@paragraph@}
-\def\phfea@paragraphbang!{\phfea@showdecorationfalse\phfea@paragraph@}
-\def\phfea@paragraph@{\@ifstar\phfea@paragraph@@\phfea@paragraph@@}
-\def\phfea@paragraph@@#1{%
-  \@startsection{paragraph}%
-  {2}% (level)
-  {0pt}% (indent)
-  {\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{%
-      \glueexpr\phfeaParagraphBeforeSkip\relax}}% (beforeskip)
-  {\if\relax\detokenize{#1}\relax
-     \z@
-   \else
-     -\glueexpr\phfeaParagraphAfterHSkip\relax% -\glueexpr... keeps plus/minus parts
-   \fi}% (afterskip)
-  {\phfeaParagraphStyle}% (style)
-  [#1]% (toc title)
-  {%
-    \ifphfea@showdecoration
-      \texorpdfstring{\phfeaParagraphDecoration\phfeaParagraphDecorationSymbol}{}%
-    \fi
-    \if\relax\detokenize{#1}\relax\else
-      \texorpdfstring{\phfeaParagraphFormatHeading{#1}}{}%
-    \fi
-  }% (title)
-}
+\def\section{\phfea@startsection{1}}
+\def\paragraph{\phfea@startsection{2}}
 %    \end{macrocode}
 % \end{macro}
-%
+% \end{macro}
+% 
+% Provide an explanative error message if the user attempts to use
+% |\subsection|, |\subsubsection| or |\subparagraph|.
 %    \begin{macrocode}
 \def\phfea@nosectioncmd#1{%
   \ClassError{phfextendedabstract}{%
