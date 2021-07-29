@@ -30,7 +30,7 @@
 \usepackage{xcolor}
 \usepackage[preset=xpkgdoc]{phfnote}
 \usepackage{needspace}
-\newbox\marginprintmacrobox
+ %\newbox\marginprintmacrobox
 \def\PrintDescribeMacro#1{%
   \strut\MacroFont\footnotesize
   \scalebox{0.78}[1.0]{\string#1}%
@@ -738,7 +738,7 @@
 %   Some helper and customization macros for |\section|.
 %    \begin{macrocode}
 \def\phfeaSectionBeforeSkip{1.5ex plus 0.8ex minus 0.25ex}
-\def\phfeaSectionAfterHSkip{1em}
+\def\phfeaSectionAfterHSkip{1em plus 0.2em}
 \def\phfeaSectionStyle{\normalfont\normalsize\phfeaHeadingStyle\bfseries}
 \def\phfeaSectionFormatHeading#1{#1}
 \def\phfeaSectionDecorationSymbol{%
@@ -765,7 +765,7 @@
 %   Same helper and customization macros, now for |\paragraph|.
 %    \begin{macrocode}
 \def\phfeaParagraphBeforeSkip{0.6ex plus 0.4ex minus 0.1ex}
-\def\phfeaParagraphAfterHSkip{0.75em}
+\def\phfeaParagraphAfterHSkip{0.75em plus 0.15em}
 \def\phfeaParagraphStyle{\normalfont\normalsize\phfeaHeadingStyle\small}
 \def\phfeaParagraphFormatHeading#1{#1}
 \def\phfeaParagraphDecorationSymbol{%
@@ -809,7 +809,7 @@
   {\if\relax\detokenize{#1}\relax
      \z@
    \else
-     -\glueexpr\phfeaSectionAfterHSkip\relax
+     -\glueexpr\phfeaSectionAfterHSkip\relax% -\glueexpr... keeps plus/minus parts
    \fi}% (afterskip)
   {\phfeaSectionStyle}% (style)
   [#1]% (toc title)
@@ -841,7 +841,7 @@
   {\if\relax\detokenize{#1}\relax
      \z@
    \else
-     -\glueexpr\phfeaParagraphAfterHSkip\relax
+     -\glueexpr\phfeaParagraphAfterHSkip\relax% -\glueexpr... keeps plus/minus parts
    \fi}% (afterskip)
   {\phfeaParagraphStyle}% (style)
   [#1]% (toc title)
