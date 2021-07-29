@@ -30,6 +30,18 @@
 \usepackage{xcolor}
 \usepackage[preset=xpkgdoc]{phfnote}
 \usepackage{needspace}
+\newbox\marginprintmacrobox
+\def\PrintDescribeMacro#1{%
+  \strut\MacroFont\footnotesize
+  \scalebox{0.78}[1.0]{\string#1}%
+  %\setbox\marginprintmacrobox=\hbox{\string#1}%
+  %\ifdim\wd\marginprintmacrobox>\marginparwidth\relax
+  %  \scalebox{0.8}[1.0]{\box\marginprintmacrobox}%
+  %\else
+  %  \box\marginprintmacrobox
+  %\fi
+}
+\let\PrintMacroName\PrintDescribeMacro
 \makeatletter
 \newsavebox\phfeaDocVirtualPage@contents
 \newenvironment{phfeaDocVirtualPage}{%
@@ -417,7 +429,7 @@
 %
 % \subsection{Vertical spacing}
 %
-% \DescribeMacro{\phfeaVerticalSpacingCompressionFactor} \leavevmode\\ To
+% \DescribeMacro{\phfeaVerticalSpacingCompressionFactor} To
 % conveniently globally adjust the vertical spacings in the document (including
 % the section and paragraph vertical spacings, as well as the spacing above and
 % below theorems, itemize, and enumerate environments), you can also use the
@@ -428,7 +440,7 @@
 % \renewcommand\phfeaVerticalSpacingCompressionFactor{0.7}
 % \end{verbatim}
 %
-% \DescribeMacro{\phfeaDisplayVerticalSpacingFactorWeight} \leavevmode\\ The
+% \DescribeMacro{\phfeaDisplayVerticalSpacingFactorWeight} The
 % vertical spacing factor also affects the vertical spacing around equations,
 % but to a lesser extent. (Compressing the space around the equations by too
 % much would not look nice.) For the spacing between equations, we take the
@@ -446,9 +458,8 @@
 % to redefine the theorem style after your customization.
 %
 %
-% \DescribeMacro{\phfeaParskipVerticalSpacingFactorWeight} \leavevmode\\ A
-% similar mechanism happens for how we adjust |\parskip|, the spacing between
-% paragraphs.
+% \DescribeMacro{\phfeaParskipVerticalSpacingFactorWeight} A similar mechanism
+% happens for how we adjust |\parskip|, the spacing between paragraphs.
 %
 %
 % \subsection{List environments}
@@ -633,7 +644,7 @@
 %    \end{macrocode}
 %
 % Tool for scaling glue expressions (for use with our vertical compression
-% factor):
+% factor):\footnote{Thanks \url{https://tex.stackexchange.com/a/198966/32188}\,!}
 %    \begin{macrocode}
 \def\phfea@scaleglue#1#2{% {factor}{glueexpr}
   \glueexpr#2*\numexpr\dimexpr#1pt\relax\relax/65536\relax
@@ -695,14 +706,16 @@
 }
 %    \end{macrocode}
 %
-% A similar mechanism affects how we adjust the paragraph skip length
-% |\parskip|.
+% \begin{macro}{\phfeaParskipVerticalSpacingFactorWeight}
+%   A similar mechanism affects how we adjust the paragraph skip length
+%   |\parskip|.
 %    \begin{macrocode}
 \def\phfeaParskipVerticalSpacingFactorWeight{1}
 \AtBeginDocument{%
   \phfea@adjustskipweighted\parskip\phfeaParskipVerticalSpacingFactorWeight
 }
 %    \end{macrocode}
+% \end{macro}
 % 
 % \paragraph{Setup specific for sectioning}
 %
@@ -771,15 +784,16 @@
 % \end{macro}
 % \end{macro}
 % 
+% Now we redefine |\section| and |\paragraph| for formatting.  Observe that
+% |\section| and |\paragraph| have no optional argument and no starred variant.
+% Also define |\section!| and |\paragraph!| that remove the decoration.  In all
+% cases, the indent is removed if the main argument (section/paragraph title) is
+% an empty argument.  Also accept a starred version, just in case someone/a
+% package/... used |\section*| to produce a section heading; |\section*| is the
+% same as |\section|.
+%
 % \begin{macro}{\section}
-% \begin{macro}{\paragraph}
-%   Redefine |\section| and |\paragraph| for formatting.  Observe that
-%   |\section| and |\paragraph| have no optional argument and no starred
-%   variant.  Also define |\section!| and |\paragraph!| that remove the
-%   decoration.  In all cases, the indent is removed if the main argument
-%   (section/paragraph title) is an empty argument.  Also accept a starred
-%   version, just in case someone/a package/... used |\section*| to produce a
-%   section heading; |\section*| is the same as |\section|.
+%   Start with definitions for |\section|.
 %    \begin{macrocode}
 \newif\ifphfea@showdecoration
 \def\section{\@ifnextchar!\phfea@sectionbang\phfea@section}
@@ -809,7 +823,10 @@
   }% (title)
 }
 %    \end{macrocode}
-% 
+% \end{macro}
+%
+% \begin{macro}{\paragraph}
+%   Produce similar definitions for |\paragraph|.
 %    \begin{macrocode}
 \def\paragraph{\@ifnextchar!\phfea@paragraphbang\phfea@paragraph}
 \def\phfea@paragraph{\phfea@showdecorationtrue\phfea@paragraph@}
@@ -839,12 +856,31 @@
 }
 %    \end{macrocode}
 % \end{macro}
-% \end{macro}
 %
 %    \begin{macrocode}
-\let\subsection\undefined
-\let\subsubsection\undefined
-\let\subparagraph\undefined
+\def\phfea@nosectioncmd#1{%
+  \ClassError{phfextendedabstract}{%
+    %
+    There is no `\string#1' command in `phfextendedabstract' documents.  You can
+    only use `\string\section` and `\string\paragraph'.  If you find yourself
+    needing additional sectioning levels, it might be that your extended
+    abstract is too detailed and you should stick at a higher level description
+    of your results.  If you do need additional section levels, it is likely
+    that you will be better off with a different document class.  If you'd like
+    to stick with `phfextendedabstract' and you really know what you're doing,
+    then you could redefine the sectioning commands as necessary based on
+    `\string\@startsection' as is done in standard LaTeX classes.  Good luck!
+    %
+  }{}%
+}
+\def\phfea@nosectioncmd@def#1{%
+  \def#1{\phfea@nosectioncmd#1}%
+}
+\phfea@nosectioncmd@def\part
+\phfea@nosectioncmd@def\chapter
+\phfea@nosectioncmd@def\subsection
+\phfea@nosectioncmd@def\subsubsection
+\phfea@nosectioncmd@def\subparagraph
 %    \end{macrocode}
 %
 %
@@ -927,11 +963,17 @@
 \fi
 \ifphfeaopt@loadtheorems
   \ifdefined\newtheoremstyle\else
-    \PackageError{phfextendedabstract}{Impossible to load theorems
-      (loadtheorems=true) because there is no \string\newtheoremstyle\space
-      command that was defined.  Consider setting pkgset= so that a theroems-related
-      package (e.g., amsthm) is loaded! (e.g. pkgset=minimal, pkgset=rich or
-      pkgset=extended)}{}
+    \ClassError{phfextendedabstract}{%
+      %
+      Impossible to load theorems (`loadtheorems=true') because there is no
+      \string\newtheoremstyle\space command that was defined.  Consider setting
+      `pkgset=...' so that a theroems-related package (e.g., amsthm) is loaded!
+      (e.g. `pkgset=minimal', `pkgset=rich' or `pkgset=extended').
+      Alternatively, set the class option `loadtheorems=false` and you can then
+      manually define any theorem environments you'd like using your favorite
+      pacakges.
+      %
+    }{}
   \fi
   \PassOptionsToPackage{proofref=false,theoremstyle=phfextendedabstractthm}{phfthm}
   \RequirePackage{phfthm}
