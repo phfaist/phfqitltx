@@ -8,7 +8,7 @@ PREFIX ?= $(DEFAULT_PREFIX)
 # phfnote must go first (all docs need phfnote.sty)
 ALLPKGS = phfnote phffullpagefigure phfqit phfquotetext phfparen phfsvnwatermark phfthm phfcc phfextendedabstract
 
-.PHONY: help clean cleanall sty cleansty pdf cleanpdf cleanaux install tdszip cleantdszip dist versionlist cleandist
+.PHONY: help clean cleanall sty cleansty pdf cleanpdf cleanaux install tdszip cleantdszip dist versionlist cleandist $(ALLPKGS)
 
 # Don't remove intermediate files
 .SECONDARY:
@@ -39,8 +39,8 @@ help:
 	@echo "    - 'make cleansty' to remove generated .sty files;"
 	@echo "    - 'make cleanpdf' to remove generated pdf documentation;"
 	@echo "    - 'make cleanall' to remove all generated files, including tds.zip's and distribution zip's;"
-	@echo "    - 'make install' to install all packages to local TEXMF directory;"
-	@echo "    - 'make install PREFIX=/path/to/texlive/texmf' to install to custom texmf directory;"
+	@echo "    - 'make install' to install all packages to $(DEFAULT_PREFIX);"
+	@echo "    - 'make install PREFIX=/path/to/texmf' to install to custom texmf directory;"
 	@echo "    - 'make tdszip' to create TDS.ZIP files for automated installation in TEXMF tree;"
 	@echo "    - 'make dist' to generate a distribution ZIP file, ready to upload to CTAN;"
 	@echo "    - 'make versionlist' to list the version information in the packages."
@@ -149,3 +149,11 @@ versionlist:
 	@echo "================================================================================"
 	@echo
 
+
+# -------------------------------------------------
+# make phfnote, make phfXXX
+# -------------------------------------------------
+
+$(ALLPKGS):
+	@echo "Don't run 'make $@', run 'make' or 'make help' for more information"
+	exit 1
