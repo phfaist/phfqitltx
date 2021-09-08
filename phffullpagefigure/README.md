@@ -4,7 +4,7 @@ Typeset figures which fill up a full page of a document.
 
 Provide a figure environment which provides the figure content on its own page,
 with the corresponding caption reading for example "Figure 3 (on next page):
-<caption>".
+〈caption〉".
 
 
 # Documentation
