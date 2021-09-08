@@ -187,7 +187,7 @@
 % The \pkgname{phfextendedabstract} class sets up the document for an extended
 % abstract submission as a single-column document, typeset by default at 11
 % point size, with at most two sectioning levels (|\section|\,s and
-% |\paragraph|\,s).
+% |\paragraph|\,s).  It is based on the \RevTeX\ class.
 %
 % The extended abstract style looks approximately like this:
 % \nopagebreak
@@ -222,7 +222,9 @@
 %
 % \end{phfeaDocVirtualPage}
 %
-% \section{Summary of features}
+%
+% \section{Main features}
+%
 % Here are the main features of the \pkgname{phfextendedabstract} class:
 % \begin{itemize}
 % \item The class \pkgname{phfextendedabstract} loads the \pkgname{revtex4-2}
@@ -232,18 +234,20 @@
 % \item Only two sectioning commands are enabled: |\section| and |\paragraph|.
 %   Both have run-in headings.  If you find yourself needing additional
 %   sectioning levels, it might be that your extended abstract is too detailed
-%   and you might want to think about how to keep it at a higher level.
+%   and you might want to think about how to keep it at a higher level.  It
+%   might also be that \pkgname{phfextendedabstract} is too limited for your
+%   needs.
 %
 %   By default, section and paragraphs have ``decorations'' (by default a symbol
 %   in the margin) to guide the reader through the overall high-level structure
-%   of the document.  You can desable them with the class option
-%   |noheadingdecorations|.
+%   of the document.  (Disable them with the |noheadingdecorations| class
+%   option.)
 %
 % \item You can easily scale all vertical spacing dimensions (section and
 %   paragraph spacing, vertical space around theorems and list environments,
 %   etc.) by a common factor with a class option.  Do you have those extra two
 %   lines that make you exceed your 3-page limit?  Try squeezing everything
-%   together with something like |compressverticalspacing=0.7| class option.
+%   together with a class option like |compressverticalspacing=0.7|.
 %
 % \item The \pkgname{phfnote} package is loaded in order to provide a set of
 %   default \LaTeX\ packages and set up hyperlinks.  A generous default set of
@@ -251,29 +255,35 @@
 %   \pkgname{enumitem}; see \pkgname{phfnote}'s documentation for the option
 %   |pkgset=extended|.
 %
-%   You are expected to call |\usepackage{hyperref}| somewhere in your preamble.
-%   We deliberately don't include \pkgname{hyperref} to give you greater control
-%   of package loading order (most packages you might want to use must be loaded
-%   before \pkgname{hyperref}).
+%   \textbf{You are expected to include
+%   \phfverb{\usepackage}\phfverb{{hyperref}} somewhere in your preamble.}  We
+%   deliberately don't include \pkgname{hyperref} when loading the class in
+%   order to give you greater control of package loading order (most packages
+%   you might want to use must be loaded before \pkgname{hyperref}).
 %
 % \item The page margins are tweaked with the \pkgname{geometry} package.
-%   (Simply call |\geometry{...}| from the \pkgname{geometry} package if you'd
-%   like to further change them.)
+%   (Simply call |\geometry{...}| if you'd like to further change them.  Refer
+%   to the \pkgname{geometry} package's documentation.)
 %
-% \item Lists, i.e.\@ itemization and enumeration environments, are customized
-%   using the \pkgname{enumitem} package so that they take up less space.  (Note
-%   that this customization won't work if you choose to load a package set via
-%   |pkgset=| that doesn't include \pkgname{enumitem}.)  You also get a
-%   |enumerate*| environment that typesets its items in-line, in a single
-%   paragraph.
+% \item Lists, i.e.\@ the |itemize| and |enumerate| environments, are customized
+%   using the \pkgname{enumitem} package so that they take up less space.  You
+%   also get a |enumerate*| environment that typesets its items in-line, in a
+%   single paragraph.
+%   
+%   (Note that this customization won't work if you choose to load a package set
+%   via a |pkgset=| option that doesn't include \pkgname{enumitem}.)
 %
-% \item By default we set a customized theorem style so that it stands out but
-%   also so that it contrasts well with the section and paragraph headings.
+% \item By default we load the \pkgname{phfthm} package and set a customized
+%   theorem style so that it stands out but also so that it contrasts well with
+%   the section and paragraph headings.
 %
 % \end{itemize}
 %
+% Check out the class option documentation in \autoref{sec:class-options} to get
+% a better idea of how to customize \pkgname{phfextendedabstract}'s behavior!
 %
-% \section{Usage}
+%
+% \section{Example Usage}
 %
 % Here's a simple template:
 % \begin{verbatim}
@@ -313,6 +323,7 @@
 %
 %
 % \section{Class options}
+% \label{sec:class-options}
 %
 % Here is a summary of class options:
 % \begin{pkgoptions}
