@@ -363,14 +363,30 @@
 % with a section, but with no decoration or run-in heading.
 % \end{verbatim}
 %
+% You can also use the additional syntax |<|\emph{\ldots}|>| to specify a custom
+% decoration instead of the default one.  (But you should only use this
+% sparingly! Redefine |\phfeaSectionDecorationSymbol| if you want to change the
+% symbol for all sections!)  For instance:
+%
+% \begin{verbatim}
+% \section<\guilsinglright>{} \emph{Manuscript in preparation.}
+% \end{verbatim}
+%
+% Here's a summary of the argument structure for |\section| and |\paragraph|:
+%
+% |\section|{\large$\mid$}|\paragraph| \emph{[}|*|\emph{]} \emph{[}|!|\emph{]}
+% \emph{[}|<|\meta{decoration symbol}|>|\emph{]} \oarg{alt title}\marg{title}
+% 
+% The optional star and optional alternative title are passed on to the standard
+% \LaTeX\ sectioning commands.  The alternative title is typically used for the
+% table of contents and for PDF bookmarks.
+%
 % \DescribeMacro{\phfeaSectionDecoration}
 % \DescribeMacro{\phfeaParagraphDecoration} You can use the
 % |\phfeaSectionDecoration{<symbol>}| and |\phfeaParagraphDecoration{<symbol>}|
-% to manually place a section or paragraph decoration at any place.  These
-% commands can be used, for instance, in combination with |\section!{}| to place
-% a section-level line with a different decoration symbol:
+% to manually place a section or paragraph decoration at any place:
 % \begin{verbatim}
-% \section!{}\phfeaSectionDecoration{$\to$} Check out our website at
+% \phfeaSectionDecoration{$\to$} Check out our website at
 % \href{https://github.com/phfaist/phfqitltx}{github.com/phfaist/phfqitltx}
 % \end{verbatim}
 %
@@ -794,8 +810,9 @@
 % \end{macro}
 % 
 % Now we redefine |\section| and |\paragraph| for formatting.  Also allow
-% |\section!| and |\paragraph!| that remove the decoration.  In all cases, the
-% indent is removed if the main argument (section/paragraph title) is an empty
+% |\section!| and |\paragraph!| that remove the decoration and |\section<...>|
+% and |\paragraph<...>| that replace the decoration.  In all cases, the indent
+% is removed if the main argument (section/paragraph title) is an empty
 % argument.  We also accept a starred version and an optional argument, and pass
 % those on to |\@startsection|; these options are sometimes useful in order to
 % work around fragile tokens in the title, etc.
@@ -823,19 +840,32 @@
 %   \item[\#1:] level number, |1| or |2|;
 %   \item[\#2:] an optional star;
 %   \item[\#3:] an optional |!| character (meaning, don't display the decoration);
-%   \item[\#4:] an optional argument, the alternative title to write in the AUX
+%   \item[\#4:] an optional |<|\meta{decoration symbol}|>| argument to
+%     replace the decoration;
+%   \item[\#5:] an optional argument, the alternative title to write in the AUX
 %     file (e.g.\@ for use in the table of contents);
-%   \item[\#5:] a mandatory argument, the title of the section/paragraph.
+%   \item[\#6:] a mandatory argument, the title of the section/paragraph.
 %   \end{itemize}
 %    \begin{macrocode}
+\newtoks\phfea@ss@decorationtoks
 \newtoks\phfea@ss@alttitle
 \newtoks\phfea@ss@title
-\NewDocumentCommand{\phfea@startsection}{m s t! o m}{%
+\NewDocumentCommand{\phfea@startsection}{m s t! d<> o m}{%
 %    \end{macrocode}
 % Store the alternative title and title in token registers.
 %    \begin{macrocode}
-  \phfea@ss@alttitle={#4}%
-  \phfea@ss@title={#5}%
+  \phfea@ss@decorationtoks={#4}%
+  \phfea@ss@alttitle={#5}%
+  \phfea@ss@title={#6}%
+%    \end{macrocode}
+% Inform the user in case of option inconsistencies or redundancies.
+%    \begin{macrocode}
+  \IfNoValueF{#4}{%
+    \IfBooleanT{#3}{%
+      \PackageWarning{phfextendedabstract}{section/paragraph: `!'
+        modifier ignored when custom decoration `<...>' is specified}%
+    }%
+  }%
 %    \end{macrocode}
 % Now define a temporary macro |\x| that will contain the correct code for a
 % call to \LaTeX' low-level |\@startsection| command.  Remember to prefix all
@@ -872,20 +902,27 @@
 % dimen, the syntax `|-\glueexpr...|' does preserve these components (presumably
 % because $-1$ is integer?).
 %    \begin{macrocode}
-      {\if\relax\detokenize{#5}\relax
+      {\if\relax\detokenize{#6}\relax
           \noexpand\z@
         \else
           -\noexpand\glueexpr\phfea@ss@getnoexpand{#1}{AfterHSkip}\noexpand\relax
         \fi}%
 %    \end{macrocode}
 % The \meta{style} argument to specify the section heading's font style.  We
-% provide a decoration, unless the no-decoration argument (a |!| character) was
-% specified.
+% provide a decoration, possibly a custom decoration if provided with the
+% |<...>| syntax; we remove the default decoration if the no-decoration argument
+% (a |!| character) was specified.
 %    \begin{macrocode}
       {%
-        \IfBooleanF{#3}{%
+        \IfNoValueTF{#4}{%
+          \IfBooleanTF{#3}{% with "!", no custom decoration --> nothing
+          }{% no "!", no custom decoration
+            \phfea@ss@getnoexpand{#1}{Decoration}%
+            \phfea@ss@getnoexpand{#1}{DecorationSymbol}%
+          }%
+        }{% with custom decoration (ignores "!" argument)
           \phfea@ss@getnoexpand{#1}{Decoration}%
-          \phfea@ss@getnoexpand{#1}{DecorationSymbol}%
+          {\the\phfea@ss@decorationtoks}%
         }%
         \phfea@ss@getnoexpand{#1}{Style}%
       }%
@@ -899,13 +936,13 @@
 %    \end{macrocode}
 % Now comes the optional \meta{alternative title} argument that will be written
 % to the AUX file.  We always provide this argument to |\@startsection|,
-% specifying by default the main title argument |#5| (non-starred variant) or an
+% specifying by default the main title argument |#6| (non-starred variant) or an
 % empty argument (for a starred variant).  We do this because otherwise,
 % |\@startsection| will copy all the other commands we add in its argument
 % (e.g., title formatting, etc.) and will write them to the AUX file.
 %    \begin{macrocode}
       \IfValueTF{#4}{[\the\phfea@ss@alttitle]}{%
-        \IfBooleanTF{#2}{[]}{[#5]}%
+        \IfBooleanTF{#2}{[]}{[\the\phfea@ss@title]}%
       }%
 %    \end{macrocode}
 % Finally, this is the main \meta{section title} argument.  
@@ -915,7 +952,7 @@
 % complaining about invalid junk in PDF bookmark strings.
 %    \begin{macrocode}
       {%
-        \if\relax\detokenize{#5}\relax\else
+        \if\relax\detokenize{#6}\relax\else
           \noexpand\texorpdfstring{%
             \phfea@ss@getnoexpand{#1}{FormatHeading}{\the\phfea@ss@title}%
           }{%

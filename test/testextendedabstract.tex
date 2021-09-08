@@ -152,7 +152,7 @@ points!
 \lipsum[9]
 
 \section!{Section with no decoration.}%
-How does this look like?
+How does this look like? (We used \verb+\section!{...}+ here.)
 \lipsum[1]
 
 \paragraph!{Same for paragraphs.}%
@@ -173,15 +173,24 @@ place (pretty fun, isn't it?).
 \section*{Starred} \ldots\ versions of the \verb+\section+ command and \ldots
 
 \paragraph*{of the \texttt{\textbackslash paragraph} command} should also work
-without any noticeable difference. Do they?
+without any noticeable difference. Do they?  They also suppress section numbers
+in case you enable section numbering!
 
 
-\section*!{}\phfeaSectionDecoration{\guillemotright}%
+%\section*!{}\phfeaSectionDecoration{\guillemotright}%
+\section*!{}%
 You can use \verb+\section!{}+ (or \verb+\section*!{}+, in case you enabled
 section numbering) to get the spacing for a section, without producing anything.
 For instance, you can use it to place your own decoration in front of a line
 that should take the same type of space as a section would.
 
+\section<\guillemotright>{Here's a custom decoration}%
+typeset using \verb+\section<...>{..}+. You can also
+
+\paragraph<{\raisebox{1.5pt}{\tiny$\to$}}>{Do the same} for paragraphs with \verb+\paragraph<...>{..}+.
+
+\section<\guilsinglright>{}   You can also use a custom decoration without any
+section title.
 
 % We can also test if the table of contents works:
 %
