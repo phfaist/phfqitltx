@@ -6,7 +6,16 @@ DEFAULT_PREFIX := $(shell kpsewhich -var-value TEXMFHOME)
 PREFIX ?= $(DEFAULT_PREFIX)
 
 # phfnote must go first (all docs need phfnote.sty)
-ALLPKGS = phfnote phffullpagefigure phfqit phfquotetext phfparen phfsvnwatermark phfthm phfcc phfextendedabstract
+ALLPKGS = \
+	phfnote \
+	phffullpagefigure \
+	phfqit \
+	phfquotetext \
+	phfparen \
+	phfsvnwatermark \
+	phfthm \
+	phfcc \
+	phfextendedabstract
 
 .PHONY: help clean cleanall sty cleansty pdf cleanpdf cleanaux install tdszip cleantdszip dist versionlist cleandist $(ALLPKGS)
 
@@ -151,7 +160,7 @@ versionlist:
 
 
 # -------------------------------------------------
-# make phfnote, make phfXXX
+# catch "make phfnote", etc. -> report error
 # -------------------------------------------------
 
 $(ALLPKGS):
