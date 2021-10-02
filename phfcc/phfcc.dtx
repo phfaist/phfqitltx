@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% Copyright (C) 2020 by Philippe Faist, philippe.faist@bluewin.ch
+% Copyright (C) 2021 by Philippe Faist, philippe.faist@bluewin.ch
 % -------------------------------------------------------
 % 
 % This file may be distributed and/or modified under the
@@ -34,6 +34,7 @@
 
 \usepackage{needspace}
 
+\usepackage[normalem]{ulem}
 
 \def\eqsign@{=}
 \def\eqsign{\protect\eqsign@}
@@ -427,6 +428,26 @@
 % appended to.\footnote{Except for an as-of-yet undocumented \phfverb{startcmds}
 % key which might be relevant if you'd like to develop a style which requires
 % you to issue definitions at the beginning of every annotation.}
+%
+% \phfMakeCommentingCommand[rmbegin={},rmend={},rmspacing=2pt,initials={ZZ}]{dummycmd}
+% There is currently one predefined style:
+% \begin{itemize}
+% \item For Lua\LaTeX\ users, the style |rmstrikethrough| is available to make
+%   text marked for removal drawn in strikethrough font, \dummycmd*{\sout{kind
+%   of like this}}.  Simply use:
+% \begin{verbatim}
+% \phfMakeCommentingCommand[style=rmstrikethrough]{ZZ} % requires LuaLaTeX
+% \end{verbatim}
+%   
+%   The implementation uses the |lua-ul| package, which requires Lua\LaTeX.  We
+%   do not support strikethrough for regular \LaTeX because we weren't able to
+%   find an implementation that worked reliably even for large blocks of text.
+%   (For instance, using the |\sout| from the \pkgname{ulem} package, you cannot
+%   strikethrough multiple paragraphs with displayed equations.)
+%
+% \item We'll probably add more predefined styles in the future.
+% \end{itemize}
+% 
 %
 % \DescribeMacro{\phfSetDefaultCommentingStyle} Instead of defining named styles
 % which have to be invoked explicitly, you can also preset the style of all
