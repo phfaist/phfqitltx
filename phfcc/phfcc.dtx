@@ -236,6 +236,10 @@
 % |\AlE*{text to be removed}| --- \AlE*{text to be removed} --- typeset the
 % given text in a way to indicate that the text should be suppressed.
 %
+% If you use Lua\LaTeX, you can get proper text strikethrough accross entire
+% chunks of text by using the argument |style={rmstrikethrough}| to
+% |\phfMakeCommentingCommand|.  (See also \autoref{sec:styles} below.)
+%
 % |\AlE!{important piece of text}| --- \AlE!{important piece of text}
 % --- typeset the given text marking it as important.
 %
@@ -402,10 +406,10 @@
 % You can define a style using |\phfDefineCommentingStyle|:
 % \begin{verbatim}
 % \phfDefineCommentingStyle{mystyle}{
-%   font=\fontfamily{txr}\selectfont,
-%   cfont={\sffamily\bfseries\large},
-%   cbegin={{\large\ensuremath{\langle}}~},
-%   cend={{\large\ensuremath{\langle}}~}
+%   font={\fontfamily{phv}\selectfont}, % phv = Helvetica
+%   cfont={\bfseries\large},
+%   cbegin={{\ensuremath{\bigl\langle}}~},
+%   cend={{~\ensuremath{\bigr\rangle}}}
 % }
 % \end{verbatim}
 % You can then define your commenting command invoking this style:
@@ -414,36 +418,50 @@
 % \end{verbatim}
 %
 % \phfDefineCommentingStyle{mystyle}{
-%   font={\fontfamily{txr}\selectfont},
+%   font={\fontfamily{phv}\selectfont},
 %   cfont={\bfseries\large},
-%   cbegin={{\large\ensuremath{\langle}}~},
-%   cend={~{\large\ensuremath{\rangle}}}
+%   cbegin={{\ensuremath{\bigl\langle}}~},
+%   cend={{~\ensuremath{\bigr\rangle}}}
 % }
 % \phfMakeCommentingCommand[style=mystyle]{me}
 %
-% Then \me{for example,} (which is |\me{for example}|) the code %
+% Then \me{for example}, (which was typeset using |\me{for example}|,) the code
 % |\me[A comment]| becomes: \me[A comment].
 %
-% Styles are loaded in the order they are specified.  Keys are overwritten, not
-% appended to.\footnote{Except for an as-of-yet undocumented \phfverb{startcmds}
-% key which might be relevant if you'd like to develop a style which requires
-% you to issue definitions at the beginning of every annotation.}
+% Styles are loaded in the order they are specified (separate style names with
+% commas).  Style definitions may contain |style=...| keys to load other styles.
+% Styles are always loaded before user keys, regardless of where the `|style|'
+% key appears in the definition.  When styles are loaded, and when the users'
+% keys are set, later keys are overwrite earlier ones.\footnote{Except for an
+% as-of-yet undocumented \phfverb{startcmds} key which might be relevant if
+% you'd like to develop a style which requires you to issue definitions at the
+% beginning of every annotation.}
 %
 % \phfMakeCommentingCommand[rmbegin={},rmend={},rmspacing=2pt,initials={ZZ}]{dummycmd}
 % There is currently one predefined style:
 % \begin{itemize}
 % \item For Lua\LaTeX\ users, the style |rmstrikethrough| is available to make
 %   text marked for removal drawn in strikethrough font, \dummycmd*{\sout{kind
-%   of like this}}.  Simply use:
+%   of like this}}.  You can cross out entire paragraphs of text which include
+%   display equations.  Simply use:
 % \begin{verbatim}
 % \phfMakeCommentingCommand[style=rmstrikethrough]{ZZ} % requires LuaLaTeX
+% 
+% ... \ZZ*{text to be removed} ... or also ... \ZZ* more
+% text that I want to remove\endZZ ...
 % \end{verbatim}
 %   
-%   The implementation uses the |lua-ul| package, which requires Lua\LaTeX.  We
-%   do not support strikethrough for regular \LaTeX because we weren't able to
-%   find an implementation that worked reliably even for large blocks of text.
-%   (For instance, using the |\sout| from the \pkgname{ulem} package, you cannot
-%   strikethrough multiple paragraphs with displayed equations.)
+%   The implementation uses the |lua-ul| package, which requires Lua\LaTeX.  To
+%   apply this style to all definitions, use
+%   |\phfSetDefaultCommentingStyle{style=rmstrikethrough}| (see below).
+%
+%   (We do not support strikethrough for regular \LaTeX\ because we weren't able
+%   to find an implementation that worked reliably even for large blocks of
+%   text.  For instance, using the |\sout| from the \pkgname{ulem} package, you
+%   cannot strikethrough multiple paragraphs with displayed equations.  Plus, to
+%   support the extended syntax of |\phfcc|'s commenting commands, we need the
+%   strikethrough to be implemented by a state change macro (like |\itshape|) or
+%   an environment, and not by a macro that accepts an argument.)
 %
 % \item We'll probably add more predefined styles in the future.
 % \end{itemize}
@@ -597,9 +615,13 @@
 \def\phfCommentingDefaultCBegin{[\,}
 \def\phfCommentingDefaultCEnd{\,]}
 \def\phfCommentingDefaultRmFont{\small\itshape}%\itshape\notesmaller[0.9]}
-\def\phfCommentingDefaultRmSpacing{1em}
-\def\phfCommentingDefaultRmBegin{\ensuremath{{\times}\!{\times}}~}
-\def\phfCommentingDefaultRmEnd{~\ensuremath{{\times}\!{\times}}}
+\def\phfCommentingDefaultRmSpacing{.3em}
+\def\phfCommentingDefaultRmBegin{%
+  \mbox{}\vrule height .55ex depth -.45ex width 2.2em\relax
+  \hspace*{-2em}}
+\def\phfCommentingDefaultRmEnd{%
+  \hspace*{-2em}%
+  \vrule height .55ex depth -.45ex width 2.2em\relax}
 \def\phfCommentingDefaultIFont{\large\bfseries}
 \def\phfCommentingDefaultISpacing{0.25em}
 \def\phfCommentingDefaultIBegin{!\hspace*{0.1em}!\hspace*{0.1em}!~}
@@ -662,7 +684,10 @@
 % Define the keys for |\setkeys| with \pkgname{xkeyval} package, and set the
 % overall defaults.
 %    \begin{macrocode}
-\define@cmdkey{phfmkccstyle}{style}{}
+\def\phfcc@hook@phfmkccstyle@setstyle@noop#1{}
+\let\phfcc@hook@phfmkccstyle@setstyle\phfcc@hook@phfmkccstyle@setstyle@noop
+\define@cmdkey{phfmkccstyle}{style}{\phfcc@hook@phfmkccstyle@setstyle{#1}}
+
 \define@cmdkey{phfmkcc}{color}{}
 \define@cmdkey{phfmkcc}{initials}{}
 \define@cmdkey{phfmkcc}{formatinitials}{}
@@ -712,7 +737,7 @@
   ispacing={\phfCommentingDefaultISpacing},%
   ibegin={\phfCommentingDefaultIBegin},%
   iend={\phfCommentingDefaultIEnd},%
-  groupcmd={\@firstofone},%
+  groupcmd={\@firstofone}%
 }{}
 %    \end{macrocode}
 %
@@ -722,34 +747,48 @@
   \csdef{phfcc@style@#1}{#2}%
 }
 \def\phfcc@default@style{}
+\def\phfcc@hook@phfmkccstyle@setstyle@savestyle#1{%
+  \xdef\phfcc@default@style{#1}%
+}
 \newcommand\phfSetDefaultCommentingStyle[1]{%
-  \presetkeys{phfmkcc}{#1}{}%
+  \let\phfcc@hook@phfmkccstyle@setstyle\phfcc@hook@phfmkccstyle@setstyle@savestyle
+  \setkeys*{phfmkccstyle}{#1}%
+  \let\phfcc@hook@phfmkccstyle@setstyle\phfcc@hook@phfmkccstyle@setstyle@noop
+  \edef\x{\noexpand\presetkeys{phfmkcc}{\expandonce\XKV@rm}{}}%
+  \x
 }
 %    \end{macrocode}
 % 
 % \begin{macro}{\phfcc@expandstylekeys}
-%   Helpers to expand style= instructions in a set of key=vals.  The helper
-%   macro |\phfcc@expandstylekeys| will inspect its argument, expected to be a
-%   list of key=value pairs.  It will detect style= settings, and place the
-%   corresponding style definitions as key=value definitions, before the
-%   remaining user key=value definitions.  It will do so recursively, so that
-%   styles can set other styles.  The final expanded key=value pairs is set in
-%   the token register |\phfcc@val@expanded@keyval|.
+%   Helpers to expand style= instructions in a set of key=vals.
+%
+%   The helper macro |\phfcc@expandstylekeys| accepts two arguments.  The
+%   argument |#1| is a list of style names and |#2| is a collection of key=value
+%   pairs.  This macro computes all the key=value settings that should be
+%   applied from the style definitions, plus all the remaining user key=value
+%   settings.  We will recursively look for style=... keywords so that styles
+%   can load other styles.
+%
+%   The final expanded key=value pairs is set in the token register
+%   |\phfcc@val@expanded@keyval|.
 %    \begin{macrocode}
 \newtoks\phfcc@val@expanded@keyval
-\def\phfcc@expandstylekeys#1{%
-  %\message{*** EXPANDSTYLEKEYS ENTRY POINT |#1| ****}%
-  \phfcc@val@expanded@keyval={#1}%
+\def\phfcc@expandstylekeys#1#2{%
+  \def\phfcc@val@expanded@preexpandstyles{#1}%
+  \phfcc@val@expanded@keyval={#2}%
   \loop
     \phfcc@expandstylekeys@once
+    \def\phfcc@val@expanded@preexpandstyles{}%
   \ifnum\phfcc@val@expanded@needmore=1\repeat
-  %\message{*** DONE DONE DONE ***}%
 }
 %    \end{macrocode}
+%
 % The implementation of |\phfcc@expandstylekeys| proceeds by iterating single
 % expansions until there are no more |style={}| values left.  A single iteration
-% is implemented here.  The following macro reads |\phfcc@val@expanded@keyval|
-% and updates |\phfcc@val@expanded@keyval| and |\phfcc@val@expanded@needmore|.
+% is implemented here.  The following macro reads its input from
+% |\phfcc@val@expanded@preexpandstyles| and |\phfcc@val@expanded@keyval|, and it
+% sets the macros |\phfcc@val@expanded@keyval| and
+% |\phfcc@val@expanded@needmore|.
 %    \begin{macrocode}
 \def\phfcc@expandstylekeys@once{%
   \def\cmdKV@phfmkccstyle@style{}
@@ -762,13 +801,18 @@
   \if\relax\detokenize\expandafter{\cmdKV@phfmkccstyle@style}\relax
     \def\phfcc@val@expanded@needmore{0}%
   \else
+    \def\phfcc@val@expanded@needmore{1}%
+  \fi
 %    \end{macrocode}
-% We have one or more styles to expand.  Iterate over the comma-separated list
-% of styles and we'll append the collected style-specific key=value definitions
-% in the macro |\phfcc@val@fullstylekeyvals| for now.
+% We might have one or more styles to expand.  Iterate over the comma-separated
+% list of styles and we'll append the collected style-specific key=value
+% definitions in the macro |\phfcc@val@fullstylekeyvals| for now.  Include also
+% the predefined style names to expand before the user-specified styles.
 %    \begin{macrocode}
-    \def\phfcc@val@fullstylekeyvals{}%
-    \@for\phfcc@tmp@next:=\cmdKV@phfmkccstyle@style\do{%
+  \def\phfcc@val@fullstylekeyvals{}%
+  \edef\phfcc@tmp@thestylelist{%
+    \phfcc@val@expanded@preexpandstyles,\cmdKV@phfmkccstyle@style}
+  \@for\phfcc@tmp@next:=\phfcc@tmp@thestylelist \do{%
 %    \end{macrocode}
 % At this point we're requested to expand the style whose name is stored in
 % |\phfcc@tmp@next|.  Collect the key=value definitions in the macro named
@@ -785,28 +829,26 @@
         \fi
         \edef\phfcc@tmp@stylekeyvals{%
           \expandafter\expandonce\csname phfcc@style@\phfcc@tmp@next \endcsname}%
-        %\message{*** STYLE KEYVALS = \detokenize\expandafter{\phfcc@tmp@stylekeyvals} ***}%
         \edef\phfcc@val@fullstylekeyvals{%
           \expandonce\phfcc@val@fullstylekeyvals,%
           \expandonce\phfcc@tmp@stylekeyvals}
       \else
-        \PackageError{phfcc}{Requested commenting style `\phfcc@tmp@next' %
-          is not defined.}{}%
+        \if\relax\detokenize\expandafter{\phfcc@tmp@next}\relax
+        \else
+          \PackageError{phfcc}{Requested commenting style `\phfcc@tmp@next' %
+            is not defined}{}%
+        \fi
       \fi
     }%
 %    \end{macrocode}
 % Now we can collect the definitions from the styles and merge them with the
 % remaining non-style-related user key/values.  The macro |\XKV@rm| is set by
-% \pkgname{xkeyval} to those key/values not processed by |\setkeys*|.  We also
-% set |\phfcc@val@expanded@needmore| to 1 to indicate that another round of
-% expansion might be needed.
+% \pkgname{xkeyval} to those key/values not processed by |\setkeys*|.
 %    \begin{macrocode}
-    \edef\x{\noexpand\phfcc@val@expanded@keyval={%
-        \expandonce\phfcc@val@fullstylekeyvals,%
-        \expandonce\XKV@rm}}%
-    \x
-    \def\phfcc@val@expanded@needmore{1}%
-  \fi
+  \edef\x{\noexpand\phfcc@val@expanded@keyval={%
+      \expandonce\phfcc@val@fullstylekeyvals,%
+      \expandonce\XKV@rm}}%
+  \x
 }
 %    \end{macrocode}
 % \end{macro}
@@ -818,7 +860,7 @@
   \RequirePackage{lua-ul}
   \newunderlinetype\beginPhfccStrikeThrough{%
     \leaders\vrule height .55ex depth -.45ex}
-  \gdef\phfcc@styleused@rmstrikethrough{} % auto-destruct so we only run once
+  \gdef\phfcc@styleused@rmstrikethrough{}% auto-destruct/only run once
 }
 \def\phfcc@style@rmstrikethrough{%
   rmfont={\beginPhfccStrikeThrough},
@@ -1253,10 +1295,10 @@
 %    \begin{macrocode}
 \newcommand\phfMakeCommentingCommand[2][]{%
   \cmdKV@phfmkcc@startcmds={}%
-  \phfcc@expandstylekeys{#1}%
+  \edef\x{\noexpand\phfcc@expandstylekeys{\phfcc@default@style}{\unexpanded{#1}}}%
+  \x
   %\setrmkeys{phfmkcc}%
   \edef\x{\noexpand\setkeys{phfmkcc}{\the\phfcc@val@expanded@keyval}}%
-  %\message{***** ABOUT TO \detokenize\expandafter{\x} *********}%
   \x
   \phf@cc@getcolor{\cmdKV@phfmkcc@color}%
   \colorlet{#2color}{\phf@cc@thecolor}%
@@ -1280,7 +1322,7 @@
     \csedef{phf@cc@val@#2@formatinitials}{\expandonce\cmdKV@phfmkcc@formatinitials}%
   \fi
   \csedef{phf@cc@val@#2@startcmds}{\the\cmdKV@phfmkcc@startcmds}%
-  %\message{***** STARTCMDS ARE \detokenize\expandafter{\the\cmdKV@phfmkcc@startcmds} *****}%
+  \message{***** STARTCMDS ARE \detokenize\expandafter{\the\cmdKV@phfmkcc@startcmds} *****}%
   \csedef{phf@cc@val@#2@font}{\expandonce\cmdKV@phfmkcc@font}%
   \csedef{phf@cc@val@#2@spacing}{\expandonce\cmdKV@phfmkcc@spacing}%
   \csedef{phf@cc@val@#2@begin}{\expandonce\cmdKV@phfmkcc@begin}%
@@ -1453,7 +1495,7 @@
 %    \end{macrocode}
 % We've got just a plain, old, inline marked text.
 %    \begin{macrocode}
-      \phf@cc@helper@pushgrpcmdsX{%
+        \phf@cc@helper@pushgrpcmdsX{%
           \expandafter\noexpand\csname phf@cc@val@\phf@cc@val@cur @font\endcsname
           \expandafter\noexpand\csname phf@cc@val@\phf@cc@val@cur @begin\endcsname
         }{%

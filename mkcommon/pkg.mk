@@ -4,7 +4,9 @@
 #
 LATEX = latex
 
-PDFLATEX = TEXINPUTS="$$TEXINPUTS:../phfnote" pdflatex
+PDFLATEXNAME = pdflatex
+
+PDFLATEX = TEXINPUTS="$$TEXINPUTS:../phfnote" $(PDFLATEXNAME)
 PDFLATEXOPTS = -interaction=batchmode
 PDFLATEXOPTSLAST = -interaction=batchmode --synctex=1
 

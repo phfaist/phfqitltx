@@ -13,13 +13,23 @@
 
 %\phfSetDefaultCommentingStyle{font=\large}
 
-\phfDefineCommentingStyle{myitalicstyle}{startcmds={\itshape}}
-\phfDefineCommentingStyle{myboldstyle}{style={myitalicstyle},startcmds={\bfseries}}
-\phfDefineCommentingStyle{myfunccstyle}{style={myitalicstyle},startcmds={\fontfamily{phv}\selectfont}}
+%\phfSetDefaultCommentingStyle{style=rmstrikethrough,}
+
+\phfDefineCommentingStyle{myitalicstyle}{
+  startcmds={\itshape}
+}
+\phfDefineCommentingStyle{myboldstyle}{
+  style={myitalicstyle},
+  startcmds={\bfseries}
+}
+\phfDefineCommentingStyle{myfunstyle}{
+  style={myitalicstyle},
+  startcmds={***\fontfamily{phv}\selectfont} % font won't show with LuaLaTeX, normal
+}
 
 
-\phfMakeCommentingCommand[initials={PhF},style=rmstrikethrough]{phf}
-\phfMakeCommentingCommand[style=rmstrikethrough]{jd}
+\phfMakeCommentingCommand[initials={PhF}]{phf}
+\phfMakeCommentingCommand{jd}
 \phfMakeCommentingCommand[initials={A.E.}]{AlE}
 \phfMakeCommentingCommand{ccfour}
 
@@ -27,7 +37,7 @@
 \phfMakeCommentingCommand{ccsix}
 \phfMakeCommentingCommand[style=myitalicstyle,initials={cc7}]{ccseven}
 \phfMakeCommentingCommand[initials={cc8},style=myboldstyle]{cceight}
-\phfMakeCommentingCommand[style=myfunccstyle]{ccnine}
+\phfMakeCommentingCommand[style=myfunstyle]{ccnine}
 % \phfMakeCommentingCommand[initials={cc7}]{ccseven}
 % \phfMakeCommentingCommand[initials={cc8}]{cceight}
 % \phfMakeCommentingCommand{ccnine}
@@ -81,7 +91,7 @@ explicit Hamiltonian models~\cite{Alicki2004_hamiltonian}, all of which are
 \ccfour!{NOT}
 depicted in \figurename~\ref{fig:test}. We will follow a different approach by
 assuming Landauer's Principle as being valid, much like one generally accepts
-the second law of thermodynamics as being valid. This allows us to {\em define}
+the second law of thermodynamics as being valid. This allows us \phf*{to}  to {\em define}
 a notion of work in our quantum setting by characterizing how much
 \ccten{randomness can be absorbed or is generated} during a noisy
 operation.\footnote{This is how a footnote looks like.} Yes.\footnote{Another
@@ -97,9 +107,10 @@ computations.
 \phf* You can comment entire chunks of text, like this:
 
 Consider a quantum mechanical system $X$ in an inital state described by the
-density operator $\sigma$.  \ccsix{Here's a comment within removed text.} Our task is to
-bring the system $X$ to another state $\rho$, while attempting to maximize some
-kind of notion of ``extracted'' work in the process.
+density operator $\sigma$.  \ccsix{Here's an annotation within removed text.}
+\ccfour[And a comment.] Our task is to bring the system $X$ to another state $\rho$,
+while attempting to maximize some kind of notion of ``extracted'' work in the
+process.
 
 The allowed operations are:
 \begin{enumerate}[label=(\alph*)]
