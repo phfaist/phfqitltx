@@ -34,6 +34,10 @@
 \usepackage{needspace}
 
 \makeatletter
+
+  % the factor by which to compress macro names in the margin
+\def\phf@xpkgdoc@marginmacronamecompressfactor{0.9}
+
 \newsavebox\phfnoteDocVirtualPage@contents
 \newenvironment{phfnoteDocVirtualPage}{%
   \par%
@@ -537,7 +541,7 @@
 % \end{phfnoteDocVirtualPage}
 % whereas with the other styles, this information is typeset as regular footnotes.
 %
-% \leavevmode\marginpar{\raggedleft \phfverb\thanks\phfverb{[N]}}\relax
+% \leavevmode\PrintMarginLabel{\string\thanks[N]}\relax
 % You may specify an optional argument to |\thanks|, forcing the footnote to a
 % specific number (it must be a number).  For example, with
 % {\ttfamily|\|author\{Ph.\@ Faist|\|thanks[9]\{|\|itshape Institute for
@@ -3444,7 +3448,7 @@
 %    \end{macrocode}
 %
 %
-% The title style to use. \marginpar{\raggedleft \phfverb{[title=...]}}
+% The title style to use. \PrintMarginLabel{[title=...]}
 % See \autoref{sec:title-styles}.
 %    \begin{macrocode}
 \DeclareStringOption[default]{title}
@@ -3452,22 +3456,21 @@
 %    \end{macrocode}
 % 
 %
-% Option for abstract attributes \marginpar{\raggedleft
-% \phfverb{[abstract=...]}}  (\autoref{sec:abstract-attributes}).
+% Option for abstract attributes \PrintMarginLabel{[abstract=...]}
+% (\autoref{sec:abstract-attributes}).
 %    \begin{macrocode}
 \DeclareStringOption[]{abstract}
 \DeclareVoidOption{noabstract}{\def\phfnote@opt@abstract{false}}
 %    \end{macrocode}
 %
-% Option for Package sets \marginpar{\raggedleft \phfverb{[pkgset=...]}}
+% Option for Package sets \PrintMarginLabel{[pkgset=...]}
 % (\autoref{sec:package-sets})
 %    \begin{macrocode}
 \DeclareStringOption[rich]{pkgset}
 %    \end{macrocode}
 %
-% Define the page geometry.  \marginpar{\raggedleft
-% \phfverb{[pagegeomdefs=...]}} \marginpar{\raggedleft \phfverb{[pagegeom=...]}}
-% See \autoref{sec:pagegeomdefs}.
+% Define the page geometry.  \PrintMarginLabel{[pagegeomdefs=...]}
+% \PrintMarginLabel{[pagegeom=...]}  See \autoref{sec:pagegeomdefs}.
 %    \begin{macrocode}
 \DeclareStringOption[default]{pagegeom}
 \DeclareVoidOption{nopagegeom}{\def\phfnote@opt@pagegeom{false}}
@@ -3482,59 +3485,60 @@
 % true. If it isn't, that means it was overridden and we need to respect that.
 % 
 %
-% Styling of section headings.  \marginpar{\raggedleft \phfverb{[secfmt=...]}}
+% Styling of section headings.  \PrintMarginLabel{[secfmt=...]}
 % See \autoref{sec:secfmt}.
 %    \begin{macrocode}
 \DeclareStringOption[section]{secfmt}
 \DeclareVoidOption{nosecfmt}{\def\phfnote@opt@secfmt{false}}
 %    \end{macrocode}
 %
-% How to treat paragraphs.  \marginpar{\raggedleft \phfverb{[par=...]}} See
+% How to treat paragraphs.  \PrintMarginLabel{[par=...]} See
 % \autoref{sec:par-defs}.
 %    \begin{macrocode}
 \DeclareStringOption[skip]{par}
 \DeclareVoidOption{nopar}{\def\phfnote@opt@par{false}}
 %    \end{macrocode} 
 % 
-% Add definitions to adjust spacing of lines and words. \marginpar{\raggedleft
-% \phfverb{[spacingdefs=...]}}  See \autoref{sec:spacingdefs}.
+% Add definitions to adjust spacing of lines and
+% words. \PrintMarginLabel{[spacingdefs=...]}  See \autoref{sec:spacingdefs}.
 %    \begin{macrocode}
 \DeclareStringOption[true]{spacingdefs}[true]
 \DeclareVoidOption{nospacingdefs}{\def\phfnote@opt@spacingdefs{false}}
 %    \end{macrocode}
 %
 %
-% Do some adjustments to the fonts. \marginpar{\raggedleft
-% \phfverb{[fontdefs=...]}} See \autoref{sec:fontdefs}.
+% Do some adjustments to the fonts. \PrintMarginLabel{[fontdefs=...]}  See
+% \autoref{sec:fontdefs}.
 %    \begin{macrocode}
 \DeclareStringOption[true]{fontdefs}[true]
 \DeclareVoidOption{nofontdefs}{\def\phfnote@opt@fontdefs{false}}
 %    \end{macrocode}
 %
-% Adjustments for footnotes. \marginpar{\raggedleft
-% \phfverb{[footnotedefs=...]}}  See \autoref{sec:footnotedefs}.
+% Adjustments for footnotes. \PrintMarginLabel{[footnotedefs=...]}  See
+% \autoref{sec:footnotedefs}.
 %    \begin{macrocode}
 \DeclareStringOption[true]{footnotedefs}[true]
 \DeclareVoidOption{nofootnotedefs}{\def\phfnote@opt@footnotedefs{false}}
 %    \end{macrocode}
 %
-% Load \pkgname{hyperref} and corresponding definitions. \marginpar{\raggedleft
-% \phfverb{[hyperrefdefs=...]}} See \autoref{sec:hyperrefdefs}.
+% Load \pkgname{hyperref} and corresponding
+% definitions. \PrintMarginLabel{[hyperrefdefs=...]} See
+% \autoref{sec:hyperrefdefs}.
 %    \begin{macrocode}
 \DeclareStringOption[]{hyperrefdefs}[]
 \DeclareVoidOption{nohyperrefdefs}{\def\phfnote@opt@hyperrefdefs{false}}
 %    \end{macrocode}
 %
-% Adjustments for bibliography, including default style. \marginpar{\raggedleft
-% \phfverb{[bibliographydefs=...]}} See \autoref{sec:bibliographydefs}.
+% Adjustments for bibliography, including default
+% style. \PrintMarginLabel{[bibliographydefs=...]} See
+% \autoref{sec:bibliographydefs}.
 %    \begin{macrocode}
 \DeclareStringOption[true]{bibliographydefs}[true]
 \DeclareVoidOption{nobibliographydefs}{\def\phfnote@opt@bibliographydefs{false}}
 %    \end{macrocode}
 % 
 % 
-% Preset option.  \marginpar{\raggedleft \phfverb{[preset=...]}} See
-% \autoref{sec:presets}.
+% Preset option.  \PrintMarginLabel{[preset=...]} See \autoref{sec:presets}.
 %    \begin{macrocode}
 \define@key{phfnote}{preset}{%
   \ifcsname phfnote@preset@#1\endcsname%
@@ -3788,8 +3792,9 @@
   \fi
 %    \end{macrocode}
 % 
-% And set the glossary, that is, the list of changes history to single-column.  For this,
-% renew the environment completely to remove the |multicols| environment.
+% And set the glossary, that is, the list of changes history to single-column.
+% For this, renew the environment completely to remove the |multicols|
+% environment.
 %    \begin{macrocode}
   \let\phfnote@xpkgdoc@old@theglossary\theglossary
   \let\phfnote@xpkgdoc@old@endtheglossary\endtheglossary
@@ -3799,7 +3804,52 @@
   {}
 %    \end{macrocode}
 %
-%
+% Tools to condense the macro names in the margins, and make them break at the
+% margin width (at arbitrary points in the macro name) instead of overflowing on
+% the documentation text.
+%    \begin{macrocode}
+  \def\phf@fillwithdiscretionaries##1##2##3{%
+    \def\phf@fillwithdescretionaries@a{##1}%
+    \def\phf@fillwithdescretionaries@b{##2}%
+    \edef\x{##3}%
+    \expandafter \phf@fillwithdiscretionaries@ \x \@nil
+  }
+  \def\phf@fillwithdiscretionaries@##1##2\@nil{%
+    \if\relax\detokenize{##1}\relax\else
+      ##1%
+      \if\relax\detokenize{##2}\relax\else
+        \discretionary{\phf@fillwithdescretionaries@a}{%
+          \phf@fillwithdescretionaries@b}{}%
+        \phf@fillwithdiscretionaries@##2\@nil
+      \fi
+    \fi
+  }
+  \definecolor{phfxpkgdocmacronamehyphencolor}{rgb}{0.6,0.6,0.7}
+  \def\phf@xpkgdoc@macrobreakhyphen{%
+    \hbox{\textcolor{phfxpkgdocmacronamehyphencolor}{-}}}
+  \def\ScaleHorizontallyAndHyphenateAnywhere##1##2{% {hscale-factor}{text}
+    \scalebox{##1}[1.0]{%
+      \parbox{% compute inverse of ##1 ...
+        \dimexpr \marginparwidth*65536 /
+        \number\dimexpr ##1\p@ \relax \relax
+      }{\raggedleft\phf@fillwithdiscretionaries{%
+          \phf@xpkgdoc@macrobreakhyphen}{}{##2}\hfill}%
+    }%
+  }
+  \def\phf@xpkgdoc@marginmacronamecompressfactor{0.85}
+  \def\phf@xpkgdoc@macrofont{\small\bfseries}% \footnotesize ?
+  \def\PrintMarginLabelContents##1{%
+    \strut\MacroFont\phf@xpkgdoc@macrofont
+    \ScaleHorizontallyAndHyphenateAnywhere{%
+      \phf@xpkgdoc@marginmacronamecompressfactor}{##1}%
+  }
+  \def\PrintMarginLabel##1{\marginpar{\PrintMarginLabelContents{##1}}}
+  \def\PrintDescribeMacro##1{\PrintMarginLabelContents{\string##1}}
+  \let\PrintMacroName\PrintDescribeMacro
+  \let\PrintDescribeEnv\PrintMarginLabelContents
+  \let\PrintEnvName\PrintMarginLabelContents
+%    \end{macrocode}
+% 
 % \textbf{Hyperref:} Request default \pkgname{hyperref} definitions with
 % |hyperrefdefs=defer|, but we'll load \pkgname{hyperdoc} instead of
 % \pkgname{hyperref}.

@@ -30,51 +30,7 @@
 \usepackage{xcolor}
 \usepackage[preset=xpkgdoc]{phfnote}
 \usepackage{needspace}
- %\newbox\marginprintmacrobox
-\definecolor{macronamehyphencolor}{rgb}{0.6,0.6,0.7}
-\makeatletter
-\def\phffillwithdiscretionaries#1{%
-  \edef\x{#1}%
-  \expandafter \phffillwithdiscretionaries@ \x \@nil
-}
-\def\phfindentafterdiscretionary{\kern1ex\relax}
-\robustify\phfindentafterdiscretionary
-\def\phffillwithdiscretionaries@#1#2\@nil{%
-  \if\relax\detokenize{#1}\relax\else
-    #1%
-    \if\relax\detokenize{#2}\relax\else
-      \discretionary{%
-        \hbox{\textcolor{macronamehyphencolor}{-}}%
-      }{%
-        %\kern1ex\relax
-        %\hbox{\textcolor{macronamehyphencolor}{-}}%
-      }{}%
-      \phffillwithdiscretionaries@#2\@nil
-    \fi
-  \fi
-}
-\def\ScaleHorizontallyAndHyphenateAnywhere#1#2{%
-  \scalebox{#1}[1.0]{%
-    \parbox{% compute inverse of #1 ...
-      \dimexpr \marginparwidth*65536 /
-          \number\dimexpr #1\p@ \relax \relax
-    }{\raggedleft\phffillwithdiscretionaries{#2}\hfill}%
-  }%
-}
-\makeatother
-\renewcommand{\ttdefault}{lmtt}
-\def\phfmarginmacronamecompressfactor{0.85}
-\def\PrintDescribeMacro#1{%
-  \strut\MacroFont\small\bfseries %footnotesize
-  \ScaleHorizontallyAndHyphenateAnywhere{\phfmarginmacronamecompressfactor}{\string#1}%
-  %\setbox\marginprintmacrobox=\hbox{\string#1}%
-  %\ifdim\wd\marginprintmacrobox>\marginparwidth\relax
-  %  \scalebox{0.8}[1.0]{\box\marginprintmacrobox}%
-  %\else
-  %  \box\marginprintmacrobox
-  %\fi
-}
-\let\PrintMacroName\PrintDescribeMacro
+
 \makeatletter
 \newsavebox\phfeaDocVirtualPage@contents
 \newenvironment{phfeaDocVirtualPage}{%
@@ -1038,15 +994,17 @@
 \def\phfea@nosectioncmd#1{%
   \ClassError{phfextendedabstract}{%
     %
-    There is no `\string#1' command in `phfextendedabstract' documents.  You can
-    only use `\string\section' and `\string\paragraph'.  If you find yourself
-    needing additional sectioning levels, it might be that your extended
-    abstract is too detailed and you should stick to a higher level description
-    of your results.  If you do need additional section levels, it is likely
-    that you will be better off with a different document class.  If you'd like
-    to stick with `phfextendedabstract' and you really know what you're doing,
-    then you could redefine the sectioning commands as necessary based on
-    `\string\@startsection' as is done in standard LaTeX classes.  Good luck!
+    There is no `\string#1' command in `phfextendedabstract'
+    documents.  You can only use `\string\section' and
+    `\string\paragraph'.  If you find yourself needing additional
+    sectioning levels, it might be that your extended abstract is too
+    detailed and you should stick to a higher level description of
+    your results.  If you do need additional section levels, it is
+    likely that you will be better off with a different document
+    class.  If you'd like to stick with `phfextendedabstract' and you
+    really know what you're doing, then you could redefine the
+    sectioning commands as necessary based on `\string\@startsection'
+    as is done in standard LaTeX classes.  Good luck!
     %
   }{}%
 }
@@ -1063,8 +1021,8 @@
 %
 % \paragraph{Set up itemization and enumeration environments}
 %
-% Provide customizable lengths for lists via macros (item sep, paragraph sep and
-% vertical skip above and below list environments).
+% Provide customizable lengths for lists via macros (item sep,
+% paragraph sep and vertical skip above and below list environments).
 % \begin{macro}{\phfeaListsVerticalSkip}
 % \begin{macro}{\phfeaListsItemSep}
 % \begin{macro}{\phfeaListsParSep}
@@ -1085,11 +1043,14 @@
 %    \begin{macrocode}
   \setlist{%
     itemsep={%
-      \phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsItemSep}},
+      \phfea@scaleglue{%
+        \phfeaVerticalSpacingCompressionFactor}{\phfeaListsItemSep}},
     parsep={%
-      \phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsParSep}},
+      \phfea@scaleglue{%
+        \phfeaVerticalSpacingCompressionFactor}{\phfeaListsParSep}},
     topsep={%
-      \phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip}},
+      \phfea@scaleglue{%
+        \phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip}},
   }%
 %    \end{macrocode}
 % \begin{environment}{enumerate*}
@@ -1120,8 +1081,10 @@
 %    \begin{macrocode}
 \def\phfeaDefineTheoremStyle{%
   \newtheoremstyle{phfextendedabstractthm}%
-    {\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip}}%
-    {\phfea@scaleglue{\phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip}}%
+    {\phfea@scaleglue{%
+        \phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip}}%
+    {\phfea@scaleglue{%
+        \phfeaVerticalSpacingCompressionFactor}{\phfeaListsVerticalSkip}}%
     {\itshape}%
     {\z@}%
     {\bfseries\itshape}%
@@ -1141,13 +1104,13 @@
   \ifdefined\newtheoremstyle\else
     \ClassError{phfextendedabstract}{%
       %
-      Impossible to load theorems (`loadtheorems=true') because there is no
-      \string\newtheoremstyle\space command that was defined.  Consider setting
-      `pkgset=...' so that a theroems-related package (e.g., amsthm) is loaded!
-      (e.g. `pkgset=minimal', `pkgset=rich' or `pkgset=extended').
-      Alternatively, set the class option `loadtheorems=false` and you can then
-      manually define any theorem environments you'd like using your favorite
-      pacakges.
+      Impossible to load theorems (`loadtheorems=true') because there
+      is no \string\newtheoremstyle\space command that was defined.
+      Consider setting `pkgset=...' so that a theroems-related package
+      (e.g., amsthm) is loaded!  (e.g. `pkgset=minimal', `pkgset=rich'
+      or `pkgset=extended').  Alternatively, set the class option
+      `loadtheorems=false' and you can then manually define any
+      theorem environments you'd like using your favorite pacakges.
       %
     }{}
   \fi
