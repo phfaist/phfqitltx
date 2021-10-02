@@ -15,8 +15,16 @@
 \phfMakeCommentingCommand{jd}
 \phfMakeCommentingCommand[initials={A.E.}]{AlE}
 \phfMakeCommentingCommand{ccfour}
+
+% \phfDefineCommentingStyle{myitalicstyle}{style={myitalicstyle},startcmds={\slshape}}
+% \phfDefineCommentingStyle{myboldstyle}{style={myitalicstyle},startcmds={\bfseries}}
+% \phfDefineCommentingStyle{myfunccstyle}{style={myitalicstyle},startcmds={\fontfamily{lmdh}}}
+
 \phfMakeCommentingCommand{ccfive}
 \phfMakeCommentingCommand{ccsix}
+% \phfMakeCommentingCommand[style=myitalicstyle,initials={cc7}]{ccseven}
+% \phfMakeCommentingCommand[initials={cc8},style=myboldstyle]{cceight}
+% \phfMakeCommentingCommand[style=myfunccstyle]{ccnine}
 \phfMakeCommentingCommand[initials={cc7}]{ccseven}
 \phfMakeCommentingCommand[initials={cc8}]{cceight}
 \phfMakeCommentingCommand{ccnine}
@@ -66,7 +74,8 @@ considerations~\cite{Oppenheim2002PRL_thermodynamical}, \ccfour{or the
 \ccnine{Some previous work has attempted to justify Landauer's Principle and
   generalizations} through explicit \ccten{models such as Szilard
   boxes}~\cite{Szilard1929ZeitschriftFuerPhysik,Dahlsten2011NJP_inadequacy}, or
-explicit Hamiltonian models~\cite{Alicki2004_hamiltonian}, all of which are NOT
+explicit Hamiltonian models~\cite{Alicki2004_hamiltonian}, all of which are
+\ccfour!{NOT}
 depicted in \figurename~\ref{fig:test}. We will follow a different approach by
 assuming Landauer's Principle as being valid, much like one generally accepts
 the second law of thermodynamics as being valid. This allows us to {\em define}
