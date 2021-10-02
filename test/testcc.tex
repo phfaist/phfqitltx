@@ -11,23 +11,26 @@
 \usepackage{phfcc}
 %\usepackage[usemarginnote=false]{phfcc}
 
-\phfMakeCommentingCommand[initials={PhF}]{phf}
-\phfMakeCommentingCommand{jd}
+%\phfSetDefaultCommentingStyle{font=\large}
+
+\phfDefineCommentingStyle{myitalicstyle}{startcmds={\itshape}}
+\phfDefineCommentingStyle{myboldstyle}{style={myitalicstyle},startcmds={\bfseries}}
+\phfDefineCommentingStyle{myfunccstyle}{style={myitalicstyle},startcmds={\fontfamily{phv}\selectfont}}
+
+
+\phfMakeCommentingCommand[initials={PhF},style=rmstrikethrough]{phf}
+\phfMakeCommentingCommand[style=rmstrikethrough]{jd}
 \phfMakeCommentingCommand[initials={A.E.}]{AlE}
 \phfMakeCommentingCommand{ccfour}
 
-% \phfDefineCommentingStyle{myitalicstyle}{style={myitalicstyle},startcmds={\slshape}}
-% \phfDefineCommentingStyle{myboldstyle}{style={myitalicstyle},startcmds={\bfseries}}
-% \phfDefineCommentingStyle{myfunccstyle}{style={myitalicstyle},startcmds={\fontfamily{lmdh}}}
-
 \phfMakeCommentingCommand{ccfive}
 \phfMakeCommentingCommand{ccsix}
-% \phfMakeCommentingCommand[style=myitalicstyle,initials={cc7}]{ccseven}
-% \phfMakeCommentingCommand[initials={cc8},style=myboldstyle]{cceight}
-% \phfMakeCommentingCommand[style=myfunccstyle]{ccnine}
-\phfMakeCommentingCommand[initials={cc7}]{ccseven}
-\phfMakeCommentingCommand[initials={cc8}]{cceight}
-\phfMakeCommentingCommand{ccnine}
+\phfMakeCommentingCommand[style=myitalicstyle,initials={cc7}]{ccseven}
+\phfMakeCommentingCommand[initials={cc8},style=myboldstyle]{cceight}
+\phfMakeCommentingCommand[style=myfunccstyle]{ccnine}
+% \phfMakeCommentingCommand[initials={cc7}]{ccseven}
+% \phfMakeCommentingCommand[initials={cc8}]{cceight}
+% \phfMakeCommentingCommand{ccnine}
 \phfMakeCommentingCommand[color={blue}]{ccten}
 \phfMakeCommentingCommand[color={red}]{cceleven}
 
