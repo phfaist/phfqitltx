@@ -5,6 +5,7 @@
 \usepackage{enumitem}
 \usepackage{amsmath}
 \usepackage{amsthm}
+\usepackage[T1]{fontenc}
 
 \newtheorem{theorem}{Theorem}
 
@@ -22,6 +23,10 @@
   style={myitalicstyle},
   startcmds={***\fontfamily{phv}\selectfont} % font won't show with LuaLaTeX, normal
 }
+
+\renewcommand\phfccfootcommentwrapfnmark[1]{\guillemotleft#1\guillemotright}
+\renewcommand\phfccfootcommenttextstyle{\bfseries\itshape}
+
 
 %\phfSetDefaultCommentingStyle{font=\large}
 

@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfcc}
 %<*package>
-    [2021/10/02 v2.0 phfcc package]
+    [2021/10/06 v2.0 phfcc package]
 %</package>
 %
 %<*driver>
@@ -233,6 +233,9 @@
 % portion of document text itself but rather an inline remark that refers to the
 % text around it.
 %
+% You can use the |footcomments| style to have your comment typeset as a
+% footnote. (See also \autoref{sec:styles} below.)
+%
 % |\AlE*{text to be removed}| --- \AlE*{text to be removed} --- typeset the
 % given text in a way to indicate that the text should be suppressed.
 %
@@ -359,7 +362,8 @@
 % \item[rmfont=\marg{LaTeX commands}] The font commands to issue when
 %   typesetting text that is to be removed. \phf*{By default, the text is in
 %   italics like this} (If you're using Lua\LaTeX, it's recommended to use the
-%   |rmstrikethrough| style for proper strikethrough text.)
+%   |rmstrikethrough| style for proper strikethrough text; see
+%   \autoref{sec:styles}.)
 % \item[rmspacing=\meta{length}] Spacing to add around text that is marked to be
 %   removed. This amount of horizontal space is added before and after.
 % \item[rmbegin=\marg{LaTeX text and/or commands}] Stuff to typeset at the
@@ -401,8 +405,75 @@
 % \subsection{Commenting Styles}
 % \label{sec:styles}
 %
-% \emph{Styles} regroup a collection of definitions that you could give to
-% |\phfMakeCommentingCommand| and remembers them for later use.
+% \emph{Styles} regroup a collection of definitions that alter the overall
+% behavior and appearance of commenting commands issued with
+% |\phfMakeCommentingCommand|.  You can assign one or more styles to a
+% commenting command definition by using the |style=| keyword:
+% \begin{verbatim}
+% \phfMakeCommentingCommand[style={footcomments}]{JD} % \JD
+% \end{verbatim}
+% 
+% You can combine style names with commas, for instance:
+%
+% \begin{verbatim}
+% \phfMakeCommentingCommand[style={rmstrikethrough,footcomments}]{JD} % \JD
+% \end{verbatim}
+% 
+% \phfMakeCommentingCommand[rmbegin={},rmend={},rmspacing=2pt,initials={ZZ}]{dummycmd}
+% \phfMakeCommentingCommand[style={footcomments},initials={YY}]{dummyYY}
+% The following styles are predefined:
+% \begin{itemize}
+% \item \leavevmode\PrintMarginLabel{footcomments} The |footcomments| style
+%   arranges for in-line comments to be typeset as footnotes.
+%   
+%   \begin{verbatim}
+% \phfMakeCommentingCommand[style={footcomments}]{YY}
+%
+% For instance, \YY[This would be an example of a comment
+% typeset as a footnote.] this text might be suitable to
+% comment on.
+% \end{verbatim}
+%   gives:
+%
+%   ``For instance, \dummyYY[This would be an example of a comment typeset as a
+%   footnote.] this text might be suitable to comment on.''
+%   
+%   This style can be convenient to place comments without interrupting the
+%   natural flow of the text.
+%
+%   You can redefine |\phfccfootcommentwrapfnmark{..}| to customize the
+%   appearance of the footnote mark, and |\phfccfootcommenttextstyle| to get
+%   some handle on the commands issued within the footnote contents.
+% \begin{verbatim}
+% \renewcommand\phfccfootcommentwrapfnmark[1]{[[#1]]}
+% \renewcommand\phfccfootcommenttextstyle{\bfseries}
+% \end{verbatim}
+%   
+% \item \leavevmode\PrintMarginLabel{rmstrikethrough} For Lua\LaTeX\ users, the
+%   style |rmstrikethrough| is available to make text marked for removal drawn
+%   in strikethrough font, \dummycmd*{\sout{kind of like this}}.  You can cross
+%   out entire paragraphs of text which include display equations.  Simply use:
+% \begin{verbatim}
+% \phfMakeCommentingCommand[style=rmstrikethrough]{ZZ} % requires LuaLaTeX
+% 
+% ... \ZZ*{text to be removed} ... or also ... \ZZ* more
+% text that I want to remove\endZZ ...
+% \end{verbatim}
+%   
+%   The implementation uses the |lua-ul| package, which requires Lua\LaTeX.  To
+%   apply this style to all definitions, use
+%   |\phfSetDefaultCommentingStyle{style=rmstrikethrough}| (see below).
+%
+%   (We do not support strikethrough for regular \LaTeX\ because we weren't able
+%   to find an implementation that worked reliably even for large blocks of
+%   text.  For instance, using the |\sout| from the \pkgname{ulem} package, you
+%   cannot strikethrough multiple paragraphs with displayed equations.  Plus, to
+%   support the extended syntax of |\phfcc|'s commenting commands, we need the
+%   strikethrough to be implemented by a state change macro (like |\itshape|) or
+%   an environment, and not by a macro that accepts an argument.)
+%
+% \item We'll probably add more predefined styles in the future.
+% \end{itemize}
 %
 % \DescribeMacro{\phfDefineCommentingStyle}
 % You can define a style using |\phfDefineCommentingStyle|:
@@ -431,43 +502,14 @@
 % |\me[A comment]| becomes: \me[A comment].
 %
 % Styles are loaded in the order they are specified (separate style names with
-% commas).  Style definitions may contain |style=...| keys to load other styles.
-% Styles are always loaded before user keys, regardless of where the `|style|'
-% key appears in the definition.  When styles are loaded, and when the users'
-% keys are set, later keys are overwrite earlier ones.\footnote{Except for an
-% as-of-yet undocumented \phfverb{startcmds} and \phfverb{endcmds} keys which
-% might be relevant if you'd like to develop a style which requires you to issue
-% definitions at the beginning of every annotation.}
-%
-% \phfMakeCommentingCommand[rmbegin={},rmend={},rmspacing=2pt,initials={ZZ}]{dummycmd}
-% There is currently one predefined style:
-% \begin{itemize}
-% \item For Lua\LaTeX\ users, the style |rmstrikethrough| is available to make
-%   text marked for removal drawn in strikethrough font, \dummycmd*{\sout{kind
-%   of like this}}.  You can cross out entire paragraphs of text which include
-%   display equations.  Simply use:
-% \begin{verbatim}
-% \phfMakeCommentingCommand[style=rmstrikethrough]{ZZ} % requires LuaLaTeX
-% 
-% ... \ZZ*{text to be removed} ... or also ... \ZZ* more
-% text that I want to remove\endZZ ...
-% \end{verbatim}
-%   
-%   The implementation uses the |lua-ul| package, which requires Lua\LaTeX.  To
-%   apply this style to all definitions, use
-%   |\phfSetDefaultCommentingStyle{style=rmstrikethrough}| (see below).
-%
-%   (We do not support strikethrough for regular \LaTeX\ because we weren't able
-%   to find an implementation that worked reliably even for large blocks of
-%   text.  For instance, using the |\sout| from the \pkgname{ulem} package, you
-%   cannot strikethrough multiple paragraphs with displayed equations.  Plus, to
-%   support the extended syntax of |\phfcc|'s commenting commands, we need the
-%   strikethrough to be implemented by a state change macro (like |\itshape|) or
-%   an environment, and not by a macro that accepts an argument.)
-%
-% \item We'll probably add more predefined styles in the future.
-% \end{itemize}
-% 
+% commas).  Style definitions may themselves contain |style=...| keys to load
+% other styles.  Styles are always loaded before user keys, regardless of where
+% the `|style|' key appears in the definition.  When styles are loaded, and when
+% the users' keys are set, later keys are overwrite earlier
+% ones.\footnote{Except for an as-of-yet undocumented \phfverb{startcmds} and
+% \phfverb{endcmds} keys which might be relevant if you'd like to develop a
+% style which requires you to issue definitions at the beginning of every
+% annotation.}
 %
 % \DescribeMacro{\phfSetDefaultCommentingStyle} Instead of defining named styles
 % which have to be invoked explicitly, you can also preset the style of all
@@ -480,16 +522,26 @@
 % % all annotations defined from here on will appear larger
 % \phfMakeCommentingCommand{AB}
 % \end{verbatim}
+%
+% You can also use |\phfMakeCommentingCommand| to set one or more default
+% style(s) for all future commenting command definitions:
+% \begin{verbatim}
+% \phfSetDefaultCommentingStyle{
+%   style={rmstrikethrough,footcomments}
+% }
+% % all annotations defined from here on will have these styles set
+% \phfMakeCommentingCommand{AB}
+% \end{verbatim}
 % 
 % \subsection{Customizing the formatting of the initials label}
 % \label{sec:customize-initials-formatting}
 %
-% \paragraph{For the \phfverb{margin} style:}
+% \paragraph{For the \phfverb{formatinitials=margin} style:}
 %
 % You can customize the appearance of the initials in the margin when using the
-% |margin| initials style by redefining the following macros.  Changes affect
-% all margin labels (i.e., changes affect all commenting commands using the
-% |margin| initials formatting style).
+% |formatinitials=margin| initials style by redefining the following macros.
+% Changes affect all margin labels (i.e., changes affect all commenting commands
+% using the |margin| initials formatting style).
 %
 % \DescribeMacro{\phfccformatmargininitials} The |\phfccformatmargininitials| is
 % used to format the initials in the margin.  You can redefine it if you'd like
@@ -510,21 +562,23 @@
 % \setlength{\phfccmargininitialssep}{2pt}
 % \end{verbatim}
 %
-% \paragraph{For the \phfverb{box} and \phfverb{nobox} styles:}
+% \paragraph{For the \phfverb{formatinitials=box} and
+%   \phfverb{formatinitials=nobox} styles:}
 %
-% \DescribeMacro{\phfccformatboxinitials} For the |box| and |nobox| initials
-% style, you can redefine the command |\phfccformatboxinitials| to typeset the
-% initials, like so:
+% \DescribeMacro{\phfccformatboxinitials} For the |formatinitials=box| and
+% |formatinitials=nobox| initials style, you can redefine the command
+% |\phfccformatboxinitials| to typeset the initials, like so:
 % \begin{verbatim}
 % \renewcommand{\phfccformatboxinitials}[1]{%
 %   \normalfont\sffamily\tiny#1%
 % }
 % \end{verbatim}
 %
-% \paragraph{For the \phfverb{footnote} style:}
+% \paragraph{For the \phfverb{formatinitials=footnote} style:}
 %
-% \DescribeMacro{\phfCCChangesBy} When using the |footnote| initials formatting
-% style, you may redefine |\phfCCChangesBy| to change the text in the footnote:
+% \DescribeMacro{\phfCCChangesBy} When using the |formatinitials=footnote|
+% initials formatting style, you may redefine |\phfCCChangesBy| to change the
+% text in the footnote:
 % \begin{verbatim}
 % \renewcommand{\phfCCChangesBy}[1]{Changes in this color are by #1}
 % \end{verbatim}
@@ -782,6 +836,8 @@
 %    \end{macrocode}
 % \end{macro}
 % 
+% \subsubsection{Internal helpers for loading styles}
+%
 % \begin{macro}{\phfcc@expandstylekeys}
 %   Helpers to expand style= instructions in a set of key=vals.
 %
@@ -834,7 +890,7 @@
 %    \begin{macrocode}
   \def\phfcc@val@fullstylekeyvals{}%
   \edef\phfcc@tmp@thestylelist{%
-    \phfcc@val@expanded@preexpandstyles,\cmdKV@phfmkccstyle@style}
+    \phfcc@val@expanded@preexpandstyles,\cmdKV@phfmkccstyle@style}%
   \@for\phfcc@tmp@next:=\phfcc@tmp@thestylelist \do{%
 %    \end{macrocode}
 % At this point we're requested to expand the style whose name is stored in
@@ -854,7 +910,7 @@
           \expandafter\expandonce\csname phfcc@style@\phfcc@tmp@next \endcsname}%
         \edef\phfcc@val@fullstylekeyvals{%
           \expandonce\phfcc@val@fullstylekeyvals,%
-          \expandonce\phfcc@tmp@stylekeyvals}
+          \expandonce\phfcc@tmp@stylekeyvals}%
       \else
         \if\relax\detokenize\expandafter{\phfcc@tmp@next}\relax
         \else
@@ -877,8 +933,10 @@
 % \end{macro}
 % 
 %
-% \paragraph{The |rmstrikethrough| predefined style}
+% \subsubsection{The \phfverb{rmstrikethrough} predefined style}
 %
+% \begin{macro}{\phfcc@style@rmstrikethrough}
+%   The definition of the |rmstrikethrough| style is fairly straightforward.
 %    \begin{macrocode}
 \gdef\phfcc@styleused@rmstrikethrough{%
   \RequirePackage{lua-ul}
@@ -893,8 +951,9 @@
   rmspacing={2pt}
 }
 %    \end{macrocode}
-%
-% \paragraph{The |footcomments| predefined style}
+% \end{macro}
+% 
+% \subsubsection{The \phfverb{footcomments} predefined style}
 %
 % \begin{macro}{\phfcc@style@footcomments}
 %   The |footcomments| style uses |startcmds| and |endcmds| to collect material
@@ -915,34 +974,15 @@
 % \end{macro}
 %
 % Now we define helpers to collect the contents of the footnote, and then
-% typeset it; furthermore this should only be done if the annotation is a
-% comment.
+% typeset it.
+%
+% \begin{macro}{\phfcc@collectcommentfootnote}
+% \begin{macro}{\phfcc@endcollectcommentfootnote}
+%   The entry point to these helpers are the macros
+%   |\phfcc@collectcommentfootnote| and |\phfcc@endcollectcommentfootnote|: They
+%   check whether this annotation is a comment and then call our main helpers if
+%   that's the case.
 %    \begin{macrocode}
-\newbox\phfcc@collectfootnotebox
-\def\phfcc@collectfootnote{%
-  \setbox\phfcc@collectfootnotebox=\vbox\bgroup
-    \leavevmode
-    \footnotesize
-    \color{\phf@cc@val@cur color}%
-    \phfccfootcommenttextstyle
-}
-\def\phfcc@footcomment@setup{%
-  \vskip -0.5\baselineskip
-  \footnotesize
-  \color{\phf@cc@val@cur color}%
-}
-\def\phfcc@endcollectfootnote{%
-  \unskip\egroup
-  \edef\phfcc@tmp@footnotecontents{%
-    \noexpand\begingroup
-    \expandonce\phfcc@footcomment@setup
-    \noexpand\phfccfootcommenttextstyle
-    \expandafter\unexpanded\expandafter{\unvbox\phfcc@collectfootnotebox}%
-    \noexpand\endgroup
-  }%
-  \color{\phf@cc@val@cur color}%
-  \expandafter\footnote\expandafter{\phfcc@tmp@footnotecontents}%
-}
 \def\phfcc@collectcommentfootnote{%
   \if@phfcc@iscomment
     \expandafter\phfcc@collectfootnote
@@ -952,6 +992,71 @@
     \expandafter\phfcc@endcollectfootnote
   \fi}
 %    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}{\phfcc@collectfootnote}
+% \begin{macro}{\phfcc@endcollectfootnote}
+% \begin{macro}{\phfcc@startfootnote}
+%   The helper |\phfcc@collectfootnote| collects the material and builds the
+%   footnote.  I had to copy some footnote-building code from |latex.ltx|
+%   unfortunately: We can't call |\footnote{}| because it requires a macro
+%   argument; we need begin/end macros to feed all the footnote contents and
+%   material as \TeX\ parses it.  Recall that \LaTeX's |\footnote| basically (1)
+%   steps the footnote counter (the counter name is stored in |\@mpfn| and the
+%   printable value is given by |\thempfn|) and prints the footnote mark
+%   (|\@footnotemark|), and (2) collects material in the |\insert| called
+%   |\footins|.  The code relevant to (1) is collected in
+%   |\phfcc@startfootnote|.  The code relevant to (2) is collected and adapted
+%   below between |\phfcc@collectfootnote| and |\phfcc@endcollectfootnote|.
+%    \begin{macrocode}
+\def\phfcc@collectfootnote{%
+  \phfcc@startfootnote
+  \insert\footins\bgroup%
+    \reset@font\footnotesize
+    \interlinepenalty\interfootnotelinepenalty
+    \splittopskip\footnotesep
+    \splitmaxdepth \dp\strutbox \floatingpenalty \@MM
+    \hsize\columnwidth \@parboxrestore
+    \protected@edef\@currentlabel{%
+       \csname p@footnote\endcsname\@thefnmark
+    }%
+    \color@begingroup
+    \@makefntext{%
+      \rule\z@\footnotesep\@finalstrut\strutbox\phfcc@hackrevtex@skippar}%
+    \ignorespaces
+    \footnotesize
+    \color{\phf@cc@val@cur color}%
+    \phfccfootcommenttextstyle
+}
+\def\phfcc@endcollectfootnote{%
+    \unskip
+    \color@endgroup
+  \egroup
+}
+\def\phfcc@startfootnote{%
+  \stepcounter\@mpfn
+  \protected@xdef\@thefnmark{\thempfn}%
+  \phfccfootcommentwrapfnmark{\@footnotemark}%
+}
+\def\phfccfootcommentwrapfnmark#1{%
+  [#1]%
+}
+%    \end{macrocode}
+% Above, we used the class-provided |\@makefntext| macro to make comment
+% footnotes look like the other document-provided footnotes, but we invoke that
+% macro with dummy content because remember, we haven't collected the footnote
+% contents yet.  But some latex classes, like Rev\TeX, this macro add a
+% paragraph; so we need to eliminate that paragraph break that would otherwise
+% appear at the beginning of the footnote:
+%    \begin{macrocode}
+\def\phfcc@hackrevtex@skippar{%
+  \@ifnextchar\par\@gobble\relax
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
 %
 %
 % \subsection{Define styles for initials formatting}
