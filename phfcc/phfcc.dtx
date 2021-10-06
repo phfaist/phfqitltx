@@ -435,9 +435,9 @@
 % Styles are always loaded before user keys, regardless of where the `|style|'
 % key appears in the definition.  When styles are loaded, and when the users'
 % keys are set, later keys are overwrite earlier ones.\footnote{Except for an
-% as-of-yet undocumented \phfverb{startcmds} key which might be relevant if
-% you'd like to develop a style which requires you to issue definitions at the
-% beginning of every annotation.}
+% as-of-yet undocumented \phfverb{startcmds} and \phfverb{endcmds} keys which
+% might be relevant if you'd like to develop a style which requires you to issue
+% definitions at the beginning of every annotation.}
 %
 % \phfMakeCommentingCommand[rmbegin={},rmend={},rmspacing=2pt,initials={ZZ}]{dummycmd}
 % There is currently one predefined style:
@@ -608,6 +608,7 @@
 % aggressive like that, so keep them normal by default.
 %    \begin{macrocode}
 \def\phfCommentingDefaultStartCmds{}
+\def\phfCommentingDefaultEndCmds{}
 \def\phfCommentingDefaultFont{}
 \def\phfCommentingDefaultSpacing{0pt}
 \def\phfCommentingDefaultBegin{}
@@ -619,11 +620,13 @@
 \def\phfCommentingDefaultRmFont{\small\itshape}%\itshape\notesmaller[0.9]}
 \def\phfCommentingDefaultRmSpacing{.3em}
 \def\phfCommentingDefaultRmBegin{%
-  \mbox{}\vrule height .55ex depth -.45ex width 2.2em\relax
+  \mbox{}\vrule height .55ex depth -.45ex width 1.4em\relax\hspace*{0.2em}%
+  \vrule height .55ex depth -.45ex width 0.6em\relax
   \hspace*{-2em}}
 \def\phfCommentingDefaultRmEnd{%
   \hspace*{-2em}%
-  \vrule height .55ex depth -.45ex width 2.2em\relax}
+  \vrule height .55ex depth -.45ex width 0.6em\relax\hspace*{0.2em}%
+  \vrule height .55ex depth -.45ex width 1.4em\relax}
 \def\phfCommentingDefaultIFont{\large\bfseries}
 \def\phfCommentingDefaultISpacing{0.25em}
 \def\phfCommentingDefaultIBegin{!\hspace*{0.1em}!\hspace*{0.1em}!~}
@@ -694,8 +697,13 @@
 \define@cmdkey{phfmkcc}{initials}{}
 \define@cmdkey{phfmkcc}{formatinitials}{}
 \newtoks\cmdKV@phfmkcc@startcmds
+\newtoks\cmdKV@phfmkcc@endcmds
 \define@key{phfmkcc}{startcmds}{%
   \cmdKV@phfmkcc@startcmds=\expandafter{\the\cmdKV@phfmkcc@startcmds#1}%
+}
+\define@key{phfmkcc}{endcmds}{%
+  \edef\x{\unexpanded{#1}\the\cmdKV@phfmkcc@endcmds}%
+  \cmdKV@phfmkcc@endcmds=\expandafter{\x}%
 }
 \define@cmdkey{phfmkcc}{font}{}
 \define@cmdkey{phfmkcc}{spacing}{}
@@ -723,6 +731,7 @@
   initials={},%
   formatinitials={default},%
   startcmds={\phfCommentingDefaultStartCmds},%
+  endcmds={\phfCommentingDefaultEndCmds},%
   font={\phfCommentingDefaultFont},%
   spacing={\phfCommentingDefaultSpacing},%
   begin={\phfCommentingDefaultBegin},%
@@ -743,11 +752,22 @@
 }{}
 %    \end{macrocode}
 %
-% Mini mechanism for defining comment styles.
+% \subsection{Helpers and handlers for styles}
+%
+% \begin{macro}{\phfDefineCommentingStyle}
+%   User interface for defining custom comment styles.
 %    \begin{macrocode}
 \newcommand\phfDefineCommentingStyle[2]{%
   \csdef{phfcc@style@#1}{#2}%
 }
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\phfSetDefaultCommentingStyle}
+%   User interface for defining the default settings for all commenting commands
+%   declared from now on.  Keep note of |style=| keywords separately (in
+%   |\phfcc@default@style|), because we cannot place them as |\presetkeys| in
+%   the main options family.
+%    \begin{macrocode}
 \def\phfcc@default@style{}
 \def\phfcc@hook@phfmkccstyle@setstyle@savestyle#1{%
   \xdef\phfcc@default@style{#1}%
@@ -760,6 +780,7 @@
   \x
 }
 %    \end{macrocode}
+% \end{macro}
 % 
 % \begin{macro}{\phfcc@expandstylekeys}
 %   Helpers to expand style= instructions in a set of key=vals.
@@ -856,7 +877,8 @@
 % \end{macro}
 % 
 %
-% A few predefined styles:
+% \paragraph{The |rmstrikethrough| predefined style}
+%
 %    \begin{macrocode}
 \gdef\phfcc@styleused@rmstrikethrough{%
   \RequirePackage{lua-ul}
@@ -871,7 +893,66 @@
   rmspacing={2pt}
 }
 %    \end{macrocode}
-% 
+%
+% \paragraph{The |footcomments| predefined style}
+%
+% \begin{macro}{\phfcc@style@footcomments}
+%   The |footcomments| style uses |startcmds| and |endcmds| to collect material
+%   and then typeset it into a footnote.
+%    \begin{macrocode}
+\def\phfcc@style@footcomments{%
+  startcmds={\phfcc@collectcommentfootnote},
+  endcmds={\phfcc@endcollectcommentfootnote},
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\phfccfootcommenttextstyle}
+%   The macro |\phfccfootcommenttextstyle| can be redefined to customize the
+%   footnote text appearance.
+%    \begin{macrocode}
+\def\phfccfootcommenttextstyle{\footnotesize}
+%    \end{macrocode}
+% \end{macro}
+%
+% Now we define helpers to collect the contents of the footnote, and then
+% typeset it; furthermore this should only be done if the annotation is a
+% comment.
+%    \begin{macrocode}
+\newbox\phfcc@collectfootnotebox
+\def\phfcc@collectfootnote{%
+  \setbox\phfcc@collectfootnotebox=\vbox\bgroup
+    \leavevmode
+    \footnotesize
+    \color{\phf@cc@val@cur color}%
+    \phfccfootcommenttextstyle
+}
+\def\phfcc@footcomment@setup{%
+  \vskip -0.5\baselineskip
+  \footnotesize
+  \color{\phf@cc@val@cur color}%
+}
+\def\phfcc@endcollectfootnote{%
+  \unskip\egroup
+  \edef\phfcc@tmp@footnotecontents{%
+    \noexpand\begingroup
+    \expandonce\phfcc@footcomment@setup
+    \noexpand\phfccfootcommenttextstyle
+    \expandafter\unexpanded\expandafter{\unvbox\phfcc@collectfootnotebox}%
+    \noexpand\endgroup
+  }%
+  \color{\phf@cc@val@cur color}%
+  \expandafter\footnote\expandafter{\phfcc@tmp@footnotecontents}%
+}
+\def\phfcc@collectcommentfootnote{%
+  \if@phfcc@iscomment
+    \expandafter\phfcc@collectfootnote
+  \fi}
+\def\phfcc@endcollectcommentfootnote{%
+  \if@phfcc@iscomment
+    \expandafter\phfcc@endcollectfootnote
+  \fi}
+%    \end{macrocode}
+%
 %
 % \subsection{Define styles for initials formatting}
 %
@@ -1297,6 +1378,7 @@
 %    \begin{macrocode}
 \newcommand\phfMakeCommentingCommand[2][]{%
   \cmdKV@phfmkcc@startcmds={}%
+  \cmdKV@phfmkcc@endcmds={}%
   \edef\x{\noexpand\phfcc@expandstylekeys{\phfcc@default@style}{\unexpanded{#1}}}%
   \x
   %\setrmkeys{phfmkcc}%
@@ -1324,7 +1406,9 @@
     \csedef{phf@cc@val@#2@formatinitials}{\expandonce\cmdKV@phfmkcc@formatinitials}%
   \fi
   \csedef{phf@cc@val@#2@startcmds}{\the\cmdKV@phfmkcc@startcmds}%
-  \message{***** STARTCMDS ARE \detokenize\expandafter{\the\cmdKV@phfmkcc@startcmds} *****}%
+  \csedef{phf@cc@val@#2@endcmds}{\the\cmdKV@phfmkcc@endcmds}%
+  %\message{***** STARTCMDS ARE \detokenize\expandafter{\the\cmdKV@phfmkcc@startcmds} *****}%
+  %\message{***** ENDCMDS ARE \detokenize\expandafter{\the\cmdKV@phfmkcc@endcmds} *****}%
   \csedef{phf@cc@val@#2@font}{\expandonce\cmdKV@phfmkcc@font}%
   \csedef{phf@cc@val@#2@spacing}{\expandonce\cmdKV@phfmkcc@spacing}%
   \csedef{phf@cc@val@#2@begin}{\expandonce\cmdKV@phfmkcc@begin}%
@@ -1431,6 +1515,7 @@
     \phf@cc@showinitials%
   }{%
     \hspace{\phf@cc@val@spacing}%
+    \csname phf@cc@val@\phf@cc@val@cur @endcmds\endcsname
   }%
 %    \end{macrocode}
 %

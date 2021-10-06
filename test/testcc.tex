@@ -11,10 +11,6 @@
 \usepackage{phfcc}
 %\usepackage[usemarginnote=false]{phfcc}
 
-%\phfSetDefaultCommentingStyle{font=\large}
-
-%\phfSetDefaultCommentingStyle{style=rmstrikethrough,}
-
 \phfDefineCommentingStyle{myitalicstyle}{
   startcmds={\itshape}
 }
@@ -27,13 +23,17 @@
   startcmds={***\fontfamily{phv}\selectfont} % font won't show with LuaLaTeX, normal
 }
 
+%\phfSetDefaultCommentingStyle{font=\large}
+
+%\phfSetDefaultCommentingStyle{style=rmstrikethrough,}
+
 
 \phfMakeCommentingCommand[initials={PhF}]{phf}
 \phfMakeCommentingCommand{jd}
 \phfMakeCommentingCommand[initials={A.E.}]{AlE}
 \phfMakeCommentingCommand{ccfour}
 
-\phfMakeCommentingCommand{ccfive}
+\phfMakeCommentingCommand[style=footcomments]{ccfive}
 \phfMakeCommentingCommand{ccsix}
 \phfMakeCommentingCommand[style=myitalicstyle,initials={cc7}]{ccseven}
 \phfMakeCommentingCommand[initials={cc8},style=myboldstyle]{cceight}
@@ -80,8 +80,8 @@ demon via information theory (see eg.~\cite{Bennett2003_NotesLP}), and
 generalizations to \AlE{quantum settings such as characterization of
   entanglement} through thermodynamical
 considerations~\cite{Oppenheim2002PRL_thermodynamical}, \ccfour{or the
-  determination of the single} shot work cost \ccfive{of the erasure} \ccsix{of a
-  quantum} \ccseven{system with quantum} side
+  determination of the single} shot work cost \ccfive{of the erasure} \ccsix{of
+  a quantum} \ccseven{system with quantum} side
 \cceight{information}~\cite{delRio2011Nature}.
 
 \ccnine{Some previous work has attempted to justify Landauer's Principle and
@@ -140,6 +140,22 @@ Let me try something on a page on its own:
   Let there be a theorem.
 \end{theorem}
 
+I would also like to test footnote-style comments. \ccfive[I added a comment to
+clarify that this and that and we're talking about the erasure of the quantum
+system and bla bla bla bla bla bla bla blabla bla bla blabla bla bla bla.
+
+Also can we have more than one paragraph?
+
+And an equation?
+\begin{align}
+  a = b\ .
+\end{align}
+
+\begin{itemize}
+\item and itemized environments?
+\item with multiple items?
+\end{itemize}
+]
 
 \clearpage
 \onecolumngrid
