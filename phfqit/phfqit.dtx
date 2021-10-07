@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfqit}
 %<*package>
-    [2021/07/27 v3.1 phfqit package]
+    [2021/07/27 v4.0 phfqit package]
 %</package>
 %
 %<*driver>
@@ -178,7 +178,7 @@
 %
 %
 %
-% \section{General Symbols (and Math Operators)}
+% \section{General Symbols and Math Operators}
 % \label{sec:symbols}
 %
 % \DescribeMacro{\Hs}
@@ -209,6 +209,14 @@
 % ideas is that this macro may be redefined to change the appearance of the $e$
 % symbol, or even to change the notation to |\exp{<ARGUMENT>}| if needed for
 % inline math.
+%
+% \DescribeMacro{\phfqitExpPowerExpression}
+% To change the appearance of whatever you typed as |\ee^{XYZ}|, you can
+% redefine |\phfqitExpPowerExpression|; for instance, to use an upright
+% ``$\mathrm{e}$'' symbol, you could type:
+% \begin{verbatim}
+% \renewcommand\phfqitExpPowerExpression[1]{\mathrm{e}^{#1}}
+% \end{verbatim}
 %
 %
 % \subsection{Math/Linear Algebra Operators}
@@ -302,18 +310,23 @@
 % \section{Bra-Ket Notation and Delimited Expressions}
 % \label{sec:bra-ket} \label{sec:delimited}
 %
-% All commands here work in math mode only.  They all accept an optional
-% argument, which is a size modifier.  Use the starred form to enclose the
-% delimiters with |\left...\right| and have the size determined automatically.
-% Usage for example is:
+% All commands here work in math mode only.  They all accept a size modifier as
+% described in \autoref{topic:size-specification-backtick}.  (The size may also
+% be provided as an optional argument; the starred form of the command may also
+% be used to enclose the delimiters with |\left...\right| and have the size
+% determined automatically.)  Example usage is:
 % \begin{center}
 %   \begin{tabular}{lc}
-%       |\ket{\psi}|  &  $\ket{\psi}$ \\[1em]
-%       |\ket[\big]{\psi}|  &  $\ket[\big]{\psi}$ \\[1em]
-%       |\ket[\Big]{\psi}|  &  $\ket[\Big]{\psi}$ \\[1em]
-%       |\ket[\bigg]{\psi}|  &  $\ket[\bigg]{\psi}$ \\[1em]
-%       |\ket[\Bigg]{\psi}|  &  $\ket[\Bigg]{\psi}$ \\[1em]
-%       |\ket*{\displaystyle\sum_k \psi_k}|  &  $\ket*{\displaystyle\sum_k \psi_k}$ \\
+%   |\ket{\psi}|  &  $\ket{\psi}$ \\[1em]
+%   |\ket`\big{\psi}|~,~~|\ket[\big]{\psi}|  &  $\ket`\big{\psi}$ \\[1em]
+%   |\ket`\Big{\psi}|~,~~|\ket[\Big]{\psi}|  &  $\ket`\Big{\psi}$ \\[1em]
+%   |\ket`\bigg{\psi}|~,~~|\ket[\bigg]{\psi}|  &  $\ket`\bigg{\psi}$ \\[1em]
+%   |\ket`\Bigg{\psi}|~,~~|\ket[\Bigg]{\psi}|  &  $\ket`\Bigg{\psi}$ \\[1em]
+%   \begin{minipage}{7cm}\relax
+%      \noindent|\ket`*{\displaystyle\sum_k \psi_k}|,\\
+%      \hspace*{2em}|\ket*{\displaystyle\sum_k \psi_k}|
+%   \end{minipage}
+%                                &  $\ket*{\displaystyle\sum_k \psi_k}$
 %   \end{tabular}
 % \end{center}
 %
@@ -347,8 +360,8 @@
 % \DescribeMacro{\abs} The absolute value of an expression.  |\abs{A}| gives
 % $\abs{A}$.
 %
-% \DescribeMacro{\avg} The average of an expression. |\avg[\big]{\sum_k A_k}|
-% gives $\avg[\big]{\sum_k A_k}$.
+% \DescribeMacro{\avg} The average of an expression. |\avg`\big{\sum_k A_k}|
+% gives $\avg`\big{\sum_k A_k}$.
 %
 % \DescribeMacro{\norm} The norm of an expression.  |\norm{A_k}| gives
 % $\norm{A_k}$.  (You can add subscripts, e.g.\@ |\norm{A_k}_\infty| is
@@ -366,6 +379,25 @@
 % \DescribeMacro{\intervaloc} A semi-open interval, open on the lower bound
 % and closed on the upper bound. |\intervaloc{x}{y}| gives $\intervaloc{x}{y}$.
 %
+%
+% \DescribeMacro{\phfqitDefineNorm} The handy command |\phfqitDefineNorm| can be used
+% to define custom norms (e.g. 1-norm, infinity-norm, p/q-norms, etc.).  The
+% syntax is |\phfDefineNorm|\meta{command name}\meta{before}\meta{after}, for
+% example:
+% \begin{verbatim}
+% \phfqitDefineNorm\onenorm{}{_1}
+% \phfqitDefineNorm\opnorm{}{_\infty}
+% \end{verbatim}
+%
+% \DescribeMacro{\phfqitDeclarePairedDelimiterXWithAltSizing}
+% \DescribeMacro{\phfqitDeclarePairedDelimiterXPPWithAltSizing} For defining
+% more advanced custom delimited expressions, you can use the
+% |\phfqitDeclarePairedDelimiterXWithAltSizing| and
+% |\phfqitDeclarePairedDelimiterXPPWithAltSizing| helpers.  These macros wrap
+% the \pkgname{mathtools} package's |\DeclarePairedDelimiterX| and
+% |\DeclarePairedDelimiterX| macros, by furthermore enabling the newly defined
+% command to accept the size argument using the backtick syntax described in
+% \autoref{topic:size-specification-backtick}.
 %
 %
 % \section{Entropy Measures and Other ``Qit Objects''}
@@ -962,8 +994,24 @@
 % \begingroup\catcode`\^=12\relax
 % \begin{macro}{\ee^...}
 %   Macro for the exponential.
+%
+%   Because the character |^| might have different catcodes (e.g. with the
+%   \pkgname{breqn} package), we use a hack with |\detokenize|.  Basically this
+%   boils down to |\def\ee^#1{\phfqitExpPowerExpression{#1}}| and
+%   |\def\phfqitExpPowerExpression#1{e^{#1}}|, up to making sure that all the
+%   |^| symbols are compared without catcodes.
+%
+%   \changed[v4.0-fixed-ee-for-catcodes]{v4.0}{2021/10/07}{Fixed the definition
+%   of \phfverb{\ee} in order to support the case where the catcode of
+%   \phfverb{^} changes}
 %    \begin{macrocode}
-\def\ee^#1{e^{#1}} % we could imagine that in inlines, we replace this by exp()...
+\edef\phfqit@def@hat{\detokenize{^}}
+\expandafter\def\expandafter\phfqit@ee@gobblehat\phfqit@def@hat{%
+  \phfqitExpPowerExpression}
+\def\phfqitExpPowerExpression#1{e^{#1}}
+\def\ee#1{\expandafter\phfqit@ee@gobblehat\detokenize{#1}}
+\robustify\phfqitExpPowerExpression
+\robustify\ee
 %    \end{macrocode}
 % \end{macro}
 % \endgroup
@@ -1164,108 +1212,10 @@
 %
 %
 %
-% \subsection{Bra-Ket Notation}
-%
-% 
-% \needspace{8\baselineskip}
-% \begin{macro}{\ket}
-% \begin{macro}{\bra}
-% \begin{macro}{\braket}
-% \begin{macro}{\ketbra}
-% \begin{macro}{\proj}
-% \begin{macro}{\matrixel}
-% \begin{macro}{\dmatrixel}
-% \begin{macro}{\innerprod}
-%   Bras, kets, norms, some delimiter stuff.  User documentation in
-%   \autoref{sec:bra-ket}.  
-%    \begin{macrocode}
-\DeclarePairedDelimiterX\ket[1]{\lvert}{\rangle}{{#1}}
-\DeclarePairedDelimiterX\bra[1]{\langle}{\rvert}{{#1}}
-\DeclarePairedDelimiterX\braket[2]{\langle}{\rangle}{%
-  {#1}\hspace*{0.2ex}\delimsize\vert\hspace*{0.2ex}{#2}%
-}
-\DeclarePairedDelimiterX\ketbra[2]{\lvert}{\rvert}{%
-  {#1}\delimsize\rangle\hspace*{-0.25ex}\delimsize\langle{#2}%
-}
-\DeclarePairedDelimiterX\proj[1]{\lvert}{\rvert}{%
-  {#1}\delimsize\rangle\hspace*{-0.25ex}\delimsize\langle{#1}%
-}
-\DeclarePairedDelimiterX\matrixel[3]{\langle}{\rangle}{%
-  {#1}\hspace*{0.2ex}\delimsize\vert\hspace*{0.2ex}{#2}%
-  \hspace*{0.2ex}\delimsize\vert\hspace*{0.2ex}{#3}%
-}
-\DeclarePairedDelimiterX\dmatrixel[2]{\langle}{\rangle}{%
-  {#1}\hspace*{0.2ex}\delimsize\vert\hspace*{0.2ex}{#2}%
-  \hspace*{0.2ex}\delimsize\vert\hspace*{0.2ex}{#1}%
-}
-\DeclarePairedDelimiterX\innerprod[2]{\langle}{\rangle}{%
-  {#1},\hspace*{0.2ex}{#2}%
-}
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-%
-%
-% \subsection{Delimited Expressions}
-% Delimited expressions are documented in \autoref{sec:delimited}.
-% 
-% \begin{macro}{\abs}
-% \begin{macro}{\avg}
-% \begin{macro}{\norm}
-%   Other delimited expressions.
-%    \begin{macrocode}
-\DeclarePairedDelimiterX\abs[1]{\lvert}{\rvert}{{#1}}
-\DeclarePairedDelimiterX\avg[1]{\langle}{\rangle}{{#1}}
-\DeclarePairedDelimiterX\norm[1]{\lVert}{\rVert}{{#1}}
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% 
-% 
-% \begin{macro}{\phfqit@insideinterval}
-%   Format the contents of an interval.  Utility for defining |\intervalc| and
-%   friends.
-%    \begin{macrocode}
-\def\phfqit@insideinterval#1#2{{#1\mathclose{},\mathopen{}#2}}
-%    \end{macrocode}
-% \end{macro}
-%
-% \needspace{4\baselineskip}
-% \begin{macro}{\intervalc}
-% \begin{macro}{\intervalo}
-% \begin{macro}{\intervalco}
-% \begin{macro}{\intervaloc}
-% Open/Closed/Semi-Open Intervals
-%    \begin{macrocode}
-\DeclarePairedDelimiterX\intervalc[2]{[}{]}{\phfqit@insideinterval{#1}{#2}}
-\DeclarePairedDelimiterX\intervalo[2]{]}{[}{\phfqit@insideinterval{#1}{#2}}
-\DeclarePairedDelimiterX\intervalco[2]{[}{[}{\phfqit@insideinterval{#1}{#2}}
-\DeclarePairedDelimiterX\intervaloc[2]{]}{]}{\phfqit@insideinterval{#1}{#2}}
-%    \end{macrocode}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-%
-%
-%
-%
-% \subsection{Entropy Measures and Other Qit Objects}
-%
-% \changed[v2.0-qit-objects]{v2.0}{2017/06/17}{Introduced the Qit Objects infrastructure}
-%
-%
-% \subsubsection{Some Internal Utilities}
+% \subsection{Helper for parsing a size argument}
 %
 % \begin{macro}{\phfqit@parsesizearg}
-%   Internal utility to parse size argument with the backtick specification
+%   Utility to parse size argument with the backtick specification
 %   (\autoref{topic:size-specification-backtick}).
 %
 %   Parses a size argument, if any, and stores it into |\phfqit@val@sizearg|.
@@ -1298,9 +1248,180 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\phfqitDeclarePairedDelimiterXWithAltSizing}
+% \begin{macro}{\phfqitDeclarePairedDelimiterXPPWithAltSizing}
+%   Macros that behave exactly like \pkgname{mathtools}'
+%   |\DeclarePairedDelimiterX| and |\DeclarePairedDelimiterXPP|, except that
+%   their size argument can also be specified by a backtick as for entropy
+%   measures or other objects in this package (e.g., to define |\abs| such that
+%   |$\abs`\Big{x - y}$| gives $\abs`\Big{x - y}$).
+%   \changed[v4.0-new-phfqitDeclarePairedDelimiterxxx]{v4.0}{2021/10/07}{Added
+%   \phfverb{\phfqitDeclarePairedDelimiterXWithAltSizing} and
+%   \phfverb{\phfqitDeclarePairedDelimiterXPPWithAltSizing}}
+%    \begin{macrocode}
+\def\phfqitDeclarePairedDelimiterXWithAltSizing{%
+  \phfqitDeclareMathtoolsPairedDelimiterCmdWithAltSizing\DeclarePairedDelimiterX
+}
+\def\phfqitDeclarePairedDelimiterXPPWithAltSizing{%
+  \phfqitDeclareMathtoolsPairedDelimiterCmdWithAltSizing\DeclarePairedDelimiterXPP
+}
+\def\phfqitDeclareMathtoolsPairedDelimiterCmdWithAltSizing#1#2{%
+  \begingroup
+    \escapechar=-1\relax
+    \xdef\phfqit@tmp@thecmd{%
+      \expandafter\noexpand\csname phfqit@paireddelim@def@\string#2\endcsname}%
+  \endgroup
+  \edef#2{%
+    \noexpand\phfqit@paireddelim@parsesizearg{\expandonce\phfqit@tmp@thecmd}%
+  }%
+  \expandafter#1\phfqit@tmp@thecmd
+}
+\def\phfqit@paireddelim@parsesizearg#1{%
+  \phfqit@parsesizearg{\expandafter#1\phfqit@val@sizearg}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+%
+% \subsection{Bra-Ket Notation}
+%
+%
+% \needspace{3\baselineskip}
+% \begin{macro}{\phfqitKetsSpaceFactor}
+% \begin{macro}{\phfqitKetsBarSpace}
+% \begin{macro}{\phfqitKetsLRAngleSpace}
+%    \begin{macrocode}
+\def\phfqitKetsBarSpace{% this was previously \hspace*{0.2ex}
+  \mkern 1.5mu\relax}
+\def\phfqitKetsRLAngleSpace{% this was previously \hspace*{-0.25ex}
+  \mkern -1.8mu\relax}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \needspace{8\baselineskip}
+% \begin{macro}{\ket}
+% \begin{macro}{\bra}
+% \begin{macro}{\braket}
+% \begin{macro}{\ketbra}
+% \begin{macro}{\proj}
+% \begin{macro}{\matrixel}
+% \begin{macro}{\dmatrixel}
+% \begin{macro}{\innerprod}
+%   Bras, kets, norms, some delimiter stuff.  User documentation in
+%   \autoref{sec:bra-ket}.  
+%    \begin{macrocode}
+\phfqitDeclarePairedDelimiterXWithAltSizing\ket[1]{\lvert}{\rangle}{{#1}}
+\phfqitDeclarePairedDelimiterXWithAltSizing\bra[1]{\langle}{\rvert}{{#1}}
+\phfqitDeclarePairedDelimiterXWithAltSizing\braket[2]{\langle}{\rangle}{%
+  {#1}\phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#2}%
+}
+\phfqitDeclarePairedDelimiterXWithAltSizing\ketbra[2]{\lvert}{\rvert}{%
+  {#1}\delimsize\rangle\phfqitKetsRLAngleSpace\delimsize\langle{#2}%
+}
+\phfqitDeclarePairedDelimiterXWithAltSizing\proj[1]{\lvert}{\rvert}{%
+  {#1}\delimsize\rangle\phfqitKetsRLAngleSpace\delimsize\langle{#1}%
+}
+\phfqitDeclarePairedDelimiterXWithAltSizing\matrixel[3]{\langle}{\rangle}{%
+  {#1}\phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#2}%
+  \phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#3}%
+}
+\phfqitDeclarePairedDelimiterXWithAltSizing\dmatrixel[2]{\langle}{\rangle}{%
+  {#1}\phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#2}%
+  \phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#1}%
+}
+\def\phfqitKetsBeforeCommaSpace{}
+\def\phfqitKetsAfterCommaSpace{\mkern 1.5mu\relax}
+\phfqitDeclarePairedDelimiterXWithAltSizing\innerprod[2]{\langle}{\rangle}{%
+  {#1}\phfqitKetsBeforeCommaSpace,\phfqitKetsAfterCommaSpace{#2}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \subsection{Delimited Expressions}
+% Delimited expressions are documented in \autoref{sec:delimited}.
+% 
+% \begin{macro}{\abs}
+% \begin{macro}{\avg}
+% \begin{macro}{\norm}
+%   Other delimited expressions.
+%    \begin{macrocode}
+\phfqitDeclarePairedDelimiterXWithAltSizing\abs[1]{\lvert}{\rvert}{{#1}}
+\phfqitDeclarePairedDelimiterXWithAltSizing\avg[1]{\langle}{\rangle}{{#1}}
+\phfqitDeclarePairedDelimiterXWithAltSizing\norm[1]{\lVert}{\rVert}{{#1}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}{\phfqitDefineNorm}
+%   Use |\phfqitDefineNorm\opnorm{}{_\infty}| to define specific norms, with the
+%   syntax |\phfqitDefineNorm|\meta{new command name}\meta{tokens
+%   before}\meta{tokens after}.  If you need arguments in the before/after
+%   tokens, then your norm starts to be more complicated than what
+%   |\phfqitDefineNorm| can handle, perhaps it's best you use
+%   |\phfqitDeclarePairedDelimiterXPPWithAltSizing| directly.
+%
+%   \changed[v4.0-new-phfqitDefineNorm]{v4.0}{2021/10/07}{Added
+%   \phfverb{\phfqitDefineNorm}}
+%    \begin{macrocode}
+\def\phfqitDefineNorm#1#2#3{%
+  \phfqitDeclarePairedDelimiterXPPWithAltSizing#1[1]{#2}{\lVert}{\rVert}{#3}{{##1}}%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\phfqit@insideinterval}
+%   Format the contents of an interval.  Utility for defining |\intervalc| and
+%   friends.
+%    \begin{macrocode}
+\def\phfqit@insideinterval#1#2{{#1\mathclose{},\mathopen{}#2}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \needspace{4\baselineskip}
+% \begin{macro}{\intervalc}
+% \begin{macro}{\intervalo}
+% \begin{macro}{\intervalco}
+% \begin{macro}{\intervaloc}
+% Open/Closed/Semi-Open Intervals
+%    \begin{macrocode}
+\phfqitDeclarePairedDelimiterXWithAltSizing\intervalc[2]{[}{]}{%
+  \phfqit@insideinterval{#1}{#2}}
+\phfqitDeclarePairedDelimiterXWithAltSizing\intervalo[2]{]}{[}{%
+  \phfqit@insideinterval{#1}{#2}}
+\phfqitDeclarePairedDelimiterXWithAltSizing\intervalco[2]{[}{[}{%
+  \phfqit@insideinterval{#1}{#2}}
+\phfqitDeclarePairedDelimiterXWithAltSizing\intervaloc[2]{]}{]}{%
+  \phfqit@insideinterval{#1}{#2}}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+%
+%
+%
+% \subsection{Entropy Measures and Other Qit Objects}
+%
+% \changed[v2.0-qit-objects]{v2.0}{2017/06/17}{Introduced the Qit Objects infrastructure}
+%
+%
+% \subsubsection{Some Internal Utilities}
+%
 % \begin{macro}{\phfqitParens}
 %   Simple parenthesis-delimited expression, with
-%   |\DeclarePairedDelimiter|-compatible syntax.  For example,
+%   |\DeclarePairedDelimiterX|-compatible syntax.  For example,
 %   \par |\phfqitParens|\marg{content} \quad$\to$\quad
 %   \fbox{\phfverb( \meta{content} \phfverb)}
 %   \par |\phfqitParens*|\marg{content} \quad$\to$\quad
@@ -1315,7 +1436,7 @@
 %
 % \begin{macro}{\phfqitSquareBrackets}
 %   Simple bracket-delimited expression, with
-%   |\DeclarePairedDelimiter|-compatible syntax.  For example,
+%   |\DeclarePairedDelimiterX|-compatible syntax.  For example,
 %   \par |\phfqitSquareBrackets|\marg{content} \quad$\to$\quad
 %   \fbox{\phfverb[ \meta{content} \phfverb]}
 %   \par |\phfqitSquareBrackets*|\marg{content} \quad$\to$\quad
@@ -1330,7 +1451,7 @@
 %
 % \begin{macro}{\phfqitCurlyBrackets}
 %   Simple bracket-delimited expression, with
-%   |\DeclarePairedDelimiter|-compatible syntax.  For example,
+%   |\DeclarePairedDelimiterX|-compatible syntax.  For example,
 %   \par |\phfqitSquareBrackets|\marg{content} \quad$\to$\quad
 %   \fbox{\phfverb\{ \meta{content} \phfverb\}}
 %   \par |\phfqitSquareBrackets*|\marg{content} \quad$\to$\quad

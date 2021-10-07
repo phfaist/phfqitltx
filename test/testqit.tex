@@ -1,0 +1,65 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{etoolbox}
+
+\usepackage{breqn}
+\usepackage{phfqit}
+
+\phfqitDefineNorm\opnorm{}{_\infty}
+
+\begin{document}
+
+\begin{align*}
+  x &= \Re(z)\ ; & y &= \Im(z)\ .
+\end{align*}
+
+Kets \& bras!
+\begin{gather*}
+  \ket{x} + \ket`\Big{\psi_-^{(e^x)}} + \ket[\Big]{\psi_-^{(e^x)}} = \ket*{\sum_j A_j}
+  \\
+  \bra{x} + \bra`\Big{\psi_-^{(e^x)}} + \bra[\Big]{\psi_-^{(e^x)}} = \bra*{\sum_j A_j}
+  \\
+  \proj{x} + \proj`\Big{\psi_-^{(e^x)}} + \proj[\Big]{\psi_-^{(e^x)}} = \proj*{\sum_j A_j}
+  \\
+  \braket{x}{y} + \braket`\Big{G}{\psi_-^{(e^x)}} + \braket[\Big]{z}{\psi_-^{(e^x)}}
+  = \braket*{X}{\sum_j A_j}
+  \\
+  \ketbra{x}{y} + \ketbra`\Big{G}{\psi_-^{(e^x)}} + \ketbra[\Big]{z}{\psi_-^{(e^x)}}
+  = \ketbra*{X}{\sum_j A_j}
+  \\
+  \dmatrixel{x}{y} + \dmatrixel`\Big{\phi}{G_-^{(e^x)}} 
+  + \dmatrixel[\Big]{\phi}{G_-^{(e^x)}}
+  = \dmatrixel*{X}{\sum_j A_j}
+  \\
+  \innerprod{x}{y} + \innerprod`\Big{G}{\psi_-^{(e^x)}} + \innerprod[\Big]{z}{\psi_-^{(e^x)}}
+  = \innerprod*{X}{\sum_j A_j}
+  \\
+  \matrixel{x}{y}{z} + \matrixel`\Big{\phi}{G_-^{(e^x)}}{z}
+  + \matrixel[\Big]{\phi}{G_-^{(e^x)}}{z}
+  = \matrixel*{X}{\sum_j A_j}{z}
+\end{gather*}
+
+Norms \& delimited stuff;
+\begin{gather*}
+  \norm`\Big{\sum_j A} = \norm[\Big]{\sum_j A} \leqslant \norm{B} -
+  \norm*{C_9^\dagger}\ ;
+  \\
+  \opnorm`\Big{\sum_j A} = \opnorm[\Big]{\sum_j A} \leqslant \opnorm{B} -
+  \opnorm*{C_9^\dagger}\ ;
+  \\
+  \abs*{\sum_j A^\dagger} = \abs`*{\sum_j A^\dagger} = \abs[\Big]{A} =
+  \abs`\Big{A}
+\end{gather*}
+
+\begin{align*}
+  \Gamma &= \ee^{-\beta H}
+\end{align*}
+
+\renewcommand\phfqitExpPowerExpression[1]{\exp\left\{#1\right\}}
+\begin{dmath}
+  \Gamma = \ee^{-\beta H}
+\end{dmath}
+
+
+\end{document}
