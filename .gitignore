@@ -46,6 +46,7 @@ phfquotetext/pkg.mk
 phfsvnwatermark/pkg.mk
 phfthm/pkg.mk
 phfcc/pkg.mk
+phfextendedabstract/pkg.mk
 
 
 
