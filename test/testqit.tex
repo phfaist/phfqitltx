@@ -4,7 +4,9 @@
 \usepackage{etoolbox}
 
 \usepackage{breqn}
+
 \usepackage{phfqit}
+%\usepackage[llanglefrommnsymbolfonts=false]{phfqit}
 
 \phfqitDefineNorm\opnorm{}{_\infty}
 
@@ -39,6 +41,30 @@ Kets \& bras!
   + \matrixel[\Big]{\phi}{G_-^{(e^x)}}{z}
   = \matrixel*{X}{\sum_j A_j}{z}
 \end{gather*}
+
+Operator kets \& bras!
+\begin{gather*}
+ \oket{x} +\oket`\Big{\psi_-^{(e^x)}} +\oket[\Big]{\psi_-^{(e^x)}} =\oket*{\sum_j A_j}
+  \\
+ \obra{x} +\obra`\Big{\psi_-^{(e^x)}} +\obra[\Big]{\psi_-^{(e^x)}} =\obra*{\sum_j A_j}
+  \\
+ \oproj{x} +\oproj`\Big{\psi_-^{(e^x)}} +\oproj[\Big]{\psi_-^{(e^x)}} =\oproj*{\sum_j A_j}
+  \\
+ \obraket{x}{y} +\obraket`\Big{G}{\psi_-^{(e^x)}} +\obraket[\Big]{z}{\psi_-^{(e^x)}}
+  =\obraket*{X}{\sum_j A_j}
+  \\
+ \oketbra{x}{y} +\oketbra`\Big{G}{\psi_-^{(e^x)}} +\oketbra[\Big]{z}{\psi_-^{(e^x)}}
+  =\oketbra*{X}{\sum_j A_j}
+  \\
+ \odmatrixel{x}{y} +\odmatrixel`\Big{\phi}{G_-^{(e^x)}} 
+  +\odmatrixel[\Big]{\phi}{G_-^{(e^x)}}
+  =\odmatrixel*{X}{\sum_j A_j}
+  \\
+ \omatrixel{x}{y}{z} +\omatrixel`\Big{\phi}{G_-^{(e^x)}}{z}
+  +\omatrixel[\Big]{\phi}{G_-^{(e^x)}}{z}
+  =\omatrixel*{X}{\sum_j A_j}{z}
+\end{gather*}
+
 
 Norms \& delimited stuff;
 \begin{gather*}

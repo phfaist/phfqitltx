@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesPackage{phfqit}
 %<*package>
-    [2021/07/27 v4.0 phfqit package]
+    [2021/10/08 v4.1 phfqit package]
 %</package>
 %
 %<*driver>
@@ -98,6 +98,7 @@
 %   (\autoref{sec:Lie-groups-algebras})
 % \item Bra-ket notation, and delimited expressions such as average, norm,
 %   \ldots (\autoref{sec:delimited})
+% \item Double bra-ket notation for operators (\autoref{sec:delimited})
 % \item Typesetting entropy measures, including the Shannon/von Neumann entropy,
 %   the smooth entropies, relative entropies, as well as my coherent relative
 %   entropy
@@ -123,6 +124,19 @@
 % \item[newReIm=\metatruefalsearg] Do not override \LaTeX{}'s default
 %   {\makeatletter $\phfqit@Re$ and $\phfqit@Im$} symbols by $\Re$ and $\Im$.
 %   See \autoref{sec:description-newReIm}.
+% \item[llanglefrommnsymbolfonts=\metatruefalsearg] In order to define the
+%   operator-kets and operator-bra symbols, we need to have double-angle bracket
+%   symbol delimiters loaded as |\llangle| and |\rrangle|.  Unlike |\langle| and
+%   |\rangle|, they are not provided by default by \pkgname{latex},
+%   \pkgname{amsmath} or \pkgname{amssymb}.  What we do is that we load the
+%   |\llangle| and |\rrangle| symbols from the MnSymbol fonts in order to define
+%   |\oket| and friends.  If you would like to provide your own definitions for
+%   |\llangle| and |\rrangle|, or if you have problems loading the MnSymbol
+%   fonts and don't need the operator-ket symbols, then you can specify
+%   |llanglefrommnsymbolfonts=false| and we won't bother loading the MnSymbol
+%   fonts.  (Note that if you provide your own definitions for |\llangle| and
+%   |\rrangle|, they have to be valid delimiters, such that for example the
+%   syntax |\left\llangle| is valid.)
 % \end{pkgoptions}
 % 
 % \changed[v2.0-pkg-opt-qitobjdef]{v2.0}{2017/08/16}{Added the
@@ -308,7 +322,9 @@
 % \iffalse \vspace{3\baselineskip}  <-- space for all the \SU(xx) listings in margin \fi
 %
 % \section{Bra-Ket Notation and Delimited Expressions}
-% \label{sec:bra-ket} \label{sec:delimited}
+%
+% \subsection{Bras and kets}
+% \label{sec:bra-ket}
 %
 % All commands here work in math mode only.  They all accept a size modifier as
 % described in \autoref{topic:size-specification-backtick}.  (The size may also
@@ -355,7 +371,21 @@
 % |\innerprod{\phi}{\psi}| gives $\innerprod{\phi}{\psi}$.
 %
 %
-% There are also some further delimited expressions defined, for convenience.
+% \DescribeMacro{\oket} \DescribeMacro{\obra} \DescribeMacro{\obraket}
+% \DescribeMacro{\oketbra} \DescribeMacro{\oproj} \DescribeMacro{\omatrixel}
+% \DescribeMacro{\odmatrixel} This package also provides associated
+% double-bra-ket commands as is occasionally used to write ``vectors'' in
+% Hilbert-Schmidt operator space, such as $\oket{A}$, $\obraket{A}{\Ident}$,
+% $\oketbra{\Ident}{E_k}$, etc.  The commands are named |\oket|, |\obra|,
+% |\obraket|, |\oketbra|, |\oproj|, |\omatrixel|, and |\odmatrixel|.  They offer
+% the same syntax as their corresponding |\ket|, |\bra|, etc., for instance, you
+% can type |\obra`\Big{\sum A_i}| to obtain $\obra`\Big{\sum A_i}$.
+%
+% \subsection{Delimited expressions: norms, absolute value, etc.}
+% \label{sec:delimited}
+%
+% There are also some commonly used delimited expressions defined for
+% convenience.
 %
 % \DescribeMacro{\abs} The absolute value of an expression.  |\abs{A}| gives
 % $\abs{A}$.
@@ -397,7 +427,8 @@
 % the \pkgname{mathtools} package's |\DeclarePairedDelimiterX| and
 % |\DeclarePairedDelimiterX| macros, by furthermore enabling the newly defined
 % command to accept the size argument using the backtick syntax described in
-% \autoref{topic:size-specification-backtick}.
+% \autoref{topic:size-specification-backtick}.  These helpers are used
+% internally to define the commands for kets, bras, norms, etc.
 %
 %
 % \section{Entropy Measures and Other ``Qit Objects''}
@@ -1347,6 +1378,51 @@
 % \end{macro}
 % \end{macro}
 %
+% \needspace{8\baselineskip}
+% \begin{macro}{\oket}
+% \begin{macro}{\obra}
+% \begin{macro}{\obraket}
+% \begin{macro}{\oketbra}
+% \begin{macro}{\oproj}
+% \begin{macro}{\omatrixel}
+% \begin{macro}{\odmatrixel}
+%   Again Bras, kets, but for operator space this time.  User documentation in
+%   \autoref{sec:bra-ket}.  These definitions depend on |\llangle| and
+%   |\rrangle| being available and expanding to valid delimiter symbols.  See
+%   also the |llanglefrommnsymbolfonts| option.
+%
+%   \changed[v4.1-okets-obras]{v4.1}{2021/10/08}{Added support for
+%   \phfverb{oket} and friends}
+%    \begin{macrocode}
+\phfqitDeclarePairedDelimiterXWithAltSizing\oket[1]{\lvert}{\rrangle}{{#1}}
+\phfqitDeclarePairedDelimiterXWithAltSizing\obra[1]{\llangle}{\rvert}{{#1}}
+\phfqitDeclarePairedDelimiterXWithAltSizing\obraket[2]{\llangle}{\rrangle}{%
+  {#1}\phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#2}%
+}
+\phfqitDeclarePairedDelimiterXWithAltSizing\oketbra[2]{\lvert}{\rvert}{%
+  {#1}\delimsize\rrangle\phfqitKetsRLAngleSpace\delimsize\llangle{#2}%
+}
+\phfqitDeclarePairedDelimiterXWithAltSizing\oproj[1]{\lvert}{\rvert}{%
+  {#1}\delimsize\rrangle\phfqitKetsRLAngleSpace\delimsize\llangle{#1}%
+}
+\phfqitDeclarePairedDelimiterXWithAltSizing\omatrixel[3]{\llangle}{\rrangle}{%
+  {#1}\phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#2}%
+  \phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#3}%
+}
+\phfqitDeclarePairedDelimiterXWithAltSizing\odmatrixel[2]{\llangle}{\rrangle}{%
+  {#1}\phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#2}%
+  \phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#1}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+%
 % \subsection{Delimited Expressions}
 % Delimited expressions are documented in \autoref{sec:delimited}.
 % 
@@ -2217,6 +2293,12 @@
 \DeclareStringOption[stdset]{qitobjdef}
 %    \end{macrocode}
 %
+% Whether we should load the |\llangle| and |\rrangle| delimiters from the
+% MnSymbol fonts.
+%    \begin{macrocode}
+\DeclareBoolOption[true]{llanglefrommnsymbolfonts}
+%    \end{macrocode}
+%
 % Whether to override \LaTeX{}'s default {\makeatletter $\phfqit@Re$ and
 % $\phfqit@Im$} symbols by our more readable $\Re$ and $\Im$.
 %    \begin{macrocode}
@@ -2244,6 +2326,44 @@
 %    \end{macrocode}
 % \end{macro}
 % \end{macro}
+%
+% \subsubsection{Load \phfverb{\llangle} and \phfverb{\rrangle} from the
+% \emph{MnSymbol} fonts}
+%
+% We need to import |\llangle| and |\rrangle| from the |MnSymbol|
+% fonts.\footnote{see e.g. \url{https://tex.stackexchange.com/a/79701/32188}}
+%
+%    \begin{macrocode}
+\ifphfqit@opt@llanglefrommnsymbolfonts
+  \DeclareFontFamily{OMX}{MnSymbolE}{}
+  \DeclareSymbolFont{phfqit@MnLargeSymbols}{OMX}{MnSymbolE}{m}{n}
+  \SetSymbolFont{phfqit@MnLargeSymbols}{bold}{OMX}{MnSymbolE}{b}{n}
+  \DeclareFontShape{OMX}{MnSymbolE}{m}{n}{
+      <-6>  MnSymbolE5
+     <6-7>  MnSymbolE6
+     <7-8>  MnSymbolE7
+     <8-9>  MnSymbolE8
+     <9-10> MnSymbolE9
+    <10-12> MnSymbolE10
+    <12->   MnSymbolE12
+  }{}
+  \DeclareFontShape{OMX}{MnSymbolE}{b}{n}{
+      <-6>  MnSymbolE-Bold5
+     <6-7>  MnSymbolE-Bold6
+     <7-8>  MnSymbolE-Bold7
+     <8-9>  MnSymbolE-Bold8
+     <9-10> MnSymbolE-Bold9
+    <10-12> MnSymbolE-Bold10
+    <12->   MnSymbolE-Bold12
+  }{}
+  \let\llangle\@undefined
+  \let\rrangle\@undefined
+  \DeclareMathDelimiter{\llangle}{\mathopen}%
+                       {phfqit@MnLargeSymbols}{'164}{phfqit@MnLargeSymbols}{'164}
+  \DeclareMathDelimiter{\rrangle}{\mathclose}%
+                       {phfqit@MnLargeSymbols}{'171}{phfqit@MnLargeSymbols}{'171}
+\fi
+%    \end{macrocode}
 %
 % \subsubsection{Standard entropy measures}
 %
