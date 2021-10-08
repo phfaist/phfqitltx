@@ -24,6 +24,7 @@
 %<*package>
     [2021/07/29 v3.2 phfnote package]
 %</package>
+%<phfnotepreset>%This preset file for phfnote is used when you call `\usepackage[preset=<PRESET NAME>]{phfnote}'
 %
 %<*driver>
 \documentclass{ltxdoc}
@@ -89,6 +90,7 @@
   \DocInput{phfnote.dtx}
 \end{document}
 %</driver>
+%<*package>
 % \fi
 %
 % \CheckSum{0}
@@ -241,12 +243,12 @@
 % \begin{pkgoptions}
 % \item[preset=pkgdoc] Basic formatting and settings for documenting \LaTeX{}
 %   packages. This preset was used for the current document.
-% \item[preset=xpkgdoc] Same as |preset=pkgdoc|, but in addition a set of
-%   useful commands are also provided, the \pkgname{tcolorbox} package is
-%   loaded along with some default boxes.  Also some commands are patched
-%   to achieve some fixes.  This preset is used for the documentation of
-%   packages in the \pkgname{phfqitltx} package suite.  (For details see
-%   the implementation of |\phfnote@preset@xpkgdoc| below.)
+% \item[preset=xpkgdoc] Same as |preset=pkgdoc|, but in addition a set of useful
+%   commands are also provided, the \pkgname{tcolorbox} package is loaded along
+%   with some default boxes.  Also some commands are patched to achieve some
+%   fixes.  This preset is used for the documentation of packages in the
+%   \pkgname{phfqitltx} package suite.  (For details see the implementation of
+%   the |xpkgdoc| preset in \autoref{sec:impl-xpkgdoc}.)
 % \end{pkgoptions}
 %
 %
@@ -3537,18 +3539,32 @@
 \DeclareVoidOption{nobibliographydefs}{\def\phfnote@opt@bibliographydefs{false}}
 %    \end{macrocode}
 % 
-% 
+% \begin{macro}{\phfnote@loadpreset}
+%   A helper macro to load presets.  Can be used by presets that want to extend
+%   other presets.
+%    \begin{macrocode}
+\def\phfnote@loadpreset#1{%
+  \IfFileExists{phfnotepreset-#1.def}{%
+    \input{phfnotepreset-#1.def}%
+  }{%
+    \ifcsname phfnote@preset@#1\endcsname%
+      \csname phfnote@preset@#1\endcsname%
+    \else%
+      \PackageError{phfnote}{Unknown preset: `#1'!}{You specified the
+        option 'preset=...' with an invalid value.  Please look up the
+        package documentation corresponding to your version of phfnote
+        for possible values.  Additionally, no file named `phfnotepreset-#1.def'
+        was found.}%
+  \fi%
+  }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
 % Preset option.  \PrintMarginLabel{[preset=...]} See \autoref{sec:presets}.
 %    \begin{macrocode}
 \define@key{phfnote}{preset}{%
-  \ifcsname phfnote@preset@#1\endcsname%
-    \csname phfnote@preset@#1\endcsname%
-  \else%
-    \PackageError{phfnote}{Unknown preset: `#1'!}{You specified the
-      option 'preset=...' with an invalid value.  Please look up the
-      package documentation corresponding to your version of phfnote
-      for possible values.}
-  \fi%
+  \phfnote@loadpreset{#1}%
 }
 %    \end{macrocode}
 % 
@@ -3582,13 +3598,19 @@
 % Define the global presets here.  See \autoref{sec:presets} for a description
 % of what these presets do.
 %
+% Some of the presets whose definitions are short are defined here directly
+% here, in the |sty| file.  Other presets are placed in a separate
+% |phfnotepreset-XXX.def| file to avoid bloating the main style file.
+%
+% \changed[chg-presets-dotdef-files]{v4.0}{2021/10/08}{Moved some presets to
+% external \phfverb{.def} files}
+%
 % \begin{macro}{\phfnote@hook@atendload}
 %   A hook for presets to do stuff at the end of package load.
 %    \begin{macrocode}
 \def\phfnote@hook@atendload{}
 %    \end{macrocode}
 % \end{macro}
-%
 %
 % \begin{macro}{\phfnote@preset@article}
 %   Article preset.
@@ -3639,7 +3661,7 @@
 %    \end{macrocode}
 % set up all the settings as for |sfnote| \ldots
 %    \begin{macrocode}
-  \phfnote@preset@sfnote
+  \phfnote@loadpreset{sfnote}%
 %    \end{macrocode}
 % \ldots but override:
 %    \begin{macrocode}
@@ -3652,14 +3674,14 @@
 %    \end{macrocode}
 % set up all the settings as for |sfnote| \ldots
 %    \begin{macrocode}
-  \phfnote@preset@sfnote
+  \phfnote@loadpreset{sfnote}%
 %    \end{macrocode}
 % \ldots but override:
 %    \begin{macrocode}
   \def\phfnote@opt@fontdefs{false}
   \PassOptionsToPackage{T1}{fontenc}
   \RequirePackage{fontenc}
-  \PassOptionsToPackage{default,osfigures,scale=0.9}{opensans}
+  \PassOptionsToPackage{default,scale=0.9}{opensans}
   \RequirePackage{opensans}
 }
 \def\phfnote@preset@utopianote{
@@ -3699,7 +3721,6 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
-%
 %
 % \begin{macro}{\phfnote@preset@pkgdoc}
 %   Preset for a package documentation.
@@ -3752,395 +3773,6 @@
 \providecommand\phfnote@pkgdoc@setupmainfont{\RequirePackage{fourier}}
 %    \end{macrocode}
 % \end{macro}
-% 
-% \begin{macro}{\phfnote@preset@xpkgdoc}
-%   Same as |preset=pkgdoc|, but also provide some handy hacks and
-%   commands.
-%
-%    \begin{macrocode}
-\def\phfnote@preset@xpkgdoc{
-  \phfnote@preset@pkgdoc
-%    \end{macrocode}
-% 
-% Include the \pkgname{verbdef} package, because it's always useful.
-%    \begin{macrocode}
-  \RequirePackage{verbdef}
-%    \end{macrocode}
-%
-% \textbf{Some patching first:}
-% Patch up |\PrintChanges| and |\PrintIndex|, if they are defined (for if we are
-% using the \pkgname{ltxdoc} package for latex package documentation).  We want
-% these to generate an entry in the table of contents.  Also provide the utility
-% |\PrintChangesAndIndex|, which calls both |\PrintChanges| and |\PrintIndex| with
-% some additional spacing.
-%    \begin{macrocode}
-  \ifdefined\PrintChanges
-    \phfnoteHackSectionStarWithTOCInCommand\PrintChanges
-  \fi
-  \ifdefined\PrintIndex
-    \phfnoteHackSectionStarWithTOCInCommand\PrintIndex
-  \fi
-  \def\PrintChangesAndIndexSpacing{\vspace{3cm plus 2cm minus 2cm}}
-  \def\PrintChangesAndIndex{\PrintChangesAndIndexSpacing\PrintChanges
-    \PrintChangesAndIndexSpacing\PrintIndex}
-%    \end{macrocode}
-%
-% Set the index to TWO columns only (three is too tight).
-%    \begin{macrocode}
-  \ifdefined\c@IndexColumns
-    \setcounter{IndexColumns}{2}
-  \fi
-%    \end{macrocode}
-% 
-% And set the glossary, that is, the list of changes history to single-column.
-% For this, renew the environment completely to remove the |multicols|
-% environment.
-%    \begin{macrocode}
-  \let\phfnote@xpkgdoc@old@theglossary\theglossary
-  \let\phfnote@xpkgdoc@old@endtheglossary\endtheglossary
-  \renewenvironment{theglossary}{%
-    \glossary@prologue%
-    \GlossaryParms \let\item\@idxitem \ignorespaces}
-  {}
-%    \end{macrocode}
-%
-% Tools to condense the macro names in the margins, and make them break at the
-% margin width (at arbitrary points in the macro name) instead of overflowing on
-% the documentation text.
-%    \begin{macrocode}
-  \def\phf@fillwithdiscretionaries##1##2##3{%
-    \def\phf@fillwithdescretionaries@a{##1}%
-    \def\phf@fillwithdescretionaries@b{##2}%
-    \edef\x{##3}%
-    \expandafter \phf@fillwithdiscretionaries@ \x \@nil
-  }
-  \def\phf@fillwithdiscretionaries@##1##2\@nil{%
-    \if\relax\detokenize{##1}\relax\else
-      ##1%
-      \if\relax\detokenize{##2}\relax\else
-        \discretionary{\phf@fillwithdescretionaries@a}{%
-          \phf@fillwithdescretionaries@b}{}%
-        \phf@fillwithdiscretionaries@##2\@nil
-      \fi
-    \fi
-  }
-  \definecolor{phfxpkgdocmacronamehyphencolor}{rgb}{0.6,0.6,0.7}
-  \def\phf@xpkgdoc@macrobreakhyphen{%
-    \hbox{\textcolor{phfxpkgdocmacronamehyphencolor}{-}}}
-  \def\ScaleHorizontallyAndHyphenateAnywhere##1##2{% {hscale-factor}{text}
-    \scalebox{##1}[1.0]{%
-      \parbox{% compute inverse of ##1 ...
-        \dimexpr \marginparwidth*65536 /
-        \number\dimexpr ##1\p@ \relax \relax
-      }{\raggedleft\phf@fillwithdiscretionaries{%
-          \phf@xpkgdoc@macrobreakhyphen}{}{##2}\hfill}%
-    }%
-  }
-  \def\phf@xpkgdoc@marginmacronamecompressfactor{0.85}
-  \def\phf@xpkgdoc@macrofont{\small\bfseries}% \footnotesize ?
-  \def\PrintMarginLabelContents##1{%
-    \strut\MacroFont\phf@xpkgdoc@macrofont
-    \ScaleHorizontallyAndHyphenateAnywhere{%
-      \phf@xpkgdoc@marginmacronamecompressfactor}{##1}%
-    \par
-  }
-  \def\PrintMarginLabel##1{\marginpar{\PrintMarginLabelContents{##1}}}
-  \def\PrintDescribeMacro##1{\PrintMarginLabelContents{\string##1}}
-  \let\PrintMacroName\PrintDescribeMacro
-  \let\PrintDescribeEnv\PrintMarginLabelContents
-  \let\PrintEnvName\PrintMarginLabelContents
-%    \end{macrocode}
-% 
-% \textbf{Hyperref:} Request default \pkgname{hyperref} definitions with
-% |hyperrefdefs=defer|, but we'll load \pkgname{hyperdoc} instead of
-% \pkgname{hyperref}.
-%    \begin{macrocode}
-  \def\phfnote@opt@hyperrefdefs{defer}
-  \g@addto@macro\phfnote@hook@atendload{
-    \RequirePackage{hypdoc}
-    \urlstyle{noteit}
-  }
-%    \end{macrocode}
-%
-% \textbf{Provide Macro:} |\pkgname|\marg{package name} to format a package
-% name.  Also place it in the general index.  This command is robust and
-% can be used in section titles etc.
-%    \begin{macrocode}
-  \def\pkgname##1{%
-    \pkgnamefmt{##1}%
-    \index{##1=\pkgnamefmt{##1}|hyperpage}%
-    \index{packages:>##1=\pkgnamefmt{##1}|hyperpage}%
-  }
-  \robustify\pkgname
-  \def\pkgnamefmt##1{\textsf{##1}}
-  \robustify\pkgnamefmt
-%    \end{macrocode}
-% 
-%
-% \textbf{Provide Macros:} |\changed| and |\changedreftext|, with more
-% advanced support for displaying changes in package functionality or API.
-% 
-% First, we need a counter for the x-ref system.
-%    \begin{macrocode}
-  \newcounter{phfnotechanged}
-%    \end{macrocode}
-% 
-% Mark changes in the implementation section of the package documentation
-% with the command |\changed|\oarg{label
-% name}\marg{v1.0}\marg{2016/05/22}\marg{description}.  This command
-% automatically adds the change to the package's change history list, and
-% allows you to refer to this change anywhere else in the package doc with
-% |\changedreftext|.
-%    \begin{macrocode}
-  \newcommand*\changed[4][]{%
-%    \end{macrocode}
-% 
-% First, if no label is given as optional argument, then just display the
-% change and add it to the package changes list.
-%    \begin{macrocode}
-    \if\relax\detokenize{##1}\relax%
-      \changedtextfmt{##2}{##3}{##4}%
-      \changes{##2}{##3}{##4}%
-    \else%
-%    \end{macrocode}
-% 
-% If a label name is provided as optional argument, then we need to write
-% some stuff to the \texttt{.aux} file to make the change visible in the
-% whole document.
-%    \begin{macrocode}
-      \protected@edef\phfnotechanged@tmpa{{##2}{##3}{##4}}%
-      \immediate\write\@auxout{\string\phfnote@changed@set%
-        {##1}{\expandonce\phfnotechanged@tmpa}}%
-      \par\hspace*{0pt}\refstepcounter{phfnotechanged}\label{phfnotechanged:##1}%
-      \begingroup\let\phfnote@changedreftext@par\relax
-        \changedreftext[\@secondoftwo]{##1}%
-      \endgroup
-      \changes{##2}{##3}{\hyperref[phfnotechanged:##1]{##4}}%
-    \fi
-  }
-  \def\phfnote@changed@set##1{%
-    \expandafter\gdef\csname phfnote@changed@lbl@##1\endcsname%
-  }
-%    \end{macrocode}
-% 
-% When you document changes with the help of |\changed|, you may refer to
-% any specific change from anywhere else in the package doc with the help
-% of |\changedreftext|\marg{label name}.
-%    \begin{macrocode}
-  \def\phfnote@changedreftext@par{\par}
-  \newcommand*\changedreftext[2][\phfnote@changedrefto]{%
-    \phfnote@changedreftext@par%
-    \ifcsname phfnote@changed@lbl@##2\endcsname
-      ##1{##2}{%
-        \expandafter\expandafter\expandafter\changedtextfmt%
-            \csname phfnote@changed@lbl@##2\endcsname
-      }
-    \else
-      \hyperref[phfnotechanged:##2]{%
-        \changedtextfmt{???}{???}{[\textbf{missing ref}]}%
-      }%
-    \fi
-    \par
-  }
-  \def\phfnote@changedrefto##1{\hyperref[phfnotechanged:##1]}
-%    \end{macrocode}
-% 
-% The macro |\changedtextfmt|\marg{v1.0}\marg{2016/05/22}\marg{description}
-% takes care of formatting the change on the spot.
-%    \begin{macrocode}
-  \newcommand*\changedtextfmt[3]{%
-    \textit{Changed in {##1\kern 0.3ex\relax[##2]}:} ##3.
-  }
-%    \end{macrocode}
-% 
-% \textbf{Provide environment \phfverb{pkgoptions}:} Set up an elaborate
-% environment (based on a |description| environment) to describe package
-% options.
-%    \begin{macrocode}
-  \RequirePackage{enumitem}
-  \newlist{pkgoptions}{description}{1}
-  \setlist[pkgoptions]{font=\pkgoptionfmt@many[{\vspace*{5pt}}],style=nextline}
-%    \end{macrocode}
-% 
-% But patch the |pkgoptions|' |\item| command, so that it puts an additional
-% pair of braces around its argument.  In this way, the |font=| attribute for
-% the list sees the full label as its next token, and can be used as a macro
-% argument.  (This is not needed for newer versions of \pkgname{enumitem}.)
-%    \begin{macrocode}
-  \apptocmd\pkgoptions{\let\pkgoptions@old@item\item%
-    \def\item{\@ifnextchar[\pkgoptions@item@\pkgoptions@item@@}%]
-    \def\pkgoptions@item@[##1]{\pkgoptions@old@item[{{##1}}]}%
-    \def\pkgoptions@item@@{\PackageWarning{phfnote}{{pkgoptions}: you must
-        specify label to \string\item as \string\item[label].}%
-      \pkgoptions@old@item}%
-  }{}{\PackageWarning{phfnote}{preset xpkgdoc: Failed to patch command
-      \string\pkgoptions}}
-  %\def\pkgoptionscombineitem{\leavevmode\vspace{\dimexpr-\baselineskip-\parskip-\itemsep\relax}}
-%    \end{macrocode}
-% 
-% For convenience, also provide a |\meta|-like command for boolean arguments
-% (|true| or |false|). `|\metatruefalsearg|' typesets as `\metatruefalsearg'.
-%    \begin{macrocode}
-  \def\metatruefalsearg{\meta{\phfverb{true} $\mid$ \phfverb{false}}}
-%    \end{macrocode}
-% 
-% Include also a command to format a package option.  Puts the option in a box
-% in typewriter text style, and indexes it.  The optional argument is meant to
-% be internal---it adds commands after the displayed text (use it to add, e.g.\@
-% spacing).
-%
-% When indexing the packages, make sure to remove the protective braces if any.
-%    \begin{macrocode}
-  \newcommand\pkgoptionfmt[2][]{%
-    \begingroup\let\meta\pkgoptfmt@meta\pkgopt@fbox{\normalfont\ttfamily ##2}\endgroup%
-    \expandafter\phfnote@pkgdoc@index\expandafter{\@firstofone ##2}%
-    ##1}
-  \newcommand\pkgoptionfmt@many[2][]{%
-    \def\pkgoptionfmt@tmp@addcomma{}
-    \def\do####1{\pkgoptionfmt@tmp@addcomma\pkgoptionfmt{\vphantom{##2}####1}%
-      \def\pkgoptionfmt@tmp@addcomma{\hskip0.25em\relax,\hskip0.8em\relax}}%
-    \expandafter\docsvlist\expandafter{\@firstofone ##2}%
-    ##1}
-  \let\pkgopt@save@meta\meta
-  \def\pkgopt@fbox{\fbox}
-  \def\pkgoptfmt@meta##1{\begingroup\normalfont\itshape\pkgopt@save@meta{##1}\endgroup}
-%    \end{macrocode}
-% 
-% Whenever a package option is formatted with |\pkgoptionfmt|, it is placed in
-% the index.  Because package options may be of the form |key=val|, we want to
-% split keys from values and put them independently in the index.  This is done
-% by entering a \TeX{} group, and using an |\lccode| trick: the code is prepared
-% to iterate over a list of comma-separated stuff, but then the ``lowercase''
-% version of that code is executed instead, where the |=|'s have been replaced
-% by |,|'s.
-%    \begin{macrocode}
-  \def\phfnote@pkgdoc@index##1{%
-    \begingroup\lccode`\= = `\,\relax%
-      \def\x{\lowercase{\def\@tmpa{##1}}}%
-      \x%
-      \let\meta\@gobble%
-      \let\marg\@gobble%
-      \let\oarg\@gobble%
-      \let\parg\@gobble%
-      \let\vphantom\@gobble%
-      \let\hphantom\@gobble%
-      \let\pkgoptattrib\@firstofone%
-      \let\pkgoptattribnodots\@firstofone%
-      \let\pkgoptattribempty\@empty%
-      \def\handleitemindex####1{%
-        \edef\@tmpc{####1}%
-        \if\relax\detokenize\expandafter{\@tmpc}\relax\else%
-          \edef\@tmpb{{\expandonce\@tmpc=\string\verb!*+\expandonce\@tmpc+ (\pkgoptname)|hyperpage}}%
-          \expandafter\index\@tmpb%
-          \edef\@tmpb{{\packageoptionsname:>\expandonce\@tmpc=\string\verb!*+\expandonce\@tmpc+|hyperpage}}%
-          \expandafter\index\@tmpb%
-        \fi%
-      }%
-      \def\@tmpc{\forcsvlist{\handleitemindex}}%
-      \expandafter\@tmpc\expandafter{\@tmpa}%
-    \endgroup%
-  }
-  \def\pkgoptname{pkg. opt.}
-  \def\packageoptionsname{package options}
-%    \end{macrocode}
-%
-% \textbf{Provide environment \phfverb{cmdoptions}:} hijack the |pkgoptions|
-% environment to do the same thing, except we place the items in the index under
-% ``command options'' instead of ``package options.''
-%    \begin{macrocode}
-  \def\cmdoptions{\begingroup\setcmdnotpkgoptions
-    \pkgoptions}
-  \def\endcmdoptions{\endpkgoptions\endgroup}
-  \newcommand\cmdoptionfmt[2][]{\begingroup\setcmdnotpkgoptions
-    \pkgoptionfmt[{##1}]{##2}\endgroup}
-  \def\cmdoptname{cmd. opt.}
-  \def\commandoptionsname{command options}
-  \def\setcmdnotpkgoptions{\let\pkgoptname\cmdoptname
-    \let\packageoptionsname\commandoptionsname
-    \let\pkgopt@fbox\cmdoptionsfbox}
-  \def\cmdoptionsfbox##1{\ensuremath{\underline{{\text{##1}}}}}
-%    \end{macrocode}
-% 
-% Provide the |\pkgoptattrib| command, which typesets its argument as
-% |\{arg, ...\}|---useful to typeset attributes such as in
-% \autoref{sec:abstract-attributes}.  The variant |\pkgoptattribondots{arg}|
-% typesets |\{arg\}| while |\pkgoptattribempty| expands to |{}|.
-%    \begin{macrocode}
-  \def\pkgoptattrib##1{\{##1,...\}}
-  \def\pkgoptattribnodots##1{\{##1\}}
-  \def\pkgoptattribempty{\{\}}
-%    \end{macrocode}
-% 
-% \textbf{Colorful boxes: environments \phfverb{pkgnote},
-%   \phfverb{pkgwarning}, and \phfverb{pkgtip}.}  Now, load the
-% \pkgname{tcolorbox} package to provide visual ``Note,'' ``Warning,'' and
-% ``Tip'' boxes.  Because \pkgname{tcolorbox} includes the
-% \pkgname{verbatim} package which messes up the |verbatim| environment in
-% latex dtx files (for which source lines all start with a |%| which needs
-% to be stripped), we save the |verbatim|-related commands, and restore
-% them after the interfering packages have been loaded.
-%    \begin{macrocode}
-  \phfnoteSaveDefs{verbatimstuff}{%
-    verbatim,@verbatim,@xverbatim,@sxverbatim,endverbatim}
-  \usepackage{tcolorbox}
-  \newtcolorbox{pkgnote}{
-    colback=blue!5!white,
-    colframe=blue!5!white,
-    coltitle=blue!50!black,
-    toptitle=1.5ex,
-    fonttitle=\bfseries,
-    title={NOTE}
-  }
-  \newtcolorbox{pkgwarning}{
-    colback=red!5!white,
-    colframe=red!5!white,
-    coltitle=red!50!black,
-    toptitle=1.5ex,
-    fonttitle=\bfseries,
-    title={WARNING}
-  }
-  \newtcolorbox{pkgtip}{
-    colback=green!5!white,
-    colframe=green!5!white,
-    coltitle=green!50!black,
-    toptitle=1.5ex,
-    fonttitle=\bfseries,
-    title={TIP}
-  }
-  \phfnoteRestoreDefs{verbatimstuff}
-%    \end{macrocode}
-%
-% Patch the |verbatim| environment to remove extraneous space after the
-% environment caused by I don't know what weird cause:
-%    \begin{macrocode}
-  \appto\endverbatim{\vspace{-\baselineskip}}
-%    \end{macrocode}
-% 
-% Common title stuff:
-%    \begin{macrocode}
-  \def\phfqitltxPkgTitle##1{The \pkgname{##1} package\thanks{\itshape
-    This document corresponds to \pkgname{##1}~\fileversion, dated \filedate. It
-    is part of the
-    \href{https://github.com/phfaist/phfqitltx/}{\pkgname{phfqitltx}} package
-    suite, see \url{https://github.com/phfaist/phfqitltx}.}}
-%    \end{macrocode}
-% 
-% Utility to parse package file date into ``|\today|''-style date: invoke as
-% |\date{\pkgfmtdate\filedate}|.
-%    \begin{macrocode}
-  \def\pkgfmtdate##1{%
-    \edef\pkgfmtdate@thedate{##1}%
-    \expandafter\pkgfmtdate@next\pkgfmtdate@thedate\@nil%
-  }
-  \def\pkgfmtdate@next##1/##2/##3\@nil{% YYYY/MM/DD
-    \ifcase ##2 \or January\or February\or March\or April\or May%
-    \or June\or July\or August\or September\or October\or November\or December\fi\space ##3,%
-    \space ##1}
-  \robustify\pkgfmtdate@next
-}
-%    \end{macrocode}
-% \end{macro}
-% 
 %
 % \begin{macro}{\phfnote@preset@reset}
 %   Finally, the |reset| preset:
@@ -4168,8 +3800,6 @@
 }
 %    \end{macrocode}
 % \end{macro}
-% 
-%
 %
 %
 % \subsubsection{Finally, Process and Execute the Package Options}
@@ -4185,30 +3815,61 @@
 %
 % Take action according to the user options.
 %
+% For the |pkgset| option.
 %    \begin{macrocode}
 \expandafter\phfnote@do@pkgset\expandafter{\phfnote@opt@pkgset}
-
+%    \end{macrocode}
+% 
+% For the |title| option.
+%    \begin{macrocode}
 \expandafter\phfnote@do@notetitle\expandafter{\phfnote@opt@title}
-
+%    \end{macrocode}
+%
+% For the |abstract| option.
+%    \begin{macrocode}
 \expandafter\phfnote@do@noteabstract\expandafter{\phfnote@opt@abstract}
-
+%    \end{macrocode}
+%
+% For the |secfmt| option.
+%    \begin{macrocode}
 \expandafter\phfnote@do@secfmt\expandafter{\phfnote@opt@secfmt}
-
-\phfnote@ifpkgoptfalsesetfalse{pagegeomdefs}{pagegeom}% deal with obsolete option
+%    \end{macrocode}
+%
+% For the |pagegeomdefs| option.  Here, the first line is needed to deal with
+% the obsolete option `|pagegeom|'.
+%    \begin{macrocode}
+\phfnote@ifpkgoptfalsesetfalse{pagegeomdefs}{pagegeom}
 \expandafter\phfnote@do@pagegeom\expandafter{\phfnote@opt@pagegeom}
-
+%    \end{macrocode}
+%
+% For the |spacingdefs| option.
+%    \begin{macrocode}
 \expandafter\phfnote@do@spacingdefs\expandafter{\phfnote@opt@spacingdefs}
-
+%    \end{macrocode}
+%
+% For the |par| option.
+%    \begin{macrocode}
 \expandafter\phfnote@do@par\expandafter{\phfnote@opt@par}
-
+%    \end{macrocode}
+%
+% For the |hyperrefdefs| option.
+%    \begin{macrocode}
 \expandafter\phfnote@do@hyperrefdefs\expandafter{\phfnote@opt@hyperrefdefs}
-
+%    \end{macrocode}
+%
+% For the |fontdefs| option.
+%    \begin{macrocode}
 \expandafter\phfnote@do@fontdefs\expandafter{\phfnote@opt@fontdefs}
-
+%    \end{macrocode}
+%
+% For the |bibliographydefs| option.
+%    \begin{macrocode}
 \expandafter\phfnote@do@bibliographydefs\expandafter{\phfnote@opt@bibliographydefs}
-
+%    \end{macrocode}
+%
+% For the |footnotedefs| option.
+%    \begin{macrocode}
 \expandafter\phfnote@do@footnotedefs\expandafter{\phfnote@opt@footnotedefs}
-
 %    \end{macrocode}
 % 
 % Finally, execute the hook we set up for definitions at the end of the package
@@ -4217,5 +3878,422 @@
 \phfnote@hook@atendload
 %    \end{macrocode}
 %
+%
+% \subsection{Helper files}
+%
+% Now we write some code to some external |.def| files for large chunks of code
+% that are only needed in specific situations, in order to avoid bloating the
+% main style file.
+%
+% \subsubsection{The \emph{xpkgdoc} preset}
+% \label{sec:impl-xpkgdoc}
+%
+% The |xpkgdoc| preset is based on the |pkgdoc| preset.  It introduces multiple
+% pretty involved tools and definitions on top of |pkgdoc|; these are not needed
+% unless this preset is loaded.  Let's write all of the corresponding
+% definitions into a separate |.def| file.
+%
+% \iffalse
+%</package>
+% \fi
+%    \begin{verbatim}
+%<*phfnotepreset-xpkgdoc>
+%    \end{verbatim}
+%
+% Load the |pkgdoc| preset before anything else:
+%    \begin{macrocode}
+\phfnote@loadpreset{pkgdoc}
+%    \end{macrocode}
+% 
+% Include the \pkgname{verbdef} package, because it's always useful.
+%    \begin{macrocode}
+\RequirePackage{verbdef}
+%    \end{macrocode}
+%
+% \textbf{Some patching first:}
+% Patch up |\PrintChanges| and |\PrintIndex|, if they are defined (for if we are
+% using the \pkgname{ltxdoc} package for latex package documentation).  We want
+% these to generate an entry in the table of contents.  Also provide the utility
+% |\PrintChangesAndIndex|, which calls both |\PrintChanges| and |\PrintIndex| with
+% some additional spacing.
+%    \begin{macrocode}
+\ifdefined\PrintChanges
+  \phfnoteHackSectionStarWithTOCInCommand\PrintChanges
+\fi
+\ifdefined\PrintIndex
+  \phfnoteHackSectionStarWithTOCInCommand\PrintIndex
+\fi
+\def\PrintChangesAndIndexSpacing{\vspace{3cm plus 2cm minus 2cm}}
+\def\PrintChangesAndIndex{\PrintChangesAndIndexSpacing\PrintChanges
+  \PrintChangesAndIndexSpacing\PrintIndex}
+%    \end{macrocode}
+%
+% Set the index to TWO columns only (three is too tight).
+%    \begin{macrocode}
+\ifdefined\c@IndexColumns
+  \setcounter{IndexColumns}{2}
+\fi
+%    \end{macrocode}
+% 
+% And set the glossary, that is, the list of changes history to single-column.
+% For this, renew the environment completely to remove the |multicols|
+% environment.
+%    \begin{macrocode}
+\let\phfnote@xpkgdoc@old@theglossary\theglossary
+\let\phfnote@xpkgdoc@old@endtheglossary\endtheglossary
+\renewenvironment{theglossary}{%
+  \glossary@prologue%
+  \GlossaryParms \let\item\@idxitem \ignorespaces}
+{}
+%    \end{macrocode}
+%
+% Tools to condense the macro names in the margins, and make them break at the
+% margin width (at arbitrary points in the macro name) instead of overflowing on
+% the documentation text.
+%    \begin{macrocode}
+\def\phf@fillwithdiscretionaries#1#2#3{%
+  \def\phf@fillwithdescretionaries@a{#1}%
+  \def\phf@fillwithdescretionaries@b{#2}%
+  \edef\x{#3}%
+  \expandafter \phf@fillwithdiscretionaries@ \x \@nil
+}
+\def\phf@fillwithdiscretionaries@#1#2\@nil{%
+  \if\relax\detokenize{#1}\relax\else
+    #1%
+    \if\relax\detokenize{#2}\relax\else
+      \discretionary{\phf@fillwithdescretionaries@a}{%
+        \phf@fillwithdescretionaries@b}{}%
+      \phf@fillwithdiscretionaries@#2\@nil
+    \fi
+  \fi
+}
+\definecolor{phfxpkgdocmacronamehyphencolor}{rgb}{0.6,0.6,0.7}
+\def\phf@xpkgdoc@macrobreakhyphen{%
+  \hbox{\textcolor{phfxpkgdocmacronamehyphencolor}{-}}}
+\def\ScaleHorizontallyAndHyphenateAnywhere#1#2{% {hscale-factor}{text}
+  \scalebox{#1}[1.0]{%
+    \parbox{% compute inverse of #1 ...
+      \dimexpr \marginparwidth*65536 /
+      \number\dimexpr #1\p@ \relax \relax
+    }{\raggedleft\phf@fillwithdiscretionaries{%
+        \phf@xpkgdoc@macrobreakhyphen}{}{#2}\hfill}%
+  }%
+}
+\def\phf@xpkgdoc@marginmacronamecompressfactor{0.85}
+\def\phf@xpkgdoc@macrofont{\small\bfseries}% \footnotesize ?
+\def\PrintMarginLabelContents#1{%
+  \strut\MacroFont\phf@xpkgdoc@macrofont
+  \ScaleHorizontallyAndHyphenateAnywhere{%
+    \phf@xpkgdoc@marginmacronamecompressfactor}{#1}%
+  \par
+}
+\def\PrintMarginLabel#1{\marginpar{\PrintMarginLabelContents{#1}}}
+\def\PrintDescribeMacro#1{\PrintMarginLabelContents{\string#1}}
+\let\PrintMacroName\PrintDescribeMacro
+\let\PrintDescribeEnv\PrintMarginLabelContents
+\let\PrintEnvName\PrintMarginLabelContents
+%    \end{macrocode}
+% 
+% \textbf{Hyperref:} Request default \pkgname{hyperref} definitions with
+% |hyperrefdefs=defer|, but we'll load \pkgname{hyperdoc} instead of
+% \pkgname{hyperref}.
+%    \begin{macrocode}
+\def\phfnote@opt@hyperrefdefs{defer}
+\g@addto@macro\phfnote@hook@atendload{
+  \RequirePackage{hypdoc}
+  \urlstyle{noteit}
+}
+%    \end{macrocode}
+%
+% \textbf{Provide Macro:} |\pkgname|\marg{package name} to format a package
+% name.  Also place it in the general index.  This command is robust and
+% can be used in section titles etc.
+%    \begin{macrocode}
+\def\pkgname#1{%
+  \pkgnamefmt{#1}%
+  \index{#1=\pkgnamefmt{#1}|hyperpage}%
+  \index{packages:>#1=\pkgnamefmt{#1}|hyperpage}%
+}
+\robustify\pkgname
+\def\pkgnamefmt#1{\textsf{#1}}
+\robustify\pkgnamefmt
+%    \end{macrocode}
+% 
+%
+% \textbf{Provide Macros:} |\changed| and |\changedreftext|, with more
+% advanced support for displaying changes in package functionality or API.
+% 
+% First, we need a counter for the x-ref system.
+%    \begin{macrocode}
+\newcounter{phfnotechanged}
+%    \end{macrocode}
+% 
+% Mark changes in the implementation section of the package documentation
+% with the command |\changed|\oarg{label
+% name}\marg{v1.0}\marg{2016/05/22}\marg{description}.  This command
+% automatically adds the change to the package's change history list, and
+% allows you to refer to this change anywhere else in the package doc with
+% |\changedreftext|.
+%    \begin{macrocode}
+\newcommand*\changed[4][]{%
+%    \end{macrocode}
+% 
+% First, if no label is given as optional argument, then just display the
+% change and add it to the package changes list.
+%    \begin{macrocode}
+  \if\relax\detokenize{#1}\relax%
+    \changedtextfmt{#2}{#3}{#4}%
+    \changes{#2}{#3}{#4}%
+  \else%
+%    \end{macrocode}
+% 
+% If a label name is provided as optional argument, then we need to write
+% some stuff to the \texttt{.aux} file to make the change visible in the
+% whole document.
+%    \begin{macrocode}
+    \protected@edef\phfnotechanged@tmpa{{#2}{#3}{#4}}%
+    \immediate\write\@auxout{\string\phfnote@changed@set%
+      {#1}{\expandonce\phfnotechanged@tmpa}}%
+    \par\hspace*{0pt}\refstepcounter{phfnotechanged}\label{phfnotechanged:#1}%
+    \begingroup\let\phfnote@changedreftext@par\relax
+      \changedreftext[\@secondoftwo]{#1}%
+    \endgroup
+    \changes{#2}{#3}{\hyperref[phfnotechanged:#1]{#4}}%
+  \fi
+}
+\def\phfnote@changed@set#1{%
+  \expandafter\gdef\csname phfnote@changed@lbl@#1\endcsname%
+}
+%    \end{macrocode}
+% 
+% When you document changes with the help of |\changed|, you may refer to
+% any specific change from anywhere else in the package doc with the help
+% of |\changedreftext|\marg{label name}.
+%    \begin{macrocode}
+\def\phfnote@changedreftext@par{\par}
+\newcommand*\changedreftext[2][\phfnote@changedrefto]{%
+  \phfnote@changedreftext@par%
+  \ifcsname phfnote@changed@lbl@#2\endcsname
+    #1{#2}{%
+      \expandafter\expandafter\expandafter\changedtextfmt%
+          \csname phfnote@changed@lbl@#2\endcsname
+    }
+  \else
+    \hyperref[phfnotechanged:#2]{%
+      \changedtextfmt{???}{???}{[\textbf{missing ref}]}%
+    }%
+  \fi
+  \par
+}
+\def\phfnote@changedrefto#1{\hyperref[phfnotechanged:#1]}
+%    \end{macrocode}
+% 
+% The macro |\changedtextfmt|\marg{v1.0}\marg{2016/05/22}\marg{description}
+% takes care of formatting the change on the spot.
+%    \begin{macrocode}
+\newcommand*\changedtextfmt[3]{%
+  \textit{Changed in {#1\kern 0.3ex\relax[#2]}:} #3.
+}
+%    \end{macrocode}
+% 
+% \textbf{Provide environment \phfverb{pkgoptions}:} Set up an elaborate
+% environment (based on a |description| environment) to describe package
+% options.
+%    \begin{macrocode}
+\RequirePackage{enumitem}
+\newlist{pkgoptions}{description}{1}
+\setlist[pkgoptions]{font=\pkgoptionfmt@many[{\vspace*{5pt}}],style=nextline}
+%    \end{macrocode}
+% 
+% But patch the |pkgoptions|' |\item| command, so that it puts an additional
+% pair of braces around its argument.  In this way, the |font=| attribute for
+% the list sees the full label as its next token, and can be used as a macro
+% argument.  (This is not needed for newer versions of \pkgname{enumitem}.)
+%    \begin{macrocode}
+\def\pkgoptions@item{\@ifnextchar[\pkgoptions@item@\pkgoptions@item@@}%]
+\def\pkgoptions@item@[#1]{\pkgoptions@old@item[{{#1}}]}%
+\def\pkgoptions@item@@{\PackageWarning{phfnote}{{pkgoptions}: you must
+    specify label to \string\item as \string\item[label].}%
+  \pkgoptions@old@item}%
+\apptocmd\pkgoptions{%
+  \let\pkgoptions@old@item\item
+  \let\item\pkgoptions@item
+}{}{\PackageWarning{phfnote}{preset xpkgdoc: Failed to patch command
+    \string\pkgoptions}}
+%    \end{macrocode}
+% 
+% For convenience, also provide a |\meta|-like command for boolean arguments
+% (|true| or |false|). `|\metatruefalsearg|' typesets as `\metatruefalsearg'.
+%    \begin{macrocode}
+\def\metatruefalsearg{\meta{\phfverb{true} $\mid$ \phfverb{false}}}
+%    \end{macrocode}
+% 
+% Include also a command to format a package option.  Puts the option in a box
+% in typewriter text style, and indexes it.  The optional argument is meant to
+% be internal---it adds commands after the displayed text (use it to add, e.g.\@
+% spacing).
+%
+% When indexing the packages, make sure to remove the protective braces if any.
+%    \begin{macrocode}
+\newcommand\pkgoptionfmt[2][]{%
+  \begingroup\let\meta\pkgoptfmt@meta\pkgopt@fbox{\normalfont\ttfamily #2}\endgroup%
+  \expandafter\phfnote@pkgdoc@index\expandafter{\@firstofone #2}%
+  #1}
+\newcommand\pkgoptionfmt@many[2][]{%
+  \def\pkgoptionfmt@tmp@addcomma{}
+  \def\do##1{\pkgoptionfmt@tmp@addcomma\pkgoptionfmt{\vphantom{#2}##1}%
+    \def\pkgoptionfmt@tmp@addcomma{\hskip0.25em\relax,\hskip0.8em\relax}}%
+  \expandafter\docsvlist\expandafter{\@firstofone #2}%
+  #1}
+\let\pkgopt@save@meta\meta
+\def\pkgopt@fbox{\fbox}
+\def\pkgoptfmt@meta#1{\begingroup\normalfont\itshape\pkgopt@save@meta{#1}\endgroup}
+%    \end{macrocode}
+% 
+% Whenever a package option is formatted with |\pkgoptionfmt|, it is placed in
+% the index.  Because package options may be of the form |key=val|, we want to
+% split keys from values and put them independently in the index.  This is done
+% by entering a \TeX{} group, and using an |\lccode| trick: the code is prepared
+% to iterate over a list of comma-separated stuff, but then the ``lowercase''
+% version of that code is executed instead, where the |=|'s have been replaced
+% by |,|'s.
+%    \begin{macrocode}
+\def\phfnote@pkgdoc@index#1{%
+  \begingroup\lccode`\= = `\,\relax%
+    \def\x{\lowercase{\def\@tmpa{#1}}}%
+    \x%
+    \let\meta\@gobble%
+    \let\marg\@gobble%
+    \let\oarg\@gobble%
+    \let\parg\@gobble%
+    \let\vphantom\@gobble%
+    \let\hphantom\@gobble%
+    \let\pkgoptattrib\@firstofone%
+    \let\pkgoptattribnodots\@firstofone%
+    \let\pkgoptattribempty\@empty%
+    \def\handleitemindex##1{%
+      \edef\@tmpc{##1}%
+      \if\relax\detokenize\expandafter{\@tmpc}\relax\else%
+        \edef\@tmpb{{\expandonce\@tmpc=\string\verb!*+\expandonce\@tmpc+ (\pkgoptname)|hyperpage}}%
+        \expandafter\index\@tmpb%
+        \edef\@tmpb{{\packageoptionsname:>\expandonce\@tmpc=\string\verb!*+\expandonce\@tmpc+|hyperpage}}%
+        \expandafter\index\@tmpb%
+      \fi%
+    }%
+    \def\@tmpc{\forcsvlist{\handleitemindex}}%
+    \expandafter\@tmpc\expandafter{\@tmpa}%
+  \endgroup%
+}
+\def\pkgoptname{pkg. opt.}
+\def\packageoptionsname{package options}
+%    \end{macrocode}
+%
+% \textbf{Provide environment \phfverb{cmdoptions}:} hijack the |pkgoptions|
+% environment to do the same thing, except we place the items in the index under
+% ``command options'' instead of ``package options.''
+%    \begin{macrocode}
+\def\cmdoptions{\begingroup\setcmdnotpkgoptions
+  \pkgoptions}
+\def\endcmdoptions{\endpkgoptions\endgroup}
+\newcommand\cmdoptionfmt[2][]{\begingroup\setcmdnotpkgoptions
+  \pkgoptionfmt[{#1}]{#2}\endgroup}
+\def\cmdoptname{cmd. opt.}
+\def\commandoptionsname{command options}
+\def\setcmdnotpkgoptions{\let\pkgoptname\cmdoptname
+  \let\packageoptionsname\commandoptionsname
+  \let\pkgopt@fbox\cmdoptionsfbox}
+\def\cmdoptionsfbox#1{\ensuremath{\underline{{\text{#1}}}}}
+%    \end{macrocode}
+% 
+% Provide the |\pkgoptattrib| command, which typesets its argument as
+% |\{arg, ...\}|---useful to typeset attributes such as in
+% \autoref{sec:abstract-attributes}.  The variant |\pkgoptattribondots{arg}|
+% typesets |\{arg\}| while |\pkgoptattribempty| expands to |{}|.
+%    \begin{macrocode}
+\def\pkgoptattrib#1{\{#1,...\}}
+\def\pkgoptattribnodots#1{\{#1\}}
+\def\pkgoptattribempty{\{\}}
+%    \end{macrocode}
+% 
+% \textbf{Colorful boxes: environments \phfverb{pkgnote},
+%   \phfverb{pkgwarning}, and \phfverb{pkgtip}.}  Now, load the
+% \pkgname{tcolorbox} package to provide visual ``Note,'' ``Warning,'' and
+% ``Tip'' boxes.  Because \pkgname{tcolorbox} includes the
+% \pkgname{verbatim} package which messes up the |verbatim| environment in
+% latex dtx files (for which source lines all start with a |%| which needs
+% to be stripped), we save the |verbatim|-related commands, and restore
+% them after the interfering packages have been loaded.
+%    \begin{macrocode}
+\phfnoteSaveDefs{verbatimstuff}{%
+  verbatim,@verbatim,@xverbatim,@sxverbatim,endverbatim}
+\usepackage{tcolorbox}
+\newtcolorbox{pkgnote}{
+  colback=blue!5!white,
+  colframe=blue!5!white,
+  coltitle=blue!50!black,
+  toptitle=1.5ex,
+  fonttitle=\bfseries,
+  title={NOTE}
+}
+\newtcolorbox{pkgwarning}{
+  colback=red!5!white,
+  colframe=red!5!white,
+  coltitle=red!50!black,
+  toptitle=1.5ex,
+  fonttitle=\bfseries,
+  title={WARNING}
+}
+\newtcolorbox{pkgtip}{
+  colback=green!5!white,
+  colframe=green!5!white,
+  coltitle=green!50!black,
+  toptitle=1.5ex,
+  fonttitle=\bfseries,
+  title={TIP}
+}
+\phfnoteRestoreDefs{verbatimstuff}
+%    \end{macrocode}
+%
+% Patch the |verbatim| environment to remove extraneous space after the
+% environment caused by I don't know what weird cause:
+%    \begin{macrocode}
+\appto\endverbatim{\vspace{-\baselineskip}}
+%    \end{macrocode}
+% 
+% Common title stuff:
+%    \begin{macrocode}
+\def\phfqitltxPkgTitle#1{The \pkgname{#1} package\thanks{\itshape
+  This document corresponds to \pkgname{#1}~\fileversion, dated \filedate. It
+  is part of the
+  \href{https://github.com/phfaist/phfqitltx/}{\pkgname{phfqitltx}} package
+  suite, see \url{https://github.com/phfaist/phfqitltx}.}}
+%    \end{macrocode}
+% 
+% Utility to parse package file date into ``|\today|''-style date: invoke as
+% |\date{\pkgfmtdate\filedate}|.
+%    \begin{macrocode}
+\def\pkgfmtdate#1{%
+  \edef\pkgfmtdate@thedate{#1}%
+  \expandafter\pkgfmtdate@next\pkgfmtdate@thedate\@nil%
+}
+\def\pkgfmtdate@next#1/#2/#3\@nil{% YYYY/MM/DD
+  \ifcase #2 \or January\or February\or March\or April\or May%
+  \or June\or July\or August\or September\or October%
+  \or November\or December\fi\space #3,%
+  \space #1}
+\robustify\pkgfmtdate@next
+%    \end{macrocode}
+%
+%    \begin{verbatim}
+%</phfnotepreset-xpkgdoc>
+%    \end{verbatim}
+% \iffalse
+%<*package>
+% \fi
+%
+%
+%
+%
 %\Finale
+%</package>
 \endinput

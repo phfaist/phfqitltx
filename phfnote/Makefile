@@ -1,6 +1,8 @@
 
 PKG = phfnote
 
+ADDITIONAL_GENERATED_FILES = phfnotepreset-xpkgdoc.def
+
 DIST_ADDITIONAL_FILES = naturemagdoi.bst
 
 -include pkg.mk

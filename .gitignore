@@ -21,6 +21,7 @@
 
 # auto-generated sty/cls files
 phf*/*.sty
+phf*/*.def
 phf*/*.cls
 
 # distribution files (TDS.ZIP)
