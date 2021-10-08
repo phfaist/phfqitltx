@@ -381,6 +381,10 @@
 % the same syntax as their corresponding |\ket|, |\bra|, etc., for instance, you
 % can type |\obra`\Big{\sum A_i}| to obtain $\obra`\Big{\sum A_i}$.
 %
+% \DescribeMacro{\llangle} \DescribeMacro{\rrangle} The \pkfname{phfqit} package
+% defines the |\llangle| and |\rrangle| delimiters (taken from the MnSymbol fonts  The double-angle bracket symbol used in
+% double-bra-ket type constructs
+%
 % \subsection{Delimited expressions: norms, absolute value, etc.}
 % \label{sec:delimited}
 %
@@ -1302,9 +1306,10 @@
     \xdef\phfqit@tmp@thecmd{%
       \expandafter\noexpand\csname phfqit@paireddelim@def@\string#2\endcsname}%
   \endgroup
-  \edef#2{%
+  \edef\x{%
     \noexpand\phfqit@paireddelim@parsesizearg{\expandonce\phfqit@tmp@thecmd}%
   }%
+  \expandafter\DeclareRobustCommand\expandafter#2\expandafter{\x}%
   \expandafter#1\phfqit@tmp@thecmd
 }
 \def\phfqit@paireddelim@parsesizearg#1{%
@@ -1318,17 +1323,28 @@
 % \subsection{Bra-Ket Notation}
 %
 %
-% \needspace{3\baselineskip}
-% \begin{macro}{\phfqitKetsSpaceFactor}
 % \begin{macro}{\phfqitKetsBarSpace}
-% \begin{macro}{\phfqitKetsLRAngleSpace}
+% \begin{macro}{\phfqitKetsRLAngleSpace}
+%   These macros can be redefined to fine-tune the space that is inserted in
+%   some of the ket/bra constructs.
+%
+%   |\phfqitKetsBarSpace| is the space around the vertical bars, e.g., in a
+%   bra-ket, or in matrix elements.  (Previously, this space was hard-coded to
+%   |\hspace*{0.2ex}|.  Now, the spacing can be specified in this macro.  We
+%   furthermore use ``math units'' (|mu|), which are more suitable for
+%   specifying space in math mode; recall that $1\,\mathrm{mu}$ is
+%   $1/18\,\mathrm{em}$ in the math font.)
 %    \begin{macrocode}
-\def\phfqitKetsBarSpace{% this was previously \hspace*{0.2ex}
-  \mkern 1.5mu\relax}
-\def\phfqitKetsRLAngleSpace{% this was previously \hspace*{-0.25ex}
-  \mkern -1.8mu\relax}
+\def\phfqitKetsBarSpace{\mkern 1.5mu\relax}
 %    \end{macrocode}
-% \end{macro}
+% The macro |\phfqitKetsRLAngleSpace| specifies the space between the right
+% angle bracket and the left angle bracket in ket-bra type constructs
+% ($\ketbra\phi\psi$).  By default, it expands to negative space to bring the
+% angle brackets closer together.  (Previously, this space was hard-coded to
+% |\hspace*{-0.25ex}|.)
+%    \begin{macrocode}
+\def\phfqitKetsRLAngleSpace{\mkern -1.8mu\relax}
+%    \end{macrocode}
 % \end{macro}
 % \end{macro}
 %
@@ -1378,6 +1394,20 @@
 % \end{macro}
 % \end{macro}
 %
+%
+% \begin{macro}{\phfqitOKetsBarSpace}
+% \begin{macro}{\phfqitOKetsRLAngleSpace}
+%   These macros are the same as |\phfqitKetsBarSpace| and
+%   |\phfqitKetsRLAngleSpace|, except that they specify the corresponding
+%   spacing for the |\oket| family of bra/ket-type constructs.
+%    \begin{macrocode}
+\def\phfqitOKetsBarSpace{\phfqitKetsBarSpace}
+\def\phfqitOKetsRLAngleSpace{\phfqitKetsRLAngleSpace}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+%
 % \needspace{8\baselineskip}
 % \begin{macro}{\oket}
 % \begin{macro}{\obra}
@@ -1392,26 +1422,26 @@
 %   also the |llanglefrommnsymbolfonts| option.
 %
 %   \changed[v4.1-okets-obras]{v4.1}{2021/10/08}{Added support for
-%   \phfverb{oket} and friends}
+%   \phfverb{\oket} and friends}
 %    \begin{macrocode}
 \phfqitDeclarePairedDelimiterXWithAltSizing\oket[1]{\lvert}{\rrangle}{{#1}}
 \phfqitDeclarePairedDelimiterXWithAltSizing\obra[1]{\llangle}{\rvert}{{#1}}
 \phfqitDeclarePairedDelimiterXWithAltSizing\obraket[2]{\llangle}{\rrangle}{%
-  {#1}\phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#2}%
+  {#1}\phfqitOKetsBarSpace\delimsize\vert\phfqitOKetsBarSpace{#2}%
 }
 \phfqitDeclarePairedDelimiterXWithAltSizing\oketbra[2]{\lvert}{\rvert}{%
-  {#1}\delimsize\rrangle\phfqitKetsRLAngleSpace\delimsize\llangle{#2}%
+  {#1}\delimsize\rrangle\phfqitOKetsRLAngleSpace\delimsize\llangle{#2}%
 }
 \phfqitDeclarePairedDelimiterXWithAltSizing\oproj[1]{\lvert}{\rvert}{%
-  {#1}\delimsize\rrangle\phfqitKetsRLAngleSpace\delimsize\llangle{#1}%
+  {#1}\delimsize\rrangle\phfqitOKetsRLAngleSpace\delimsize\llangle{#1}%
 }
 \phfqitDeclarePairedDelimiterXWithAltSizing\omatrixel[3]{\llangle}{\rrangle}{%
-  {#1}\phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#2}%
-  \phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#3}%
+  {#1}\phfqitOKetsBarSpace\delimsize\vert\phfqitOKetsBarSpace{#2}%
+  \phfqitOKetsBarSpace\delimsize\vert\phfqitOKetsBarSpace{#3}%
 }
 \phfqitDeclarePairedDelimiterXWithAltSizing\odmatrixel[2]{\llangle}{\rrangle}{%
-  {#1}\phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#2}%
-  \phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#1}%
+  {#1}\phfqitOKetsBarSpace\delimsize\vert\phfqitOKetsBarSpace{#2}%
+  \phfqitOKetsBarSpace\delimsize\vert\phfqitOKetsBarSpace{#1}%
 }
 %    \end{macrocode}
 % \end{macro}
