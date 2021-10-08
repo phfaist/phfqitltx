@@ -1,1 +1,0 @@
-../mkcommon/pkg.mk
