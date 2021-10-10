@@ -2,6 +2,7 @@
 
 Utilities for inline commenting in collaborative documents.
 
+Easily define helper macros to insert comments in a LaTeX document. A convenient syntax enables you to mark text additions (e.g., "... \phf{I'm adding this text} ..." or "... \phf I'm adding this text\endphf ..."), an in-line comment (e.g., "... We're the best \phf[I'm not sure about this.] ..."), and text removals (e.g., "... \phf*{remove me} ..."). New colors are assigned automatically to each commenter by default, and the appearance of all comments is highly customizable.
 
 # Documentation
 
