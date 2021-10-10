@@ -377,13 +377,31 @@
 % double-bra-ket commands as is occasionally used to write ``vectors'' in
 % Hilbert-Schmidt operator space, such as $\oket{A}$, $\obraket{A}{\Ident}$,
 % $\oketbra{\Ident}{E_k}$, etc.  The commands are named |\oket|, |\obra|,
-% |\obraket|, |\oketbra|, |\oproj|, |\omatrixel|, and |\odmatrixel|.  They offer
-% the same syntax as their corresponding |\ket|, |\bra|, etc., for instance, you
-% can type |\obra`\Big{\sum A_i}| to obtain $\obra`\Big{\sum A_i}$.
+% |\obraket|, |\oketbra|, |\oproj|, |\omatrixel|, and |\odmatrixel|.
 %
-% \DescribeMacro{\llangle} \DescribeMacro{\rrangle} The \pkfname{phfqit} package
-% defines the |\llangle| and |\rrangle| delimiters (taken from the MnSymbol fonts  The double-angle bracket symbol used in
-% double-bra-ket type constructs
+% The commands |\oket|, |\obra|, |\obraket|, etc.\@ offer the same syntax as
+% their corresponding |\ket|, |\bra|, etc.\@ counterparts.  For instance, you can
+% type |\obra`\Big{\sum A_i}| to obtain $\obra`\Big{\sum A_i}$.
+%
+% \DescribeMacro{\llangle} \DescribeMacro{\rrangle} The \pkgname{phfqit} package
+% defines the |\llangle| and |\rrangle| delimiters, by taking the relevant
+% symbols from the \pkgname{MnSymbol} fonts.  These double-angle bracket symbols
+% are used for the double-bra-ket type constructs (|\oket| and friends).
+%
+% If you'd like to provide your own definition of |\llangle| and |\rrangle|, or
+% if for any reason you would not want us to attempt to load the
+% \pkgname{MnSymbol} fonts at all, then you can set the package option
+% |llanglefrommnsymbolfonts=false|.
+%
+% If you provide your own definition of |\llangle| and |\rrangle|, then make
+% sure that they are proper \TeX\ delimiters, i.e., constructs of the form
+% |\left\llangle ... \right\rrangle| or |\bigl\llangle ... \bigr\rrangle| must
+% work.
+%
+% If your document never uses the double-bra-ket macros (i.e., none of the
+% |\oket|, |\obra|, and friends), then you may safely specifiy
+% |llanglefrommnsymbolfonts=false| to avoid loading the relevant symbols.
+%
 %
 % \subsection{Delimited expressions: norms, absolute value, etc.}
 % \label{sec:delimited}
@@ -398,8 +416,8 @@
 % gives $\avg`\big{\sum_k A_k}$.
 %
 % \DescribeMacro{\norm} The norm of an expression.  |\norm{A_k}| gives
-% $\norm{A_k}$.  (You can add subscripts, e.g.\@ |\norm{A_k}_\infty| is
-% $\norm{A_k}_\infty$.)
+% $\norm{A_k}$.  (If you'd like to define customized norms, e.g., to add
+% subscripts, then check out the |\phfqitDefineNorm| command discussed below.)
 %
 % \DescribeMacro{\intervalc} A closed interval. |\intervalc{x}{y}| gives
 % $\intervalc{x}{y}$.
@@ -414,10 +432,10 @@
 % and closed on the upper bound. |\intervaloc{x}{y}| gives $\intervaloc{x}{y}$.
 %
 %
-% \DescribeMacro{\phfqitDefineNorm} The handy command |\phfqitDefineNorm| can be used
-% to define custom norms (e.g. 1-norm, infinity-norm, p/q-norms, etc.).  The
-% syntax is |\phfDefineNorm|\meta{command name}\meta{before}\meta{after}, for
-% example:
+% \DescribeMacro{\phfqitDefineNorm} The handy command |\phfqitDefineNorm| can be
+% used to define custom norms (e.g. 1-norm, infinity-norm, p/q-norms, etc.).
+% The syntax is |\phfqitDefineNorm|\meta{command name}\meta{before}\meta{after},
+% for example:
 % \begin{verbatim}
 % \phfqitDefineNorm\onenorm{}{_1}
 % \phfqitDefineNorm\opnorm{}{_\infty}
@@ -1348,7 +1366,7 @@
 % \end{macro}
 % \end{macro}
 %
-% \needspace{8\baselineskip}
+% \needspace{7\baselineskip}
 % \begin{macro}{\ket}
 % \begin{macro}{\bra}
 % \begin{macro}{\braket}
@@ -1356,7 +1374,6 @@
 % \begin{macro}{\proj}
 % \begin{macro}{\matrixel}
 % \begin{macro}{\dmatrixel}
-% \begin{macro}{\innerprod}
 %   Bras, kets, norms, some delimiter stuff.  User documentation in
 %   \autoref{sec:bra-ket}.  
 %    \begin{macrocode}
@@ -1379,6 +1396,22 @@
   {#1}\phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#2}%
   \phfqitKetsBarSpace\delimsize\vert\phfqitKetsBarSpace{#1}%
 }
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\phfqitKetsBeforeCommaSpace}
+% \begin{macro}{\phfqitKetsAfterCommaSpace}
+% \begin{macro}{\innerprod}
+%   We also provide the |\innerprod| macro at this point.  Customize the inner
+%   spacing before and after the comma with |\phfqitKetsBeforeCommaSpace| and
+%   |\phfqitKetsAfterCommaSpace|.
+%    \begin{macrocode}
 \def\phfqitKetsBeforeCommaSpace{}
 \def\phfqitKetsAfterCommaSpace{\mkern 1.5mu\relax}
 \phfqitDeclarePairedDelimiterXWithAltSizing\innerprod[2]{\langle}{\rangle}{%
@@ -1388,13 +1421,7 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-% \end{macro}
-%
-%
+% 
 % \begin{macro}{\phfqitOKetsBarSpace}
 % \begin{macro}{\phfqitOKetsRLAngleSpace}
 %   These macros are the same as |\phfqitKetsBarSpace| and

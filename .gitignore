@@ -36,6 +36,7 @@ phfquotetext/phfquotetext.zip
 phfsvnwatermark/phfsvnwatermark.zip
 phfthm/phfthm.zip
 phfcc/phfcc.zip
+phfextendedabstract/phfextendedabstract.zip
 
 # pkg.mk
 phffullpagefigure/pkg.mk

@@ -42,7 +42,7 @@ help:
 	@echo "--------------------------------------------------"
 	@echo ""
 	@echo "Run:"
-	@echo "    - 'make sty' to generate all the style files;"
+	@echo "    - 'make sty' to generate all the style and class files;"
 	@echo "    - 'make pdf' to generate all package documentation files;"
 	@echo "    - 'make cleanaux' to remove TeX aux files;"
 	@echo "    - 'make cleansty' to remove generated .sty files;"
