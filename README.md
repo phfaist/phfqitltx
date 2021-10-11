@@ -67,7 +67,7 @@ package documentation, run
 
 # License
 
-(C) 2016 Philippe Faist, philippe.faist@bluewin.ch
+(C) 2016-2021 Philippe Faist, philippe.faist@bluewin.ch
 
 This material is subject to the [LaTeX Project Public License](http://www.ctan.org/license/lppl1.3),
 version 1.3 or above.
