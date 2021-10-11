@@ -1012,6 +1012,25 @@
 %    \begin{macrocode}
 \def\phfcc@collectfootnote{%
   \phfcc@startfootnote
+%    \end{macrocode}
+% There are two sets of commands we need to issue.  1) if we're in a minipage,
+% follow the definition of |\@mpfootnotetext| from |latex.ltx|.  2) if we're not
+% in a minipage, then follow the default definition of |\@footnotetext| from
+% |latex.ltx|.
+%
+% Gosh, this is really ugly.  We should create a mechanism by which we can read
+% up all the tokens of the comments (\`a la |verbatim|), and then re-parse those
+% tokens (perhaps using |\scantokens|?) to issue a proper |\footnote| command
+% which then really takes care of all these implementation details.
+%    \begin{macrocode}
+  \ifx\@footnotetext\@mpfootnotetext
+    \expandafter\phfcc@collectfootnote@minipage
+  \else
+    \expandafter\phfcc@collectfootnote@normal
+  \fi
+}
+\def\phfcc@collectfootnote@normal{%
+  \let\phfcc@endcollectfootnote\phfcc@endcollectfootnote@normal
   \insert\footins\bgroup%
     \reset@font\footnotesize
     \interlinepenalty\interfootnotelinepenalty
@@ -1029,7 +1048,29 @@
     \color{\phf@cc@val@cur color}%
     \phfccfootcommenttextstyle
 }
-\def\phfcc@endcollectfootnote{%
+\def\phfcc@endcollectfootnote@normal{%
+    \unskip
+    \color@endgroup
+  \egroup
+}
+\def\phfcc@collectfootnote@minipage{%
+  \let\phfcc@endcollectfootnote\phfcc@endcollectfootnote@minipage
+  \global\setbox\@mpfootins\vbox\bgroup%
+    \unvbox\@mpfootins
+    \reset@font\footnotesize
+    \hsize\columnwidth
+    \@parboxrestore
+    \protected@edef\@currentlabel
+         {\csname p@mpfootnote\endcsname\@thefnmark}%
+    \color@begingroup
+    \@makefntext{%
+      \rule\z@\footnotesep\@finalstrut\strutbox\phfcc@hackrevtex@skippar}%
+    \ignorespaces
+    \footnotesize
+    \color{\phf@cc@val@cur color}%
+    \phfccfootcommenttextstyle
+}
+\def\phfcc@endcollectfootnote@minipage{%
     \unskip
     \color@endgroup
   \egroup
