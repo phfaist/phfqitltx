@@ -378,11 +378,24 @@
 % \section<\guilsinglright>{} \emph{Manuscript in preparation.}
 % \end{verbatim}
 %
+% A further syntax enables you to specify run-in headings, in case the
+% section or paragraph title is actually the beginning of a sentence
+% that continues after the title.  When issuing the `|\section|' or
+% `|\paragraph|' command, precede your title with an equal sign `|=|':
+%
+% \begin{verbatim}
+% \paragraph={This title} actually begins a sentence (...)
+%
+% \paragraph!={This paragraph} also has its decoration suppressed (...)
+% \end{verbatim}
+%
+%
 % Here's a summary of the argument structure for |\section| and |\paragraph|:
 %
 % |\section|{\large\textbar}|\paragraph|
 % \emph{[} |*| \emph{]} \emph{[} |!| \emph{]}
 % \emph{[} |<|\meta{decoration}|>| \emph{]}
+% \emph{[} |=| \emph{]}
 % \emph{[} \oarg{alt title} \emph{]}
 % \marg{title}
 % 
@@ -450,9 +463,22 @@
 % \renewcommand\phfeaSectionFormatHeading[1]{\MakeUppercase{#1}\ ---}
 % \end{verbatim}
 %
-% The macros |\phfeaSectionFormatHeading{...}| and
-% |\phfeaParagraphFormatHeading{...}| are not called if the section/paragraph
-% title argument is empty.
+% \DescribeMacro{\phfeaSectionFormatRuninHeading}
+% \DescribeMacro{\phfeaParagraphFormatRuninHeading} The macros
+% |\phfeaSectionFormatRuninHeading{...}| and
+% |\phfeaParagraphFormatRuninHeading{...}| are invoked instead of
+% |\phfeaSectionFormatHeading{...}| and
+% |\phfeaParagraphFormatHeading{...}| if the section or paragraph has
+% a run-in title that begins a sentence.
+% \begin{verbatim}
+% \renewcommand\phfeaParagraphFormatRuninHeading[1]{\emph{#1}\ }
+% \end{verbatim}
+%
+% The macros |\phfeaSectionFormatHeading{...}|,
+% |\phfeaParagraphFormatHeading{...}|,
+% |\phfeaSectionFormatRuninHeading{...}|, and
+% |\phfeaParagraphFormatRuninHeading{...}| are not called if the
+% section/paragraph title argument is empty.
 %
 %
 % \subsection{Vertical spacing}
@@ -776,6 +802,7 @@
 \def\phfeaSectionAfterHSkip{1em plus 0.2em}
 \def\phfeaSectionStyle{\normalfont\normalsize\phfeaHeadingStyle\bfseries}
 \def\phfeaSectionFormatHeading#1{#1}
+\def\phfeaSectionFormatRuninHeading#1{#1\ }
 \def\phfeaSectionDecorationSymbol{%
   \raisebox{0.2ex}{{\notesmaller[0.4]{\ensuremath{\blacksquare}}}}}
 \ifphfeaopt@sectiondecorations
@@ -804,6 +831,7 @@
 \def\phfeaParagraphAfterHSkip{0.75em plus 0.15em}
 \def\phfeaParagraphStyle{\normalfont\normalsize\phfeaHeadingStyle\small}
 \def\phfeaParagraphFormatHeading#1{#1}
+\def\phfeaParagraphFormatRuninHeading#1{#1\ }
 \def\phfeaParagraphDecorationSymbol{%
   \raisebox{0.2ex}{{\notesmaller[0.6]{\ensuremath{\triangleright}}}}}
 \ifphfeaopt@paragraphdecorations
@@ -847,43 +875,111 @@
 %   We now define the main internal |\phfea@startsection| macro which will
 %   produce the correct |\@startsection| command for the given section level.
 %   The arguments to |\phfea@startsection| are:
-%   \begin{itemize}[itemsep=0pt,topsep=0pt]
-%   \item[\#1:] level number, |1| or |2|;
-%   \item[\#2:] an optional star;
-%   \item[\#3:] an optional |!| character (meaning, don't display the decoration);
-%   \item[\#4:] an optional |<|\meta{decoration tokens}|>| argument to
-%     replace the decoration;
-%   \item[\#5:] an optional argument, the alternative title to write in the AUX
-%     file (e.g.\@ for use in the table of contents);
-%   \item[\#6:] a mandatory argument, the title of the section/paragraph.
+% \begin{itemize}[itemsep=0pt,topsep=0pt]
+% \item[\#1:] level number, |1| or |2|;
+% \item[\#2:] an optional star;
+% \item[\#3:] an optional |!| character (meaning, don't display the
+%   decoration); Temporarily stored in |\ifphfea@ss@nodecoration|:
+%    \begin{macrocode}
+\newif\ifphfea@ss@nodecoration
+%    \end{macrocode}
+% \item[\#4:] an optional |<|\meta{decoration tokens}|>| argument to
+%   replace the decoration; Temporarily stored in
+%   |\phfea@ss@hasdecorationtoks| and |\phfea@ss@decorationtoks|:
+%    \begin{macrocode}
+\newif\ifphfea@ss@hasdecorationtoks
+\newtoks\phfea@ss@decorationtoks
+%    \end{macrocode}
+% \item[\#5:] an optional |=| character to indicate the given title is
+%   a run-in title; Temporarily stored in |\ifphfea@ss@runintitle|
+%   switch:
+%    \begin{macrocode}
+\newif\ifphfea@ss@runintitle
+%    \end{macrocode}
+% \item[\#6:] an optional argument, the alternative title to write in
+%   the AUX file (e.g.\@ for use in the table of contents);
+%   Temporarily stored in:
+%    \begin{macrocode}
+\newif\ifphfea@ss@hasalttitle
+\newtoks\phfea@ss@alttitle
+%    \end{macrocode}
+% \item[\#7:] a mandatory argument, the title of the
+%   section/paragraph.  Temporarily stored in:
 %   \end{itemize}
 %    \begin{macrocode}
-\newtoks\phfea@ss@decorationtoks
-\newtoks\phfea@ss@alttitle
+\newif\ifphfea@ss@nonemptytitle
 \newtoks\phfea@ss@title
-\NewDocumentCommand{\phfea@startsection}{m s t! d<> o m}{%
 %    \end{macrocode}
-% Store the alternative title and title in token registers.
+%
+% Now here's the macro definition:
 %    \begin{macrocode}
-  \phfea@ss@decorationtoks={#4}%
-  \phfea@ss@alttitle={#5}%
-  \phfea@ss@title={#6}%
+\NewDocumentCommand{\phfea@startsection}{m s t! d<> t= o m}{%
 %    \end{macrocode}
-% Inform the user in case of option inconsistencies or redundancies.
+% Remove default decoration?
 %    \begin{macrocode}
-  \IfNoValueF{#4}{%
-    \IfBooleanT{#3}{%
-      \PackageWarning{phfextendedabstract}{section/paragraph: `!'
-        modifier ignored when custom decoration `<...>' is specified}%
-    }%
+  \IfBooleanTF{#3}{%
+    \phfea@ss@nodecorationtrue
+  }{%
+    \phfea@ss@nodecorationfalse
   }%
 %    \end{macrocode}
-% Now define a temporary macro |\x| that will contain the correct code for a
-% call to \LaTeX' low-level |\@startsection| command.  Remember to prefix all
-% macros by |\noexpand| unless they should be expanded in the preparation of
-% that code for |\@startsection|.  \LaTeX' |\@startsection| takes a lot of
-% arguments, let's be careful not to miss any.  Also, we can use the convenient
-% construct |\phfea@ss@getnoexpand{#1}{XyzProperty}| which in this |\edef| will
+% Replace default decoration?
+%    \begin{macrocode}
+  \IfValueTF{#4}{%
+    \phfea@ss@hasdecorationtokstrue
+    \phfea@ss@decorationtoks={#4}%
+  }{%
+    \phfea@ss@hasdecorationtoksfalse
+    \phfea@ss@decorationtoks={}%
+  }%
+%    \end{macrocode}
+% Is the title a run-in beginning of the sentence?
+%    \begin{macrocode}
+  \IfBooleanTF{#5}{%
+    \phfea@ss@runintitletrue
+  }{%
+    \phfea@ss@runintitlefalse
+  }%
+%    \end{macrocode}
+% Store the alternative title, if it is provided.
+%    \begin{macrocode}
+  \IfValueTF{#6}{%
+    \phfea@ss@hasalttitletrue
+    \phfea@ss@alttitle={#6}%
+  }{%
+    \phfea@ss@hasalttitlefalse
+    \phfea@ss@alttitle={}%
+  }%
+%    \end{macrocode}
+% Store the title and check if it is nonempty.
+%    \begin{macrocode}
+  \if\relax\detokenize{#7}\relax
+    \phfea@ss@nonemptytitlefalse
+  \else
+    \phfea@ss@nonemptytitletrue
+  \fi
+  \phfea@ss@title={#7}%
+%    \end{macrocode}
+% Past this point, we should no longer use macro arguments of the form
+% |#N|, except for |#1| (``|Section|'') and |#2| (possible |*|).  This
+% convention will make future maintenance easier.
+%
+% Inform the user in case of option inconsistencies or redundancies.
+%    \begin{macrocode}
+  \ifphfea@ss@hasdecorationtoks
+    \ifphfea@ss@nodecoration
+      \PackageWarning{phfextendedabstract}{section/paragraph: `!'
+        modifier ignored when custom decoration `<...>' is specified}%
+    \fi
+  \fi
+%    \end{macrocode}
+% Now define a temporary macro |\x| that will contain the correct code
+% for a call to \LaTeX' low-level |\@startsection| command.  Remember
+% to prefix all macros by |\noexpand| unless they should be expanded
+% in the preparation of that code for |\@startsection|.  \LaTeX'
+% |\@startsection| takes a lot of arguments, let's be careful not to
+% miss any.  Also, we can use the convenient construct
+% |\phfea@ss@getnoexpand{#1}{XyzProperty}| which in this |\edef| will
 % expand to
 % |\noexpand\phfea|\emph{$\langle$}|Section|\emph{\textbar}\relax
 % |Paragraph|\emph{$\rangle$}|XyzProperty|.
@@ -896,8 +992,8 @@
       {#1}%
       {\z@}%
 %    \end{macrocode}
-% Then comes the \meta{before skip} argument.  Use |\phfea@scaleglue| to account for
-% the vertical compression factor.
+% Then comes the \meta{before skip} argument.  Use |\phfea@scaleglue|
+% to account for the vertical compression factor.
 %    \begin{macrocode}
       {%
         \noexpand\phfea@scaleglue{\noexpand\phfeaVerticalSpacingCompressionFactor}{%
@@ -913,10 +1009,14 @@
 % dimen, the syntax `|-\glueexpr...|' does preserve these components (presumably
 % because $-1$ is integer?).
 %    \begin{macrocode}
-      {\if\relax\detokenize{#6}\relax
-          \noexpand\z@
+      {\ifphfea@ss@nonemptytitle
+          \ifphfea@ss@runintitle
+            \noexpand\z@
+          \else
+            -\noexpand\glueexpr\phfea@ss@getnoexpand{#1}{AfterHSkip}\noexpand\relax
+          \fi
         \else
-          -\noexpand\glueexpr\phfea@ss@getnoexpand{#1}{AfterHSkip}\noexpand\relax
+          \noexpand\z@
         \fi}%
 %    \end{macrocode}
 % The \meta{style} argument to specify the section heading's font style.  We
@@ -925,16 +1025,18 @@
 % (a |!| character) was specified.
 %    \begin{macrocode}
       {%
-        \IfNoValueTF{#4}{%
-          \IfBooleanTF{#3}{% with "!", no custom decoration --> nothing
-          }{% no "!", no custom decoration
-            \phfea@ss@getnoexpand{#1}{Decoration}%
-            \phfea@ss@getnoexpand{#1}{DecorationSymbol}%
-          }%
-        }{% with custom decoration (ignores "!" argument)
+        \ifphfea@ss@hasdecorationtoks
+          % custom decoration, ignores "!" argument
           \phfea@ss@getnoexpand{#1}{Decoration}%
           {\the\phfea@ss@decorationtoks}%
-        }%
+        \else
+          \ifphfea@ss@nodecoration
+            % suppress default decoration
+          \else
+            \phfea@ss@getnoexpand{#1}{Decoration}%
+            \phfea@ss@getnoexpand{#1}{DecorationSymbol}%
+          \fi
+        \fi
         \phfea@ss@getnoexpand{#1}{Style}%
       }%
 %    \end{macrocode}
@@ -946,34 +1048,63 @@
       \IfBooleanT{#2}{*}%
 %    \end{macrocode}
 % Now comes the optional \meta{alternative title} argument that will be written
-% to the AUX file.  We always provide this argument to |\@startsection|,
-% specifying by default the main title argument |#6| (non-starred variant) or an
-% empty argument (for a starred variant).  We do this because otherwise,
-% |\@startsection| will copy all the other commands we add in its argument
-% (e.g., title formatting, etc.) and will write them to the AUX file.
+% to the AUX file.
+%
+% Always provide this optional argument, to avoid passing formatting
+% commands here (unless we're called as the starred variant, cf.\@
+% |#2|).
 %    \begin{macrocode}
-      \IfValueTF{#4}{[\the\phfea@ss@alttitle]}{%
-        \IfBooleanTF{#2}{[]}{[\the\phfea@ss@title]}%
-      }%
+      \ifphfea@ss@hasalttitle
+        [\the\phfea@ss@alttitle]%
+      \else
+        \IfBooleanTF{#2}{}{[\the\phfea@ss@title]}%
+      \fi
 %    \end{macrocode}
-% Finally, this is the main \meta{section title} argument.  
-% If the title is not empty, we also provide the title wrapped in a
-% corresponding |\phfeaSection/ParagraphFormatHeading| macro call.  Everything
-% should be protected in |\texorpdfstring| calls to avoid \emph{pdflatex} from
-% complaining about invalid junk in PDF bookmark strings.
+% Finally, this is the main \meta{section title} argument.
+%
+% We call our helper macros to format the title \emph{here}, and not
+% in the \meta{style} argument, because I've run into problems
+% otherwise (e.g.\@ with |\MakeUppercase{...}| in the section format
+% macro)
 %    \begin{macrocode}
       {%
-        \if\relax\detokenize{#6}\relax\else
-          \noexpand\texorpdfstring{%
-            \phfea@ss@getnoexpand{#1}{FormatHeading}{\the\phfea@ss@title}%
-          }{%
-            \the\phfea@ss@title
-          }%
+        \ifphfea@ss@nonemptytitle
+          \ifphfea@ss@runintitle
+            \phfea@startsection@helpformatrunintitle{\phfea@ss@levelName{#1}}{%
+              \the\phfea@ss@title}%
+          \else
+            \phfea@startsection@helpformattitle{\phfea@ss@levelName{#1}}{%
+              \the\phfea@ss@title}%
+          \fi
         \fi
       }%
   }%
   %\message{**** EMITTING @startsection: |\detokenize\expandafter{\x}| ***}%
   \x
+}
+%    \end{macrocode}
+% The helper macros
+% |\phfea@startsection@helpformattitle{Section/Paragraph}| and
+% |\phfea@startsection@helpformatrunintitle{Section/Paragraph}| take
+% care of wrapping the title in the appropriate formatting command
+% (e.g.\@ |\phfeaParagraphFormatHeading| or
+% |\phfeaParagraphFormatRuninHeading|), and of protecting the title in
+% |\texorpdfstring| calls to avoid \emph{pdflatex} from complaining
+% about invalid junk in PDF bookmark strings.
+%    \begin{macrocode}
+\def\phfea@startsection@helpformattitle#1#2{% {Section}{<title>}
+  \noexpand\texorpdfstring{%
+    \expandafter\noexpand\csname phfea#1FormatHeading\endcsname{#2}%
+  }{%
+    #2%
+  }%
+}
+\def\phfea@startsection@helpformatrunintitle#1#2{% {Section}{<title>}
+  \noexpand\texorpdfstring{%
+    \expandafter\noexpand\csname phfea#1FormatRuninHeading\endcsname{#2}%
+  }{%
+    #2%
+  }%
 }
 %    \end{macrocode}
 % \end{macro}

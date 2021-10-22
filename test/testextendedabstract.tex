@@ -47,7 +47,9 @@
 % \renewcommand{\phfeaSectionDecorationSymbol}{\Large$\Rightarrow$}
 % \renewcommand{\phfeaParagraphDecorationSymbol}{\raisebox{1pt}{\tiny $>$}}
 
-%\renewcommand\phfeaSectionFormatHeading[1]{\MakeUppercase{#1}}
+\renewcommand\phfeaSectionFormatHeading[1]{\MakeUppercase{#1}}
+\renewcommand\phfeaSectionFormatRuninHeading[1]{\fbox{\MakeUppercase{#1}\ }}
+%\renewcommand\phfeaSectionFormatHeading[1]{\fbox{#1}}
 
 \renewcommand\phfeaParagraphFormatHeading[1]{#1\,---}
 
@@ -191,6 +193,29 @@ typeset using \verb+\section<...>{..}+. You can also
 
 \section<\guilsinglright>{}   You can also use a custom decoration without any
 section title.
+
+
+\section={The section title} can also be typeset run-in, starting the
+section's sentence.
+
+\section!={The run-in title} can be combined with `\verb+!+' to remove the
+decoration.  Be sure to place the `\verb+!+' before the `\verb+=+'.
+
+\section<{$\blacktriangleleft$}>={The run-in title} can be combined with `\verb|<...>|' to
+replace the decoration.
+
+
+\paragraph={The paragraph title} can also be typeset run-in, starting the
+paragraph's sentence.
+
+\paragraph!={The run-in title} can be combined with `\verb+!+' to remove the
+decoration.  Be sure to place the `\verb+!+' before the `\verb+=+'.
+
+\paragraph<--->={The run-in title} can be combined with `\verb|<...>|' to
+replace the decoration.
+
+
+
 
 % We can also test if the table of contents works:
 %

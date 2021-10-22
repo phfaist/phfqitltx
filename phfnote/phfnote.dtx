@@ -66,7 +66,8 @@
   \end{lrbox}%
   %%\centering%
   \begin{tcolorbox}[text width=6cm,sharp corners,%
-    before={\par\vspace{5pt}\centering\nopagebreak\parindent=0pt},after={\par\vspace{5pt}},%
+    before={\par\vspace{5pt}\centering\nopagebreak\parindent=0pt},%
+    after={\par\vspace{5pt}},%
     leftrule=0.4pt,toprule=0.4pt,rightrule=0.6pt,bottomrule=0.6pt,%
     colframe=black,colback=white]%
     \scalebox{0.5}{\usebox{\phfnoteDocVirtualPage@contents}}%
@@ -220,8 +221,8 @@
 % \item[preset=sfssnote] {\fontfamily{cmss}\selectfont Format the note in
 %   \LaTeX' default sans-serif font.  A very nice sans serif font.  It might
 %   look heavy though, depending on your taste.}
-% \item[preset=opensansnote] {\opensans Format the note
-%   in Open Sans font (using the `\pkgname{opensans}' package with some
+% \item[preset=opensansnote] {\ifcsname opensans\endcsname\opensans\fi Format
+%   the note in Open Sans font (using the `\pkgname{opensans}' package with some
 %   default options).  A very beautiful and readable sans serif font.}
 % \item[preset=utopianote] {\fontfamily{futs}\selectfont Format the note in
 %   Utopia font (by using the \pkgname{fourier} package).  Perfect to my
