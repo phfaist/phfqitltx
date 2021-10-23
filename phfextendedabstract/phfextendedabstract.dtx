@@ -22,7 +22,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[2005/12/01]
 %<package>\ProvidesClass{phfextendedabstract}
 %<*package>
-    [2021/09/08 v1.0 phfextendedabstract class]
+    [2021/10/23 v1.1 phfextendedabstract class]
 %</package>
 %
 %<*driver>
@@ -336,13 +336,10 @@
 % \end{pkgoptions}
 % 
 %
-% \section{Macros and environments}
+% \section{Sections and paragraphs}
 %
-% \subsection{Sections and paragraphs}
-%
-% \DescribeMacro{\section} \DescribeMacro{\paragraph} This class only provides
-% two sectioning levels: |\section| and |\paragraph|.  Both produce run-in
-% headings.
+% This class only provides two sectioning levels: |\section| and |\paragraph|.
+% Both produce run-in headings.
 %
 % By default, sections and paragraphs produce a small ``decoration'' in the left
 % margin, to guide the reader's eye through the document's high-level structure.
@@ -351,6 +348,9 @@
 % |sectiondecorations|, |paragraphdecorations| and |noheadingdecorations| class
 % options.
 %
+% \subsection{Disabling section/paragraph decorations}
+%
+% \DescribeMacro{\section!} \DescribeMacro{\paragraph!}
 % The |\section| and |\paragraph| macros also accept a special syntax: If they
 % are immediately followed by an exclamation mark (|!|), then they do not
 % produce the corresponding decoration.  E.g.:
@@ -369,15 +369,21 @@
 % with a section, but with no decoration or run-in heading.
 % \end{verbatim}
 %
+% \subsection{One-time custom section/paragraph decoration}
+%
+% \DescribeMacro{\section<...>} \DescribeMacro{\paragraph<...>}
 % You can also use the additional syntax |<|\emph{\ldots}|>| to specify a custom
 % decoration instead of the default one.  (But you should only use this
 % sparingly! Redefine |\phfeaSectionDecorationSymbol| if you want to change the
 % symbol for all sections!)  For instance:
 %
 % \begin{verbatim}
-% \section<\guilsinglright>{} \emph{Manuscript in preparation.}
+% \section<{\guilsinglright}x>{} \emph{Manuscript in preparation.}
 % \end{verbatim}
 %
+% \subsection{Run-in titles that begin a sentence}
+%
+% \DescribeMacro{\section=} \DescribeMacro{\paragraph=}
 % A further syntax enables you to specify run-in headings, in case the
 % section or paragraph title is actually the beginning of a sentence
 % that continues after the title.  When issuing the `|\section|' or
@@ -385,23 +391,36 @@
 %
 % \begin{verbatim}
 % \paragraph={This title} actually begins a sentence (...)
+% \end{verbatim}
 %
+% You can use the `|=|' modifier in conjuction with other special arguments such
+% as `|!|' or `|<...>|'.  Mind the order of the symbols (see full argument
+% structure below).
+% \begin{verbatim}
 % \paragraph!={This paragraph} also has its decoration suppressed (...)
 % \end{verbatim}
 %
+% \changed[add-sectioneq-runin]{v1.1}{2021/10/23}{Added syntax for run-in
+% section and paragraph titles that begin a sentence}
 %
+% \subsection{Full section/paragraph command argument structure}
+%
+% \DescribeMacro{\section} \DescribeMacro{\paragraph}
 % Here's a summary of the argument structure for |\section| and |\paragraph|:
 %
-% |\section|{\large\textbar}|\paragraph|
-% \emph{[} |*| \emph{]} \emph{[} |!| \emph{]}
-% \emph{[} |<|\meta{decoration}|>| \emph{]}
-% \emph{[} |=| \emph{]}
-% \emph{[} \oarg{alt title} \emph{]}
+% |\|{\(\big\{\)}|section|{\(\big\vert\)}|paragraph|{\(\big\}\)}
+% {\(\big[\)}|*|{\(\big]\)}
+% {\(\big[\)}|!|{\(\big]\)}
+% {\(\big[\)}|<|\meta{decoration}|>|{\(\big]\)}
+% {\(\big[\)}|=|{\(\big]\)}
+% {\(\big[\)}\oarg{alt title}{\(\big]\)}
 % \marg{title}
 % 
 % The optional star and optional alternative title are passed on to the standard
 % \LaTeX\ sectioning commands.  The alternative title is typically used for the
 % table of contents and for PDF bookmarks.
+%
+% \subsection{Section and paragraph decorations}
 %
 % \DescribeMacro{\phfeaSectionDecoration}
 % \DescribeMacro{\phfeaParagraphDecoration} You can use the
@@ -427,6 +446,8 @@
 % \renewcommand{\phfeaSectionDecorationSymbol}{\Large$\Rightarrow$}
 % \renewcommand{\phfeaParagraphDecorationSymbol}{\raisebox{1pt}{\tiny $>$}}
 % \end{verbatim}
+%
+% \subsection{Section and paragraph appearance and spacing}
 %
 % You can customize section and paragraph headings, including spacing and style,
 % by redefining the following macros.
@@ -474,6 +495,10 @@
 % \renewcommand\phfeaParagraphFormatRuninHeading[1]{\emph{#1}\ }
 % \end{verbatim}
 %
+% Note that for ``run-in'' headings that begin a sentence, space after the title
+% is entirely suppressed.  It is up to the |\phfeaXxxFormatRuninHeading| macros
+% to make sure appropriate space is appended at the end of the title.
+%
 % The macros |\phfeaSectionFormatHeading{...}|,
 % |\phfeaParagraphFormatHeading{...}|,
 % |\phfeaSectionFormatRuninHeading{...}|, and
@@ -481,7 +506,10 @@
 % section/paragraph title argument is empty.
 %
 %
-% \subsection{Vertical spacing}
+% \section{Compressing vertical spacing}
+%
+% \subsection{Compression command and adjustments}
+% \label{sec:vertical-compression-macros}
 %
 % \DescribeMacro{\phfeaVerticalSpacingCompressionFactor} To
 % conveniently globally adjust the vertical spacings in the document (including
@@ -515,8 +543,64 @@
 % \DescribeMacro{\phfeaParskipVerticalSpacingFactorWeight} A similar mechanism
 % happens for how we adjust |\parskip|, the spacing between paragraphs.
 %
+% \subsection{A small selection of useful vertical dimensions you can customize}
 %
-% \subsection{List environments}
+% The following dimensions are specific to \pkgname{phfextendedabstract}.  If a
+% compression factor is applied (e.g., via a |compressverticalspacing=0.75|
+% package option), then the actual vertical dimension is further compressed by
+% the given factor.  I.e., these dimensions do not yet account for vertical
+% compression.  I.e., if you set them manually, they will further be compressed
+% by the given compression factor.
+% \begin{itemize}
+% \item Vertical spacings in list environments --- |\phfeaListsVerticalSkip|,
+%   |\phfeaListsItemSep|, and |\phfeaListsParSep| (see
+%   \autoref{sec:list-environ})
+% \end{itemize}
+%
+% The following dimensions are specific to \pkgname{phfextendedabstract}.
+% However, they are unaffected by vertical compression.  To reduce the space,
+% set a new value manually.
+% \begin{itemize}
+% \item Vertical spacing within the title --- |\phfeaTitleAboveVSpace|,
+%   |\phfeaTitleInnerVSpace|, |\phfeaTitleBelowVSpace| (see
+%   \autoref{sec:title-customize})
+% \end{itemize}
+%
+% Here are further \TeX\ or \LaTeX\ lengths that you might want to tweak.  These
+% lengths are modified by \pkgname{phfextendedabstract} at the beginning of the
+% document in order to account for vertical space compression.  If you'd like to
+% set custom values, it is recommended you do so in the preamble of your
+% document so that they are affected by vertical compression like the other
+% document lengths.  If you set these lengths after the beginning of the
+% document, they won't be affected by vertical compression.
+% \begin{itemize}
+% \item Space between consecutive paragraphs --- |\parskip|.  (See also
+%   |\phfeaParskipVerticalSpacingFactorWeight| in
+%   \autoref{sec:vertical-compression-macros}.)
+% \item Space immediately above and below display equations ---
+%   |\abovedisplayskip|, |\belowdisplayskip|, |\abovedisplayshortskip|,
+%   |\belowdisplayshortskip|.  (See also
+%   |\phfeaDisplayVerticalSpacingFactorWeight| in
+%   \autoref{sec:vertical-compression-macros}.)
+% \end{itemize}
+%
+% The following lengths are listed here for your convenience.  They are not
+% modified by \pkgname{phfextendedabstract}, even if a vertical compression
+% factor is set.
+% \begin{itemize}
+% \item Spacing of items inside a bibliography --- |\bibsep|
+% \item Spacing around figures and tables --- |\textfloatsep| (between
+%   figures/tables and text when at top/bottom), |\floatsep| (between two or
+%   more figures/tables at top/bottom), |\intextsep| (between float and text,
+%   when float is placed with |[h]| ``here'').^^A
+%   \footnote{See also \url{https://tex.stackexchange.com/a/26522/32188}}
+% \item Within figures, spacing around the caption --- |\abovecaptionskip| and
+%   |\belowcaptionskip|.
+% \end{itemize}
+%
+%
+% \section{List environments}
+% \label{sec:list-environ}
 %
 % \DescribeEnv{enumerate*} This class provides an |enumerate|-like
 % environment which typesets its items inline, as a list.  For example, here is
@@ -561,6 +645,7 @@
 %
 % \subsection{Customization of the main title and general headings style}
 % \label{sec:customize-title-and-headings-style}
+% \label{sec:title-customize}
 %
 % \DescribeMacro{\phfeaHeadingStyle} The macro |\phfeaHeadingStyle| is defined to be
 % |\sffamily|, unless the |sansstyle=false| class option is provided
@@ -577,7 +662,45 @@
 % \renewcommand\phfeaTitleStyle{\bfseries}
 % \end{verbatim}
 %
+% \DescribeMacro{\phfeaTitleAboveVSpace} The macro |\phfeaTitleAboveVSpace|
+% sets the vertical space to insert immediately above the main title.  You can
+% redefine the macro to add additional spacing, or even to move the title
+% upwards with a negative value:
+% \begin{verbatim}
+% \renewcommand\phfeaTitleAboveVSpace{20pt}
+% \end{verbatim}
+% If you define |\phfeaTitleAboveVSpace| to be empty, space above the title is
+% suppressed.  Because of a quirk in how \TeX/\LaTeX\ handle vertical space and
+% usage of the |\vspace*| command, a value of |0pt| results in a different
+% actual vertical spacing than an empty macro (in which case no vertical spacing
+% commands are issued).
 %
+% \DescribeMacro{\phfeaTitleInnerVSpace} The |\phfeaTitleInnerVSpace| macro sets
+% the spacing between the title and the author list.  If the macro is empty,
+% default spacing is used.  You can redefine this macro to set a custom spacing.
+%
+% \DescribeMacro{\phfeaTitleBelowVSpace} The macro |\phfeaTitleBelowVSpace| sets
+% the space between the title block (including authors) and the beginning of the
+% document text.  This vertical space does \emph{not} get compressed with the
+% option |compressverticalspacing=X|.
+%
+% You can customize this spacing by redefining the command:
+% \begin{verbatim}
+% \renewcommand\phfeaTitleBelowVSpace{2\baselineskip} % or 20pt, etc.
+% \end{verbatim}
+%
+% If you redefine |\phfeaTitleBelowVSpace| to be an empty macro, the space is
+% suppressed.
+%
+% Vertical spacing after the title can be impacted if you have an abstract, as
+% the latter often comes with its own surrounding vertical spacing.  If you'd
+% like to reduce space around the abstract, consider setting \RevTeX'
+% |\frontmatter@preabstractspace| and |\frontmatter@postabstractspace| to zero.
+%
+% \changed[add-title-above-inner-below-space]{v1.1}{2021/10/23}{Added macros
+% \phfverb\phfeaTitleAboveVSpace, \phfverb\phfeaTitleInnerVSpace, and
+% \phfverb\phfeaTitleBelowVSpace to control spacing above, within, and below the
+% title}
 %
 %
 %
@@ -591,7 +714,7 @@
 % Here come the gory details.
 %
 %
-% \paragraph{Class options}
+% \subsection{Declare and process class options}
 % We process these first, to see which options we should pass on to
 % \RevTeX.
 %    \begin{macrocode}
@@ -617,8 +740,9 @@
 %    \end{macrocode}
 %
 %
-% \paragraph{Load \RevTeX, the base class}
+% \subsection{Basic class setup, load class and package dependencies}
 %
+% Load \RevTeX, the base class.
 %    \begin{macrocode}
 \providecommand\phfea@revtexopts{%
   aps,pra,%
@@ -665,36 +789,7 @@
 %    \end{macrocode}
 % 
 %
-% \paragraph{Default sans serif font}
-%
-% \begin{macro}{\phfeaHeadingStyle}
-%   Unless instructed not to do so, \iffalse load the ``Source Sans Pro'' font
-%   as default sans serif font, using the semibold glyphs in place of bold.  By
-%   default, this font will \else set the sans serif font family to \fi be used
-%   for section headings and the main title.
-%    \begin{macrocode}
-\ifphfeaopt@sansstyle
-  \def\phfeaHeadingStyle{\sffamily}
-\else
-  \def\phfeaHeadingStyle{}
-\fi
-%    \end{macrocode}
-% \end{macro}
-%
-%
-% \paragraph{Default title format}
-%
-% \begin{macro}{\phfeaTitleStyle}
-%   Change \RevTeX\ title format.  Title style can be customized by redefining
-%   |\phfeaTitleStyle|.
-%    \begin{macrocode}
-\def\phfeaTitleStyle{\phfeaHeadingStyle\Large}
-\def\frontmatter@title@format{\phfeaTitleStyle\centering\parskip\z@skip}
-%    \end{macrocode}
-% \end{macro}
-%
-%
-% \paragraph{Vertical spacing compression factor}
+% \subsection{Vertical spacing compression factor}
 %
 % Define a general factor by which the section and paragraph spacings will be
 % compressed.  This macro is set by the |compressverticalspacing=X| package
@@ -714,15 +809,13 @@
 }
 %    \end{macrocode}
 %
-% Adjust spacing around display equations according to the vertical compression
-% factor.  Do this only at the beginning of the document, since the user might
-% still want to adjust |\phfeaVerticalSpacingCompressionFactor| in their
-% preamble.
-%
-% \begin{macro}{\phfeaDisplayVerticalSpacingFactorWeight}
-% We only apply a fraction of the scaling, because it's ugly if we compress
-% equations too much.  Define |\phfeaDisplayVerticalSpacingFactorWeight| as $w$ and
-% $\alpha$ as the vertical scaling factor.  The new skips are computed as
+% For some vertical lengths, such as space around equations or |\parskip|, we
+% don't apply the full vertical compression but only a fraction of it, because
+% it can be ugly if we compress those spacings too much.  For such spacings
+% (e.g., for display equations, see |\phfeaDisplayVerticalSpacingFactorWeight|
+% below), define a ``factor weight'' $w$.  Let $\alpha$ denote the vertical
+% scaling factor (|\phfeaVerticalSpacingCompressionFactor|).  The new skips are
+% then computed as
 % \begin{equation*}
 %   \phfverb{oldskip}\quad\rightarrow\quad
 %     (1-w)\,\phfverb{oldskip} + w\,\alpha\,\phfverb{oldskip}\ .
@@ -731,15 +824,21 @@
 % the full scaling factor is applied,
 % $\phfverb{oldskip}\rightarrow \alpha\,\phfverb{oldskip}$.)  By default,
 % $w=1/2$:
+%
+% \begin{macro}{\phfea@compressedskipweighted}
+% \begin{macro}{\phfea@set@compressedskipweighted}
+%   This is a simple tool to compute the new spacing, when a ``factor weight''
+%   $w$ is to be taken into account.
+%
+%   Here, |#1| is the length that we want to compress with a fraction of
+%   |\phfeaVerticalSpacingCompressionFactor|, and |#2| is the ``factor weight''
+%   $w$.  The macro |\phfea@compressedskipweighted| expands to a glue expression with the
+%   correct dimension. The macro |\phfea@set@compressedskipweighted| behaves in the same
+%   way, except that it immediately assigns the new value into |#1|, which must
+%   be a glue register.
 %    \begin{macrocode}
-\def\phfeaDisplayVerticalSpacingFactorWeight{.5}
-%    \end{macrocode}
-% \end{macro}
-% Tool to compute the new spacing for each of the relevant display-related
-% skips:
-%    \begin{macrocode}
-\def\phfea@adjustskipweighted#1#2{%
-  #1=\glueexpr
+\def\phfea@compressedskipweighted#1#2{%
+  \glueexpr
     \phfea@scalegluedpt{%
       \dimexpr 1\p@ - #2\p@\relax
     }{#1}%
@@ -755,15 +854,34 @@
     }%
     \relax
 }
+\def\phfea@set@compressedskipweighted#1#2{%
+  #1=\phfea@compressedskipweighted{#1}{#2}%
+}
 %    \end{macrocode}
-% And schedule this adjustment to be carried out at the beginning of the
-% document.
+% \end{macro}
+% \end{macro}
+%
+%
+% \begin{macro}{\phfeaDisplayVerticalSpacingFactorWeight}
+%   This is the ``factor weight'' to apply to spacing around display equations
+%   when compressing them according to the vertical compression factor.
+%    \begin{macrocode}
+\def\phfeaDisplayVerticalSpacingFactorWeight{.5}
+%    \end{macrocode}
+% \end{macro}
+%
+% Schedule assignments to standard \LaTeX\ lengths only at the beginning of the
+% document, so the user can still set (unscaled) lengths in the preamble.
 %    \begin{macrocode}
 \AtBeginDocument{%
-  \phfea@adjustskipweighted\abovedisplayskip\phfeaDisplayVerticalSpacingFactorWeight
-  \phfea@adjustskipweighted\belowdisplayskip\phfeaDisplayVerticalSpacingFactorWeight
-  \phfea@adjustskipweighted\abovedisplayshortskip\phfeaDisplayVerticalSpacingFactorWeight
-  \phfea@adjustskipweighted\belowdisplayshortskip\phfeaDisplayVerticalSpacingFactorWeight
+  \phfea@set@compressedskipweighted
+      \abovedisplayskip\phfeaDisplayVerticalSpacingFactorWeight
+  \phfea@set@compressedskipweighted
+      \belowdisplayskip\phfeaDisplayVerticalSpacingFactorWeight
+  \phfea@set@compressedskipweighted
+      \abovedisplayshortskip\phfeaDisplayVerticalSpacingFactorWeight
+  \phfea@set@compressedskipweighted
+      \belowdisplayshortskip\phfeaDisplayVerticalSpacingFactorWeight
 }
 %    \end{macrocode}
 %
@@ -773,19 +891,113 @@
 %    \begin{macrocode}
 \def\phfeaParskipVerticalSpacingFactorWeight{1}
 \AtBeginDocument{%
-  \phfea@adjustskipweighted\parskip\phfeaParskipVerticalSpacingFactorWeight
+  \phfea@set@compressedskipweighted
+      \parskip\phfeaParskipVerticalSpacingFactorWeight
 }
 %    \end{macrocode}
 % \end{macro}
-% 
-% \paragraph{Setup specific for sectioning}
+%
+%
+%
+% \subsection{Some style settings}
+%
+% \paragraph{Sans serif font style, if applicable}
+%
+% \begin{macro}{\phfeaHeadingStyle}
+%   Unless instructed not to do so, set the sans serif font family to be used
+%   for section headings and the main title.
+%    \begin{macrocode}
+\ifphfeaopt@sansstyle
+  \def\phfeaHeadingStyle{\sffamily}
+\else
+  \def\phfeaHeadingStyle{}
+\fi
+%    \end{macrocode}
+% \end{macro}
+%
+% \paragraph{Title: redefine some RevTeX hooks and set custom format}
+%
+% \begin{macro}{\phfeaTitleStyle}
+%   Styling of the title is handled by |\phfeaTitleStyle|.
+%    \begin{macrocode}
+\def\phfeaTitleStyle{\phfeaHeadingStyle\Large}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\phfeaTitleAboveVSpace}
+% \begin{macro}{\phfeaTitleInnerVSpace}
+% \begin{macro}{\phfeaTitleBelowVSpace}
+%   Space within the title block is handled by the following macros.  Above the
+%   entire title block --- |\phfeaTitleAboveVSpace|, between title and authors
+%   --- |\phfeaTitleInnerVSpace|, after entire title block (incl.\@ authors and
+%   possible abstract) --- |\phfeaTitleBelowVSpace|:
+%    \begin{macrocode}
+\def\phfeaTitleAboveVSpace{}
+\def\phfeaTitleInnerVSpace{}
+\def\phfeaTitleBelowVSpace{\baselineskip}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+%
+% Plug these into \RevTeX' |\frontmatter@...| stuff:
+%    \begin{macrocode}
+\appto\frontmatter@title@above{%
+  \if\relax\detokenize\expandafter{\phfeaTitleAboveVSpace}\relax
+  \else
+    \vspace*{\phfeaTitleAboveVSpace}%
+  \fi
+}
+\def\frontmatter@title@format{%
+  \phfeaTitleStyle\centering\parskip=\z@skip
+}
+\appto\frontmatter@authorformat{%
+  \if\relax\detokenize\expandafter{\phfeaTitleInnerVSpace}\relax
+  \else
+    \parskip=\phfeaTitleInnerVSpace\relax
+  \fi
+}%
+\def\frontmatter@title@below{}  
+\def\frontmatter@finalspace{%
+  \if\relax\detokenize\expandafter{\phfeaTitleBelowVSpace}\relax
+  \else
+    \vspace{\phfeaTitleBelowVSpace}%
+  \fi
+}
+%    \end{macrocode}
+%
+% Header/footer (page number) on the title page should be the same as on the
+% other pages, in |plain| style.
+%    \begin{macrocode}
+\let\ps@titlepage\ps@plain
+\pagestyle{plain}
+%    \end{macrocode}
+%
+% Plug into |\frontmatter@setup| to suppress space around the abstract, in case
+% no abstract was given.  (Usually no abstract is given for an extended
+% abstract).  Whether or not an abstract was given is determined by testing if
+% \RevTeX' |\absbox| box register is void.
+%    \begin{macrocode}
+\appto\frontmatter@setup{%
+  \ifvoid\absbox
+    %\gdef\frontmatter@preabstractspace{\z@}%
+    %\gdef\frontmatter@postabstractspace{\z@}%
+    \let\frontmatter@abstract@produce\relax
+  \fi
+}
+%    \end{macrocode}
+%
+%
+% \subsection{Sectioning}
 %
 % By design, there are only two sectioning levels in a
 % \pkgname{phfextendedabstract} document: sections (|\section|) and paragraphs
 % (|\paragraph|).  Any other sectioning command (e.g., |\subsection|) will
 % produce an error.
 %
-% Neither of these two section levels is numbered.
+% Neither of these two section levels is numbered.  A table of contents only
+% prints sections.  Users can change this behavior by setting appropriate values
+% for the |secnumdepth| and |tocdepth| counters.
 %    \begin{macrocode}
 \setcounter{secnumdepth}{0}
 \setcounter{tocdepth}{1}
@@ -905,11 +1117,11 @@
 %    \end{macrocode}
 % \item[\#7:] a mandatory argument, the title of the
 %   section/paragraph.  Temporarily stored in:
-%   \end{itemize}
 %    \begin{macrocode}
 \newif\ifphfea@ss@nonemptytitle
 \newtoks\phfea@ss@title
 %    \end{macrocode}
+% \end{itemize}
 %
 % Now here's the macro definition:
 %    \begin{macrocode}
@@ -934,6 +1146,8 @@
   }%
 %    \end{macrocode}
 % Is the title a run-in beginning of the sentence?
+%
+% \changedreftext{add-sectioneq-runin}
 %    \begin{macrocode}
   \IfBooleanTF{#5}{%
     \phfea@ss@runintitletrue
@@ -1065,46 +1279,33 @@
 % We call our helper macros to format the title \emph{here}, and not
 % in the \meta{style} argument, because I've run into problems
 % otherwise (e.g.\@ with |\MakeUppercase{...}| in the section format
-% macro)
+% macro).
+%
+% We wrap the title in the appropriate formatting command (e.g.\@
+% |\phfeaParagraphFormatHeading| or |\phfeaParagraphFormatRuninHeading|), and we
+% protect the title in |\texorpdfstring| calls to avoid \emph{pdflatex} from
+% complaining about invalid junk in PDF bookmark strings.
 %    \begin{macrocode}
       {%
         \ifphfea@ss@nonemptytitle
           \ifphfea@ss@runintitle
-            \phfea@startsection@helpformatrunintitle{\phfea@ss@levelName{#1}}{%
-              \the\phfea@ss@title}%
+            \noexpand\texorpdfstring{%
+              \phfea@ss@getnoexpand{#1}{FormatRuninHeading}{\the\phfea@ss@title}%
+            }{%
+              \the\phfea@ss@title
+            }%
           \else
-            \phfea@startsection@helpformattitle{\phfea@ss@levelName{#1}}{%
-              \the\phfea@ss@title}%
+            \noexpand\texorpdfstring{%
+              \phfea@ss@getnoexpand{#1}{FormatHeading}{\the\phfea@ss@title}%
+            }{%
+              \the\phfea@ss@title
+            }%
           \fi
         \fi
       }%
   }%
   %\message{**** EMITTING @startsection: |\detokenize\expandafter{\x}| ***}%
   \x
-}
-%    \end{macrocode}
-% The helper macros
-% |\phfea@startsection@helpformattitle{Section/Paragraph}| and
-% |\phfea@startsection@helpformatrunintitle{Section/Paragraph}| take
-% care of wrapping the title in the appropriate formatting command
-% (e.g.\@ |\phfeaParagraphFormatHeading| or
-% |\phfeaParagraphFormatRuninHeading|), and of protecting the title in
-% |\texorpdfstring| calls to avoid \emph{pdflatex} from complaining
-% about invalid junk in PDF bookmark strings.
-%    \begin{macrocode}
-\def\phfea@startsection@helpformattitle#1#2{% {Section}{<title>}
-  \noexpand\texorpdfstring{%
-    \expandafter\noexpand\csname phfea#1FormatHeading\endcsname{#2}%
-  }{%
-    #2%
-  }%
-}
-\def\phfea@startsection@helpformatrunintitle#1#2{% {Section}{<title>}
-  \noexpand\texorpdfstring{%
-    \expandafter\noexpand\csname phfea#1FormatRuninHeading\endcsname{#2}%
-  }{%
-    #2%
-  }%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -1150,7 +1351,7 @@
 %    \end{macrocode}
 %
 %
-% \paragraph{Set up itemization and enumeration environments}
+% \subsection{Itemization and enumeration environments}
 %
 % Provide customizable lengths for lists via macros (item sep,
 % paragraph sep and vertical skip above and below list environments).

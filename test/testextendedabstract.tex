@@ -4,7 +4,7 @@
 %    sansstyle=false,
 %    sectiondecorations=false,
 %    noheadingdecorations,
-%    compressverticalspacing=2,
+%    compressverticalspacing=.5,
 %    pkgset=none,
 %    loadtheorems=false,
 ]{phfextendedabstract}
@@ -18,7 +18,7 @@
 \parskip=2pt plus 1pt minus 0pt\relax
 
 %\renewcommand\phfeaVerticalSpacingCompressionFactor{0.3} %2.5}
-% \setstretch{1.2}
+\setstretch{1.1}
 
 %\setcounter{secnumdepth}{2}
 
@@ -42,8 +42,6 @@
 
 %\renewcommand\phfeaHeadingStyle{\ttfamily}
 
-
-
 % \renewcommand{\phfeaSectionDecorationSymbol}{\Large$\Rightarrow$}
 % \renewcommand{\phfeaParagraphDecorationSymbol}{\raisebox{1pt}{\tiny $>$}}
 
@@ -54,6 +52,84 @@
 \renewcommand\phfeaParagraphFormatHeading[1]{#1\,---}
 
 
+\renewcommand{\phfeaTitleAboveVSpace}{}
+\renewcommand{\phfeaTitleInnerVSpace}{}
+\renewcommand{\phfeaTitleBelowVSpace}{\baselineskip}
+
+
+
+\makeatletter
+% \def\frontmatter@preabstractspace{\z@}%
+% \def\frontmatter@postabstractspace{\z@}%
+
+% % \def\frontmatter@authorformat{%
+% %  \skip@\@flushglue
+% %  \@flushglue\z@ plus.3\hsize\relax
+% %  \centering
+% %  \advance\baselineskip\p@
+% %  %\parskip11.5\p@\relax
+% %  \@flushglue\skip@
+% % }
+% % \appto\frontmatter@authorformat{%
+% %   \parskip=.5\baselineskip\relax
+% % }%
+
+% % \def\frontmatter@above@affiliation@script{%
+% %  \skip@\@flushglue
+% %  \@flushglue\z@ plus.3\hsize\relax
+% %  \centering
+% %  \@flushglue\skip@
+% %  \addvspace{3.5\p@}%
+% % }%
+
+
+% %%% TESTS %%%
+% \def\xxxhrule{\hrule width 400pt height .4pt}
+% \def\titleblock@produce{%
+%   \xxxhrule
+%  \begingroup
+%   \ltx@footnote@pop
+%   \def\@mpfn{mpfootnote}%
+%   \def\thempfn{\thempfootnote}%
+%   \c@mpfootnote\z@
+%   \let\@makefnmark\frontmatter@makefnmark
+%   \frontmatter@setup
+%   \thispagestyle{titlepage}\label{FirstPage}%
+%   \frontmatter@title@produce
+%   \xxxhrule
+%   \groupauthors@sw{%
+%    \frontmatter@author@produce@group
+%   }{%
+%    \frontmatter@author@produce@script
+%    %\xxxhrule x\par
+%   }%
+%   \frontmatter@RRAPformat{%
+%    \expandafter\produce@RRAP\expandafter{\@date}%
+%    \expandafter\produce@RRAP\expandafter{\@received}%
+%    \expandafter\produce@RRAP\expandafter{\@revised}%
+%    \expandafter\produce@RRAP\expandafter{\@accepted}%
+%    \expandafter\produce@RRAP\expandafter{\@published}%
+%   }%
+% \xxxhrule
+%   \frontmatter@abstract@produce
+% \xxxhrule
+%   \@ifx@empty\@pacs{}{%
+%    \@pacs@produce\@pacs
+%   }%
+%   \@ifx@empty\@keywords{}{%
+%    \@keywords@produce\@keywords
+%   }%
+%   \par
+%   \frontmatter@finalspace
+% \xxxhrule
+%  \endgroup
+% \parskip=\z@
+% }%
+% %%% TESTS %%%
+\makeatother
+
+
+
 
 
 \usepackage{hyperref}
@@ -62,19 +138,28 @@
 \begin{document}
 \title{Test of my extended abstract document style}
 \author{Philippe Faist}
-%\affiliation{Affil. 1}
+ % \affiliation{Affil. 1}
 \author{Alter Ego}
-% \affiliation[Affil. X}
+ % \affiliation{Affil. X}
 \author{Someone Else}
-% \affiliation{Affil. 1}
-% \affiliation{Another Affil.}
-%\email{someoneelse@example.com}
-%\date{July 26, 2021}
+% \email{someoneelse@example.com}
+%  \affiliation{Affil. 1}
+%  \affiliation{Another Affil.}
+% \date{July 26, 2021}
+% \begin{abstract}
+%   This is an abstract abstract.
+%   This is an abstract abstract.
+%   This is an abstract abstract.
+%   This is an abstract abstract.
+%   This is an abstract abstract.
+%   This is an abstract abstract.
+%   This is an abstract abstract.
+%   This is an abstract abstract.
+%   This is an abstract abstract.
+% \end{abstract}
 \maketitle
+%XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-%\begin{abstract}
-%We're doing something really cool.
-%\end{abstract}
 
 \section{Introduction.}
 \lipsum[1]
