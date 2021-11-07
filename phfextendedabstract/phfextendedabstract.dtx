@@ -588,7 +588,6 @@
 % modified by \pkgname{phfextendedabstract}, even if a vertical compression
 % factor is set.
 % \begin{itemize}
-% \item Spacing of items inside a bibliography --- |\bibsep|
 % \item Spacing around figures and tables --- |\textfloatsep| (between
 %   figures/tables and text when at top/bottom), |\floatsep| (between two or
 %   more figures/tables at top/bottom), |\intextsep| (between float and text,
@@ -596,7 +595,14 @@
 %   \footnote{See also \url{https://tex.stackexchange.com/a/26522/32188}}
 % \item Within figures, spacing around the caption --- |\abovecaptionskip| and
 %   |\belowcaptionskip|.
+% \item Spacing of items inside a bibliography --- |\bibsep|
 % \end{itemize}
+%
+% If you're desperate on saving some vertical space, don't forget that you can
+% also set |\clubpenalty| and |\widowpenalty| to tell \TeX\ that it's fine to
+% break a paragraph across pages with a single line on one of the pages.  You
+% might avoid lines not appearing on your desired page in this way.
+%
 %
 %
 % \section{List environments}
@@ -699,8 +705,8 @@
 %
 % \changed[add-title-above-inner-below-space]{v1.1}{2021/10/23}{Added macros
 % \phfverb\phfeaTitleAboveVSpace, \phfverb\phfeaTitleInnerVSpace, and
-% \phfverb\phfeaTitleBelowVSpace to control spacing above, within, and below the
-% title}
+% \phfverb\phfeaTitleBelowVSpace\space to control spacing above, within, and
+% below the title}
 %
 %
 %
