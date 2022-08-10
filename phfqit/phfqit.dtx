@@ -596,6 +596,61 @@
 % \meta{size-spec}\hspace{0pt}|(|\meta{argument}|)|.
 %
 %
+% \subsection{Mutual Information}
+% \label{sec:mutual-information}
+%
+% These mutual entropy measures all share the same syntax.  This syntax is only
+% described for the mutual information |\II|, but the other mutual information
+% measures enjoy the same features.
+%
+% These commands are robust, meaning they can be used for example in figure
+% captions and section headings.
+%
+% \DescribeMacro{\II} Mutual information (also conditional).  The general syntax
+% is |\II|\hspace{0pt}\meta{size-spec}\relax
+% \hspace{0pt}\oarg{state}\hspace{0pt}\oarg{epsilon}\hspace{0pt}\relax
+% \marg{first system}\hspace{0pt}\marg{second system}\relax
+% \hspace{0pt}\oarg{conditioning system}.  For example:
+% \begin{center}
+%   \begin{tabular}{lc}
+%       |\II{A}{C}|   & $\II{A}{C}$ \\
+%       |\II[\rho]{A}{C}|   & $\II[\rho]{A}{C}$ \\
+%       |\II[\rho][\epsilon]{A}{C}[B]|   & $\II[\rho][\epsilon]{A}{C}[B]$ \\
+%   \end{tabular}
+% \end{center}
+%
+% The command |\II| is defined only if the package option
+% \pkgoptionfmt{qitobjdef=stdset} is set (which is the default).
+%
+% \DescribeMacro{\ISym} You may redefine this macro if you want to change the
+% ``$I$'' symbol of all mutual information measures.
+%
+% \paragraph{Appearance and alternative notation.}
+% You may change the notation of any of the above mutual information measures
+% (or define new measures) by redefining the corresponding commands as follows:
+% \begin{verbatim}
+% \renewcommand{\II}{\Ibase{\hat{\ISym}}{*}}
+% \end{verbatim}
+%
+% \paragraph{Base mutual information macro.}
+% \DescribeMacro{\Ibase} Base macro entropy for an entropy measure.  The general
+% syntax is:
+% |\Ibase|\hspace{0pt}\marg{I-symbol}\hspace{0pt}\marg{subscript}\relax
+% \hspace{0pt}\oarg{state}\hspace{0pt}\oarg{epsilon}\hspace{0pt}\relax
+% \marg{first system}\hspace{0pt}\marg{second system}\hspace{0pt}\oarg{conditioning system}
+%
+% Using this macro it is easy to define custom special-purpose entropy measures,
+% for instance:
+% \begin{verbatim}
+% \newcommand\Ixyz{\Ibase{\tilde\ISym}{\mathrm{xyz}}}
+% \end{verbatim}
+% \begingroup\newcommand\Ixyz{\Ibase{\tilde\ISym}{\mathrm{xyz}}}
+% The above code defines the command |\Ixyz[\rho][\epsilon]{A}{C}[B]| $\to$
+% \fbox{$\Ixyz[\rho][\epsilon]{A}{C}[B]$}. \endgroup
+%
+% See also the implementation documentation below for more specific information
+% on how to customize parts of the rendering, for instance.
+% 
 % \subsection{Relative Entropy}
 % \label{sec:relative-entropies}
 %
@@ -1908,6 +1963,194 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \subsubsection{Qit Object Implementation: Mutual Information}
+%
+% Same, but for the mutual information.
+%
+% \begin{macro}{\IbaseParse}
+%   Base parser macro for mutual information measures; possibly conditional
+%   and/or smooth.
+%
+%   USAGE:
+%   |\Ibase|\marg{H-symbol}\hspace{0pt}\relax
+%   \marg{subscript}\hspace{0pt}\relax
+%   \meta{size-spec}\hspace{0pt}\oarg{state}\relax
+%   \hspace{0pt}\oarg{epsilon}\hspace{0pt}\marg{A-system}\hspace{0pt}\relax
+%   \marg{B-system}\hspace{0pt}\oarg{conditioning system}
+%
+%   The argument \meta{size-spec} is optional, and is documented in
+%   \autoref{topic:size-specification-backtick}.  For example \meta{size-spec} =
+%   |`*| or |`\Big|.
+%
+%   Example:
+%   \par |\Ibase{\hat{I}}{\mathrm{max}}[\rho][\epsilon]{A}{C}[B]|
+%   \quad$\to$\quad
+%   \fbox{$\Ibase{\hat{I}}{\mathrm{max}}[\rho][\epsilon]{A}{C}[B]$}
+% 
+%   The |\IbaseParse| macro is responsible for parsing the arguments to
+%   |\Ibase|.  We should parse the arguments using helper macros as needed,
+%   adding rendering arguments with |\qitobjAddArg| or |\qitobjAddArgx|, and
+%   then calling |\qitobjParseDone|.  The arguments are then automatically
+%   provided as arguments to the |\IbaseRender| function.  We just have to make
+%   sure we add the correct number of arguments in the correct order.
+%   
+%    \begin{macrocode}
+\def\IbaseParse#1#2{%
+%    \end{macrocode}
+%
+% The first arguments are the mandatory arguments
+% \marg{H-symbol}\hspace{0pt}\marg{subscript}.  Then defer to helper macros for
+% the rest of the parsing.
+%    \begin{macrocode}
+  \qitobjAddArg{#1}%
+  \qitobjAddArg{#2}%
+  \phfqit@parsesizearg\IbaseParse@%
+}
+%    \end{macrocode}
+% 
+% Store the delimiter size argument which |\phfqit@parsesizearg| has stored into
+% |\phfqit@val@sizearg|, then parse an optional \oarg{state} argument.
+%    \begin{macrocode}
+\newcommand\IbaseParse@[1][]{%
+  \qitobjAddArgx{\phfqit@val@sizearg}%
+  \qitobjAddArg{#1}%
+  \IbaseParse@@%
+}
+%    \end{macrocode}
+% Then parse an optional \oarg{epsilon} argument, as well as two mandatory
+% \marg{A/B-system} arguments.
+%    \begin{macrocode}
+\newcommand\IbaseParse@@[3][]{%
+  \qitobjAddArg{#1}%
+  \qitobjAddArg{#2}%
+  \qitobjAddArg{#3}%
+  \IbaseParse@@@%
+}
+%    \end{macrocode}
+% Finally, parse an optional \oarg{conditioning system}.
+%    \begin{macrocode}
+\newcommand\IbaseParse@@@[1][]{%
+  \qitobjAddArg{#1}%
+  \qitobjParseDone%
+}
+%    \end{macrocode}
+% \end{macro}
+% 
+%
+% \begin{macro}{\IbaseRender}
+%   Render the entropy measure.
+%   \par |#1| = ``$H$'' symbol to use (e.g. |H|)
+%   \par |#2| = subscript (type of entropy, e.g. |\marthrm{min},0|)
+%   \par |#3| = possible size argument to expand in front of parens command (one
+%   of \emph{(empty)}, |*|, or |[\big]| using a standard sizing command)
+%   \par |#4| = the state (e.g. |\rho|), may be left empty
+%   \par |#5| = epsilon argument (superscript to entropy measure), if any, or
+%   leave argument empty
+%   \par |#6| = system A of mutual information
+%   \par |#7| = system B of mutual information
+%   \par |#8| = conditioning system, if any, or else leave the argument empty
+%    \begin{macrocode}
+\def\IbaseRender#1#2#3#4#5#6#7#8{%
+%%\message{DEBUG: IbaseRender\detokenize{{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}}}%
+%    \end{macrocode}
+%
+%   Start with the mutual info symbol (`I'), the subscript, and the superscript:
+%    \begin{macrocode}
+  \IbaseRenderSym{#1}_{\IbaseRenderSub{#2}}^{\IbaseRenderSup{#5}}
+%    \end{macrocode}
+% Render the contents of the entropy (parenthetic expression with system \&
+% conditioning system), only if the system or conditioning system or state are
+% not empty:
+%    \begin{macrocode}
+  \notblank{#4#6#7#8}{%
+    \IbaseRenderContents{#3}{#6}{#7}{#8}%
+%    \end{macrocode}
+% Finally, add the state as subscript, if any:
+%    \begin{macrocode}
+    \IbaseRenderTail{#4}%
+  }{}%
+%    \end{macrocode}
+% We're done.
+%    \begin{macrocode}
+  \qitobjDone%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \needspace{5\baselineskip}
+% \begin{macro}{\IbaseRenderSym}
+% \begin{macro}{\IbaseRenderSub}
+% \begin{macro}{\IbaseRenderSup}
+% \begin{macro}{\IbaseRenderTail}
+% \begin{macro}{\IbaseRenderSep}
+%   Macros to render different parts of the entropy measure.  By default, don't
+%   do anything special to them (but this might be locally overridden in a tuned
+%   Qit Object, for instance).
+%    \begin{macrocode}
+\def\IbaseRenderSym#1{#1}%
+\def\IbaseRenderSub#1{#1}%
+\def\IbaseRenderSup#1{#1}%
+\def\IbaseRenderTail#1{_{#1}}%
+\def\IbaseRenderSep{\,:\,}%
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% \end{macro}
+% 
+% \begin{macro}{\IbaseRenderContents}
+% For the main contents rendering macro, we need to do a little more work.
+% First, declare a token register in which we will prepare the contents of the
+% parenthetic expression.
+%    \begin{macrocode}
+\newtoks\Ibase@tmp@toks
+\def\Ibase@addtoks#1\@Ibase@END@ADD@TOKS{%
+  \Ibase@tmp@toks=\expandafter{\the\Ibase@tmp@toks#1}}%
+%    \end{macrocode}
+% Now we need to define the macro which formats the contents of the entropy.
+% The arguments are |#1| = possible sizing argument, |#2| = first system name,
+% |#3| = second system name, |#4| = conditioning system, if any.
+%    \begin{macrocode}
+\def\IbaseRenderContents#1#2#3#4{%
+%    \end{macrocode}
+% We need to construct the parenthetic argument to the entropy, which we will
+% store in the token register |\Ibase@tmp@toks|.  Start with systems name:
+%    \begin{macrocode}
+    \Ibase@tmp@toks={#2\IbaseRenderSep #3}%
+%    \end{macrocode}
+% \ldots{} add conditional system, if specified:
+%    \begin{macrocode}
+    \notblank{#4}{%
+      \Ibase@addtoks\mathclose{}\,\delimsize\vert\,\mathopen{}%
+          #4%
+          \@Ibase@END@ADD@TOKS%
+    }{}%
+%    \end{macrocode}
+% The tokens are ready now. Prepare the argument to the command
+% |\IbaseRenderContentsInnerParens| (normally just |\phfqitParens|), and go:
+%    \begin{macrocode}
+    \edef\tmp@args{\unexpanded{#1}{\the\Ibase@tmp@toks}}%
+    \expandafter\IbaseRenderContentsInnerParens\tmp@args%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\X}
+%   Macro which expands to the parenthetic expression type macro we would like
+%   to use. By default, this is |\phfqitParens|.
+%    \begin{macrocode}
+\def\IbaseRenderContentsInnerParens{\phfqitParens}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\Ibase}
+%   Finally, we declare our base entropic quantity type:
+%    \begin{macrocode}
+\DefineQitObject{Ibase}{\IbaseParse}{\IbaseRender}
+%    \end{macrocode}
+% \end{macro}
 %
 % \subsubsection{Qit Object Implementation: Entropy Function}
 %
@@ -2288,6 +2531,13 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\ISym}
+%   Symbol to use to denote a mutual information.
+%    \begin{macrocode}
+\def\ISym{I}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\DSym}
 %   Symbol to use to denote a relative entropy measure.
 %    \begin{macrocode}
@@ -2455,6 +2705,16 @@
 % \end{macro}
 % \end{macro}
 % \end{macro}
+% \end{macro}
+%
+% 
+% \needspace{4\baselineskip}
+% \begin{macro}{\II}
+%   The definition of individual mutual information measures just delegate to
+%   |\Ibase| with the relevant subscript.
+%    \begin{macrocode}
+\def\II{\Ibase{\ISym}{}}
+%    \end{macrocode}
 % \end{macro}
 %
 % 
