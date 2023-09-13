@@ -3982,17 +3982,19 @@
 }
 \def\phf@xpkgdoc@marginmacronamecompressfactor{0.85}
 \def\phf@xpkgdoc@macrofont{\small\bfseries}% \footnotesize ?
+\AtBeginDocument{%
 \def\PrintMarginLabelContents#1{%
   \strut\MacroFont\phf@xpkgdoc@macrofont
   \ScaleHorizontallyAndHyphenateAnywhere{%
     \phf@xpkgdoc@marginmacronamecompressfactor}{#1}%
   \par
-}
-\def\PrintMarginLabel#1{\marginpar{\PrintMarginLabelContents{#1}}}
-\def\PrintDescribeMacro#1{\PrintMarginLabelContents{\string#1}}
+}%
+\def\PrintMarginLabel#1{\marginpar{\PrintMarginLabelContents{#1}}}%
+\def\PrintDescribeMacro#1{\PrintMarginLabelContents{\string#1}}%
 \let\PrintMacroName\PrintDescribeMacro
 \let\PrintDescribeEnv\PrintMarginLabelContents
 \let\PrintEnvName\PrintMarginLabelContents
+}%
 %    \end{macrocode}
 % 
 % \textbf{Hyperref:} Request default \pkgname{hyperref} definitions with
